@@ -1,0 +1,203 @@
+<!--
+Copyright 2013 Monocrea Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>入力ページ</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <script>
+            function nameFocusout(name) {
+                if (name.value.match(/[!"#$%&'"]/)) {
+                    alert("名前に使用できない文字が含まれています。");
+                    name.focus();
+                }
+            }
+            var ADDRESS = {
+                P01: ["札幌", "函館", "富良野"],
+                P02: ["青森", "弘前", "八戸"],
+                P03: ["秋田", "北秋田", "大仙"]
+            };
+            function prefectureChange(prefecture) {
+                var city = document.getElementById("city");
+                city.innerHTML = "";
+
+                var selectedPrefecture =
+                        prefecture.options[prefecture.selectedIndex].value;
+
+                var cities = ADDRESS[selectedPrefecture];
+                if (cities) {
+                    for (var i = 0; i < cities.length; i++) {
+                        city.innerHTML += "<option>" + cities[i] + "</option>";
+                    }
+                }
+            }
+            function inputConfirm() {
+                if (!window.confirm('よろしいですか？')) {
+                    return false;
+                }
+            }
+        </script>
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <body>
+        <div id="container">
+            <div id="content">
+                <h1>入力ページ</h1>
+                <p>
+                    このページではフォームの入力操作を確認します。
+                    「利用規約」リンクをクリックすると利用規約ページが別ウィンドウで開きます。
+                    「同意して確定」ボタンをクリックすると確認ダイアログが表示されます。
+                    ダイアログを承諾すると完了ページに遷移します。拒否するとこのページに留まります。
+                </p>
+                <form action="done.html" method="get">
+                    <table class="input-form">
+                        <col style="width:15%;"/>
+                        <col style="width:30%;"/>
+                        <col style="width:55%;"/>
+                        <thead>
+                            <tr>
+                                <th>項目名</th>
+                                <th>項目</th>
+                                <th>サポートされる入力操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>名前</th>
+                                <td><input id="name" name="名前" type="text" onblur="nameFocusout(this);"/></td>
+                                <td>
+                                    <ul>
+                                        <li>テキストボックスの入力
+                                            <ul>
+                                                <li>上書</li>
+                                                <li>追記</li>
+                                            </ul>
+                                        </li>
+                                        <li>Javascriptのアラートを承諾<br/>
+                                            (左の名前入力欄は「!"#$%&amp;'」のいずれかが含まれた状態でフォーカスアウトするとアラートを表示します。)</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>性別</th>
+                                <td>
+                                    <input id="gender-male" type="radio" name="性別" value="m"/>
+                                    <label for="gender-male">男性</label>
+                                    <input id="gender-female"  type="radio" name="性別" value="f"/>
+                                    <label for="gender-female">女性</label>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li>ラジオボタンの選択
+                                            <ul>
+                                                <li>input要素のid属性を指定して選択</li>
+                                                <li>input要素のvalue属性を指定して選択</li>
+                                                <li>label要素のtext文字列を指定して選択</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>住所</th>
+                                <td>
+                                    都道府県：
+                                    <select id="prefecture" name="都道府県" onchange="prefectureChange(this);">
+                                        <option value="P00"></option>
+                                        <option value="P01">北海道</option>
+                                        <option value="P02">青森</option>
+                                        <option value="P03">秋田</option>
+                                    </select>
+                                    <br/>
+                                    市区町村：
+                                    <select id="city" name="市区町村">
+                                    </select>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li>
+                                            セレクトボックスの選択
+                                            <ul>
+                                                <li>option要素のvalue属性を指定して選択</li>
+                                                <li>option要素のtext文字列を指定して選択</li>
+                                                <li>option要素の順番を指定して選択</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            Javascriptの処理待ち<br/>
+                                            (左の市区町村の選択肢は都道府県の選択によって変わります。)
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>趣味</th>
+                                <td>
+                                    <input id="hobby-sports" name="趣味" type="checkbox" value="sports" />
+                                    <label for="hobby-sports">運動</label>
+                                    <input id="hobby-art" name="趣味" type="checkbox" value="art"/>
+                                    <label for="hobby-art">芸術</label>
+                                    <input id="hobby-work" name="趣味" type="checkbox" value="work"/>
+                                    <label for="hobby-work">仕事</label>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li>チェックボックスのチェック
+                                            <ul>
+                                                <li>input要素のid属性を指定して選択</li>
+                                                <li>input要素のvalue属性を指定して選択</li>
+                                                <li>label要素のtext文字列を指定して選択</li>
+                                            </ul>
+                                        </li>
+
+                                    </ul>
+                                    </td>
+                            </tr>
+                            <tr>
+                                <th>備考</th>
+                                <td>
+                                    <textarea id="remark" name="備考" rows="4" cols="30"></textarea>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li>テキストエリアの入力
+                                            <ul>
+                                                <li>上書</li>
+                                                <li>追記</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3">
+                                    <a href="javascript:void(0);" onclick="window.open('terms.html', 'terms');">利用規約</a>
+                                    <input id="confirm" type="submit" value="同意して確定" onclick="return inputConfirm();"/>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </form>
+            </div>
+            <div id="footer">
+                Copyright 2013 Monocrea Inc.
+            </div>
+        </div>
+    </body>
+</html>

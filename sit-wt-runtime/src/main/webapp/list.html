@@ -1,0 +1,64 @@
+<!--
+Copyright 2013 Monocrea Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script>
+            function select(no) {
+                alert(no + "を選択しました");
+            }
+        </script>
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <body>
+        <div id="container">
+            <div id="content">
+                <h1>完了ページ</h1>
+                <p>
+                    このページでは表示されている内容に対する検証操作を確認します。
+                </p>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>名前</th>
+                            <th>選択</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>試験壱</td>
+                            <td><button onclick="select(1)">選択</button></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>試験弐</td>
+                            <td><button onclick="select(2)">選択</button></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>試験参</td>
+                            <td><button onclick="select(3)">選択</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

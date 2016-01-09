@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.sitoolkit.wt</groupId>
+  <artifactId>sit-wt-maven-plugin-it</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.sitoolkit.wt</groupId>
+      <artifactId>sit-wt-runtime</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <name>sit-wt-maven-plugin Maven Plugin</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sitoolkit.wt</groupId>
+        <artifactId>sit-wt-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <baseUrl>http://localhost:8280/</baseUrl>
+        </configuration>
+        <executions>
+          <execution>
+            <id>script2java</id>
+            <goals>
+              <goal>script2java</goal>
+            </goals>
+            <phase>generate-test-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- <plugin> -->
+      <!-- <groupId>org.codehaus.mojo</groupId> -->
+      <!-- <artifactId>build-helper-maven-plugin</artifactId> -->
+      <!-- <version>1.9.1</version> -->
+      <!-- <executions> -->
+      <!-- <execution> -->
+      <!-- <id>add-source</id> -->
+      <!-- <phase>generate-test-sources</phase> -->
+      <!-- <goals> -->
+      <!-- <goal>add-test-source</goal> -->
+      <!-- </goals> -->
+      <!-- <configuration> -->
+      <!-- <sources> -->
+      <!-- <source>${project.build.directory}/generated-test-sources/test/</source> -->
+      <!-- </sources> -->
+      <!-- </configuration> -->
+      <!-- </execution> -->
+      <!-- </executions> -->
+      <!-- </plugin> -->
+    </plugins>
+  </build>
+</project>

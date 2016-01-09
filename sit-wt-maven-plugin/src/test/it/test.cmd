@@ -1,0 +1,1 @@
+mvn -X -o sit-wt:test

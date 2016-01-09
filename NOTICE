@@ -1,0 +1,29 @@
+SIToolkit Core
+Copyright 2013 Monocrea Inc.
+
+This product contains library developed by The Apache Software Foundation
+under the Apache License 2.0.
+ http://www.apache.org/
+
+This product contains the JUnit library
+under the  Common Public License Version 1.0.
+ http://junit.org/
+
+This product contains the Logback library
+under the Eclipse Public License v1.0.
+Copyright (C) 1999-2012, QOS.ch. All rights reserved.
+ http://logback.qos.ch/
+
+This product contains the Selenium library
+under the Apache License 2.0.
+Copyright 2007-2009 Selenium committers All rights reserved.
+ http://docs.seleniumhq.org/
+
+This product contains the SLF4J library
+under the MIT license.
+Copyright (c) 2004-2013 QOS.ch All rights reserved.
+ http://www.slf4j.org/
+
+This product contains the Spring Framework library
+under the Apache License 2.0.
+ http://projects.spring.io/spring-framework/

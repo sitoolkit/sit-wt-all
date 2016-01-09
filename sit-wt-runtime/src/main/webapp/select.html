@@ -1,0 +1,61 @@
+<!--
+Copyright 2013 Monocrea Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<title>選択ページ</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="content">
+      <h1>選択ページ</h1>
+      <table class="input-form">
+        <col style="width: 250px;" />
+        <col style="width: 250px;" />
+        <thead>
+          <tr>
+            <th>項目名</th>
+            <th>項目</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>単一選択セレクトボックス</td>
+            <td><select id="single-select">
+                <option value="00"></option>
+                <option value="01">一</option>
+                <option value="02">二</option>
+                <option value="03">三</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>複数選択セレクトボックス</td>
+            <td><select id="multi-select" multiple="multiple">
+                <option value="00"></option>
+                <option value="01">一</option>
+                <option value="02">二</option>
+                <option value="03">三</option>
+            </select></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="footer">Copyright 2013 Monocrea Inc.</div>
+  </div>
+</body>
+</html>

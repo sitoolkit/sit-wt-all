@@ -1,0 +1,35 @@
+#if ($test.pkg)
+package ${test.pkg};
+
+#end
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+
+/**
+ *
+ */
+@TestExecutionListeners(listeners = {
+    DependencyInjectionTestExecutionListener.class,
+    ${test.fileBase}.class })
+public class ${test.fileBase} extends SitTesterTestBase {
+
+#foreach ($caseNo in $test.caseNos)
+    @Test
+    public void test$caseNo() {
+        test();
+    }
+#end
+
+    @Override
+    protected String getTestScriptPath() {
+        return "$test.scriptPath";
+    }
+
+    @Override
+    protected String getSheetName() {
+        return "$test.sheetName";
+    }
+}

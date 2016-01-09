@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="sitoolkit" basedir="." default="install">
+
+  <property environment="env" />
+  <property name="workdir" value="${basedir}/../target/work" />
+  <property name="resdir" value="${basedir}/archetype/src" />
+
+  <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="${mvn.home}/bin/mvn">
+    <os family="windows"/>
+  </condition>
+
+
+  <target name="show">
+    <echoproperties/>
+  </target>
+
+  <target name="install"
+          depends="01_copy-archetype-work,02_create-from-archetype,03_copy-archetype-resource,04_install-archetype">
+  </target>
+
+
+  <target name="deploy"
+          depends="01_copy-archetype-work,02_create-from-archetype,03_copy-archetype-resource,05_deploy-archetype">
+  </target>
+
+
+  <target name="01_copy-archetype-work">
+
+    <delete dir="${workdir}" />
+
+    <copy todir="${workdir}">
+      <fileset dir="${basedir}/../">
+        <exclude name=".git" />
+        <exclude name=".gitignore" />
+        <exclude name="distribution/**/*" />
+        <exclude name="distribution" />
+        <exclude name="target/**/*" />
+        <exclude name="target" />
+      </fileset>
+    </copy>
+
+  </target>
+
+
+
+  <target name="02_create-from-archetype">
+
+    <exec executable="${mvn.cmd}" dir="${workdir}" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-Darchetype.filteredExtentions=java,xml,txt,groovy,cs,mdo,aj,jsp,gsp,vm,html,xhtml,properties,.classpath,.project,launch,component" />
+      <arg value="archetype:create-from-project" />
+    </exec>
+
+  </target>
+
+
+
+  <target name="03_copy-archetype-resource">
+<!--
+    <delete dir="${resdir}" />
+-->
+    <property name="arcres" value="${workdir}/target/generated-sources/archetype/src" />
+
+    <copy todir="${resdir}">
+      <fileset dir="${arcres}">
+        <exclude name="generated-sources/archetype/target" />
+      </fileset>
+    </copy>
+
+    <property name="settings" value="${resdir}/main/resources/archetype-resources/.settings" />
+
+    <move todir="${settings}" includeemptydirs="false">
+      <fileset dir="${settings}" includes="*.launch" />
+      <globmapper from="${ant.project.name}*.launch" to="__artifactId__*.launch" />
+    </move>
+
+  </target>
+
+
+
+  <target name="04_install-archetype">
+
+    <exec executable="${mvn.cmd}" dir="${basedir}/archetype" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="clean" />
+      <arg value="install" />
+    </exec>
+
+  </target>
+
+  <target name="05_deploy-archetype">
+
+    <exec executable="${mvn.cmd}" dir="${basedir}/archetype">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-P"/>
+      <arg value="release"/>
+      <arg value="-Dmaven.test.skip=true"/>
+      <arg value="clean" />
+      <arg value="deploy" />
+    </exec>
+
+  </target>
+
+</project>

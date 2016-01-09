@@ -1,0 +1,5 @@
+/target/
+/src/test/resources/testscript/SeleniumIDETestScript.xlsx
+/testscript/入力TestScript*.xlsx
+~$*
+.DS_Store

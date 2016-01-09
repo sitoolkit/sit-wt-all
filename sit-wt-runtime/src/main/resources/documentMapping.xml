@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2013 Monocrea Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+
+<mapping
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns='http://www.sitoolkit.org/schema/tabledata-mapping'
+    xsi:schemaLocation='http://www.sitoolkit.org/schema/tabledata-mapping https://raw.githubusercontent.com/sitoolkit/sit-util-td/master/src/main/xsd/tabledata-mapping-1.0.xsd'>
+
+    <table beanId="testStep" name="テストステップ">
+        <column property="no" name="No."/>
+        <column property="itemName" name="項目名"/>
+        <column property="operation" name="操作"/>
+        <column property="locator.type" name="ロケーター形式"/>
+        <column property="locator.value" name="ロケーター"/>
+        <column property="dataType" name="データ形式"/>
+        <column property="screenshotTiming" name="スクリーンショット"/>
+        <column property="testData" name="テストデータ" pattern="ケース_([0-9]*)$"/>
+        <column property="breakPoint" name="ブレークポイント"/>
+    </table>
+
+    <table beanId="pageItemSpec" name="画面定義書ファイル">
+        <column property="name" name="項目"/>
+        <column property="control" name="コントロール"/>
+        <column property="pname" name="項目物理名"/>
+    </table>
+
+</mapping>

@@ -1,0 +1,76 @@
+package org.sitoolkit.wt.infra;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+
+@Configuration
+@PropertySource(ignoreResourceNotFound = true, value = { "classpath:sit-wt-default.properties",
+        "classpath:sit-wt.properties" })
+public abstract class PropertyManager {
+
+    @Value("${window.width}")
+    private int windowWidth;
+
+    @Value("${window.height}")
+    private int windowHeight;
+
+    @Value("${implicitly.wait}")
+    private int implicitlyWait;
+
+    @Value("${window.resize}")
+    private boolean resizeWindow;
+
+    @Value("${pageobj.dir}")
+    private String pageObjectDir;
+
+    @Value("${driverType}")
+    private String driverType;
+
+    @Value("${appiumAddress}")
+    private String appiumAddress;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
+        pspc.setIgnoreUnresolvablePlaceholders(true);
+        return pspc;
+    }
+
+    public int getWindowWidth() {
+        return windowWidth;
+    }
+
+    public int getWindowHeight() {
+        return windowHeight;
+    }
+
+    public int getImplicitlyWait() {
+        return implicitlyWait;
+    }
+
+    public boolean isResizeWindow() {
+        return resizeWindow;
+    }
+
+    public String getPageObjectDir() {
+        return pageObjectDir;
+    }
+
+    public String getDriverType() {
+        return driverType;
+    }
+
+    public URL getAppiumAddress() {
+        try {
+            return new URL(appiumAddress);
+        } catch (MalformedURLException e) {
+            throw new ConfigurationException(e);
+        }
+    }
+}

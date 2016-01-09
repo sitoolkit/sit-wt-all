@@ -1,0 +1,35 @@
+h1 {
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    letter-spacing: 0.3rem;
+}
+table {
+	border-collapse: collapse;
+}
+table tr th, table tr td {
+	border-bottom: solid 1px gray;
+	padding: 0.7rem;
+	vertical-align: top;
+}
+table > thead > tr > th {
+	border-bottom: double 3px gray;
+	letter-spacing: 0.5rem;
+}
+
+table tr td img {
+	box-shadow: 3px 3px 10px #777777;
+	display: block;
+	margin-top: 5px;
+}
+div.box {
+	position:absolute;
+	border: dotted 2px red;
+	text-align:right;
+	color : red;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+div.box-hidden {
+	border: none;
+}

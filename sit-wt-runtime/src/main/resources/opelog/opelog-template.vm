@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>操作ログ $testScriptName ケース_$caseNo $result</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="style.css"/>
+		<script src="jquery.js"></script>
+		<script src="numbering.js"></script>
+	</head>
+	<body>
+		<h1>操作ログ $testScriptName ケース_$caseNo $result</h1>
+		<table>
+			<thead>
+				<tr>
+					<th>No</th>
+					<th>タイムスタンプ</th>
+					<th>操作ログ</th>
+				</tr>
+			</thead>
+			<tbody>
+#foreach ($rec in $records)
+				<tr>
+					<th>$rec.no</th>
+					<td>$rec.timestamp</td>
+					<td #if ($rec.filePath)class="screenshot"#end>$rec.log
+#if ($rec.filePath)
+						<img src="$rec.filePath"/>
+#end
+#foreach ($pos in $rec.positions)
+						<input type="hidden" value='{"no":$pos.no,"x":$pos.x,"y":$pos.y,"w":$pos.w,"h":$pos.h}'/>
+#end
+					</td>
+				</tr>
+#end
+			</tbody>
+		</table>
+	</body>
+</html>
