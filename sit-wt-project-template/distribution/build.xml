@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="sitoolkit" basedir="." default="install">
+<project name="sit-wt-project-template" basedir="." default="install">
 
   <property environment="env" />
   <property name="workdir" value="${basedir}/../target/work" />
@@ -10,17 +10,23 @@
   </condition>
 
 
-  <target name="show">
-    <echoproperties/>
+
+  <target name="install">
+    <property name="mvn.phase" value="install"/>
+    <antcall target="all"/>
   </target>
 
-  <target name="install"
-          depends="01_copy-archetype-work,02_create-from-archetype,03_copy-archetype-resource,04_install-archetype">
+  <target name="deploy">
+    <property name="mvn.phase" value="deploy"/>
+    <antcall target="all"/>
   </target>
 
 
-  <target name="deploy"
-          depends="01_copy-archetype-work,02_create-from-archetype,03_copy-archetype-resource,05_deploy-archetype">
+  <target name="all">
+    <antcall target="01_copy-archetype-work"/>
+    <antcall target="02_create-from-archetype"/>
+    <antcall target="03_copy-archetype-resource"/>
+    <antcall target="04_process-archetype"/>
   </target>
 
 
@@ -56,9 +62,9 @@
 
 
   <target name="03_copy-archetype-resource">
-<!--
+
     <delete dir="${resdir}" />
--->
+
     <property name="arcres" value="${workdir}/target/generated-sources/archetype/src" />
 
     <copy todir="${resdir}">
@@ -77,26 +83,14 @@
   </target>
 
 
-
-  <target name="04_install-archetype">
-
-    <exec executable="${mvn.cmd}" dir="${basedir}/archetype" failonerror="true">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="clean" />
-      <arg value="install" />
-    </exec>
-
-  </target>
-
-  <target name="05_deploy-archetype">
+  <target name="04_process-archetype">
 
     <exec executable="${mvn.cmd}" dir="${basedir}/archetype">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-P"/>
-      <arg value="release"/>
+      <arg value="-P relase"/>
       <arg value="-Dmaven.test.skip=true"/>
       <arg value="clean" />
-      <arg value="deploy" />
+      <arg value="${mvn.phase}" />
     </exec>
 
   </target>
