@@ -78,8 +78,6 @@ public class PageSpec2Script implements ApplicationContextAware {
 
     private String testScriptDir = "pageobj";
 
-    private String templatePath = "src/main/resources/TestScriptTemplate.xlsx";
-
     private String caseNo = "001";
 
     private String sheetName = "項目定義";
@@ -241,14 +239,6 @@ public class PageSpec2Script implements ApplicationContextAware {
 
     public void setTestScriptDir(String testScriptDir) {
         this.testScriptDir = testScriptDir;
-    }
-
-    public String getTemplatePath() {
-        return templatePath;
-    }
-
-    public void setTemplatePath(String templatePath) {
-        this.templatePath = templatePath;
     }
 
     @Override

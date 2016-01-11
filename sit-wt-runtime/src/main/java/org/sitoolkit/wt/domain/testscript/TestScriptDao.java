@@ -30,7 +30,7 @@ public class TestScriptDao {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
-    private static final String TEMPLATE_PATH = "src/main/resources/TestScriptTemplate.xlsx";
+    private static final String TEMPLATE_PATH = "classpath:TestScriptTemplate.xlsx";
 
     @Resource
     ApplicationContext appCtx;
