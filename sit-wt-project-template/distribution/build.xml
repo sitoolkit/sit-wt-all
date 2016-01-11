@@ -5,10 +5,11 @@
   <property name="workdir" value="${basedir}/../target/work" />
   <property name="resdir" value="${basedir}/archetype/src" />
 
-  <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="${mvn.home}/bin/mvn">
-    <os family="windows"/>
+  
+  <!-- TODO else~を修正 -->
+  <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
+    <os family="windows" />
   </condition>
-
 
 
   <target name="install">

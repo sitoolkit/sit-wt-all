@@ -5,11 +5,10 @@
   <property name="testArtifactId" value="sit-wt-test" />
   <property name="testdir" value="${basedir}/target/${testArtifactId}" />
 
-
-  <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="${mvn.home}/bin/mvn">
+  <!-- TODO else~を修正 -->
+  <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
     <os family="windows" />
   </condition>
-
 
   <target name="install">
     <property name="mvn.phase" value="install" />
@@ -37,7 +36,7 @@
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
-      <arg value="release,${mvn.repo}" />
+      <arg value="${mvn.repo}" />
       <arg value="-pl" />
       <arg value="!sit-wt-project-template,!sit-wt-project-template/distribution/archetype" />
       <arg value="-Dmaven.test.skip=true" />
