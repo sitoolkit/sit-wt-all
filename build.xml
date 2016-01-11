@@ -31,7 +31,7 @@
     <antcall target="04_integration-test" />
   </target>
 
-  <target name="01_process-all">
+  <target name="01_process-all" depends="check-test.skip">
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
@@ -39,13 +39,21 @@
       <arg value="${mvn.repo}" />
       <arg value="-pl" />
       <arg value="!sit-wt-project-template,!sit-wt-project-template/distribution/archetype" />
-      <arg value="-Dmaven.test.skip=true" />
+      <arg value="-Dmaven.test.skip=${test.skip}" />
       <arg value="clean" />
       <arg value="${mvn.phase}" />
     </exec>
 
   </target>
 
+  
+  <target name="check-test.skip" unless="test.skip">
+    <input message="select maven.test.skip"
+           addproperty="mvn.repo"
+           validargs="true,false"
+           defaultvalue="true" />
+  </target>
+  
 
   <target name="02_process-archetype">
 
