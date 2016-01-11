@@ -4,6 +4,7 @@
   <property environment="env" />
   <property name="testArtifactId" value="sit-wt-test" />
   <property name="testdir" value="${basedir}/target/${testArtifactId}" />
+  <property name="file.encoding" value="UTF-8"/>
 
   <!-- TODO else~を修正 -->
   <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
@@ -40,6 +41,7 @@
       <arg value="-pl" />
       <arg value="!sit-wt-project-template,!sit-wt-project-template/distribution/archetype" />
       <arg value="-Dmaven.test.skip=${test.skip}" />
+      <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="clean" />
       <arg value="${mvn.phase}" />
     </exec>
@@ -100,6 +102,7 @@
       <arg value="-DbaseUrl=${basedir}/sit-wt-runtime/src/main/webapp" />
       <arg value="-P" />
       <arg value="${mvn.repo}" />
+      <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="clean" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:selenium2script" />
       <arg value="integration-test" />
