@@ -49,7 +49,9 @@
 
   <target name="02_process-archetype">
 
-    <ant antfile="${basedir}/sit-wt-project-template/distribution/build.xml" target="${mvn.phase}" inheritall="false" />
+    <ant antfile="${basedir}/sit-wt-project-template/distribution/build.xml"
+         target="${mvn.phase}"
+         inheritall="false" />
 
   </target>
 
@@ -74,44 +76,42 @@
 
   </target>
 
+
   <target name="04_integration-test" depends="check-mvn.repo">
 
-    <copy file="${basedir}/sit-wt-runtime/seleniumscript/SeleniumIDETestScript.html" todir="${testdir}/seleniumscript" />
-    <copy file="${basedir}/sit-wt-runtime/testscript/ExcelTestScript.xlsx" todir="${testdir}/testscript" />
-
-    <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="true">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-Ddaemon=true" />
-      <arg value="test-compile" />
-      <arg value="jetty:start" />
-    </exec>
+    <copy file="${basedir}/sit-wt-runtime/seleniumscript/SeleniumIDETestScript.html"
+          todir="${testdir}/seleniumscript" />
+    <replace file="${testdir}/seleniumscript/SeleniumIDETestScript.html"
+             token="http://localhost:8280/"
+             value="" />
+    <copy file="${basedir}/sit-wt-runtime/testscript/ExcelTestScript.xlsx"
+          todir="${testdir}/testscript" />
 
     <exec executable="${mvn.cmd}" dir="${testdir}" resultproperty="testresult">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-DbaseUrl=http://localhost:8280" />
+      <arg value="-DbaseUrl=${basedir}/sit-wt-runtime/src/main/webapp" />
       <arg value="-P" />
       <arg value="${mvn.repo}" />
+      <arg value="clean" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:selenium2script" />
       <arg value="integration-test" />
     </exec>
 
-    <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="false">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="jetty:stop" />
-    </exec>
+    <condition property="testfailed">
+      <not>
+        <equals arg1="${testresult}" arg2="0" />
+      </not>
+    </condition>
+    <fail if="testfailed" message="integration test faild." />
 
-    <fail message="integration test faild.">
-      <condition>
-        <not>
-          <equals arg1="#{testresult}" arg2="0" />
-        </not>
-      </condition>
-    </fail>
   </target>
 
 
   <target name="check-mvn.repo" unless="mvn.repo">
-    <input message="select mvn.repo" addproperty="mvn.repo" validargs="local.repositories,sonatype.repositores" defaultvalue="local.repositories"/>
+    <input message="select mvn.repo"
+           addproperty="mvn.repo"
+           validargs="local.repositories,sonatype.repositores"
+           defaultvalue="local.repositories" />
   </target>
 
 </project>
