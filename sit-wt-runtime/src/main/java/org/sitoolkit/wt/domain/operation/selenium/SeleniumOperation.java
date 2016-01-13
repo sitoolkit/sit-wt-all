@@ -20,6 +20,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -72,15 +73,31 @@ public abstract class SeleniumOperation implements Operation {
 
     protected WebElement findElement(Locator locator) {
         try {
-            return seleniumDriver.findElement(by(locator));
+            WebElement element = seleniumDriver.findElement(by(locator));
+
+            setElementVisible(element);
+            return element;
         } catch (NoSuchElementException e) {
             throw ElementNotFoundException.create(locator, e);
         }
     }
 
+    protected void setElementVisible(WebElement element) {
+        if (seleniumDriver instanceof JavascriptExecutor) {
+            ((JavascriptExecutor) seleniumDriver)
+                    .executeScript("return arguments[0].style.display;", element);
+        }
+    }
+
     protected List<WebElement> findElements(Locator locator) {
         try {
-            return seleniumDriver.findElements(by(locator));
+
+            List<WebElement> elements = seleniumDriver.findElements(by(locator));
+            for (WebElement element : elements) {
+                setElementVisible(element);
+            }
+
+            return elements;
         } catch (NoSuchElementException e) {
             throw ElementNotFoundException.create(locator, e);
         }
