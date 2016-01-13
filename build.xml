@@ -24,7 +24,7 @@
     <antcall target="all" />
   </target>
 
-
+  
   <target name="all">
     <antcall target="01_process-all" />
     <antcall target="02_process-archetype" />
@@ -47,14 +47,10 @@
     </exec>
 
   </target>
-
-  <target name="test">
-    <zip destfile="${basedir}/sit-wt-runtime/target/opelog.zip" basedir="${basedir}/sit-wt-runtime/target/opelog_*"/>
-  </target>
   
   <target name="check-test.skip" unless="test.skip">
     <input message="select maven.test.skip"
-           addproperty="mvn.repo"
+           addproperty="test.skip"
            validargs="true,false"
            defaultvalue="true" />
   </target>
