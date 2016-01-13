@@ -48,6 +48,9 @@
 
   </target>
 
+  <target name="test">
+    <zip destfile="${basedir}/sit-wt-runtime/target/opelog.zip" basedir="${basedir}/sit-wt-runtime/target/opelog_*"/>
+  </target>
   
   <target name="check-test.skip" unless="test.skip">
     <input message="select maven.test.skip"
@@ -91,23 +94,40 @@
 
     <copy file="${basedir}/sit-wt-runtime/seleniumscript/SeleniumIDETestScript.html"
           todir="${testdir}/seleniumscript" />
-    <replace file="${testdir}/seleniumscript/SeleniumIDETestScript.html"
-             token="http://localhost:8280/"
-             value="" />
     <copy file="${basedir}/sit-wt-runtime/testscript/ExcelTestScript.xlsx"
           todir="${testdir}/testscript" />
 
-    <exec executable="${mvn.cmd}" dir="${testdir}" resultproperty="testresult">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-DbaseUrl=${basedir}/sit-wt-runtime/src/main/webapp" />
-      <arg value="-P" />
-      <arg value="${mvn.repo}" />
-      <arg value="-Dfile.encoding=${file.encoding}" />
-      <arg value="clean" />
-      <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:selenium2script" />
-      <arg value="integration-test" />
-    </exec>
+    <parallel>
+      
+      <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="true">
+        <env key="JAVA_HOME" value="${java.home}" />
+        <arg value="test-compile" />
+        <arg value="jetty:run" />
+      </exec>
+      
+      <sequential>
+      
+        <exec executable="${mvn.cmd}" dir="${testdir}" resultproperty="testresult" >
+          <env key="JAVA_HOME" value="${java.home}" />
+          <arg value="-DbaseUrl=http://localhost:8280/" />
+          <arg value="-P" />
+          <arg value="${mvn.repo}" />
+          <arg value="-Dfile.encoding=${file.encoding}" />
+          <arg value="clean" />
+          <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:selenium2script" />
+          <arg value="integration-test" />
+        </exec>
+    
+        <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="false">
+          <env key="JAVA_HOME" value="${java.home}" />
+          <arg value="jetty:stop" />
+        </exec>
+      
+      </sequential>
 
+    </parallel>    
+
+    
     <condition property="testfailed">
       <not>
         <equals arg1="${testresult}" arg2="0" />
