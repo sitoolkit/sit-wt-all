@@ -35,6 +35,15 @@ public abstract class PropertyManager {
     @Value("${appiumAddress}")
     private String appiumAddress;
 
+    @Value("${screenshot.resize}")
+    private boolean screenshotResize;
+
+    @Value("${screenshot.padding.width}")
+    private int screenshotPaddingWidth;
+
+    @Value("${screenshot.padding.height}")
+    private int screenshotPaddingHeight;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -72,5 +81,17 @@ public abstract class PropertyManager {
         } catch (MalformedURLException e) {
             throw new ConfigurationException(e);
         }
+    }
+
+    public boolean isScreenshotResize() {
+        return screenshotResize;
+    }
+
+    public int getScreenshotPaddingWidth() {
+        return screenshotPaddingWidth;
+    }
+
+    public int getScreenshotPaddingHeight() {
+        return screenshotPaddingHeight;
     }
 }

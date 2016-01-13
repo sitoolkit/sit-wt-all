@@ -128,7 +128,6 @@ public class TestContext {
         testStep = testScript.getTestStep(0);
     }
 
-
     public TestScript getTestScript() {
         return testScript;
     }
@@ -199,6 +198,10 @@ public class TestContext {
 
     public String getItemName() {
         return testStep == null ? "noItemName" : testStep.getItemName();
+    }
+
+    public String getScreenshotTiming() {
+        return testStep == null ? "noScreenshotTiming" : testStep.getScreenshotTiming();
     }
 
     public int getCurrentIndex() {

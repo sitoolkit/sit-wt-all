@@ -22,13 +22,15 @@
 				<tr>
 					<th>$rec.no</th>
 					<td>$rec.timestamp</td>
-					<td #if ($rec.filePath)class="screenshot"#end>$rec.log
-#if ($rec.filePath)
-						<img src="$rec.filePath"/>
-#end
-#foreach ($pos in $rec.positions)
+#if ($rec.screenshot)
+                    <td class="screenshot">$rec.screenshot.fileName
+						<img src="$rec.screenshot.filePath"/>
+#foreach ($pos in $rec.screenshot.positions)
 						<input type="hidden" value='{"no":$pos.no,"x":$pos.x,"y":$pos.y,"w":$pos.w,"h":$pos.h}'/>
-#end
+#end ## foreach
+#else
+                    <td>$rec.log
+#end ## if
 					</td>
 				</tr>
 #end

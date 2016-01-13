@@ -5,6 +5,7 @@ import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.EvidenceManager;
 import org.sitoolkit.wt.domain.evidence.OperationLog;
+import org.sitoolkit.wt.domain.evidence.Screenshot;
 import org.sitoolkit.wt.domain.evidence.selenium.ElementPositionSupport2;
 import org.sitoolkit.wt.domain.evidence.selenium.SeleniumDialogScreenshotSupport;
 import org.sitoolkit.wt.domain.operation.ScreenshotOperation;
@@ -15,6 +16,7 @@ import org.sitoolkit.wt.domain.tester.selenium.SeleniumTester;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.PropertyManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -85,5 +87,17 @@ public class RuntimeConfig {
     @Scope("prototype")
     public Locator locator() {
         return new Locator();
+    }
+
+    @Bean
+    @Scope("prototype")
+    public Screenshot getScreenshot(PropertyManager pm) {
+        Screenshot screenshot = new Screenshot();
+
+        screenshot.setResize(pm.isScreenshotResize());
+        screenshot.setScreenshotPaddingWidth(pm.getScreenshotPaddingWidth());
+        screenshot.setScreenshotPaddingHeight(pm.getScreenshotPaddingHeight());
+
+        return screenshot;
     }
 }

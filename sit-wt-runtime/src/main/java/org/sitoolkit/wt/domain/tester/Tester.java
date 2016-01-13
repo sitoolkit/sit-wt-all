@@ -73,7 +73,8 @@ public class Tester {
     /**
      * テストスクリプトファイルを読み込み内部に保持します。
      *
-     * @param testScriptPath テストスクリプトのパス
+     * @param testScriptPath
+     *            テストスクリプトのパス
      */
     public void setUpClass(String testScriptPath, String sheetName) {
         if (!isScriptLoaded()) {
@@ -105,13 +106,14 @@ public class Tester {
     /**
      * ケース番号のテストスクリプトに従い、テストを実施します。
      *
-     * @param caseNo ケース番号
+     * @param caseNo
+     *            ケース番号
      * @return Verify操作がNGとなった数
      */
     public TestResult operate(String caseNo) {
         if (!testScript.containsCaseNo(caseNo)) {
-            String msg = "指定されたケース番号[" + caseNo
-                    + "]は不正です。指定可能なケース番号：" + testScript.getCaseNoMap().keySet();
+            String msg = "指定されたケース番号[" + caseNo + "]は不正です。指定可能なケース番号："
+                    + testScript.getCaseNoMap().keySet();
             throw new TestException(msg);
         }
         current.reset();
@@ -158,13 +160,13 @@ public class Tester {
         return result;
     }
 
-
     /**
-     * 1件のテストステップを実施します。
-     * テストステップに指示がある場合、 実施前または後でスクリーンショットを取得します。
+     * 1件のテストステップを実施します。 テストステップに指示がある場合、 実施前または後でスクリーンショットを取得します。
      *
-     * @param testStep テストステップ
-     * @param caseNo ケース番号
+     * @param testStep
+     *            テストステップ
+     * @param caseNo
+     *            ケース番号
      * @see TestStep#execute(int)
      * @see TestStep#beforeScreenshot()
      * @see TestStep#afterScreenshot()
@@ -172,29 +174,23 @@ public class Tester {
     void operateOneScript(TestStep testStep, String caseNo) {
         testStep.setCurrentCaseNo(caseNo);
         if (testStep.isSkip()) {
-            log.info("ケース[{}][{} {}]の操作をスキップします",
-                caseNo, testStep.getNo(), testStep.getItemName());
+            log.info("ケース[{}][{} {}]の操作をスキップします", caseNo, testStep.getNo(), testStep.getItemName());
             return;
         }
-        boolean screenshotted = false;
 
         if (testStep.dialogScreenshot()) {
-            opelog.addScreenshot(screenshotOpe.getWithDialog(), "", false);
+            opelog.addScreenshot(screenshotOpe.getWithDialog());
         } else if (testStep.beforeScreenshot()) {
             opelog.addScreenshot(screenshotOpe.get(), "前");
-            screenshotted = true;
         }
 
         testStep.execute();
 
         if (testStep.afterScreenshot()) {
             opelog.addScreenshot(screenshotOpe.get(), "後");
-            screenshotted = true;
         }
 
-        if (screenshotted) {
-            opelog.renewPositionList();
-        }
+        opelog.flushOneStep();
 
         try {
             Thread.sleep(getOperationSpan());
@@ -205,6 +201,7 @@ public class Tester {
 
     /**
      * 操作実行後に待機する時間間隔を取得します。
+     * 
      * @return 操作実行後に待機する時間間隔
      */
     public int getOperationSpan() {

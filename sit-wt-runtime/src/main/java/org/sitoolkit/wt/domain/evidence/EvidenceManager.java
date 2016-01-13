@@ -18,13 +18,15 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.sitoolkit.wt.infra.PropertyUtils;
-import org.sitoolkit.wt.infra.SitPathUtils;
 import org.sitoolkit.wt.infra.TestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ResourceUtils;
 
-public class EvidenceManager {
+public class EvidenceManager implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(EvidenceManager.class);
 
@@ -50,8 +52,9 @@ public class EvidenceManager {
      */
     private File imgDir;
     private String logFilePath = "target/sit-wt.log";
-    private List<ElementPosition> positionList = new ArrayList<ElementPosition>();
+    private Screenshot screenshot;
     private Template tmpl;
+    private ApplicationContext appCtx;
 
     @PostConstruct
     public void init() {
@@ -82,56 +85,48 @@ public class EvidenceManager {
         } catch (IOException e) {
             throw new TestException(e);
         }
+
+        screenshot = appCtx.getBean(Screenshot.class);
     }
 
     public void addElementPosition(ElementPosition pos) {
-        positionList.add(pos);
+        screenshot.addElementPosition(pos);
     }
 
     /**
      * 位置情報のリストを再作成します。
      */
-    public void renewPositionList() {
-        positionList = new ArrayList<ElementPosition>();
+    public void flushScreenshot() {
+        if (screenshot.flush()) {
+            screenshot = appCtx.getBean(Screenshot.class);
+        }
     }
 
     public void addLogRecord(LogRecord log) {
         records.add(log);
     }
 
-    public void addLogRecord(LogRecord log, File screenshotFile, boolean withPos) {
-        log.setFilePath(SitPathUtils.relatvePath(opelogRootDir, screenshotFile));
-        if (withPos) {
-            log.setPositions(positionList);
-        }
-        addLogRecord(log);
-    }
+    public void addScreenshotLogRecord(LogRecord log, File screenshotFile, String scriptName,
+            String caseNo, String testStepNo, String itemName, String timing, String resize) {
 
-    public File saveScreenshotFile(File file, String scriptName, String caseNo, String testStepNo,
-            String itemName, String timing) {
+        screenshot.setFile(imgDir, screenshotFile, scriptName, caseNo, testStepNo, itemName,
+                timing);
+        screenshot.setBasedir(opelogRootDir);
 
-        String screenshotFileName = buildScreenshotFileName(scriptName, caseNo, testStepNo,
-                itemName, timing);
-        File dstFile = new File(imgDir, screenshotFileName);
-
-        try {
-
-            if (dstFile.exists()) {
-                dstFile = new File(imgDir, dstFile.getName() + "_" + System.currentTimeMillis());
+        // TODO スクリーンショットを個別にリサイズするかしないかの設定方法を検討
+        if (screenshot.isResize()) {
+            if (StringUtils.contains(resize, "全")) {
+                screenshot.setResize(false);
             }
-            FileUtils.moveFile(file, dstFile);
-
-        } catch (IOException e) {
-            LOG.warn("スクリーンショットファイルの移動に失敗しました", e);
+        } else {
+            if (StringUtils.contains(resize, "縮")) {
+                screenshot.setResize(true);
+            }
         }
-        return dstFile;
-    }
 
-    private String buildScreenshotFileName(String scriptName, String caseNo, String testStepNo,
-            String itemName, String timing) {
+        log.setScreenshot(screenshot);
+        addLogRecord(log);
 
-        return StringUtils.join(new String[] { scriptName, caseNo, testStepNo, itemName, timing },
-                "_") + ".png";
     }
 
     public void flush(String scriptName, String caseNo, String evidence) {
@@ -150,7 +145,7 @@ public class EvidenceManager {
             throw new TestException("操作ログの出力に失敗しました", e);
         } finally {
             records.clear();
-            renewPositionList();
+            flushScreenshot();
         }
 
     }
@@ -199,6 +194,11 @@ public class EvidenceManager {
             }
         }
         return false;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext arg0) throws BeansException {
+        appCtx = arg0;
     }
 
 }

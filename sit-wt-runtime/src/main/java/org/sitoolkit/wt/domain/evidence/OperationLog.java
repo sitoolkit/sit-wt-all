@@ -138,36 +138,18 @@ public class OperationLog {
      *            スクリーンショットの画像ファイル
      * @param timing
      *            スクリーンショット取得タイミング ファイル名に使用する。
-     * @see #addScreenshot(java.io.File, java.lang.String, boolean)
      */
     public void addScreenshot(File file, String timing) {
-        addScreenshot(file, timing, true);
-    }
-
-    /**
-     * 操作ログにスクリーンショットを追加します。
-     * 
-     * @param file
-     *            スクリーンショットの画像ファイル
-     * @param timing
-     *            スクリーンショット取得タイミング ファイル名に使用する。
-     * @param withPos
-     *            操作ログを表示した際に、要素位置を表示する場合にtrueを指定
-     */
-    public void addScreenshot(File file, String timing, boolean withPos) {
         if (file == null) {
-            em.renewPositionList();
+            em.flushScreenshot();
             return;
         }
 
-        File dstFile = em.saveScreenshotFile(file, current.getScriptName(), current.getCaseNo(),
-                current.getTestStepNo(), current.getItemName(), timing);
-
         LogRecord record = new LogRecord();
-        record.setLog(dstFile.getName());
-        em.addLogRecord(record, dstFile, withPos);
+        em.addScreenshotLogRecord(record, file, current.getScriptName(), current.getCaseNo(),
+                current.getTestStepNo(), current.getItemName(), timing,
+                current.getScreenshotTiming());
 
-        LOG.info("スクリーンショットを取得しました {}", dstFile.getAbsolutePath());
     }
 
     public void flush() {
@@ -196,8 +178,8 @@ public class OperationLog {
 
     }
 
-    public void renewPositionList() {
-        em.renewPositionList();
+    public void flushOneStep() {
+        em.flushScreenshot();
     }
 
 }

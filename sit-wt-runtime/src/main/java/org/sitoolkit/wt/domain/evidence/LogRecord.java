@@ -17,11 +17,9 @@ package org.sitoolkit.wt.domain.evidence;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
- * このクラスは、操作ログの構成単位となるVOです。
- * 1回の操作、または1つのスクリーンショットを1インスタンスとして保持します。
+ * このクラスは、操作ログの構成単位となるVOです。 1回の操作、または1つのスクリーンショットを1インスタンスとして保持します。
  */
 public class LogRecord {
 
@@ -42,11 +40,16 @@ public class LogRecord {
      * スクリーンショットファイル
      */
     private String filePath;
+    //
+    // /**
+    // * 要素の位置情報
+    // */
+    // private List<ElementPosition> positions;
 
     /**
-     * 要素の位置情報
+     * スクリーンショット
      */
-    private List<ElementPosition> positions;
+    private Screenshot screenshot;
 
     /**
      * ログレベル
@@ -86,13 +89,13 @@ public class LogRecord {
         this.filePath = filePath;
     }
 
-    public List<ElementPosition> getPositions() {
-        return positions;
-    }
-
-    public void setPositions(List<ElementPosition> positions) {
-        this.positions = positions;
-    }
+    // public List<ElementPosition> getPositions() {
+    // return positions;
+    // }
+    //
+    // public void setPositions(List<ElementPosition> positions) {
+    // this.positions = positions;
+    // }
 
     public String getNo() {
         return no;
@@ -108,6 +111,14 @@ public class LogRecord {
 
     public void setLogLevel(LogLevelVo logLevel) {
         this.logLevel = logLevel;
+    }
+
+    public Screenshot getScreenshot() {
+        return screenshot;
+    }
+
+    public void setScreenshot(Screenshot screenshot) {
+        this.screenshot = screenshot;
     }
 
 }
