@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sitoolkit.wt.app.selenium;
+package org.sitoolkit.wt.app.selenium2script;
 
 import java.io.File;
 
@@ -33,8 +33,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @author yuichi.kuwahara
  */
 @TestExecutionListeners(listeners = { DependencyInjectionTestExecutionListener.class,
-        SeleniumTestScriptConverterTest.class })
-public class SeleniumTestScriptConverterTest extends SitTesterTestBase {
+        Selenium2ScriptTest.class })
+public class Selenium2ScriptTest extends SitTesterTestBase {
 
     private String testScriptPath;
 

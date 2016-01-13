@@ -11,17 +11,18 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@Import({BaseConfig.class })
+@Import({ BaseConfig.class })
 public class Selenium2ScriptConfig {
 
     @Resource
     Environment env;
 
     @Bean
-    public Selenium2Script getConverter(TestScriptDao dao) {
+    public Selenium2Script getConverter(TestScriptDao dao,
+            SeleniumStepConverter seleniumStepConverter) {
         Selenium2Script conv = new Selenium2Script();
         conv.setDao(dao);
-        conv.setSeleniumIdeCommandMap(PropertyUtils.loadAsMap("/selenium2operation", false));
+        conv.setSeleniumStepConverter(seleniumStepConverter);
 
         return conv;
     }
@@ -29,6 +30,14 @@ public class Selenium2ScriptConfig {
     @Bean
     public SeleniumTestStep getSeleniumTestStep() {
         return new SeleniumTestStep();
+    }
+
+    @Bean
+    public SeleniumStepConverter getSeleniumStepConverter() {
+        SeleniumStepConverterImpl conv = new SeleniumStepConverterImpl();
+        conv.setSeleniumIdeCommandMap(PropertyUtils.loadAsMap("/selenium2operation", false));
+
+        return conv;
     }
 
 }
