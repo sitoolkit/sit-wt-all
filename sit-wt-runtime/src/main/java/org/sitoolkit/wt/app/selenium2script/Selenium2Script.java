@@ -61,7 +61,7 @@ public class Selenium2Script implements ApplicationContextAware {
 
     private String seleniumScriptDir = "seleniumscript";
 
-    private String testScriptDir = "testscript";
+    private String outputDir = "target/testscript";
 
     private String caseNo = "001";
 
@@ -105,7 +105,7 @@ public class Selenium2Script implements ApplicationContextAware {
         List<TestStep> testStepList = seleniumStepConverter.convertTestScript(list, caseNo);
 
         String sitScriptName = seleniumScript.getName().replace(".html", ".xlsx");
-        File sitScriptFile = new File(testScriptDir, sitScriptName);
+        File sitScriptFile = new File(outputDir, sitScriptName);
 
         dao.write(sitScriptFile, testStepList);
 
@@ -216,12 +216,12 @@ public class Selenium2Script implements ApplicationContextAware {
         this.seleniumScriptDir = seleniumScriptDir;
     }
 
-    public String getTestScriptDir() {
-        return testScriptDir;
+    public String getOutputDir() {
+        return outputDir;
     }
 
-    public void setTestScriptDir(String testScriptDir) {
-        this.testScriptDir = testScriptDir;
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
     }
 
     public String getCaseNo() {

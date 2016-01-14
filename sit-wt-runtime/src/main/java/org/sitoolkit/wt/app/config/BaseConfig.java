@@ -1,7 +1,5 @@
 package org.sitoolkit.wt.app.config;
 
-import java.lang.reflect.Field;
-
 import org.sitoolkit.util.tabledata.BeanFactory;
 import org.sitoolkit.util.tabledata.FileInputSourceWatcher;
 import org.sitoolkit.util.tabledata.FileOverwriteChecker;
@@ -14,7 +12,6 @@ import org.sitoolkit.wt.domain.testscript.OperationConverter;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SpringBeanFactory;
-import org.sitoolkit.wt.infra.VoidFileOverwriteChecker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -24,8 +21,8 @@ import org.springframework.context.annotation.Import;
 public class BaseConfig {
 
     @Bean
-    public VoidFileOverwriteChecker getFileOverwriteChecker() {
-        return new VoidFileOverwriteChecker();
+    public FileOverwriteChecker getFileOverwriteChecker() {
+        return new FileOverwriteChecker();
     }
 
     @Bean
@@ -36,20 +33,11 @@ public class BaseConfig {
     @Bean
     public TableDataDao tableDataDao(FileOverwriteChecker fileOverwriteChecker,
             InputSourceWatcher watcher) {
+
         TableDataDaoExcelImpl dao = new TableDataDaoExcelImpl();
+        dao.setFileOverwriteChecker(fileOverwriteChecker);
+        dao.setInputSourceWatcher(watcher);
 
-        // TODO sit-util-td 0.5までの暫定対応
-        try {
-            Field focfield = dao.getClass().getDeclaredField("fileOverwriteChecker");
-            focfield.setAccessible(true);
-            focfield.set(dao, fileOverwriteChecker);
-
-            Field iswField = dao.getClass().getDeclaredField("watcher");
-            iswField.setAccessible(true);
-            iswField.set(dao, watcher);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
         return dao;
     }
 

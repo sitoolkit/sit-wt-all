@@ -68,7 +68,7 @@ public class Script2Java implements ApplicationContextAware {
     /**
      * テストスクリプトディレクトリのパス
      */
-    private String testScriptDir = "testscript";
+    private String testScriptDirs = "testscript,target/testscript";
 
     private ApplicationContext appCtx;
 
@@ -107,25 +107,27 @@ public class Script2Java implements ApplicationContextAware {
      */
     public int execute() {
         loadTimestampFile();
-
+        
         String scriptPathes = System.getProperty(SYSPROP_TESTS_SCRIPT_PATH);
         if (StringUtils.isNotEmpty(scriptPathes)) {
             for (String path : scriptPathes.split(",")) {
-                generate(new File(path));
+                generate(new File(path), ".");
             }
 
         } else {
-            File testScriptDirF = new File(testScriptDir);
-            if (!testScriptDirF.exists()) {
+            for (String testScriptDir : testScriptDirs.split(",")) {
+                File testScriptDirF = new File(testScriptDir);
+                if (!testScriptDirF.exists()) {
 
-                log.info("テストスクリプトディレクトリを作成します。{}", testScriptDirF.getAbsolutePath());
-                testScriptDirF.mkdirs();
-            }
+                    log.info("テストスクリプトディレクトリを作成します。{}", testScriptDirF.getAbsolutePath());
+                    testScriptDirF.mkdirs();
+                }
 
-            log.info("テストスクリプトディレクトリ以下のスクリプトを処理します。{}", testScriptDirF.getAbsolutePath());
-            for (File scriptFile : FileUtils.listFiles(testScriptDirF,
-                    new String[] { "csv", "xls", "xlsx" }, true)) {
-                generate(scriptFile);
+                log.info("テストスクリプトディレクトリ以下のスクリプトを処理します。{}", testScriptDirF.getAbsolutePath());
+                for (File scriptFile : FileUtils.listFiles(testScriptDirF,
+                        new String[] { "csv", "xls", "xlsx" }, true)) {
+                    generate(scriptFile, testScriptDir);
+                }
             }
         }
 
@@ -138,24 +140,28 @@ public class Script2Java implements ApplicationContextAware {
      *
      * @param scriptFile
      *            テストスクリプト
+     * @param testScriptDir 
      */
-    public void generate(File scriptFile) {
+    public void generate(File scriptFile, String testScriptDir) {
+        
         if (scriptFile.getName().startsWith("~$")) {
             log.debug("システムファイルのため生成処理から除外します {}", scriptFile.getAbsolutePath());
             return;
         }
+        
         String lastModified = Long.toString(scriptFile.lastModified());
         String storedLastModified = timestampLog.getProperty(scriptFile.getAbsolutePath());
         if (lastModified.equals(storedLastModified)) {
             log.info("テストスクリプトのテストクラスは最新の状態です {}", scriptFile.getAbsolutePath());
             return;
         }
+        
         timestampLog.put(scriptFile.getAbsolutePath(), lastModified);
 
         log.info("テストスクリプトを読み込みます。{}", scriptFile.getAbsolutePath());
 
         TestClass testClass = appCtx.getBean(TestClass.class);
-        load(testClass, scriptFile);
+        load(testClass, scriptFile, testScriptDir);
 
         TestScript testScript = dao.load(scriptFile, testClass.getSheetName(), true);
         testClass.getCaseNos().addAll(testScript.getCaseNoMap().keySet());
@@ -182,9 +188,10 @@ public class Script2Java implements ApplicationContextAware {
      *
      * @param scriptFile
      *            スクリプトファイル
+     * @param testScriptDir 
      * @return スクリプトファイルに対応するテストクラス
      */
-    void load(TestClass testClass, File scriptFile) {
+    void load(TestClass testClass, File scriptFile, String testScriptDir) {
 
         // スクリプトパスの設定
         testClass.setScriptPath(SitPathUtils.relatvePath(new File("."), scriptFile));
@@ -244,11 +251,11 @@ public class Script2Java implements ApplicationContextAware {
     }
 
     public String getTestScriptDir() {
-        return testScriptDir;
+        return testScriptDirs;
     }
 
     public void setTestScriptDir(String testScriptDir) {
-        this.testScriptDir = testScriptDir;
+        this.testScriptDirs = testScriptDir;
     }
 
     public TestScriptDao getDao() {
