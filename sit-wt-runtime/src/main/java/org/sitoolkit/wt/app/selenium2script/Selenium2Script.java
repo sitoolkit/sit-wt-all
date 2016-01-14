@@ -240,10 +240,6 @@ public class Selenium2Script implements ApplicationContextAware {
         this.tdDao = tdDao;
     }
 
-    public SeleniumStepConverter getSeleniumStepConverter() {
-        return seleniumStepConverter;
-    }
-
     public void setSeleniumStepConverter(SeleniumStepConverter seleniumStepConverter) {
         this.seleniumStepConverter = seleniumStepConverter;
     }

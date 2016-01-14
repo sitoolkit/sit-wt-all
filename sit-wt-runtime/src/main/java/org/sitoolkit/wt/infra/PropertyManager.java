@@ -2,6 +2,8 @@ package org.sitoolkit.wt.infra;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +46,9 @@ public abstract class PropertyManager {
     @Value("${screenshot.padding.height}")
     private int screenshotPaddingHeight;
 
+    @Value("${selenium.screenshot.pattern}")
+    private String seleniumScreenshotPattern;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -79,7 +84,7 @@ public abstract class PropertyManager {
         try {
             return new URL(appiumAddress);
         } catch (MalformedURLException e) {
-            throw new ConfigurationException(e);
+            throw new ConfigurationException("appium.address", e);
         }
     }
 
@@ -93,5 +98,13 @@ public abstract class PropertyManager {
 
     public int getScreenshotPaddingHeight() {
         return screenshotPaddingHeight;
+    }
+
+    public Pattern getSeleniumScreenshotPattern() {
+        try {
+            return Pattern.compile(seleniumScreenshotPattern);
+        } catch (PatternSyntaxException e) {
+            throw new ConfigurationException("selenium.screenshot.pattern", e);
+        }
     }
 }

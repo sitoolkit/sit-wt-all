@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.sitoolkit.wt.app.config.BaseConfig;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
+import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.PropertyUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,9 +34,10 @@ public class Selenium2ScriptConfig {
     }
 
     @Bean
-    public SeleniumStepConverter getSeleniumStepConverter() {
-        SeleniumStepConverterImpl conv = new SeleniumStepConverterImpl();
+    public SeleniumStepConverter getSeleniumStepConverter(PropertyManager pm) {
+        SeleniumStepConverter conv = new SeleniumStepConverter();
         conv.setSeleniumIdeCommandMap(PropertyUtils.loadAsMap("/selenium2operation", false));
+        conv.setScreenshotPattern(pm.getSeleniumScreenshotPattern());
 
         return conv;
     }
