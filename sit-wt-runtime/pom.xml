@@ -61,7 +61,7 @@
     <dependency>
       <groupId>org.sitoolkit.util</groupId>
       <artifactId>sit-util-td</artifactId>
-      <version>0.5</version>
+      <version>0.5.1</version>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
