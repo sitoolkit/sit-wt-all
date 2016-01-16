@@ -60,7 +60,7 @@ public class IncludeOperation implements Operation, TestContextListener {
     OperationLog opelog;
 
     @Override
-    public void execute(TestStep testStep) {
+    public void operate(TestStep testStep) {
         String testStepName = testStep.getLocator().getValue();
         opelog.info(LOG, ElementPosition.EMPTY, "テストスクリプト[{}]を実行します。", testStepName);
 

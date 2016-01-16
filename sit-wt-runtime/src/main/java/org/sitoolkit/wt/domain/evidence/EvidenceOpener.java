@@ -22,7 +22,7 @@ public class EvidenceOpener {
     public void open() {
         File outputDir = new File(buildDir);
         File[] opelogDirs = outputDir.listFiles(new PatternFilenameFilter(opelogDirRegex));
-        Arrays.sort(opelogDirs, new FileLastModifiedComarator());
+        Arrays.sort(opelogDirs, new FileLastModifiedComarator(false));
 
         if (opelogDirs.length == 0) {
             LOG.info("エビデンスフォルダがありません {}", outputDir.getAbsolutePath());
@@ -32,7 +32,7 @@ public class EvidenceOpener {
         File[] opelogFiles = opelogDirs[0].listFiles(new PatternFilenameFilter(opelogFileRegex));
         LOG.info("{}に{}のエビデンスがあります ", opelogDirs[0].getName(), opelogFiles.length);
 
-        Arrays.sort(opelogFiles, new FileLastModifiedComarator());
+        Arrays.sort(opelogFiles, new FileLastModifiedComarator(true));
 
         try {
             for (int i = 0; i < openFileCount; i++) {

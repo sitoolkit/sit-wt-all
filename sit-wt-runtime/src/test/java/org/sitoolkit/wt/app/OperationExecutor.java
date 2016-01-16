@@ -15,7 +15,7 @@ public class OperationExecutor {
         ctx.setTestStep(testStep);
 
         Operation operation = appCtx.getBean(operationName + "Operation", Operation.class);
-        operation.execute(testStep);
+        operation.operate(testStep);
     }
 
     public static void execute(ApplicationContext appCtx, String operationName,

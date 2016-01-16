@@ -59,7 +59,7 @@ public class Selenium2Script implements ApplicationContextAware {
 
     private SeleniumStepConverter seleniumStepConverter;
 
-    private String seleniumScriptDir = "seleniumscript";
+    private String seleniumScriptDirs = "seleniumscript,.";
 
     private String outputDir = "target/testscript";
 
@@ -85,13 +85,16 @@ public class Selenium2Script implements ApplicationContextAware {
      * @return 0:正常終了
      */
     public int execute() {
-        File scriptDir = new File(seleniumScriptDir);
-        if (!scriptDir.exists()) {
-            scriptDir.mkdirs();
-        }
 
-        for (File scriptFile : FileUtils.listFiles(scriptDir, new String[] { "html" }, true)) {
-            convert(scriptFile);
+        for (String seleniumScriptDir : seleniumScriptDirs.split(",")) {
+            File scriptDir = new File(seleniumScriptDir);
+            if (!scriptDir.exists()) {
+                scriptDir.mkdirs();
+            }
+
+            for (File scriptFile : FileUtils.listFiles(scriptDir, new String[] { "html" }, true)) {
+                convert(scriptFile);
+            }
         }
 
         return 0;
@@ -209,11 +212,11 @@ public class Selenium2Script implements ApplicationContextAware {
     }
 
     public String getSeleniumScriptDir() {
-        return seleniumScriptDir;
+        return seleniumScriptDirs;
     }
 
     public void setSeleniumScriptDir(String seleniumScriptDir) {
-        this.seleniumScriptDir = seleniumScriptDir;
+        this.seleniumScriptDirs = seleniumScriptDir;
     }
 
     public String getOutputDir() {

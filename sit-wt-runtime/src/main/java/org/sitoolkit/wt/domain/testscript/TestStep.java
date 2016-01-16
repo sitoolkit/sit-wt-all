@@ -88,7 +88,7 @@ public class TestStep {
      *
      */
     public void execute() {
-        getOperation().execute(this);
+        getOperation().operate(this);
     }
 
     public String getNo() {
@@ -101,6 +101,7 @@ public class TestStep {
 
     /**
      * 操作名を取得します。
+     * 
      * @return 操作名
      */
     public String getOperationName() {
@@ -109,7 +110,9 @@ public class TestStep {
 
     /**
      * 操作名を設定します。
-     * @param operationName 操作名
+     * 
+     * @param operationName
+     *            操作名
      */
     public void setOperationName(String operationName) {
         this.operationName = operationName;
@@ -118,19 +121,22 @@ public class TestStep {
     /**
      * ロケーターを取得します。
      *
-     * @return ロケーター　ブランクの場合は項目名
+     * @return ロケーター ブランクの場合は項目名
      */
     public Locator getLocator() {
         return locator;
     }
+
     /**
      * ロケーターを設定します。
      *
-     * @param locator　ロケーター
+     * @param locator
+     *            ロケーター
      */
     public void setLocator(Locator locator) {
         this.locator = locator;
     }
+
     /**
      * テストデータの中から実行中ケースで使用する値を取得します。
      *
@@ -206,6 +212,7 @@ public class TestStep {
 
     /**
      * 現在のケースでダイアログのスクリーンショットが必要な場合にtrueを返します。
+     * 
      * @return 現在のケースでダイアログのスクリーンショットが必要な場合にtrue
      */
     public boolean dialogScreenshot() {
@@ -221,8 +228,7 @@ public class TestStep {
     }
 
     /**
-     * 実行中ケースでは当該操作を行わないことを表します。
-     * テスト値が空の場合にtrueとなります。
+     * 実行中ケースでは当該操作を行わないことを表します。 テスト値が空の場合にtrueとなります。
      *
      * @return
      */

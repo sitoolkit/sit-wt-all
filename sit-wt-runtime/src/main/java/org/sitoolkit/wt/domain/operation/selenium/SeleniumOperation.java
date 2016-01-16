@@ -15,10 +15,14 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -29,10 +33,12 @@ import org.sitoolkit.wt.domain.evidence.OperationLog;
 import org.sitoolkit.wt.domain.evidence.selenium.ElementPositionSupport2;
 import org.sitoolkit.wt.domain.operation.Operation;
 import org.sitoolkit.wt.domain.testscript.Locator;
+import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.ElementNotFoundException;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ResourceUtils;
 
 /**
  *
@@ -47,12 +53,52 @@ public abstract class SeleniumOperation implements Operation {
     PropertyManager pm;
 
     protected Logger log = LoggerFactory.getLogger(getClass());
+
     @Resource
     OperationLog opelog;
     @Resource
     protected WebDriver seleniumDriver;
     @Resource
     ElementPositionSupport2 position;
+
+    private static String setElementVisibleJs = "";
+
+    private boolean jsEnabled = false;
+
+    // TODO 非表示要素を可視化→戻しの処理がスレッドセーフでないため改良したい
+    private boolean visibilityChanged = false;
+
+    static {
+        Logger logger = LoggerFactory.getLogger(SelectOperation.class);
+        try {
+            File file = ResourceUtils.getFile("classpath:setElementVisible.js");
+            logger.debug("非表示要素操作関数のjsファイルを読み込みます {}", file.getAbsolutePath());
+            setElementVisibleJs = FileUtils.readFileToString(file);
+        } catch (IOException e) {
+            logger.error("非表示要素操作関数のjsファイルを読み込みに失敗しました ", e);
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        jsEnabled = seleniumDriver instanceof JavascriptExecutor;
+    }
+
+    @Override
+    public void operate(TestStep testStep) {
+        execute(testStep);
+
+        if (visibilityChanged) {
+            visibilityChanged = false;
+            WebElement effectedElement = (WebElement) ((JavascriptExecutor) seleniumDriver)
+                    .executeScript("return document.sitFuncRestoreElementVisibility();");
+            log.debug("要素:{} id={} class={}の可視状態を戻しました", effectedElement.getTagName(),
+                    effectedElement.getAttribute("id"), effectedElement.getAttribute("class"));
+        }
+
+    }
+
+    protected abstract void execute(TestStep testStep);
 
     protected By by(Locator locator) {
         switch (locator.getTypeVo()) {
@@ -75,7 +121,10 @@ public abstract class SeleniumOperation implements Operation {
         try {
             WebElement element = seleniumDriver.findElement(by(locator));
 
-            setElementVisible(element);
+            if (jsEnabled && !element.isDisplayed()) {
+                log.debug("要素:{}を可視にします", locator);
+                setElementVisible(element);
+            }
             return element;
         } catch (NoSuchElementException e) {
             throw ElementNotFoundException.create(locator, e);
@@ -83,21 +132,16 @@ public abstract class SeleniumOperation implements Operation {
     }
 
     protected void setElementVisible(WebElement element) {
-        if (seleniumDriver instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) seleniumDriver)
-                    .executeScript("return arguments[0].style.display;", element);
-        }
+        WebElement effectedElement = (WebElement) ((JavascriptExecutor) seleniumDriver)
+                .executeScript(setElementVisibleJs, element);
+        log.debug("要素:{} id={} class={}を可視にしました", effectedElement.getTagName(),
+                effectedElement.getAttribute("id"), effectedElement.getAttribute("class"));
+        visibilityChanged = true;
     }
 
     protected List<WebElement> findElements(Locator locator) {
         try {
-
-            List<WebElement> elements = seleniumDriver.findElements(by(locator));
-            for (WebElement element : elements) {
-                setElementVisible(element);
-            }
-
-            return elements;
+            return seleniumDriver.findElements(by(locator));
         } catch (NoSuchElementException e) {
             throw ElementNotFoundException.create(locator, e);
         }
@@ -156,5 +200,4 @@ public abstract class SeleniumOperation implements Operation {
     public void setWaitSpan(int waitSpan) {
         this.waitSpan = waitSpan;
     }
-
 }

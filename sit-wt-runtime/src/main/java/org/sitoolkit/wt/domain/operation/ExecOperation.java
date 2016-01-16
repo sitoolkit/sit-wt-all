@@ -44,7 +44,7 @@ public class ExecOperation implements Operation {
     protected OperationLog opelog;
 
     @Override
-    public void execute(TestStep testStep) {
+    public void operate(TestStep testStep) {
 
         String cmd = testStep.getLocator().getValue();
         opelog.info(log, ElementPosition.EMPTY, "コマンド[{}]を実行します。", cmd);

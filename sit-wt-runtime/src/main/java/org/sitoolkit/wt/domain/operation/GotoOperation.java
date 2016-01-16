@@ -40,7 +40,7 @@ public class GotoOperation implements Operation {
     protected OperationLog opelog;
 
     @Override
-    public void execute(TestStep testStep) {
+    public void operate(TestStep testStep) {
         String value = testStep.getValue();
 
         opelog.info(log, ElementPosition.EMPTY, "ステップNo[{}]を実行します。", value);
