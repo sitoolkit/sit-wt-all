@@ -109,9 +109,7 @@
           <arg value="-P" />
           <arg value="${mvn.repo}" />
           <arg value="-Dfile.encoding=${file.encoding}" />
-          <arg value="clean" />
-          <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:selenium2script" />
-          <arg value="integration-test" />
+          <arg value="verify" />
         </exec>
     
         <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="false">

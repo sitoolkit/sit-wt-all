@@ -27,8 +27,9 @@
         <version>${sitwt.version}</version>
         <executions>
           <execution>
-            <id>script2java</id>
+            <id>generate-test-sources</id>
             <goals>
+              <goal>selenium2script</goal>
               <goal>script2java</goal>
             </goals>
           </execution>
