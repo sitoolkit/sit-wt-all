@@ -89,7 +89,7 @@ public class Selenium2Script implements ApplicationContextAware {
         for (String seleniumScriptDir : seleniumScriptDirs.split(",")) {
             File scriptDir = new File(seleniumScriptDir);
             if (!scriptDir.exists()) {
-                scriptDir.mkdirs();
+                continue;
             }
 
             for (File scriptFile : FileUtils.listFiles(scriptDir, new String[] { "html" }, true)) {

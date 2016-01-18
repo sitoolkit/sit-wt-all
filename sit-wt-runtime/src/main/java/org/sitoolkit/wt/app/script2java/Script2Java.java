@@ -107,7 +107,7 @@ public class Script2Java implements ApplicationContextAware {
      */
     public int execute() {
         loadTimestampFile();
-        
+
         String scriptPathes = System.getProperty(SYSPROP_TESTS_SCRIPT_PATH);
         if (StringUtils.isNotEmpty(scriptPathes)) {
             for (String path : scriptPathes.split(",")) {
@@ -118,9 +118,7 @@ public class Script2Java implements ApplicationContextAware {
             for (String testScriptDir : testScriptDirs.split(",")) {
                 File testScriptDirF = new File(testScriptDir);
                 if (!testScriptDirF.exists()) {
-
-                    log.info("テストスクリプトディレクトリを作成します。{}", testScriptDirF.getAbsolutePath());
-                    testScriptDirF.mkdirs();
+                    continue;
                 }
 
                 log.info("テストスクリプトディレクトリ以下のスクリプトを処理します。{}", testScriptDirF.getAbsolutePath());
@@ -140,22 +138,22 @@ public class Script2Java implements ApplicationContextAware {
      *
      * @param scriptFile
      *            テストスクリプト
-     * @param testScriptDir 
+     * @param testScriptDir
      */
     public void generate(File scriptFile, String testScriptDir) {
-        
+
         if (scriptFile.getName().startsWith("~$")) {
             log.debug("システムファイルのため生成処理から除外します {}", scriptFile.getAbsolutePath());
             return;
         }
-        
+
         String lastModified = Long.toString(scriptFile.lastModified());
         String storedLastModified = timestampLog.getProperty(scriptFile.getAbsolutePath());
         if (lastModified.equals(storedLastModified)) {
             log.info("テストスクリプトのテストクラスは最新の状態です {}", scriptFile.getAbsolutePath());
             return;
         }
-        
+
         timestampLog.put(scriptFile.getAbsolutePath(), lastModified);
 
         log.info("テストスクリプトを読み込みます。{}", scriptFile.getAbsolutePath());
@@ -188,7 +186,7 @@ public class Script2Java implements ApplicationContextAware {
      *
      * @param scriptFile
      *            スクリプトファイル
-     * @param testScriptDir 
+     * @param testScriptDir
      * @return スクリプトファイルに対応するテストクラス
      */
     void load(TestClass testClass, File scriptFile, String testScriptDir) {

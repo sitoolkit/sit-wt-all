@@ -15,14 +15,14 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -71,9 +71,9 @@ public abstract class SeleniumOperation implements Operation {
     static {
         Logger logger = LoggerFactory.getLogger(SelectOperation.class);
         try {
-            File file = ResourceUtils.getFile("classpath:setElementVisible.js");
-            logger.debug("非表示要素操作関数のjsファイルを読み込みます {}", file.getAbsolutePath());
-            setElementVisibleJs = FileUtils.readFileToString(file);
+            URL resUrl = ResourceUtils.getURL("classpath:setElementVisible.js");
+            logger.debug("非表示要素操作関数のjsファイルを読み込みます {}", resUrl.toString());
+            setElementVisibleJs = IOUtils.toString(resUrl);
         } catch (IOException e) {
             logger.error("非表示要素操作関数のjsファイルを読み込みに失敗しました ", e);
         }
