@@ -37,7 +37,7 @@
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
-      <arg value="${mvn.repo}" />
+      <arg value="${mvn.repo},localhost,ci" />
       <arg value="-pl" />
       <arg value="!sit-wt-project-template,!sit-wt-project-template/distribution/archetype" />
       <arg value="-Dmaven.test.skip=${test.skip}" />
