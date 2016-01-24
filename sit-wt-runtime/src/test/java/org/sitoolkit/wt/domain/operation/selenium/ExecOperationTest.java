@@ -15,7 +15,7 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
@@ -30,22 +30,22 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  *
  * @author yu.kawai
  */
-@TestExecutionListeners(listeners = {
-	    DependencyInjectionTestExecutionListener.class,
-	    ExecOperationTest.class })
+@TestExecutionListeners(listeners = { DependencyInjectionTestExecutionListener.class,
+        ExecOperationTest.class })
 public class ExecOperationTest extends SitTesterTestBase {
 
-	private static final String TEST_DIR = "./testdir";
+    private static final String TEST_DIR = "./testdir";
 
-	@Before
-	public void before(){
-		File dir = new File(TEST_DIR);
-		if (dir.isDirectory()) dir.delete();
-	}
+    @Before
+    public void before() {
+        File dir = new File(TEST_DIR);
+        if (dir.isDirectory())
+            dir.delete();
+    }
 
-	@Test
-	public void testExecute() {
-		test("001", new AfterTest() {
+    @Test
+    public void test001() {
+        test("001", new AfterTest() {
 
             @Override
             public void callback() {
@@ -53,23 +53,24 @@ public class ExecOperationTest extends SitTesterTestBase {
                 assertTrue(dir.isDirectory());
             }
 
-		});
-	}
+        });
+    }
 
-	@After
-	public void after(){
-		File dir = new File(TEST_DIR);
-		if (dir.isDirectory()) dir.delete();
-	}
+    @After
+    public void after() {
+        File dir = new File(TEST_DIR);
+        if (dir.isDirectory())
+            dir.delete();
+    }
 
-	@Override
-	protected String getTestScriptPath() {
-		return"src/test/resources/ExecOperationTestScript.xlsx";
-	}
+    @Override
+    protected String getTestScriptPath() {
+        return "src/test/resources/ExecOperationTestScript.xlsx";
+    }
 
-	@Override
-	protected String getSheetName() {
-		return "TestScript";
-	}
+    @Override
+    protected String getSheetName() {
+        return "TestScript";
+    }
 
 }
