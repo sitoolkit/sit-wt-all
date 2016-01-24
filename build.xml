@@ -74,7 +74,7 @@
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-DarchetypeGroupId=org.sitoolkit.wt" />
       <arg value="-DarchetypeArtifactId=sit-wt-project" />
-      <arg value="-DarchetypeVersion=0.9-SNAPSHOT" />
+      <arg value="-DarchetypeVersion=0.9" />
       <arg value="-DgroupId=a.b.c" />
       <arg value="-DartifactId=${testArtifactId}" />
       <arg value="-Darchetype.interactive=false" />
