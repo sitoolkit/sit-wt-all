@@ -106,6 +106,7 @@
         <exec executable="${mvn.cmd}" dir="${testdir}" resultproperty="testresult" >
           <env key="JAVA_HOME" value="${java.home}" />
           <arg value="-DbaseUrl=http://localhost:8280/" />
+          <arg value="-Devidence.open=false" />
           <arg value="-P" />
           <arg value="${mvn.repo}" />
           <arg value="-Dfile.encoding=${file.encoding}" />
