@@ -103,7 +103,7 @@ public class Script2Java implements ApplicationContextAware {
      * テストスクリプトに対しテストクラスを生成します。
      *
      * @return 0 (固定)
-     * @see #generate(File)
+     * @see #generate(File, String)
      */
     public int execute() {
         loadTimestampFile();
