@@ -91,13 +91,7 @@ public class Locator {
     }
 
     public enum Type {
-        id,
-        css,
-        name,
-        xpath,
-        link,
-        tag,
-        na;
+        id, css, name, xpath, link, tag, title, na;
 
         public static Type decode(String code) {
             for (Type type : values()) {
@@ -115,9 +109,7 @@ public class Locator {
 
     @Override
     public String toString() {
-        return Type.na.name().equals(getType())
-            ? getValue()
-            : getType() + "=" + getValue();
+        return Type.na.name().equals(getType()) ? getValue() : getType() + "=" + getValue();
     }
 
     public String getAttributeName() {
@@ -148,7 +140,6 @@ public class Locator {
         if (locator == null) {
             locator = build(Type.na.name(), str);
         }
-
 
         return locator;
     }

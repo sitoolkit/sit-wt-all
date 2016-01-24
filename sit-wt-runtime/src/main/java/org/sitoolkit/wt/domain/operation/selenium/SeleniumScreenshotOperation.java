@@ -25,17 +25,21 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.domain.operation.ScreenshotOperation;
 import org.sitoolkit.wt.domain.tester.TestContext;
+import org.sitoolkit.wt.infra.ConfigurationException;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 /**
  *
@@ -78,7 +82,19 @@ public class SeleniumScreenshotOperation implements ScreenshotOperation {
                 seleniumDriver.manage().window().setSize(bodySize);
                 LOG.debug("bodySize {}", bodySize);
             }
-            return ((TakesScreenshot) seleniumDriver).getScreenshotAs(OutputType.FILE);
+
+            try {
+                return ((TakesScreenshot) seleniumDriver).getScreenshotAs(OutputType.FILE);
+            } catch (NoSuchWindowException nswe) {
+                try {
+                    File file = File.createTempFile("sit-wt", "screenshot-failure");
+                    FileUtils.copyURLToFile(
+                            ResourceUtils.getURL("classpath:screenshot-failure.png"), file);
+                    return file;
+                } catch (IOException ioe) {
+                    throw new ConfigurationException(ioe);
+                }
+            }
         } else {
             LOG.warn("ドライバ{}はスクリーンショットを取得できません。", seleniumDriver.getClass().getName());
             return null;

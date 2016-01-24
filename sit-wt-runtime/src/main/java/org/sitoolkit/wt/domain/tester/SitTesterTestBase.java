@@ -83,7 +83,7 @@ public abstract class SitTesterTestBase extends AbstractTestExecutionListener {
 
     @Before
     public void setUp() {
-        tester.setUp();
+        tester.setUp(getCurrentCaseNo());
     }
 
     @After

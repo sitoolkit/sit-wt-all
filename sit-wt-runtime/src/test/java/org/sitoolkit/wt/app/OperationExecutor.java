@@ -20,8 +20,8 @@ public class OperationExecutor {
 
     public static void execute(ApplicationContext appCtx, String operationName,
             String locatorValue) {
-        TestStep testStep = new TestStep();
-        Locator locator = new Locator();
+        TestStep testStep = appCtx.getBean(TestStep.class);
+        Locator locator = appCtx.getBean(Locator.class);
         locator.setValue(locatorValue);
         execute(appCtx, operationName, testStep, locator);
     }

@@ -15,6 +15,11 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.NoSuchWindowException;
+import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
 
@@ -28,12 +33,36 @@ public class SwitchWindowOperation extends SeleniumOperation {
 
     @Override
     public void execute(TestStep testStep) {
-        String windowName = testStep.getLocator().getValue();
-        info(null, "ウィンドウを{}に切り替えます", windowName);
-        if ("_parent".equalsIgnoreCase(windowName) || "null".equalsIgnoreCase(windowName)) {
-            windowName = "";
+        Locator windowLocator = testStep.getLocator();
+
+        if (Locator.Type.title == windowLocator.getTypeVo()) {
+            List<String> avairableName = new ArrayList<>();
+            List<String> avairableTitle = new ArrayList<>();
+
+            for (String windowHandle : seleniumDriver.getWindowHandles()) {
+                String windowTitle = seleniumDriver.switchTo().window(windowHandle).getTitle();
+
+                avairableName.add(windowHandle);
+                avairableTitle.add(windowTitle);
+
+                if (windowTitle.equals(windowLocator.getValue())) {
+                    info(null, "ウィンドウを{}に切り替えます", windowLocator);
+                    return;
+                }
+            }
+
+            throw new NoSuchWindowException("ロケーター:" + windowLocator + "に該当するウィンドウはありません。name:"
+                    + avairableName + "かtitle:" + avairableTitle + "が指定可能です。");
+
+        } else {
+            info(null, "ウィンドウを{}に切り替えます", windowLocator);
+            String windowName = windowLocator.getValue();
+            if ("_parent".equalsIgnoreCase(windowName) || "null".equalsIgnoreCase(windowName)) {
+                windowName = "";
+            }
+            seleniumDriver.switchTo().window(windowName);
+
         }
-        seleniumDriver.switchTo().window(windowName);
     }
 
 }

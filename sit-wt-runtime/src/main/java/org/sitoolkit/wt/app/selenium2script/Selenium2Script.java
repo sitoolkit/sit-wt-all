@@ -92,7 +92,9 @@ public class Selenium2Script implements ApplicationContextAware {
                 continue;
             }
 
-            for (File scriptFile : FileUtils.listFiles(scriptDir, new String[] { "html" }, true)) {
+            boolean recursive = !".".equals(seleniumScriptDir);
+            for (File scriptFile : FileUtils.listFiles(scriptDir, new String[] { "html" },
+                    recursive)) {
                 convert(scriptFile);
             }
         }
@@ -101,6 +103,8 @@ public class Selenium2Script implements ApplicationContextAware {
     }
 
     public File convert(File seleniumScript) {
+        log.info("Seleniumスクリプトを変換します。{}", seleniumScript.getAbsolutePath());
+
         // htmlの読み込み
         SeleniumTestScript list = loadSeleniumScript(seleniumScript);
 

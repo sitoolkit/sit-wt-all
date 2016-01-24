@@ -24,7 +24,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.OperationLog;
-import org.sitoolkit.wt.domain.operation.ScreenshotOperation;
+import org.sitoolkit.wt.domain.evidence.ScreenshotTiming;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -56,18 +56,22 @@ public class Tester {
     @Resource
     TestScriptDao dao;
 
-    /**
-     * スクリーンショット操作
-     */
-    private ScreenshotOperation screenshotOpe;
+    // /**
+    // * スクリーンショット操作
+    // */
+    // private ScreenshotOperation screenshotOpe;
     /**
      * テストスクリプトがロード済の場合にtrue
      */
     private boolean scriptLoaded = false;
     private TestScript testScript;
 
-    public void setUp() {
-        // NOP
+    public void setUp(String caseNo) {
+        current.reset();
+        current.setCaseNo(caseNo);
+        current.setScriptName(testScript.getName());
+
+        opelog.beginScript();
     }
 
     /**
@@ -96,7 +100,7 @@ public class Tester {
      *
      */
     public void tearDown() {
-        opelog.flush();
+        opelog.endScript();
     }
 
     public void tearDownClass() {
@@ -116,9 +120,6 @@ public class Tester {
                     + testScript.getCaseNoMap().keySet();
             throw new TestException(msg);
         }
-        current.reset();
-        current.setCaseNo(caseNo);
-        current.setScriptName(testScript.getName());
         dialog.checkReserve(testScript.getTestStepList(), caseNo);
         log.info("ケース{}を実行します", caseNo);
 
@@ -135,7 +136,8 @@ public class Tester {
                     ngList.add(e);
                     result.add(e);
                     opelog.warn(log, "期待と異なる結果になりました。{}", e.getLocalizedMessage());
-                    opelog.addScreenshot(screenshotOpe.get());
+                    // opelog.addScreenshot(screenshotOpe.get());
+                    opelog.addScreenshot(ScreenshotTiming.ON_ERROR);
                     if (debug.isDebug()) {
                         debug.pause();
                     }
@@ -143,7 +145,8 @@ public class Tester {
                     if (debug.isDebug()) {
                         ngList.add(e);
                         log.error("予期しないエラーが発生しました。{}", e.getLocalizedMessage());
-                        opelog.addScreenshot(screenshotOpe.get());
+                        // opelog.addScreenshot(screenshotOpe.get());
+                        opelog.addScreenshot(ScreenshotTiming.ON_ERROR);
                         debug.pause();
                     } else {
                         throw e;
@@ -152,8 +155,9 @@ public class Tester {
             } while (debug.next());
 
         } catch (Exception e) {
-            opelog.addScreenshot(screenshotOpe.get(), "テスト実施が異常終了");
+            // opelog.addScreenshot(screenshotOpe.get(), "テスト実施が異常終了");
             opelog.error(log, e.getMessage());
+            opelog.addScreenshot(ScreenshotTiming.ON_ERROR);
             log.debug("例外詳細", e);
             result.setErrorCause(e);
         }
@@ -179,18 +183,21 @@ public class Tester {
         }
 
         if (testStep.dialogScreenshot()) {
-            opelog.addScreenshot(screenshotOpe.getWithDialog());
+            // opelog.addScreenshot(screenshotOpe.getWithDialog());
+            opelog.addScreenshot(ScreenshotTiming.ON_DIALOG);
         } else if (testStep.beforeScreenshot()) {
-            opelog.addScreenshot(screenshotOpe.get(), "前");
+            // opelog.addScreenshot(screenshotOpe.get(), "前");
+            opelog.addScreenshot(ScreenshotTiming.BEFORE_OPERATION);
         }
 
         testStep.execute();
 
         if (testStep.afterScreenshot()) {
-            opelog.addScreenshot(screenshotOpe.get(), "後");
+            // opelog.addScreenshot(screenshotOpe.get(), "後");
+            opelog.addScreenshot(ScreenshotTiming.AFTER_OPERATION);
         }
 
-        opelog.flushOneStep();
+        opelog.endStep();
 
         try {
             Thread.sleep(getOperationSpan());
@@ -212,11 +219,11 @@ public class Tester {
         return scriptLoaded;
     }
 
-    public ScreenshotOperation getScreenshotOpe() {
-        return screenshotOpe;
-    }
-
-    public void setScreenshotOpe(ScreenshotOperation screenshotOpe) {
-        this.screenshotOpe = screenshotOpe;
-    }
+    // public ScreenshotOperation getScreenshotOpe() {
+    // return screenshotOpe;
+    // }
+    //
+    // public void setScreenshotOpe(ScreenshotOperation screenshotOpe) {
+    // this.screenshotOpe = screenshotOpe;
+    // }
 }

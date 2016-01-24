@@ -3,12 +3,15 @@ package org.sitoolkit.wt.app.config;
 import org.sitoolkit.wt.app.page2script.Page2ScriptImportConfig;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
+import org.sitoolkit.wt.domain.evidence.Evidence;
 import org.sitoolkit.wt.domain.evidence.EvidenceManager;
 import org.sitoolkit.wt.domain.evidence.OperationLog;
 import org.sitoolkit.wt.domain.evidence.Screenshot;
+import org.sitoolkit.wt.domain.evidence.ScreenshotTaker;
+import org.sitoolkit.wt.domain.evidence.appium.HybridScreenshotTaker;
 import org.sitoolkit.wt.domain.evidence.selenium.ElementPositionSupport2;
 import org.sitoolkit.wt.domain.evidence.selenium.SeleniumDialogScreenshotSupport;
-import org.sitoolkit.wt.domain.operation.ScreenshotOperation;
+import org.sitoolkit.wt.domain.evidence.selenium.SeleniumScreenshotTaker;
 import org.sitoolkit.wt.domain.tester.ELSupport;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.tester.Tester;
@@ -29,9 +32,8 @@ import org.springframework.context.annotation.Scope;
 public class RuntimeConfig {
 
     @Bean(name = "tester")
-    public Tester getTester(ScreenshotOperation screenshotOpe) {
+    public Tester getTester(ScreenshotTaker screenshotTaker) {
         SeleniumTester tester = new SeleniumTester();
-        tester.setScreenshotOpe(screenshotOpe);
 
         return tester;
     }
@@ -90,8 +92,21 @@ public class RuntimeConfig {
     }
 
     @Bean
+    public ScreenshotTaker screenshotTaker(PropertyManager pm) {
+
+        if ("hybrid".equals(pm.getScreenthotMode())) {
+            return new HybridScreenshotTaker();
+        }
+
+        SeleniumScreenshotTaker taker = new SeleniumScreenshotTaker();
+        taker.setResizeWindow(pm.isResizeWindow());
+
+        return taker;
+    }
+
+    @Bean
     @Scope("prototype")
-    public Screenshot getScreenshot(PropertyManager pm) {
+    public Screenshot screenshot(PropertyManager pm) {
         Screenshot screenshot = new Screenshot();
 
         screenshot.setResize(pm.isScreenshotResize());
@@ -99,5 +114,11 @@ public class RuntimeConfig {
         screenshot.setScreenshotPaddingHeight(pm.getScreenshotPaddingHeight());
 
         return screenshot;
+    }
+
+    @Bean
+    @Scope("prototype")
+    public Evidence evidence() {
+        return new Evidence();
     }
 }

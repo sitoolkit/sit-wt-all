@@ -31,11 +31,14 @@ public abstract class PropertyManager {
     @Value("${pageobj.dir}")
     private String pageObjectDir;
 
-    @Value("${driverType}")
+    @Value("${driver.type}")
     private String driverType;
 
-    @Value("${appiumAddress}")
+    @Value("${appium.address}")
     private String appiumAddress;
+
+    @Value("${screenshot.mode}")
+    private String screenshotMode;
 
     @Value("${screenshot.resize}")
     private boolean screenshotResize;
@@ -106,5 +109,9 @@ public abstract class PropertyManager {
         } catch (PatternSyntaxException e) {
             throw new ConfigurationException("selenium.screenshot.pattern", e);
         }
+    }
+
+    public String getScreenthotMode() {
+        return screenshotMode;
     }
 }

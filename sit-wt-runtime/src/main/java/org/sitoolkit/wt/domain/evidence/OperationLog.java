@@ -15,8 +15,6 @@
  */
 package org.sitoolkit.wt.domain.evidence;
 
-import java.io.File;
-
 import javax.annotation.Resource;
 
 import org.sitoolkit.wt.domain.tester.TestContext;
@@ -42,6 +40,11 @@ public class OperationLog {
 
     @Resource
     EvidenceManager em;
+
+    @Resource
+    ScreenshotTaker screenshotTaker;
+
+    private Evidence currentEvidence;
 
     /**
      * 定型メッセージで操作ログを出力します。
@@ -108,7 +111,7 @@ public class OperationLog {
         record.setNo(current.getTestStep().getNo());
         record.setLog(msg);
 
-        em.addLogRecord(record);
+        currentEvidence.addLogRecord(record);
 
         addPosition(pos);
     }
@@ -116,45 +119,18 @@ public class OperationLog {
     public void addPosition(ElementPosition pos) {
         if (pos != null && pos != ElementPosition.EMPTY) {
             pos.setNo(current.getTestStep().getNo());
-            em.addElementPosition(pos);
+            currentEvidence.addElementPosition(pos);
         }
     }
 
-    /**
-     * 操作ログにスクリーンショットを追加します。
-     * 
-     * @param file
-     *            スクリーンショットの画像ファイル
-     * @see #addScreenshot(java.io.File, java.lang.String, boolean)
-     */
-    public void addScreenshot(File file) {
-        addScreenshot(file, "");
+    public void addScreenshot(ScreenshotTiming timing) {
+        Screenshot screenshot = screenshotTaker.get(timing);
+        currentEvidence.addScreenshot(screenshot, current.getScreenshotTiming());
+        em.moveScreenshot(currentEvidence, current.getTestStepNo(), current.getItemName());
     }
 
-    /**
-     * 操作ログにスクリーンショットを追加します。
-     * 
-     * @param file
-     *            スクリーンショットの画像ファイル
-     * @param timing
-     *            スクリーンショット取得タイミング ファイル名に使用する。
-     */
-    public void addScreenshot(File file, String timing) {
-        if (file == null) {
-            em.flushScreenshot();
-            return;
-        }
-
-        LogRecord record = new LogRecord();
-        em.addScreenshotLogRecord(record, file, current.getScriptName(), current.getCaseNo(),
-                current.getTestStepNo(), current.getItemName(), timing,
-                current.getScreenshotTiming());
-
-    }
-
-    public void flush() {
-        String evidence = em.build(current.getCaseNo(), current.getScriptName());
-        em.flush(current.getScriptName(), current.getCaseNo(), evidence);
+    public void endScript() {
+        em.flushEvidence(currentEvidence);
 
     }
 
@@ -174,12 +150,16 @@ public class OperationLog {
         record.setNo(current.getTestStepNo());
         record.setLog(msg);
         record.setLogLevel(LogLevelVo.ERROR);
-        em.addLogRecord(record);
+        currentEvidence.addLogRecord(record);
 
     }
 
-    public void flushOneStep() {
-        em.flushScreenshot();
+    public void beginScript() {
+        currentEvidence = em.createEvidence(current.getScriptName(), current.getCaseNo());
+    }
+
+    public void endStep() {
+        currentEvidence.commitScreenshot();
     }
 
 }

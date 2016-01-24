@@ -5,12 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.sitoolkit.wt.infra.SitPathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ public class Screenshot {
 
     private File file;
 
-    private File basedir;
+    private String filePath;
 
     private int screenshotPaddingWidth;
 
@@ -28,24 +27,34 @@ public class Screenshot {
 
     private boolean resize;
 
+    private boolean resizing;
+
     private List<ElementPosition> positions = new ArrayList<ElementPosition>();
+
+    private ScreenshotTiming timing;
+
+    private String errorMesage;
 
     public void addElementPosition(ElementPosition pos) {
         positions.add(pos);
     }
 
-    public boolean flush() {
+    public void clearElementPosition() {
+        positions.clear();
+    }
+
+    public Future<?> resize() {
 
         if (file == null) {
-            return false;
+            return null;
         }
 
         if (positions.isEmpty()) {
-            return true;
+            return null;
         }
 
         if (!resize) {
-            return true;
+            return null;
         }
 
         int minX = Integer.MAX_VALUE;
@@ -63,75 +72,69 @@ public class Screenshot {
         LOG.debug("elements:{} rectanble maxX:{}, minY:{}, maxX:{}, maxY:{}",
                 new Object[] { positions.size(), maxX, minY, maxX, maxY });
 
-        try {
-            BufferedImage orgImg = ImageIO.read(file);
-            int subX = Math.max(minX - screenshotPaddingWidth, 0);
-            int subY = Math.max(minY - screenshotPaddingHeight, 0);
-            int subW = Math.min((maxX - minX) + screenshotPaddingWidth * 2,
-                    orgImg.getWidth() - subX);
-            int subH = Math.min((maxY - minY) + screenshotPaddingHeight * 2,
-                    orgImg.getHeight() - subY);
+        resizing = true;
+        return Executors.newSingleThreadExecutor().submit(new Resizer(minX, minY, maxX, maxY));
+    }
 
-            LOG.debug("origonal image w:{}, h:{} sub image x:{}, y:{}, w:{}, h{}",
-                    new Object[] { orgImg.getWidth(), orgImg.getHeight(), subX, subY, subW, subH });
+    private class Resizer implements Runnable {
 
-            BufferedImage subImg = orgImg.getSubimage(subX, subY, subW, subH);
-            ImageIO.write(subImg, "png", file);
+        private int minX;
+        private int minY;
+        private int maxX;
+        private int maxY;
 
-            for (ElementPosition pos : positions) {
-                pos.setX(pos.getX() - subX);
-                pos.setY(pos.getY() - subY);
-            }
-        } catch (IOException e) {
-            LOG.warn("スクリーンショットファイル{}のサイズ変更で例外が発生", file.getName(), e);
+        public Resizer(int minX, int minY, int maxX, int maxY) {
+            super();
+            this.minX = minX;
+            this.minY = minY;
+            this.maxX = maxX;
+            this.maxY = maxY;
         }
 
-        return true;
-    }
+        @Override
+        public void run() {
+            try {
+                BufferedImage orgImg = ImageIO.read(file);
+                int subX = Math.max(minX - screenshotPaddingWidth, 0);
+                int subY = Math.max(minY - screenshotPaddingHeight, 0);
+                int subW = Math.min((maxX - minX) + screenshotPaddingWidth * 2,
+                        orgImg.getWidth() - subX);
+                int subH = Math.min((maxY - minY) + screenshotPaddingHeight * 2,
+                        orgImg.getHeight() - subY);
 
-    public void setFile(File imgDir, File file, String scriptName, String caseNo, String testStepNo,
-            String itemName, String timing) {
+                for (ElementPosition pos : positions) {
+                    pos.setX(pos.getX() - subX);
+                    pos.setY(pos.getY() - subY);
+                }
 
-        String screenshotFileName = buildScreenshotFileName(scriptName, caseNo, testStepNo,
-                itemName, timing);
-        File dstFile = new File(imgDir, screenshotFileName);
+                BufferedImage subImg = orgImg.getSubimage(subX, subY, subW, subH);
+                ImageIO.write(subImg, "png", file);
 
-        try {
+                LOG.debug("origonal image w:{}, h:{} sub image x:{}, y:{}, w:{}, h{} file:{}",
+                        new Object[] { orgImg.getWidth(), orgImg.getHeight(), subX, subY, subW,
+                                subH, file.getAbsolutePath() });
 
-            if (dstFile.exists()) {
-                dstFile = new File(imgDir, dstFile.getName() + "_" + System.currentTimeMillis());
+            } catch (IOException e) {
+                LOG.error("スクリーンショットファイル{}のサイズ変更で例外が発生", file.getName(), e);
+            } finally {
+                resizing = false;
             }
-            FileUtils.moveFile(file, dstFile);
-            this.file = dstFile;
 
-            LOG.info("スクリーンショットを取得しました {}", dstFile.getAbsolutePath());
-
-        } catch (IOException e) {
-            LOG.warn("スクリーンショットファイルの移動に失敗しました", e);
         }
-    }
 
-    private String buildScreenshotFileName(String scriptName, String caseNo, String testStepNo,
-            String itemName, String timing) {
-
-        return StringUtils.join(new String[] { scriptName, caseNo, testStepNo, itemName, timing },
-                "_") + ".png";
-    }
-
-    public String getFilePath() {
-        return SitPathUtils.relatvePath(basedir, file);
     }
 
     public String getFileName() {
-        return file.getName();
+
+        return file == null ? "" : file.getName();
     }
 
     public List<ElementPosition> getPositions() {
         return positions;
     }
 
-    public void setBasedir(File basedir) {
-        this.basedir = basedir;
+    public void setPositions(List<ElementPosition> positions) {
+        this.positions = positions;
     }
 
     public void setResize(boolean resize) {
@@ -148,6 +151,42 @@ public class Screenshot {
 
     public void setScreenshotPaddingHeight(int screenshotPaddingHeight) {
         this.screenshotPaddingHeight = screenshotPaddingHeight;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public ScreenshotTiming getTiming() {
+        return timing;
+    }
+
+    public void setTiming(ScreenshotTiming timing) {
+        this.timing = timing;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public synchronized boolean isResizing() {
+        return resizing;
+    }
+
+    public String getErrorMesage() {
+        return errorMesage;
+    }
+
+    public void setErrorMesage(String errorMesage) {
+        this.errorMesage = errorMesage;
     }
 
 }

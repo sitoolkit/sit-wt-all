@@ -21,7 +21,6 @@ import javax.annotation.Resource;
 
 import org.junit.Test;
 import org.sitoolkit.util.tabledata.TableDataMapper;
-import org.sitoolkit.wt.app.selenium2script.Selenium2Script;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContext;
@@ -45,7 +44,6 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
     public void beforeTestClass(TestContext testContext) throws Exception {
         Selenium2Script converter = Selenium2Script.initInstance();
         File testScript = converter.convert(new File("seleniumscript/SeleniumIDETestScript.html"));
-        testScript.deleteOnExit();
         testScriptPath = testScript.getAbsolutePath();
 
         // Commons BeanutilsのConverterが異なるApplicationContext間で共有となる事象の暫定対応
