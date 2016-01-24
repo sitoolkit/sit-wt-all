@@ -89,7 +89,7 @@
     <exec executable="${mvn.cmd}" dir="${basedir}/archetype">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P"/>
-      <arg value="relase"/>
+      <arg value="release"/>
       <arg value="-Dmaven.test.skip=true"/>
       <arg value="clean" />
       <arg value="${mvn.phase}" />
