@@ -34,20 +34,20 @@ public class EvidenceManager implements ApplicationContextAware {
     private static final Logger LOG = LoggerFactory.getLogger(EvidenceManager.class);
 
     /**
-     * 操作ログのVelocityテンプレート
+     * エビデンスのVelocityテンプレート
      */
-    private String templatePath = "/opelog/opelog-template.vm";
+    private String templatePath = "/evidence/evidence-template.vm";
 
     /**
-     * 操作ログの表示に関連する資源
+     * エビデンスの表示に関連する資源
      */
-    private String[] opelogResources = new String[] { "classpath:opelog/style.css",
-            "classpath:opelog/jquery.js", "classpath:opelog/numbering.js" };
+    private String[] evidenceResources = new String[] { "css/style.css", "js/jquery.js",
+            "js/numbering.js" };
 
     /**
-     * 操作ログの出力先ディレクトリ
+     * エビデンスの出力先ディレクトリ
      */
-    private File opelogRootDir;
+    private File evidenceDir;
     /**
      * スクリーンショットの出力先ディレクトリ
      */
@@ -58,16 +58,16 @@ public class EvidenceManager implements ApplicationContextAware {
 
     @PostConstruct
     public void init() {
-        opelogRootDir = new File("target",
-                "opelog_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
-        opelogRootDir.mkdirs();
-        if (opelogRootDir.exists()) {
-            LOG.info("操作ログ出力ディレクトリを作成しました。{}", opelogRootDir.getAbsolutePath());
+        evidenceDir = new File("target",
+                "evidence_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+        evidenceDir.mkdirs();
+        if (evidenceDir.exists()) {
+            LOG.info("エビデンス出力ディレクトリを作成しました。{}", evidenceDir.getAbsolutePath());
         } else {
-            throw new TestException("操作ログ出力ディレクトリの作成に失敗しました" + opelogRootDir.getAbsoluteFile());
+            throw new TestException("エビデンス出力ディレクトリの作成に失敗しました" + evidenceDir.getAbsoluteFile());
         }
 
-        imgDir = new File(opelogRootDir, "img");
+        imgDir = new File(evidenceDir, "img");
         imgDir.mkdirs();
         if (!imgDir.exists()) {
             throw new TestException("スクリーンショット出力ディレクトリの作成に失敗しました" + imgDir.getAbsoluteFile());
@@ -76,10 +76,9 @@ public class EvidenceManager implements ApplicationContextAware {
             Properties prop = PropertyUtils.load("/velocity.properties", false);
             Velocity.init(prop);
             tmpl = Velocity.getTemplate(templatePath);
-            for (String opelogRes : opelogResources) {
-                URL url = ResourceUtils.getURL(opelogRes);
-                File dstFile = new File(opelogRootDir,
-                        StringUtils.substringAfterLast(url.getPath(), "/"));
+            for (String evidenceRes : evidenceResources) {
+                URL url = ResourceUtils.getURL("classpath:evidence/" + evidenceRes);
+                File dstFile = new File(evidenceDir, evidenceRes);
                 FileUtils.copyURLToFile(url, dstFile);
             }
         } catch (IOException e) {
@@ -113,7 +112,7 @@ public class EvidenceManager implements ApplicationContextAware {
 
             FileUtils.moveFile(file, dstFile);
             screenshot.setFile(dstFile);
-            screenshot.setFilePath(SitPathUtils.relatvePath(opelogRootDir, dstFile));
+            screenshot.setFilePath(SitPathUtils.relatvePath(evidenceDir, dstFile));
 
             LOG.info("スクリーンショットを取得しました {}", dstFile.getAbsolutePath());
 
@@ -139,7 +138,7 @@ public class EvidenceManager implements ApplicationContextAware {
     public void flushEvidence(Evidence evidence) {
         String html = build(evidence);
 
-        File htmlFile = new File(opelogRootDir, opelogFileName(evidence.getScriptName(),
+        File htmlFile = new File(evidenceDir, buildEvidenceFileName(evidence.getScriptName(),
                 evidence.getCaseNo(), evidence.hasError()));
 
         if (htmlFile.exists()) {
@@ -147,16 +146,16 @@ public class EvidenceManager implements ApplicationContextAware {
                     System.currentTimeMillis() + "_" + htmlFile.getName());
         }
 
-        LOG.info("操作ログを出力します {}", htmlFile.getAbsolutePath());
+        LOG.info("エビデンスを出力します {}", htmlFile.getAbsolutePath());
 
         try {
             FileUtils.write(htmlFile, html, "UTF-8");
         } catch (Exception e) {
-            throw new TestException("操作ログの出力に失敗しました", e);
+            throw new TestException("エビデンスの出力に失敗しました", e);
         }
     }
 
-    private String opelogFileName(String scriptName, String caseNo, boolean hasError) {
+    private String buildEvidenceFileName(String scriptName, String caseNo, boolean hasError) {
 
         String resultHtml = ".html";
         if (hasError) {
@@ -168,9 +167,9 @@ public class EvidenceManager implements ApplicationContextAware {
     }
 
     /**
-     * 操作ログファイルに出力する文字列を構築します。
+     * エビデンスファイルに出力する文字列を構築します。
      *
-     * @return 操作ログファイルに出力する文字列
+     * @return エビデンスファイルに出力する文字列
      */
     private String build(Evidence evidence) {
         VelocityContext context = new VelocityContext();
@@ -197,7 +196,7 @@ public class EvidenceManager implements ApplicationContextAware {
     public void moveLogFile() {
         try {
             File logFile = new File(logFilePath);
-            FileUtils.copyFileToDirectory(logFile, opelogRootDir, true);
+            FileUtils.copyFileToDirectory(logFile, evidenceDir, true);
             logFile.deleteOnExit();
         } catch (IOException e) {
             throw new TestException(e);

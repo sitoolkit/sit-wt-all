@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>操作ログ $testScriptName ケース_$caseNo $result</title>
+		<title>テストエビデンス $testScriptName ケース_$caseNo $result</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" href="style.css"/>
-		<script src="jquery.js"></script>
-		<script src="numbering.js"></script>
+		<link rel="stylesheet" href="css/style.css"/>
+		<script src="js/jquery.js"></script>
+		<script src="js/numbering.js"></script>
 	</head>
 	<body>
-		<h1>操作ログ $testScriptName ケース_$caseNo $result</h1>
+        <a href="./">エビデンスフォルダへ</a>
+		<h1>テストエビデンス $testScriptName ケース_$caseNo $result</h1>
 		<table>
 			<thead>
 				<tr>

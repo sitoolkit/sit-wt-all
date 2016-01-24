@@ -16,21 +16,21 @@ public class EvidenceOpener {
     private static final Logger LOG = LoggerFactory.getLogger(EvidenceOpener.class);
     private int openFileCount = 1;
     private String buildDir = "target";
-    private String opelogDirRegex = "^opelog_.*";
-    private String opelogFileRegex = ".*\\.html$";
+    private String evidenceDirRegex = "^evidence_.*";
+    private String evidenceFileRegex = ".*\\.html$";
 
     public void open() {
         File outputDir = new File(buildDir);
-        File[] opelogDirs = outputDir.listFiles(new PatternFilenameFilter(opelogDirRegex));
-        Arrays.sort(opelogDirs, new FileLastModifiedComarator(false));
+        File[] evidenceDirs = outputDir.listFiles(new PatternFilenameFilter(evidenceDirRegex));
+        Arrays.sort(evidenceDirs, new FileLastModifiedComarator(false));
 
-        if (opelogDirs.length == 0) {
+        if (evidenceDirs.length == 0) {
             LOG.info("エビデンスフォルダがありません {}", outputDir.getAbsolutePath());
             return;
         }
 
-        File[] opelogFiles = opelogDirs[0].listFiles(new PatternFilenameFilter(opelogFileRegex));
-        LOG.info("{}に{}のエビデンスがあります ", opelogDirs[0].getName(), opelogFiles.length);
+        File[] opelogFiles = evidenceDirs[0].listFiles(new PatternFilenameFilter(evidenceFileRegex));
+        LOG.info("{}に{}のエビデンスがあります ", evidenceDirs[0].getName(), opelogFiles.length);
 
         Arrays.sort(opelogFiles, new FileLastModifiedComarator(true));
 
