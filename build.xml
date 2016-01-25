@@ -4,13 +4,19 @@
   <property environment="env" />
   <property name="testArtifactId" value="sit-wt-test" />
   <property name="testdir" value="${basedir}/target/${testArtifactId}" />
-  <property name="file.encoding" value="UTF-8"/>
+  <property name="file.encoding" value="UTF-8" />
 
   <!-- TODO else~を修正 -->
   <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
     <os family="windows" />
   </condition>
+  
+  
+  <condition property="mvn.profile.ci" value="localhost,ci,release" else="">
+    <isset property="ci"/>
+  </condition>
 
+  
   <target name="install">
     <property name="mvn.phase" value="install" />
     <property name="mvn.repo" value="local.repositories" />
@@ -24,20 +30,19 @@
     <antcall target="all" />
   </target>
 
-  
+
   <target name="all">
     <antcall target="01_process-all" />
-    <antcall target="02_process-archetype" />
-    <antcall target="03_create-project" />
     <antcall target="04_integration-test" />
   </target>
 
+  
   <target name="01_process-all" depends="check-test.skip">
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
-      <arg value="${mvn.repo},localhost,ci,release" />
+      <arg value="${mvn.repo},${mvn.profile.ci}" />
       <arg value="-pl" />
       <arg value="!sit-wt-project-template,!sit-wt-project-template/distribution/archetype" />
       <arg value="-Dmaven.test.skip=${test.skip}" />
@@ -47,6 +52,7 @@
     </exec>
 
   </target>
+
   
   <target name="check-test.skip" unless="test.skip">
     <input message="select maven.test.skip"
@@ -54,81 +60,22 @@
            validargs="true,false"
            defaultvalue="true" />
   </target>
-  
-
-  <target name="02_process-archetype">
-
-    <ant antfile="${basedir}/sit-wt-project-template/distribution/build.xml"
-         target="${mvn.phase}"
-         inheritall="false" />
-
-  </target>
-
-
-  <target name="03_create-project">
-
-    <delete dir="${testdir}" />
-    <mkdir dir="${testdir}" />
-
-    <exec executable="${mvn.cmd}" dir="${basedir}/target" failonerror="true">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-DarchetypeGroupId=org.sitoolkit.wt" />
-      <arg value="-DarchetypeArtifactId=sit-wt-project" />
-      <arg value="-DarchetypeVersion=0.10-SNAPSHOT" />
-      <arg value="-DgroupId=a.b.c" />
-      <arg value="-DartifactId=${testArtifactId}" />
-      <arg value="-Darchetype.interactive=false" />
-      <arg value="-DarchetypeCatalog=local" />
-      <arg value="-B" />
-      <arg value="archetype:generate" />
-    </exec>
-
-  </target>
 
 
   <target name="04_integration-test" depends="check-mvn.repo">
 
-    <copy file="${basedir}/sit-wt-runtime/seleniumscript/SeleniumIDETestScript.html"
-          todir="${testdir}/seleniumscript" />
-    <copy file="${basedir}/sit-wt-runtime/testscript/ExcelTestScript.xlsx"
-          todir="${testdir}/testscript" />
-
-    <parallel>
-      
-      <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="true">
-        <env key="JAVA_HOME" value="${java.home}" />
-        <arg value="test-compile" />
-        <arg value="jetty:run" />
-      </exec>
-      
-      <sequential>
-      
-        <exec executable="${mvn.cmd}" dir="${testdir}" resultproperty="testresult" >
-          <env key="JAVA_HOME" value="${java.home}" />
-          <arg value="-DbaseUrl=http://localhost:8280/" />
-          <arg value="-Devidence.open=false" />
-          <arg value="-P" />
-          <arg value="${mvn.repo}" />
-          <arg value="-Dfile.encoding=${file.encoding}" />
-          <arg value="verify" />
-        </exec>
+    <copy file="${basedir}/sit-wt-project-template/pom.xml" todir="${testdir}"/>
     
-        <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="false">
-          <env key="JAVA_HOME" value="${java.home}" />
-          <arg value="jetty:stop" />
-        </exec>
-      
-      </sequential>
-
-    </parallel>    
-
-    
-    <condition property="testfailed">
-      <not>
-        <equals arg1="${testresult}" arg2="0" />
-      </not>
-    </condition>
-    <fail if="testfailed" message="integration test faild." />
+    <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-Devidence.open=false" />
+      <arg value="-Dsample.baseUrl=file://${basedir}/sit-wt-runtime/" />
+      <arg value="-P" />
+      <arg value="${mvn.repo}" />
+      <arg value="-Dfile.encoding=${file.encoding}" />
+      <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
+      <arg value="verify" />
+    </exec>
 
   </target>
 

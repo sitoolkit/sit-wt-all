@@ -14,13 +14,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 @Mojo(name = "sample")
 public class GetSampleMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/sit-wt-runtime/")
+    @Parameter(defaultValue = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/sit-wt-runtime/", property = "sample.baseUrl")
     private URL baseUrl;
 
-    @Parameter(defaultValue = "${basedir}")
+    @Parameter(defaultValue = "${basedir}", property = "sample.basedir")
     private File basedir;
 
-    @Parameter(defaultValue = "src/main/webapp/input.html,src/main/webapp/terms.html,src/main/webapp/done.html,src/main/webapp/style.css,testscript/ExcelTestScript.xlsx,seleniumscript/SeleniumIDETestScript.html")
+    @Parameter(defaultValue = "src/main/webapp/input.html,src/main/webapp/terms.html,src/main/webapp/done.html,src/main/webapp/style.css,"
+            + "testscript/ExcelTestScript.xlsx", property = "sample.resources")
     private String resources;
 
     @Override
