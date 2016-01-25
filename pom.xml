@@ -5,7 +5,7 @@
   <!-- The Basics -->
   <groupId>org.sitoolkit.wt</groupId>
   <artifactId>sit-wt-all</artifactId>
-  <version>0.9</version>
+  <version>0.10-SNAPSHOT</version>
   <packaging>pom</packaging>
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -51,7 +51,7 @@
         <artifactId>versions-maven-plugin</artifactId>
         <version>2.2</version>
         <configuration>
-          <newVersion>0.9-SNAPSHOT</newVersion>
+          <newVersion>0.10-SNAPSHOT</newVersion>
           <properties>
             <property>
               <name>sitwt.version</name>
