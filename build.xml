@@ -69,7 +69,7 @@
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-Devidence.open=false" />
-      <arg value="-Dsample.baseUrl=file://${basedir}/sit-wt-runtime/" />
+      <arg value="-Dsample.baseUrl=file:///${basedir}/sit-wt-runtime/" />
       <arg value="-P" />
       <arg value="${mvn.repo}" />
       <arg value="-Dfile.encoding=${file.encoding}" />
