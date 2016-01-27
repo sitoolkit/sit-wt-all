@@ -13,8 +13,6 @@
     <version>7</version>
   </parent>
   <modules>
-    <module>sit-wt-project-template</module>
-    <module>sit-wt-project-template/distribution/archetype</module>
     <module>sit-wt-maven-plugin</module>
     <module>sit-wt-runtime</module>
   </modules>
