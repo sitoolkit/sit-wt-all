@@ -75,4 +75,25 @@
       </plugin>
     </plugins>
   </build>
+  
+  <!-- Environment Settings -->
+  <profiles>
+    <profile>
+      <id>debug</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <forkCount>0</forkCount>
+              <systemPropertyVariables>
+                <sitwt.debug>true</sitwt.debug>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
 </project>
