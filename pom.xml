@@ -5,7 +5,7 @@
   <!-- The Basics -->
   <groupId>org.sitoolkit.wt</groupId>
   <artifactId>sit-wt-all</artifactId>
-  <version>0.10-SNAPSHOT</version>
+  <version>0.10</version>
   <packaging>pom</packaging>
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -43,21 +43,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <newVersion>0.10-SNAPSHOT</newVersion>
-          <properties>
-            <property>
-              <name>sitwt.version</name>
-            </property>
-          </properties>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 
   <!-- More Project Information -->

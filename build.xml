@@ -10,13 +10,13 @@
   <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
     <os family="windows" />
   </condition>
-  
-  
+
+
   <condition property="mvn.profile.ci" value="localhost,ci,release" else="">
-    <isset property="ci"/>
+    <isset property="ci" />
   </condition>
 
-  
+
   <target name="install">
     <property name="mvn.phase" value="install" />
     <property name="mvn.repo" value="local.repositories" />
@@ -36,7 +36,7 @@
     <antcall target="02_acceptance-test" />
   </target>
 
-  
+
   <target name="01_build" depends="check-test.skip">
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
@@ -51,7 +51,7 @@
 
   </target>
 
-  
+
   <target name="check-test.skip" unless="test.skip">
     <input message="select maven.test.skip"
            addproperty="test.skip"
@@ -62,8 +62,8 @@
 
   <target name="02_acceptance-test" depends="check-mvn.repo">
 
-    <copy file="${basedir}/distribution/pom.xml" todir="${testdir}"/>
-    
+    <copy file="${basedir}/distribution/pom.xml" todir="${testdir}" />
+
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-Devidence.open=false" />
@@ -83,6 +83,22 @@
            addproperty="mvn.repo"
            validargs="local.repositories,sonatype.repositores"
            defaultvalue="local.repositories" />
+  </target>
+
+
+  <target name="set-version">
+
+    <property name="version" value="0.10" />
+
+    <replaceregexp file="${basedir}/distribution/pom.xml"
+                   match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
+                   replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
+
+    <exec executable="${mvn.cmd}" dir="${basedir}">
+      <arg value="-DnewVersion=${version}" />
+      <arg value="versions:set" />
+    </exec>
+
   </target>
 
 </project>
