@@ -8,24 +8,24 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.sitoolkit.wt.app.script2java.Script2Java;
-import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  */
 @Mojo(name = "script2java", defaultPhase = LifecyclePhase.GENERATE_TEST_SOURCES)
 public class Script2JavaMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${basedir}/testscript")
-    private String testscriptDirectory;
+    @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/test")
+    private File outputDirectory;
 
     @Component
-    private BuildContext buildContext;
+    private MavenProject project;
 
     @Override
     public void execute() throws MojoExecutionException {
-        Script2Java.staticExecute();
-
-        buildContext.refresh(new File(testscriptDirectory));
+        String outdir = outputDirectory.getAbsolutePath();
+        Script2Java.staticExecute(outdir);
+        project.addTestCompileSourceRoot(outdir);
     }
 }
