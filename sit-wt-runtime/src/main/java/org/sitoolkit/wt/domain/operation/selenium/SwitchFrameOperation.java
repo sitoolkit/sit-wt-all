@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 public class SwitchFrameOperation extends SeleniumOperation {
 
     @Override
-    public void execute(TestStep testStep) {
-        info(null, "フレームを{}に切り替えます", testStep.getItemName());
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
+        ctx.info("フレームを{}に切り替えます", testStep.getItemName());
         Locator locator = testStep.getLocator();
         if (locator.isNa()) {
             seleniumDriver.switchTo().defaultContent();

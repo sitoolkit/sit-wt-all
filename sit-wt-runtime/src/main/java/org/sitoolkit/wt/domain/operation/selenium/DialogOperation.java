@@ -16,6 +16,7 @@
 package org.sitoolkit.wt.domain.operation.selenium;
 
 import org.openqa.selenium.Alert;
+import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
 
@@ -26,17 +27,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class DialogOperation extends SeleniumOperation {
 
-    public void execute(TestStep testStep) {
+    @Override
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         try {
             Alert alert = seleniumDriver.switchTo().alert();
             String alertText = alert.getText();
             testStep.getLocator().setValue(alertText);
 
             if (testStep.getDialogValue()) {
-                info("許諾", null);
+                ctx.info(MessagePattern.項目をXXします, "許諾");
                 alert.accept();
             } else {
-                info("拒否", null);
+                ctx.info(MessagePattern.項目をXXします, "拒否");
                 alert.dismiss();
             }
         } catch (UnsupportedOperationException e) {

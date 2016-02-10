@@ -17,12 +17,9 @@ package org.sitoolkit.wt.domain.operation;
 
 import java.io.InputStream;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.sitoolkit.wt.domain.evidence.ElementPosition;
-import org.sitoolkit.wt.domain.evidence.OperationLog;
+import org.sitoolkit.wt.domain.evidence.LogRecord;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.TestException;
 import org.slf4j.Logger;
@@ -40,14 +37,15 @@ public class ExecOperation implements Operation {
 
     private static final String CMD_SEPARATOR = "[\\s]+";
 
-    @Resource
-    protected OperationLog opelog;
+    // @Resource
+    // protected OperationLog opelog;
 
     @Override
-    public void operate(TestStep testStep) {
+    public OperationResult operate(TestStep testStep) {
+        OperationResult result = new OperationResult();
 
         String cmd = testStep.getLocator().getValue();
-        opelog.info(log, ElementPosition.EMPTY, "コマンド[{}]を実行します。", cmd);
+        result.addRecord(LogRecord.info(log, testStep, "コマンド[{}]を実行します", cmd));
 
         ProcessBuilder pb = new ProcessBuilder(cmd.split(CMD_SEPARATOR));
         pb.redirectErrorStream(true);
@@ -70,11 +68,13 @@ public class ExecOperation implements Operation {
         }
 
         if (!StringUtils.isEmpty(cmdlog)) {
-            opelog.info(log, ElementPosition.EMPTY, cmdlog);
+            result.addRecord(LogRecord.info(log, testStep, "コマンド実行結果 {}", cmdlog));
         }
 
         if (exitValue != 0) {
             throw new TestException("コマンドが異常終了しました。 " + cmd);
         }
+
+        return result;
     }
 }

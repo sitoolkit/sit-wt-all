@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 public class SetWindowSizeOperation extends SeleniumOperation {
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         String value = testStep.getValue();
         String[] size = value.split(",");
 
@@ -39,6 +39,9 @@ public class SetWindowSizeOperation extends SeleniumOperation {
         try {
             int width = Integer.parseInt(size[0]);
             int height = Integer.parseInt(size[1]);
+
+            ctx.info("ウィンドウサイズを({}, {})に設定します", width, height);
+
             Dimension targetSize = new Dimension(width, height);
             seleniumDriver.manage().window().setSize(targetSize);
         } catch (NumberFormatException e) {

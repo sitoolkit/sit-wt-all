@@ -23,8 +23,14 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
-import org.sitoolkit.wt.domain.evidence.OperationLog;
+import org.sitoolkit.wt.domain.evidence.Evidence;
+import org.sitoolkit.wt.domain.evidence.EvidenceManager;
+import org.sitoolkit.wt.domain.evidence.LogLevelVo;
+import org.sitoolkit.wt.domain.evidence.LogRecord;
+import org.sitoolkit.wt.domain.evidence.Screenshot;
+import org.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import org.sitoolkit.wt.domain.evidence.ScreenshotTiming;
+import org.sitoolkit.wt.domain.operation.OperationResult;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -32,7 +38,6 @@ import org.sitoolkit.wt.infra.TestException;
 import org.sitoolkit.wt.infra.VerifyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 
 /**
  * このクラスは、テストの実施者を表すエンティティです。
@@ -42,16 +47,19 @@ import org.springframework.context.ApplicationContext;
 public class Tester {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
-    @Resource
-    ApplicationContext appCtx;
-    @Resource
-    OperationLog opelog;
+
     @Resource
     TestContext current;
     @Resource
     DebugSupport debug;
     @Resource
     DialogScreenshotSupport dialog;
+
+    @Resource
+    EvidenceManager em;
+
+    @Resource
+    ScreenshotTaker screenshotTaker;
 
     @Resource
     TestScriptDao dao;
@@ -71,7 +79,7 @@ public class Tester {
         current.setCaseNo(caseNo);
         current.setScriptName(testScript.getName());
 
-        opelog.beginScript();
+        // opelog.beginScript();
     }
 
     /**
@@ -95,16 +103,12 @@ public class Tester {
         }
     }
 
-    /**
-     * 現在実行中のケース番号の操作ログを出力します。
-     *
-     */
     public void tearDown() {
-        opelog.endScript();
+        // NOP
     }
 
     public void tearDownClass() {
-        opelog.moveLogFile();
+        em.moveLogFile();
     }
 
     /**
@@ -115,52 +119,69 @@ public class Tester {
      * @return Verify操作がNGとなった数
      */
     public TestResult operate(String caseNo) {
+
         if (!testScript.containsCaseNo(caseNo)) {
             String msg = "指定されたケース番号[" + caseNo + "]は不正です。指定可能なケース番号："
                     + testScript.getCaseNoMap().keySet();
             throw new TestException(msg);
         }
+
         dialog.checkReserve(testScript.getTestStepList(), caseNo);
         log.info("ケース{}を実行します", caseNo);
 
         List<Exception> ngList = new ArrayList<Exception>();
         TestResult result = new TestResult();
 
+        Evidence evidence = em.createEvidence(current.getScriptName(), caseNo);
+        TestStep testStep = null;
+
         try {
+
             do {
-                TestStep testStep = current.getTestStep();
+                testStep = current.getTestStep();
                 dialog.reserveWindowRect(testStep.getNo());
+
                 try {
-                    operateOneScript(testStep, current.getCaseNo());
+
+                    operateOneScript(testStep, current.getCaseNo(), evidence);
+
                 } catch (VerifyException e) {
                     ngList.add(e);
                     result.add(e);
-                    opelog.warn(log, "期待と異なる結果になりました。{}", e.getLocalizedMessage());
-                    // opelog.addScreenshot(screenshotOpe.get());
-                    opelog.addScreenshot(ScreenshotTiming.ON_ERROR);
+                    evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
+                            "期待と異なる結果になりました {}", e.getLocalizedMessage()));
+                    addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
+
                     if (debug.isDebug()) {
                         debug.pause();
                     }
+
                 } catch (Exception e) {
+
                     if (debug.isDebug()) {
                         ngList.add(e);
-                        log.error("予期しないエラーが発生しました。{}", e.getLocalizedMessage());
-                        // opelog.addScreenshot(screenshotOpe.get());
-                        opelog.addScreenshot(ScreenshotTiming.ON_ERROR);
+                        evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
+                                "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
+                        addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
                         debug.pause();
                     } else {
                         throw e;
                     }
+
                 }
+
             } while (debug.next());
 
         } catch (Exception e) {
-            // opelog.addScreenshot(screenshotOpe.get(), "テスト実施が異常終了");
-            opelog.error(log, e.getMessage());
-            opelog.addScreenshot(ScreenshotTiming.ON_ERROR);
+            evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
+                    "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
+            addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
             log.debug("例外詳細", e);
             result.setErrorCause(e);
+        } finally {
+            em.flushEvidence(evidence);
         }
+
         return result;
     }
 
@@ -175,35 +196,40 @@ public class Tester {
      * @see TestStep#beforeScreenshot()
      * @see TestStep#afterScreenshot()
      */
-    void operateOneScript(TestStep testStep, String caseNo) {
+    private void operateOneScript(TestStep testStep, String caseNo, Evidence evidence) {
         testStep.setCurrentCaseNo(caseNo);
+
         if (testStep.isSkip()) {
             log.info("ケース[{}][{} {}]の操作をスキップします", caseNo, testStep.getNo(), testStep.getItemName());
             return;
         }
 
         if (testStep.dialogScreenshot()) {
-            // opelog.addScreenshot(screenshotOpe.getWithDialog());
-            opelog.addScreenshot(ScreenshotTiming.ON_DIALOG);
+            addScreenshot(evidence, ScreenshotTiming.ON_DIALOG);
         } else if (testStep.beforeScreenshot()) {
-            // opelog.addScreenshot(screenshotOpe.get(), "前");
-            opelog.addScreenshot(ScreenshotTiming.BEFORE_OPERATION);
+            addScreenshot(evidence, ScreenshotTiming.BEFORE_OPERATION);
         }
 
-        testStep.execute();
+        OperationResult result = testStep.getOperation().operate(testStep);
+        evidence.addLogRecords(result.getRecords());
 
         if (testStep.afterScreenshot()) {
-            // opelog.addScreenshot(screenshotOpe.get(), "後");
-            opelog.addScreenshot(ScreenshotTiming.AFTER_OPERATION);
+            addScreenshot(evidence, ScreenshotTiming.AFTER_OPERATION);
         }
 
-        opelog.endStep();
+        evidence.commitScreenshot();
 
         try {
             Thread.sleep(getOperationSpan());
         } catch (InterruptedException e) {
             log.warn("スレッドの待機に失敗しました", e);
         }
+    }
+
+    private void addScreenshot(Evidence evidence, ScreenshotTiming timing) {
+        Screenshot screenshot = screenshotTaker.get(timing);
+        evidence.addScreenshot(screenshot, current.getScreenshotTiming());
+        em.moveScreenshot(evidence, current.getTestStepNo(), current.getItemName());
     }
 
     /**
@@ -219,11 +245,4 @@ public class Tester {
         return scriptLoaded;
     }
 
-    // public ScreenshotOperation getScreenshotOpe() {
-    // return screenshotOpe;
-    // }
-    //
-    // public void setScreenshotOpe(ScreenshotOperation screenshotOpe) {
-    // this.screenshotOpe = screenshotOpe;
-    // }
 }

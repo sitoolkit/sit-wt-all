@@ -47,9 +47,10 @@ public class OpenOperation extends SeleniumOperation {
      *
      * @see WebDriver#get(String)
      */
-    public void execute(TestStep testStep) {
+    @Override
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         String url = buildUrl(System.getProperty("baseUrl"), testStep.getLocator().getValue());
-        info("オープン", null);
+        ctx.info("URLをオープンします {}", url);
         seleniumDriver.get(url);
     }
 

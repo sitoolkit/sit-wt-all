@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class DrawLineOperation extends SeleniumOperation {
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         WebElement canvas = findElement(testStep.getLocator());
         Actions builder = new Actions(seleniumDriver);
 
@@ -38,14 +38,14 @@ public class DrawLineOperation extends SeleniumOperation {
         if (values.length == 2) {
             toX = Integer.parseInt(values[0]);
             toY = Integer.parseInt(values[1]);
-            info(canvas, "キャンバス({})の({}, {})まで線を引きます。", testStep.getLocator(), toX, toY);
+            ctx.info(canvas, "キャンバス({})の({}, {})まで線を引きます。", testStep.getLocator(), toX, toY);
         } else {
             fromX = Integer.parseInt(values[0]);
             fromY = Integer.parseInt(values[1]);
             toX = Integer.parseInt(values[2]);
             toY = Integer.parseInt(values[3]);
 
-            info(canvas, "キャンバス({})の({}, {})から({}, {})まで線を引きます。", testStep.getLocator(), fromX,
+            ctx.info(canvas, "キャンバス({})の({}, {})から({}, {})まで線を引きます。", testStep.getLocator(), fromX,
                     fromY, toX, toY);
             builder.moveToElement(canvas, fromX, fromY);
         }

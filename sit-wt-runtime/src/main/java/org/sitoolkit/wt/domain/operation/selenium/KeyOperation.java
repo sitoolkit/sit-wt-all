@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +35,10 @@ public class KeyOperation extends SeleniumOperation {
 
     private static final String SPECIAL_KEY_PREFIX = "key_";
 
-    public void execute(TestStep testStep) {
+    @Override
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         WebElement element = findElement(testStep.getLocator());
-        info(Arrays.toString(testStep.getValues()), "打鍵", element);
+        ctx.info(element, MessagePattern.項目にXXをYYします, Arrays.toString(testStep.getValues()), "打鍵");
         CharSequence[] chars = split(testStep.getValues());
         Keys.chord(chars);
     }

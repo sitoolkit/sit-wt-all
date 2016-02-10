@@ -60,10 +60,12 @@ public class Script2Java implements ApplicationContextAware {
 
     public static final String SYSPROP_TESTS_SCRIPT_PATH = "testsScriptPath";
 
+    private static final String DEFAULT_TEST_SRC_DIR = "target/generated-test-sources/test/";
+
     /**
      * テストソースディレクトリのパス
      */
-    private String testSrcDir = "target/generated-test-sources/test/";
+    private String testSrcDir = DEFAULT_TEST_SRC_DIR;
 
     /**
      * テストスクリプトディレクトリのパス
@@ -84,7 +86,7 @@ public class Script2Java implements ApplicationContextAware {
     private Properties timestampLog = new Properties();
 
     public static void main(String[] args) {
-        System.exit(staticExecute(null));
+        System.exit(staticExecute(DEFAULT_TEST_SRC_DIR));
     }
 
     public static int staticExecute(String testSrcDir) {

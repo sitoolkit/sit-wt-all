@@ -44,13 +44,13 @@ public class VerifySelectOperation extends SeleniumOperation {
     }
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         String[] expectedValues = testStep.getValues();
         WebElement element = findElement(testStep.getLocator());
         Select select = new Select(element);
 
-        info(element, "{}({})で選択された値が期待値{}に一致することを確認します。", new Object[] { testStep.getItemName(),
-                testStep.getLocator(), Arrays.toString(expectedValues) });
+        ctx.info(element, "{}({})で選択された値が期待値{}に一致することを確認します。", new Object[] {
+                testStep.getItemName(), testStep.getLocator(), Arrays.toString(expectedValues) });
 
         OptionSupport support = map.get(testStep.getDataType());
 

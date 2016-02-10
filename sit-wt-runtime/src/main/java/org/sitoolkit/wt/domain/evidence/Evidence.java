@@ -22,6 +22,13 @@ public class Evidence {
 
     public void addLogRecord(LogRecord log) {
         records.add(log);
+        currentPositions.addAll(log.getPositions());
+    }
+
+    public void addLogRecords(List<LogRecord> logs) {
+        for (LogRecord log : logs) {
+            addLogRecord(log);
+        }
     }
 
     public void addElementPosition(ElementPosition pos) {
@@ -41,6 +48,7 @@ public class Evidence {
 
         record.setScreenshot(currentScreenshot);
 
+        // TODO スクリーンショットのリサイズをテストスクリプトから指定する使用については要検討
         if (screenshot.isResize()) {
             if (StringUtils.contains(resize, "全")) {
                 screenshot.setResize(false);

@@ -19,8 +19,7 @@ import java.io.File;
 
 import javax.annotation.Resource;
 
-import org.sitoolkit.wt.domain.evidence.ElementPosition;
-import org.sitoolkit.wt.domain.evidence.OperationLog;
+import org.sitoolkit.wt.domain.evidence.LogRecord;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.tester.TestContextListener;
 import org.sitoolkit.wt.domain.testscript.TestScript;
@@ -56,13 +55,14 @@ public class IncludeOperation implements Operation, TestContextListener {
     @Resource
     TestScriptDao dao;
 
-    @Resource
-    OperationLog opelog;
+    // @Resource
+    // OperationLog opelog;
 
     @Override
-    public void operate(TestStep testStep) {
+    public OperationResult operate(TestStep testStep) {
         String testStepName = testStep.getLocator().getValue();
-        opelog.info(LOG, ElementPosition.EMPTY, "テストスクリプト[{}]を実行します。", testStepName);
+
+        LogRecord log = LogRecord.info(LOG, testStep, "テストスクリプト[{}]を実行します。", testStepName);
 
         current.backup();
 
@@ -81,6 +81,8 @@ public class IncludeOperation implements Operation, TestContextListener {
             throw new TestException(msg);
         }
         current.setTestContextListener(this);
+
+        return new OperationResult(log);
     }
 
     @Override

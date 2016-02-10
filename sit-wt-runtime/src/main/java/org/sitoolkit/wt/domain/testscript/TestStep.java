@@ -83,14 +83,6 @@ public class TestStep {
      */
     private String breakPoint;
 
-    /**
-     * 指定のテストデータを使用し、テスト操作を実行する。
-     *
-     */
-    public void execute() {
-        getOperation().operate(this);
-    }
-
     public String getNo() {
         return no;
     }

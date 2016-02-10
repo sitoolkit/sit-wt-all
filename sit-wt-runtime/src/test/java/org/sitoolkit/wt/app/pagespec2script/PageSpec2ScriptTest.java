@@ -25,6 +25,7 @@ import org.junit.rules.TestName;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.sitoolkit.util.tabledata.TableDataMapper;
+import org.sitoolkit.wt.app.OperationExecutor;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContext;
@@ -62,6 +63,7 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
 
     @Test
     public void test001() {
+        OperationExecutor.execute(appCtx, "open", "input.html");
         test();
     }
 

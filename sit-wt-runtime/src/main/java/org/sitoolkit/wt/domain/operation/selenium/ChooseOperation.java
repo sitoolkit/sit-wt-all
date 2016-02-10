@@ -15,13 +15,16 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
@@ -78,18 +81,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChooseOperation extends SeleniumOperation {
 
-    public void execute(TestStep testStep) {
+    @Override
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
+
         String[] values = testStep.getValues();
-        info(Arrays.toString(values), "選択", null);
+        ctx.info(MessagePattern.項目にXXをYYします, Arrays.toString(values), "選択");
+
         Map<String, Choice> map = toMap(values);
+
+        List<WebElement> elements = null;
         if ("label".equals(testStep.getDataType())) {
-            chooseByLabel(testStep.getLocator(), map);
+            elements = chooseByLabel(testStep.getLocator(), map);
         } else {
-            chooseByValue(testStep.getLocator(), map);
+            elements = chooseByValue(testStep.getLocator(), map);
         }
+
+        ctx.addOperatedElement(elements);
     }
 
-    protected void chooseByLabel(Locator locator, Map<String, Choice> map) {
+    protected List<WebElement> chooseByLabel(Locator locator, Map<String, Choice> map) {
+
+        List<WebElement> elements = new ArrayList<>();
+
         for (WebElement element : findElements(locator)) {
             String id = element.getAttribute("id");
             WebElement label = seleniumDriver
@@ -101,21 +114,29 @@ public class ChooseOperation extends SeleniumOperation {
                 continue;
             }
             if (setChecked(element, label, choice.on)) {
-                addPosition(element);
+                elements.add(element);
             }
         }
+
+        return elements;
     }
 
-    protected void chooseByValue(Locator locator, Map<String, Choice> map) {
+    protected List<WebElement> chooseByValue(Locator locator, Map<String, Choice> map) {
+
+        List<WebElement> elements = new ArrayList<>();
+
         for (WebElement element : findElements(locator)) {
             Choice choice = map.get(element.getAttribute("value"));
             if (choice == null) {
                 continue;
             }
             if (setChecked(element, element, choice.on)) {
-                addPosition(element);
+                // addPosition(element);
+                elements.add(element);
             }
         }
+
+        return elements;
     }
 
     protected Map<String, Choice> toMap(String[] values) {

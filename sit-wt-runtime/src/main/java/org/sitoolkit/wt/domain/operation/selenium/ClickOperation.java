@@ -16,6 +16,7 @@
 package org.sitoolkit.wt.domain.operation.selenium;
 
 import org.openqa.selenium.WebElement;
+import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +27,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClickOperation extends SeleniumOperation {
 
-    public void execute(TestStep testStep) {
+    @Override
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         WebElement element = findElement(testStep.getLocator());
-        info("クリック", element);
+        ctx.info(element, MessagePattern.項目をXXします, "クリック");
         element.click();
     }
 }

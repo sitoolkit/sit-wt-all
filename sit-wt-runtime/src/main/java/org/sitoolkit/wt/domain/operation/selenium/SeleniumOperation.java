@@ -28,10 +28,9 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.sitoolkit.wt.domain.evidence.ElementPosition;
-import org.sitoolkit.wt.domain.evidence.OperationLog;
 import org.sitoolkit.wt.domain.evidence.selenium.ElementPositionSupport2;
 import org.sitoolkit.wt.domain.operation.Operation;
+import org.sitoolkit.wt.domain.operation.OperationResult;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.ElementNotFoundException;
@@ -46,18 +45,14 @@ import org.springframework.util.ResourceUtils;
  */
 public abstract class SeleniumOperation implements Operation {
 
-    private int waitTimes = 20;
-    private int waitSpan = 250;
-
     @Resource
     PropertyManager pm;
 
     protected Logger log = LoggerFactory.getLogger(getClass());
 
     @Resource
-    OperationLog opelog;
-    @Resource
     protected WebDriver seleniumDriver;
+
     @Resource
     ElementPositionSupport2 position;
 
@@ -85,8 +80,14 @@ public abstract class SeleniumOperation implements Operation {
     }
 
     @Override
-    public void operate(TestStep testStep) {
-        execute(testStep);
+    public OperationResult operate(TestStep testStep) {
+
+        SeleniumOperationContext ctx = new SeleniumOperationContext();
+        ctx.setLogger(log);
+        ctx.setTestStep(testStep);
+        ctx.setElementPositionSupport(position);
+
+        execute(testStep, ctx);
 
         if (visibilityChanged) {
             visibilityChanged = false;
@@ -96,9 +97,13 @@ public abstract class SeleniumOperation implements Operation {
                     effectedElement.getAttribute("id"), effectedElement.getAttribute("class"));
         }
 
+        OperationResult result = new OperationResult();
+        result.setRecords(ctx.getRecords());
+
+        return result;
     }
 
-    protected abstract void execute(TestStep testStep);
+    protected abstract void execute(TestStep testStep, SeleniumOperationContext ctx);
 
     protected By by(Locator locator) {
         switch (locator.getTypeVo()) {
@@ -166,38 +171,4 @@ public abstract class SeleniumOperation implements Operation {
         return false;
     }
 
-    protected void info(String verb, WebElement element) {
-        ElementPosition pos = position.get(element);
-        opelog.info(log, verb, pos);
-    }
-
-    protected void info(String object, String verb, WebElement element) {
-        ElementPosition pos = position.get(element);
-        opelog.info(log, object, verb, pos);
-    }
-
-    public void info(WebElement element, String messagePattern, Object... params) {
-        ElementPosition pos = position.get(element);
-        opelog.info(log, pos, messagePattern, params);
-    }
-
-    protected void addPosition(WebElement element) {
-        opelog.addPosition(position.get(element));
-    }
-
-    public int getWaitTimes() {
-        return waitTimes;
-    }
-
-    public void setWaitTimes(int waitTimes) {
-        this.waitTimes = waitTimes;
-    }
-
-    public int getWaitSpan() {
-        return waitSpan;
-    }
-
-    public void setWaitSpan(int waitSpan) {
-        this.waitSpan = waitSpan;
-    }
 }
