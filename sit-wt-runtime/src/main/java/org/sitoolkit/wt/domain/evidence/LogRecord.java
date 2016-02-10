@@ -135,6 +135,48 @@ public class LogRecord {
      * 
      * @param logger
      *            ロガー
+     * @param logLevel
+     *            ログレベル
+     * @param testStep
+     *            テストステップ
+     * @param messagePattern
+     *            メッセージパターン
+     * @param params
+     *            メッセージパラメーター
+     * @return 操作ログ
+     */
+    public static LogRecord create(Logger logger, LogLevelVo logLevel, TestStep testStep,
+            String messagePattern, Object... params) {
+
+        String msg = log(messagePattern, params);
+
+        switch (logLevel) {
+        case INFO:
+            logger.info(msg);
+            break;
+        case DEBUG:
+            logger.debug(msg);
+            break;
+        case ERROR:
+            logger.error(msg);
+            break;
+        case WARN:
+            logger.warn(msg);
+            break;
+        default:
+            logger.info(msg);
+        }
+
+        String testStepNo = testStep == null ? "xxx" : testStep.getNo();
+
+        return new LogRecord(testStepNo, msg);
+    }
+
+    /**
+     * 操作ログオブジェクトを作成します。
+     * 
+     * @param logger
+     *            ロガー
      * @param testStep
      *            テストステップ
      * @param messagePattern
@@ -157,8 +199,6 @@ public class LogRecord {
      * 
      * @param logger
      *            ロガー
-     * @param logLevel
-     *            ログレベル
      * @param testStep
      *            テストステップ
      * @param messagePattern
@@ -171,33 +211,6 @@ public class LogRecord {
             Object... params) {
 
         return create(logger, LogLevelVo.INFO, testStep, messagePattern, params);
-    }
-
-    /**
-     * 操作ログオブジェクトを作成します。
-     * 
-     * @param logger
-     *            ロガー
-     * @param logLevel
-     *            ログレベル
-     * @param testStep
-     *            テストステップ
-     * @param messagePattern
-     *            メッセージパターン
-     * @param params
-     *            メッセージパラメーター
-     * @return 操作ログ
-     */
-    public static LogRecord create(Logger logger, LogLevelVo logLevel, TestStep testStep,
-            String messagePattern, Object... params) {
-
-        String msg = log(messagePattern, params);
-
-        logger.info(msg);
-
-        String testStepNo = testStep == null ? "xxx" : testStep.getNo();
-
-        return new LogRecord(testStepNo, msg);
     }
 
     private static String log(String messagePattern, Object... params) {
