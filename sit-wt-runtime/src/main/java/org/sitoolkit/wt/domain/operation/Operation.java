@@ -23,5 +23,5 @@ import org.sitoolkit.wt.domain.testscript.TestStep;
  */
 public interface Operation {
 
-    void operate(TestStep testStep);
+    OperationResult operate(TestStep testStep);
 }

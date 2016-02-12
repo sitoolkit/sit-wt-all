@@ -19,6 +19,7 @@ import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
+import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.TestException;
 import org.springframework.stereotype.Component;
@@ -33,25 +34,30 @@ public class InputOperation extends SeleniumOperation {
     private static final String APPEND_PREFIX = "append:";
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         String value = testStep.getValue();
         WebElement element = findElement(testStep.getLocator());
+
         if (hasAttribute(element, "type", "file")) {
             File file = new File(value);
+
             if (file.exists()) {
-                info(file.getAbsolutePath(), "入力", element);
+                ctx.info(element, MessagePattern.項目にXXをYYします, file.getAbsolutePath(), "入力");
                 element.sendKeys(file.getAbsolutePath());
             } else {
                 throw new TestException("指定されたファイルが存在しません " + file.getAbsolutePath());
             }
+
         } else {
+
             if (value.startsWith(APPEND_PREFIX)) {
-                info(value, "入力(追記)", element);
+                ctx.info(element, MessagePattern.項目にXXをYYします, value, "入力(追記)");
                 value = StringUtils.substringAfter(value, APPEND_PREFIX);
             } else {
-                info(value, "入力(上書)", element);
+                ctx.info(element, MessagePattern.項目にXXをYYします, value, "入力(上書)");
                 element.clear();
             }
+
             element.sendKeys(value);
         }
     }

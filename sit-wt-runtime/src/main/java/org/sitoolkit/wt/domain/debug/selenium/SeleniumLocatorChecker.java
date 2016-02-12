@@ -7,6 +7,7 @@ import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.debug.LocatorChecker;
 import org.sitoolkit.wt.domain.operation.selenium.SeleniumOperation;
+import org.sitoolkit.wt.domain.operation.selenium.SeleniumOperationContext;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class SeleniumLocatorChecker extends SeleniumOperation implements LocatorChecker {
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         // NOP
     }
 
@@ -32,7 +33,7 @@ public class SeleniumLocatorChecker extends SeleniumOperation implements Locator
 
             if (elements.isEmpty()) {
                 log.info("ロケーター({})に該当する要素は見つかりませんでした。", locator);
-                return ;
+                return;
             }
             StringBuilder sb = new StringBuilder();
 

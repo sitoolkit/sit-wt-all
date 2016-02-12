@@ -16,7 +16,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.report.encoding>UTF-8</project.report.encoding>
-    <sitwt.version>0.10</sitwt.version>
+    <sitwt.version>0.11</sitwt.version>
   </properties>
 
   <!-- Build Settings -->
@@ -39,25 +39,6 @@
             <goals>
               <goal>open-evidence</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-test-sources/test/</source>
-              </sources>
-            </configuration>
           </execution>
         </executions>
       </plugin>

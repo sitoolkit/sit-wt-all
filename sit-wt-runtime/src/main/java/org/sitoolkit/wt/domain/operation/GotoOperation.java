@@ -17,8 +17,7 @@ package org.sitoolkit.wt.domain.operation;
 
 import javax.annotation.Resource;
 
-import org.sitoolkit.wt.domain.evidence.ElementPosition;
-import org.sitoolkit.wt.domain.evidence.OperationLog;
+import org.sitoolkit.wt.domain.evidence.LogRecord;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -36,19 +35,20 @@ public class GotoOperation implements Operation {
     protected Logger log = LoggerFactory.getLogger(getClass());
     @Resource
     protected TestContext current;
-    @Resource
-    protected OperationLog opelog;
+    // @Resource
+    // protected OperationLog opelog;
 
     @Override
-    public void operate(TestStep testStep) {
+    public OperationResult operate(TestStep testStep) {
         String value = testStep.getValue();
 
-        opelog.info(log, ElementPosition.EMPTY, "ステップNo[{}]を実行します。", value);
+        LogRecord record = LogRecord.info(log, testStep, "ステップNo[{}]を実行します。", value);
 
         TestScript testScript = current.getTestScript();
         int nextIndex = testScript.getIndexByScriptNo(value) - 1;
         current.setCurrentIndex(nextIndex);
 
+        return new OperationResult(record);
     }
 
 }

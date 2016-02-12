@@ -5,7 +5,6 @@ import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.Evidence;
 import org.sitoolkit.wt.domain.evidence.EvidenceManager;
-import org.sitoolkit.wt.domain.evidence.OperationLog;
 import org.sitoolkit.wt.domain.evidence.Screenshot;
 import org.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import org.sitoolkit.wt.domain.evidence.appium.HybridScreenshotTaker;
@@ -46,11 +45,6 @@ public class RuntimeConfig {
     @Bean
     public TestContext testContext() {
         return new TestContext();
-    }
-
-    @Bean
-    public OperationLog operationLog() {
-        return new OperationLog();
     }
 
     @Bean

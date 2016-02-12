@@ -29,9 +29,10 @@ public class WaitOperation extends SeleniumOperation {
     private int timeout = 1;
     private int waitSpan = 100;
 
-    public void execute(TestStep testStep) {
-        log.info("{}({})に{}が表示されるまで{}秒間待機します。", new Object[] { testStep.getItemName(),
-                testStep.getLocator(), testStep.getValue(), getTimeout() });
+    @Override
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
+        ctx.info("{}({})に{}が表示されるまで{}秒間待機します。", testStep.getItemName(), testStep.getLocator(),
+                testStep.getValue(), getTimeout());
         int count = (getTimeout() * 1000) / getWaitSpan();
 
         for (int i = 0; i < count; i++) {

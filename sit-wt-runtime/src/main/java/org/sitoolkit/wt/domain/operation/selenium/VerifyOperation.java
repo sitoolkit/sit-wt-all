@@ -29,13 +29,13 @@ import org.springframework.stereotype.Component;
 public class VerifyOperation extends SeleniumOperation {
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         String expected = testStep.getValue();
         WebElement element = findElement(testStep.getLocator());
         String actual = getActual(element, testStep);
 
-        info(element, "{}({})の値が期待値[{}]に一致することを確認します。",
-                new Object[] { testStep.getItemName(), testStep.getLocator(), expected });
+        ctx.info(element, "{}({})の値が期待値[{}]に一致することを確認します。", testStep.getItemName(),
+                testStep.getLocator(), expected);
         if (!RegexHelper.matches(testStep.getValue(), actual)) {
             throw new VerifyException("{0}({1})の値[{2}]は期待値[{3}]と異なります。", testStep.getItemName(),
                     testStep.getLocator(), actual, expected);

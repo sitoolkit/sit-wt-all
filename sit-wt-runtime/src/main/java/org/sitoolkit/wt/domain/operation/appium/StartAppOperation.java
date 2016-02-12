@@ -1,6 +1,7 @@
 package org.sitoolkit.wt.domain.operation.appium;
 
 import org.sitoolkit.wt.domain.operation.selenium.OpenOperation;
+import org.sitoolkit.wt.domain.operation.selenium.SeleniumOperationContext;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +11,7 @@ import io.appium.java_client.AppiumDriver;
 public class StartAppOperation extends OpenOperation {
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
 
         if (seleniumDriver instanceof AppiumDriver<?>) {
             AppiumDriver<?> appiumDriver = (AppiumDriver<?>) seleniumDriver;
@@ -20,7 +21,7 @@ public class StartAppOperation extends OpenOperation {
                 }
             }
         } else {
-            super.execute(testStep);
+            super.execute(testStep, ctx);
         }
     }
 }

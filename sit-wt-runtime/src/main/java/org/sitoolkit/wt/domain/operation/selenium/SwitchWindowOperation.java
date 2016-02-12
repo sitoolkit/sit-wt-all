@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 public class SwitchWindowOperation extends SeleniumOperation {
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         Locator windowLocator = testStep.getLocator();
 
         if (Locator.Type.title == windowLocator.getTypeVo()) {
@@ -46,7 +46,7 @@ public class SwitchWindowOperation extends SeleniumOperation {
                 avairableTitle.add(windowTitle);
 
                 if (windowTitle.equals(windowLocator.getValue())) {
-                    info(null, "ウィンドウを{}に切り替えます", windowLocator);
+                    ctx.info("ウィンドウを{}に切り替えます", windowLocator);
                     return;
                 }
             }
@@ -55,7 +55,7 @@ public class SwitchWindowOperation extends SeleniumOperation {
                     + avairableName + "かtitle:" + avairableTitle + "が指定可能です。");
 
         } else {
-            info(null, "ウィンドウを{}に切り替えます", windowLocator);
+            ctx.info("ウィンドウを{}に切り替えます", windowLocator);
             String windowName = windowLocator.getValue();
             if ("_parent".equalsIgnoreCase(windowName) || "null".equalsIgnoreCase(windowName)) {
                 windowName = "";

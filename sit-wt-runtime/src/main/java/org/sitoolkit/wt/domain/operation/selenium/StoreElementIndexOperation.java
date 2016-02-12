@@ -36,10 +36,11 @@ public class StoreElementIndexOperation extends SeleniumOperation {
     private int indexDefault = 1;
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         WebElement element = findElement(testStep.getLocator());
         WebElement parent = element.findElement(By.xpath(".."));
         int idx = getIndexDefault();
+
         for (WebElement child : parent.findElements(By.xpath("/*"))) {
             if (element.getLocation().equals(child.getLocation())) {
                 break;
@@ -47,7 +48,7 @@ public class StoreElementIndexOperation extends SeleniumOperation {
             idx++;
         }
 
-        log.debug("element:{}, elementIndex:{}", element, idx);
+        ctx.info(element, "{}({})のインデックスは{}です", testStep.getItemName(), testStep.getLocator(), idx);
 
         context.addParam(testStep.getDataType(), idx);
     }

@@ -3,6 +3,7 @@
     <pluginExecution>
       <pluginExecutionFilter>
         <goals>
+          <goal>selenium2script</goal>
           <goal>script2java</goal>
         </goals>
       </pluginExecutionFilter>

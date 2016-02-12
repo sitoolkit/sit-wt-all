@@ -27,7 +27,7 @@
                     <td class="screenshot">$rec.screenshot.fileName
 						<img src="$rec.screenshot.filePath"/>
 #foreach ($pos in $rec.screenshot.positions)
-						<input type="hidden" value='{"no":$pos.no,"x":$pos.x,"y":$pos.y,"w":$pos.w,"h":$pos.h}'/>
+						<input type="hidden" value='{"no":"$pos.no","x":$pos.x,"y":$pos.y,"w":$pos.w,"h":$pos.h}'/>
 #end ## foreach
 #else
                     <td>$rec.log

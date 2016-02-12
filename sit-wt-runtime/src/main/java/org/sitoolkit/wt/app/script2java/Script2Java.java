@@ -60,10 +60,12 @@ public class Script2Java implements ApplicationContextAware {
 
     public static final String SYSPROP_TESTS_SCRIPT_PATH = "testsScriptPath";
 
+    private static final String DEFAULT_TEST_SRC_DIR = "target/generated-test-sources/test/";
+
     /**
      * テストソースディレクトリのパス
      */
-    private String testSrcDir = "target/generated-test-sources/test/";
+    private String testSrcDir = DEFAULT_TEST_SRC_DIR;
 
     /**
      * テストスクリプトディレクトリのパス
@@ -84,17 +86,16 @@ public class Script2Java implements ApplicationContextAware {
     private Properties timestampLog = new Properties();
 
     public static void main(String[] args) {
-        System.exit(staticExecute());
+        System.exit(staticExecute(DEFAULT_TEST_SRC_DIR));
     }
 
-    public static int staticExecute() {
-        // ApplicationContext appCtx = new
-        // ClassPathXmlApplicationContext("classpath:sit-wt-conf.xml",
-        // "classpath:sit-wt-gen-test-conf.xml");
+    public static int staticExecute(String testSrcDir) {
         ApplicationContext appCtx = new AnnotationConfigApplicationContext(Script2JavaConfig.class,
                 ExtConfig.class);
-        Script2Java testGen = appCtx.getBean(Script2Java.class);
-        return testGen.execute();
+        Script2Java script2java = appCtx.getBean(Script2Java.class);
+        script2java.setTestSrcDir(testSrcDir);
+
+        return script2java.execute();
     }
 
     /**

@@ -33,10 +33,12 @@ public class StoreOperation extends SeleniumOperation {
     TestContext context;
 
     @Override
-    public void execute(TestStep testStep) {
+    public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         String name = testStep.getLocator().getValue();
         String value = testStep.getValue();
+
         log.info("変数を定義します {}={}", name, value);
+
         context.addParam(name, value);
     }
 
