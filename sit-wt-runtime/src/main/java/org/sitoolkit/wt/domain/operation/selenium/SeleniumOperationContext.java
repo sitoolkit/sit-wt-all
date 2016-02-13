@@ -23,16 +23,16 @@ public class SeleniumOperationContext {
     private List<LogRecord> records = new ArrayList<>();
 
     public void info(WebElement element, MessagePattern pattern, Object... params) {
-        add(LogRecord.create(logger, conv(element), testStep, pattern, params));
+        records.add(LogRecord.create(logger, conv(element), testStep, pattern, params));
     }
 
     public void info(WebElement element, String pattern, Object... params) {
-        add(LogRecord.create(logger, elementPositionSupport.get(element), testStep, pattern,
+        records.add(LogRecord.create(logger, elementPositionSupport.get(element), testStep, pattern,
                 params));
     }
 
     public void info(String pattern, Object... params) {
-        add(LogRecord.create(logger, LogLevelVo.INFO, testStep, pattern, params));
+        records.add(LogRecord.create(logger, LogLevelVo.INFO, testStep, pattern, params));
     }
 
     public void info(MessagePattern pattern, Object... params) {
@@ -41,13 +41,6 @@ public class SeleniumOperationContext {
 
     private ElementPosition conv(WebElement element) {
         return elementPositionSupport.get(element);
-    }
-
-    private void add(LogRecord log) {
-
-        logger.info(log.getLog());
-        records.add(log);
-
     }
 
     public void addOperatedElement(List<WebElement> elements) {
