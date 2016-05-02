@@ -85,21 +85,22 @@ public class ChooseOperation extends SeleniumOperation {
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
 
         String[] values = testStep.getValues();
-        ctx.info(MessagePattern.項目にXXをYYします, Arrays.toString(values), "選択");
+        ctx.info(MessagePattern.項目にXXをYYします, Arrays.asList(values), "選択");
 
         Map<String, Choice> map = toMap(values);
 
         List<WebElement> elements = null;
         if ("label".equals(testStep.getDataType())) {
-            elements = chooseByLabel(testStep.getLocator(), map);
+            elements = chooseByLabel(ctx, testStep.getLocator(), map);
         } else {
-            elements = chooseByValue(testStep.getLocator(), map);
+            elements = chooseByValue(ctx, testStep.getLocator(), map);
         }
 
         ctx.addOperatedElement(elements);
     }
 
-    protected List<WebElement> chooseByLabel(Locator locator, Map<String, Choice> map) {
+    protected List<WebElement> chooseByLabel(SeleniumOperationContext ctx, Locator locator,
+            Map<String, Choice> map) {
 
         List<WebElement> elements = new ArrayList<>();
 
@@ -121,17 +122,18 @@ public class ChooseOperation extends SeleniumOperation {
         return elements;
     }
 
-    protected List<WebElement> chooseByValue(Locator locator, Map<String, Choice> map) {
+    protected List<WebElement> chooseByValue(SeleniumOperationContext ctx, Locator locator,
+            Map<String, Choice> map) {
 
         List<WebElement> elements = new ArrayList<>();
 
         for (WebElement element : findElements(locator)) {
-            Choice choice = map.get(element.getAttribute("value"));
+            String value = element.getAttribute("value");
+            Choice choice = map.get(value);
             if (choice == null) {
                 continue;
             }
             if (setChecked(element, element, choice.on)) {
-                // addPosition(element);
                 elements.add(element);
             }
         }
