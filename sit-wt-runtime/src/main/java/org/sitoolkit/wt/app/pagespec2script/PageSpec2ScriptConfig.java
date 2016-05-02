@@ -18,11 +18,11 @@ public class PageSpec2ScriptConfig {
 
     @Resource
     @Bean
-    public PageSpec2Script getPageSpecConverter(TestScriptDao tsDao, TableDataDao tdDao) {
+    public PageSpec2Script getPageSpecConverter(TestScriptDao tsDao, TableDataDao excelDao) {
         PageSpec2Script conv = new PageSpec2Script();
         conv.setFileFilter(new PrefixFileFilter("画面定義書_"));
         conv.setDao(tsDao);
-        conv.setTableDataDao(tdDao);
+        conv.setTableDataDao(excelDao);
         conv.setPageSpecConverterMap(PropertyUtils.loadAsMap("/item2operation", false));
 
         return conv;

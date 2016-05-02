@@ -1,19 +1,22 @@
-No.	項目名	操作	"ロケーター形式"	ロケーター	データ形式	"スクリーンショット"	ケース_001	ケース_002
-1	開始URL	open		input.html		後	y	y
-2	名前	input	id	name			試験太郎	!
-3	性別	click	name	性別				y
-4	入力エラーアラート	dialog				前		OK
-5	性別	choose	name	性別	label		男性	女性
-6	名前	input	id	name				試験花子
-7	都道府県	select	id	prefecture	label		北海道	青森
-8	市区町村	select	id	city	label		富良野	青森
-9	趣味	choose	css	input[id^='hobby-']	label		運動;仕事	芸術
-10	備考	input	id	remark			特になし	特になし
-11	実施対象外の行							
-12	利用規約リンク	click	link	利用規約			y	
-13	利用規約ウィンドウ	switchWindow		terms			y	
-14	閉じるリンク	click	link	閉じる			y	
-15	親ウィンドウ	switchWindow		_parent			y	
-16	確定ボタン	click	css	input[value='同意して確定']		前	y	y
-17	確認ダイアログ	dialog				前	OK	OK
-18	名前	verify	xpath	//*[@id="confirm"]/tbody/tr[1]/td		前	試験太郎	試験花子
+No.,項目名,操作,"ロケーター
+形式",ロケーター,データ形式,"スクリーン
+ショット","ブレーク
+ポイント",ケース_001,ケース_002
+1,開始URL,open,,input.html,,後,,y,y
+2,名前,input,id,name,,,,試験太郎,!
+3,性別,click,name,性別,,,,,y
+4,入力エラーアラート,dialog,,,,前,,,OK
+5,性別,choose,name,性別,label,,,男性,女性
+6,名前,input,,,,,,,試験花子
+7,都道府県,select,id,prefecture,label,,,北海道,青森
+8,市区町村,select,id,city,label,,,富良野,青森
+9,趣味,choose,css,input[id^='hobby-'],label,,,運動;仕事,芸術
+10,備考,input,id,remark,,,,特になし,特になし
+11,実施対象外の行,,,,,,,,
+12,利用規約リンク,click,link,利用規約,,前,,y,
+13,利用規約ウィンドウ,switchWindow,,terms,,,,y,
+14,閉じるリンク,click,link,閉じる,,前,,y,
+15,親ウィンドウ,switchWindow,,_parent,,,,y,
+16,確定ボタン,click,css,input[value='同意して確定'],,前,,y,y
+17,確認ダイアログ,dialog,,,,前,,OK,OK
+18,名前,verify,xpath,"//*[@id=""confirm""]/tbody/tr[1]/td",,前,,試験太郎,試験花子

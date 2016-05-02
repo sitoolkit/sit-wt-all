@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.util.tabledata.FileIOUtils;
 import org.sitoolkit.wt.app.config.ExtConfig;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
@@ -86,10 +87,12 @@ public class Script2Java implements ApplicationContextAware {
     private Properties timestampLog = new Properties();
 
     public static void main(String[] args) {
-        System.exit(staticExecute(DEFAULT_TEST_SRC_DIR));
+        System.exit(staticExecute(DEFAULT_TEST_SRC_DIR, System.getProperty("file.encoding")));
     }
 
-    public static int staticExecute(String testSrcDir) {
+    public static int staticExecute(String testSrcDir, String testScriptCsvEncoding) {
+        FileIOUtils.setFileEncoding(testScriptCsvEncoding);
+
         ApplicationContext appCtx = new AnnotationConfigApplicationContext(Script2JavaConfig.class,
                 ExtConfig.class);
         Script2Java script2java = appCtx.getBean(Script2Java.class);

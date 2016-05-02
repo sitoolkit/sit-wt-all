@@ -16,16 +16,19 @@ import org.sitoolkit.wt.app.script2java.Script2Java;
 @Mojo(name = "script2java", defaultPhase = LifecyclePhase.GENERATE_TEST_SOURCES)
 public class Script2JavaMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/test")
-    private File outputDirectory;
+	@Parameter(defaultValue = "${file.encoding}")
+	private String testScriptCsvEncoding;
 
-    @Component
-    private MavenProject project;
+	@Parameter(defaultValue = "${project.build.directory}/generated-test-sources/test")
+	private File outputDirectory;
 
-    @Override
-    public void execute() throws MojoExecutionException {
-        String outdir = outputDirectory.getAbsolutePath();
-        Script2Java.staticExecute(outdir);
-        project.addTestCompileSourceRoot(outdir);
-    }
+	@Component
+	private MavenProject project;
+
+	@Override
+	public void execute() throws MojoExecutionException {
+		String outdir = outputDirectory.getAbsolutePath();
+		Script2Java.staticExecute(outdir, testScriptCsvEncoding);
+		project.addTestCompileSourceRoot(outdir);
+	}
 }

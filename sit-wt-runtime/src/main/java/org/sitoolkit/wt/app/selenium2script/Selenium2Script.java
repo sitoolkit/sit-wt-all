@@ -24,7 +24,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.sitoolkit.util.tabledata.TableDataDao;
 import org.sitoolkit.wt.app.config.ExtConfig;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -52,8 +51,6 @@ public class Selenium2Script implements ApplicationContextAware {
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
     private ApplicationContext appCtx;
-
-    private TableDataDao tdDao;
 
     private TestScriptDao dao;
 
@@ -143,21 +140,21 @@ public class Selenium2Script implements ApplicationContextAware {
             String nodeValue = tdList.item(i).getTextContent();
 
             switch ((i - 1) % 3) {
-            case 0:
-                testStep.setCommand(nodeValue);
-                break;
-            case 1:
-                testStep.setTarget(nodeValue);
-                break;
-            case 2:
-                testStep.setValue(nodeValue);
-                list.add(testStep);
-                log.debug("Seleniumテストスクリプトを1行読み込みました　command:{},target:{},value:{}",
-                        testStep.getCommand(), testStep.getTarget(), testStep.getValue());
-                testStep = new SeleniumTestStep();
-                break;
-            default:
-                break;
+                case 0:
+                    testStep.setCommand(nodeValue);
+                    break;
+                case 1:
+                    testStep.setTarget(nodeValue);
+                    break;
+                case 2:
+                    testStep.setValue(nodeValue);
+                    list.add(testStep);
+                    log.debug("Seleniumテストスクリプトを1行読み込みました　command:{},target:{},value:{}",
+                            testStep.getCommand(), testStep.getTarget(), testStep.getValue());
+                    testStep = new SeleniumTestStep();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -237,14 +234,6 @@ public class Selenium2Script implements ApplicationContextAware {
 
     public void setCaseNo(String caseNo) {
         this.caseNo = caseNo;
-    }
-
-    public TableDataDao getTdDao() {
-        return tdDao;
-    }
-
-    public void setTdDao(TableDataDao tdDao) {
-        this.tdDao = tdDao;
     }
 
     public void setSeleniumStepConverter(SeleniumStepConverter seleniumStepConverter) {

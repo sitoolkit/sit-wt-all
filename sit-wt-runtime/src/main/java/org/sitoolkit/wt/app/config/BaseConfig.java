@@ -4,8 +4,8 @@ import org.sitoolkit.util.tabledata.BeanFactory;
 import org.sitoolkit.util.tabledata.FileInputSourceWatcher;
 import org.sitoolkit.util.tabledata.FileOverwriteChecker;
 import org.sitoolkit.util.tabledata.InputSourceWatcher;
-import org.sitoolkit.util.tabledata.TableDataDao;
 import org.sitoolkit.util.tabledata.TableDataMapper;
+import org.sitoolkit.util.tabledata.csv.TableDataDaoCsvImpl;
 import org.sitoolkit.util.tabledata.excel.TableDataDaoExcelImpl;
 import org.sitoolkit.wt.domain.operation.Operation;
 import org.sitoolkit.wt.domain.testscript.OperationConverter;
@@ -31,12 +31,23 @@ public class BaseConfig {
     }
 
     @Bean
-    public TableDataDao tableDataDao(FileOverwriteChecker fileOverwriteChecker,
+    public TableDataDaoExcelImpl excelDao(FileOverwriteChecker fileOverwriteChecker,
             InputSourceWatcher watcher) {
 
         TableDataDaoExcelImpl dao = new TableDataDaoExcelImpl();
         dao.setFileOverwriteChecker(fileOverwriteChecker);
         dao.setInputSourceWatcher(watcher);
+
+        return dao;
+    }
+
+    @Bean
+    public TableDataDaoCsvImpl tableDataDaoCsvImpl(FileOverwriteChecker fileOverwriteChecker,
+            InputSourceWatcher inputSourceWatcher) {
+
+        TableDataDaoCsvImpl dao = new TableDataDaoCsvImpl();
+        dao.setFileOverwriteChecker(fileOverwriteChecker);
+        dao.setInputSourceWatcher(inputSourceWatcher);
 
         return dao;
     }
