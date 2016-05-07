@@ -2,6 +2,8 @@ package org.sitoolkit.wt.app.config;
 
 import org.sitoolkit.wt.app.page2script.Page2ScriptImportConfig;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
+import org.sitoolkit.wt.domain.debug.LocatorChecker;
+import org.sitoolkit.wt.domain.debug.selenium.SeleniumLocatorChecker;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.Evidence;
 import org.sitoolkit.wt.domain.evidence.EvidenceManager;
@@ -55,6 +57,11 @@ public class RuntimeConfig {
     @Bean
     public DebugSupport debugSupport() {
         return new DebugSupport();
+    }
+
+    @Bean
+    public LocatorChecker locatorChecker() {
+        return new SeleniumLocatorChecker();
     }
 
     @Bean
