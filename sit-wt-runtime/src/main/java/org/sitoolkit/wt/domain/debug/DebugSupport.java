@@ -160,8 +160,8 @@ public class DebugSupport {
                 if (nextStep == null) {
                     LOG.info("全てのテストステップが終了しました。");
                 } else {
-                    LOG.info("現在のテストステップは{} {}です。",
-                            new Object[] { nextStep.getNo(), nextStep.getItemName() });
+                    LOG.info("現在のテストステップは{} {}({})です。", new Object[] { nextStep.getNo(),
+                            nextStep.getItemName(), nextStep.getLocator() });
                 }
             }
 
