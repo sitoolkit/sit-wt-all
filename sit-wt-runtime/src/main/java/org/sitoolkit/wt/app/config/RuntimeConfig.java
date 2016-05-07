@@ -1,7 +1,9 @@
 package org.sitoolkit.wt.app.config;
 
-import org.sitoolkit.wt.app.page2script.Page2ScriptImportConfig;
+import org.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
+import org.sitoolkit.wt.domain.debug.LocatorChecker;
+import org.sitoolkit.wt.domain.debug.selenium.SeleniumLocatorChecker;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.Evidence;
 import org.sitoolkit.wt.domain.evidence.EvidenceManager;
@@ -26,7 +28,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
-@Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptImportConfig.class })
+@Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptConfig.class })
 @ComponentScan("org.sitoolkit.wt.domain.operation")
 public class RuntimeConfig {
 
@@ -55,6 +57,11 @@ public class RuntimeConfig {
     @Bean
     public DebugSupport debugSupport() {
         return new DebugSupport();
+    }
+
+    @Bean
+    public LocatorChecker locatorChecker() {
+        return new SeleniumLocatorChecker();
     }
 
     @Bean

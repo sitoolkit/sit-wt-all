@@ -58,74 +58,76 @@ class DebugCommand {
     /**
      * コマンド実行結果のテストステップインデックスを取得します。
      *
-     * @param idx テストステップインデックス
-     * @param testScript テストスクリプト
+     * @param idx
+     *            テストステップインデックス
+     * @param testScript
+     *            テストスクリプト
      * @return コマンド実行結果のテストステップインデックス
      */
     int execute(final int idx, TestScript testScript, ApplicationContext appCtx) {
         int ret = idx;
         switch (key) {
-        case START:
-            ret = idx + 1;
-            break;
-        case BACK:
-            ret = idx - 1;
-            break;
-        case CURRENT:
-            ret = idx;
-            break;
-        case FORWARD:
-            ret = idx + 1;
-            break;
-        case EXEC_STEP_NO:
-            ret = testScript.getIndexByScriptNo(body);
-            break;
-        case SET_STEP_NO:
-            ret = testScript.getIndexByScriptNo(body);
-            break;
+            case START:
+                ret = idx;
+                break;
+            case BACK:
+                ret = idx - 1;
+                break;
+            case CURRENT:
+                ret = idx;
+                break;
+            case FORWARD:
+                ret = idx + 1;
+                break;
+            case EXEC_STEP_NO:
+                ret = testScript.getIndexByScriptNo(body);
+                break;
+            case SET_STEP_NO:
+                ret = testScript.getIndexByScriptNo(body);
+                break;
 
-        case LOC:
-            LocatorChecker check = appCtx.getBean(LocatorChecker.class);
+            case LOC:
+                LocatorChecker check = appCtx.getBean(LocatorChecker.class);
 
-            Locator locator = Locator.build(body);
+                Locator locator = Locator.build(body);
 
-            if (locator.isNa()) {
-                LOG.info("書式が不正です。");
-            } else {
-                check.check(locator);
-            }
-            break;
+                if (locator.isNa()) {
+                    LOG.info("書式が不正です。");
+                } else {
+                    check.check(locator);
+                }
+                break;
 
-        case SHOW_PARAM:
-            showParam(appCtx);
-            break;
+            case SHOW_PARAM:
+                showParam(appCtx);
+                break;
 
-        case INPUT_PARAM:
-            inputParam(appCtx);
-            break;
+            case INPUT_PARAM:
+                inputParam(appCtx);
+                break;
 
-        case EXPORT:
-            try {
-                TestScriptGenerateTool exporter = appCtx.getBean(TestScriptGenerateTool.class);
-                exporter.generateFromPage();
-            } catch (Exception e) {
-                LOG.error("エクスポートの実行中に予期しないエラーが発生しました。", e);
-            }
-            break;
+            case EXPORT:
+                try {
+                    TestScriptGenerateTool exporter = appCtx.getBean(TestScriptGenerateTool.class);
+                    exporter.generateFromPage();
+                } catch (Exception e) {
+                    LOG.error("エクスポートの実行中に予期しないエラーが発生しました。", e);
+                }
+                break;
 
-        case OPEN_SRCIPT:
-            try {
-                Desktop.getDesktop().open(testScript.getScriptFile());
-            } catch (IOException e) {
-                LOG.error("予期しないエラーが発生しました。", e);
-            }
-            break;
+            case OPEN_SRCIPT:
+                try {
+                    Desktop.getDesktop().open(testScript.getScriptFile());
+                } catch (IOException e) {
+                    LOG.error("予期しないエラーが発生しました。", e);
+                }
+                break;
 
-        case EXIT:
-            ret = testScript.getTestStepList().size();
-            break;
-        default:
-            break;
+            case EXIT:
+                ret = testScript.getTestStepList().size();
+                break;
+            default:
+                break;
         }
 
         return ret;

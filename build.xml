@@ -63,6 +63,7 @@
   <target name="02_acceptance-test" depends="check-mvn.repo">
 
     <copy file="${basedir}/distribution/pom.xml" todir="${testdir}" />
+    <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" todir="${testdir}/testscript" />
 
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
@@ -70,6 +71,7 @@
       <arg value="-Dsample.baseUrl=file:///${basedir}/sit-wt-runtime/" />
       <arg value="-P" />
       <arg value="${mvn.repo}" />
+      <arg value="-e" />
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
       <arg value="verify" />
@@ -88,7 +90,7 @@
 
   <target name="set-version">
 
-    <property name="version" value="0.11.1" />
+    <property name="version" value="0.12" />
 
     <replaceregexp file="${basedir}/distribution/pom.xml"
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"

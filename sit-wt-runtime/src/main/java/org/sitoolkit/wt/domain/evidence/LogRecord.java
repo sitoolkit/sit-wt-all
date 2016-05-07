@@ -17,7 +17,6 @@ package org.sitoolkit.wt.domain.evidence;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -73,10 +72,13 @@ public class LogRecord {
 
     private LogRecord(String no, String log, ElementPosition... positions) {
         this(no, log);
-        this.positions = Arrays.asList(positions);
+        this.positions = new ArrayList<>();
 
         for (ElementPosition position : positions) {
-            position.setNo(no);
+            if (ElementPosition.EMPTY != position) {
+                position.setNo(no);
+                this.positions.add(position);
+            }
         }
     }
 
@@ -151,20 +153,20 @@ public class LogRecord {
         String msg = log(messagePattern, params);
 
         switch (logLevel) {
-        case INFO:
-            logger.info(msg);
-            break;
-        case DEBUG:
-            logger.debug(msg);
-            break;
-        case ERROR:
-            logger.error(msg);
-            break;
-        case WARN:
-            logger.warn(msg);
-            break;
-        default:
-            logger.info(msg);
+            case INFO:
+                logger.info(msg);
+                break;
+            case DEBUG:
+                logger.debug(msg);
+                break;
+            case ERROR:
+                logger.error(msg);
+                break;
+            case WARN:
+                logger.warn(msg);
+                break;
+            default:
+                logger.info(msg);
         }
 
         String testStepNo = testStep == null ? "xxx" : testStep.getNo();

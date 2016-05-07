@@ -36,10 +36,13 @@ public class SeleniumOperationContext {
     }
 
     public void info(MessagePattern pattern, Object... params) {
-        info(pattern.toString(), params);
+        info(null, pattern, params);
     }
 
     private ElementPosition conv(WebElement element) {
+        if (element == null) {
+            return ElementPosition.EMPTY;
+        }
         return elementPositionSupport.get(element);
     }
 
@@ -52,7 +55,11 @@ public class SeleniumOperationContext {
         LogRecord log = records.get(records.size() - 1);
 
         for (WebElement element : elements) {
-            log.getPositions().add(elementPositionSupport.get(element));
+            ElementPosition position = elementPositionSupport.get(element);
+            if (ElementPosition.EMPTY != position) {
+                position.setNo(testStep.getNo());
+                log.getPositions().add(position);
+            }
         }
 
     }

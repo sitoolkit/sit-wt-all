@@ -12,11 +12,24 @@
       <artifactId>sit-wt-runtime</artifactId>
       <version>${sitwt.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.appium</groupId>
+      <artifactId>java-client</artifactId>
+      <version>${appium.version}</version>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.report.encoding>UTF-8</project.report.encoding>
-    <sitwt.version>0.11.1</sitwt.version>
+    <sitwt.version>0.12</sitwt.version>
+    <selenium.version>2.53.0</selenium.version>
+    <appium.version>3.4.1</appium.version>
   </properties>
 
   <!-- Build Settings -->

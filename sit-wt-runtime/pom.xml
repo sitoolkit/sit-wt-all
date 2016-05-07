@@ -56,11 +56,12 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.sitoolkit.util</groupId>
       <artifactId>sit-util-td</artifactId>
-      <version>0.5.2</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
@@ -85,15 +86,12 @@
     <dependency>
       <groupId>io.appium</groupId>
       <artifactId>java-client</artifactId>
-      <version>3.3.0</version>
+      <version>${appium.version}</version>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <artifactId>gson</artifactId>
           <groupId>com.google.code.gson</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>guava</artifactId>
-          <groupId>com.google.guava</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -101,15 +99,16 @@
   <parent>
     <groupId>org.sitoolkit.wt</groupId>
     <artifactId>sit-wt-all</artifactId>
-    <version>0.11.1</version>
+    <version>0.12</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring.version>4.2.4.RELEASE</spring.version>
     <slf4j.version>1.7.13</slf4j.version>
-    <selenium.version>2.48.2</selenium.version>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <selenium.version>2.53.0</selenium.version>
+    <appium.version>3.4.1</appium.version>
   </properties>
   <build>
     <testResources>

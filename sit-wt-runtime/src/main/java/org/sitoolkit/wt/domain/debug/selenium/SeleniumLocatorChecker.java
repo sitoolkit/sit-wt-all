@@ -1,6 +1,9 @@
 package org.sitoolkit.wt.domain.debug.selenium;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.InvalidSelectorException;
@@ -10,7 +13,7 @@ import org.sitoolkit.wt.domain.operation.selenium.SeleniumOperation;
 import org.sitoolkit.wt.domain.operation.selenium.SeleniumOperationContext;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.springframework.stereotype.Component;
+import org.sitoolkit.wt.infra.PropertyManager;
 
 /**
  * {@link LocatorChecker}のSelenium実装です。
@@ -18,8 +21,10 @@ import org.springframework.stereotype.Component;
  * @author yuichi.kuwahara
  *
  */
-@Component
 public class SeleniumLocatorChecker extends SeleniumOperation implements LocatorChecker {
+
+    @Resource
+    PropertyManager pm;
 
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
@@ -29,7 +34,10 @@ public class SeleniumLocatorChecker extends SeleniumOperation implements Locator
     @Override
     public void check(Locator locator) {
         try {
+            seleniumDriver.manage().timeouts().implicitlyWait(0, TimeUnit.MICROSECONDS);
             List<WebElement> elements = seleniumDriver.findElements(by(locator));
+            seleniumDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(),
+                    TimeUnit.MILLISECONDS);
 
             if (elements.isEmpty()) {
                 log.info("ロケーター({})に該当する要素は見つかりませんでした。", locator);

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.m2e.Maven2LaunchConfigurationType">
 <booleanAttribute key="M2_DEBUG_OUTPUT" value="false"/>
-<stringAttribute key="M2_GOALS" value="test"/>
+<stringAttribute key="M2_GOALS" value="verify"/>
 <booleanAttribute key="M2_NON_RECURSIVE" value="false"/>
 <booleanAttribute key="M2_OFFLINE" value="false"/>
 <stringAttribute key="M2_PROFILES" value="localhost"/>
 <listAttribute key="M2_PROPERTIES">
-<listEntry value="test=ExcelTestScriptTest"/>
+<listEntry value="test=ExcelTestScriptIT#test001"/>
 <listEntry value="forkCount=0"/>
 </listAttribute>
 <stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
