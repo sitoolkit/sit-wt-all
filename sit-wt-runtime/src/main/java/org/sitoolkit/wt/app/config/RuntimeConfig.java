@@ -1,6 +1,6 @@
 package org.sitoolkit.wt.app.config;
 
-import org.sitoolkit.wt.app.page2script.Page2ScriptImportConfig;
+import org.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.debug.LocatorChecker;
 import org.sitoolkit.wt.domain.debug.selenium.SeleniumLocatorChecker;
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
-@Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptImportConfig.class })
+@Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptConfig.class })
 @ComponentScan("org.sitoolkit.wt.domain.operation")
 public class RuntimeConfig {
 
