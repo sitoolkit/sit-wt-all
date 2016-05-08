@@ -3,13 +3,17 @@ package org.sitoolkit.wt.domain.evidence;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FalseFileFilter;
+import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.io.PatternFilenameFilter;
 
 public class EvidenceOpener {
 
@@ -21,22 +25,29 @@ public class EvidenceOpener {
 
     public void open() {
         File outputDir = new File(buildDir);
-        File[] evidenceDirs = outputDir.listFiles(new PatternFilenameFilter(evidenceDirRegex));
-        Arrays.sort(evidenceDirs, new FileLastModifiedComarator(false));
+        List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
+                FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
+        Collections.sort(evidenceDirs, new FileLastModifiedComarator(false));
 
-        if (evidenceDirs.length == 0) {
+        if (evidenceDirs.isEmpty()) {
             LOG.info("エビデンスフォルダがありません {}", outputDir.getAbsolutePath());
             return;
         }
 
-        File[] opelogFiles = evidenceDirs[0].listFiles(new PatternFilenameFilter(evidenceFileRegex));
-        LOG.info("{}に{}のエビデンスがあります ", evidenceDirs[0].getName(), opelogFiles.length);
+        List<File> opelogFiles = new ArrayList<File>(FileUtils.listFiles(evidenceDirs.get(0),
+                new RegexFileFilter(evidenceFileRegex), TrueFileFilter.INSTANCE));
+        LOG.info("{}に{}のエビデンスがあります ", evidenceDirs.get(0).getName(), opelogFiles.size());
 
-        Arrays.sort(opelogFiles, new FileLastModifiedComarator(true));
+        Collections.sort(opelogFiles, new FileLastModifiedComarator(true));
 
         try {
-            for (int i = 0; i < openFileCount; i++) {
-                Desktop.getDesktop().open(opelogFiles[i]);
+            int openFiles = 0;
+            for (File file : opelogFiles) {
+                Desktop.getDesktop().open(file);
+
+                if (++openFiles >= openFileCount) {
+                    break;
+                }
             }
         } catch (IOException e) {
             throw new IllegalStateException(e);
