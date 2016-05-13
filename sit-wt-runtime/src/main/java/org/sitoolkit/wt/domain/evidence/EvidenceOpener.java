@@ -27,6 +27,7 @@ public class EvidenceOpener {
         File outputDir = new File(buildDir);
         List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
                 FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
+        evidenceDirs.remove(outputDir);
         Collections.sort(evidenceDirs, new FileLastModifiedComarator(false));
 
         if (evidenceDirs.isEmpty()) {

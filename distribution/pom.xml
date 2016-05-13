@@ -27,7 +27,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.report.encoding>UTF-8</project.report.encoding>
-    <sitwt.version>0.12.1</sitwt.version>
+    <sitwt.version>0.12.2</sitwt.version>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
   </properties>
