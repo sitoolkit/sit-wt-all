@@ -52,6 +52,6 @@ public class SelectOperation extends SeleniumOperation {
             }
         }
 
-        ctx.info(element, MessagePattern.項目にXXをYYします, sb.toString() + "の選択肢", "選択");
+        ctx.info(element, MessagePattern.項目にXXをYYします, sb.toString(), "選択");
     }
 }
