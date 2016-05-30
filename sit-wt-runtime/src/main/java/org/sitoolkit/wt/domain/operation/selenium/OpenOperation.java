@@ -78,9 +78,9 @@ public class OpenOperation extends SeleniumOperation {
         }
     }
 
-    private String file2url(String url) {
+    private String file2url(String path) {
         try {
-            return new File(url).toURI().toURL().toString();
+            return new File(path).toURI().toURL().toString();
         } catch (MalformedURLException e) {
             throw new TestException(e);
         }
