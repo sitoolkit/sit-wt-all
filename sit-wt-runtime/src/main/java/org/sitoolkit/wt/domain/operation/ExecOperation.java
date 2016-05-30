@@ -44,10 +44,15 @@ public class ExecOperation implements Operation {
     public OperationResult operate(TestStep testStep) {
         OperationResult result = new OperationResult();
 
-        String cmd = testStep.getLocator().getValue();
-        result.addRecord(LogRecord.info(log, testStep, "コマンド[{}]を実行します", cmd));
+        String command = testStep.getLocator().getValue();
 
-        ProcessBuilder pb = new ProcessBuilder(cmd.split(CMD_SEPARATOR));
+        if (System.getProperty("os.name").startsWith("windows")) {
+            command = "cmd /c " + command;
+        }
+
+        result.addRecord(LogRecord.info(log, testStep, "コマンド[{}]を実行します", command));
+
+        ProcessBuilder pb = new ProcessBuilder(command.split(CMD_SEPARATOR));
         pb.redirectErrorStream(true);
         Process process = null;
         String cmdlog = null;
@@ -72,7 +77,7 @@ public class ExecOperation implements Operation {
         }
 
         if (exitValue != 0) {
-            throw new TestException("コマンドが異常終了しました。 " + cmd);
+            throw new TestException("コマンドが異常終了しました。 " + command);
         }
 
         return result;
