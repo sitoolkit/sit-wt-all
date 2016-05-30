@@ -13,12 +13,12 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.4</version>
+      <version>2.5</version>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <version>1.8.3</version>
+      <version>1.9.2</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -81,7 +81,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.1.3</version>
+      <version>1.1.7</version>
     </dependency>
     <dependency>
       <groupId>io.appium</groupId>
@@ -103,8 +103,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
-    <spring.version>4.2.4.RELEASE</spring.version>
-    <slf4j.version>1.7.13</slf4j.version>
+    <spring.version>4.2.6.RELEASE</spring.version>
+    <slf4j.version>1.7.21</slf4j.version>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
   </properties>
@@ -133,64 +133,6 @@
                 <jvmarg value="-XX:-UseSplitVerifier" />
               </java>
             </target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.18.1</version>
-          <configuration>
-            <argLine>-Dfile.encoding=${file.encoding} -XX:-UseSplitVerifier</argLine>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jxr-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>taglist-maven-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>cobertura-maven-plugin</artifactId>
-          <version>2.5.2</version>
-          <configuration>
-            <instrumentation>
-              <excludes>
-                <exclude>**/*Test.class</exclude>
-                <exclude>org/sitoolkit/tester/TestClassGenerator.class</exclude>
-              </excludes>
-            </instrumentation>
-            <formats>
-              <format>html</format>
-              <format>xml</format>
-            </formats>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>findbugs-maven-plugin</artifactId>
-          <version>2.5.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.15</version>
-          <configuration>
-            <configLocation>config/sit_checks.xml</configLocation>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>javancss-maven-plugin</artifactId>
-          <version>2.1</version>
-          <configuration>
-            <includes>
-              <include>**/*.java</include>
-            </includes>
           </configuration>
         </plugin>
         <plugin>
@@ -261,47 +203,8 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.4</version>
-        <configuration>
-          <locales>ja</locales>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-jxr-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>taglist-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>findbugs-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>javancss-maven-plugin</artifactId>
-            </plugin>
-          </reportPlugins>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-
 
   <profiles>
     <profile>

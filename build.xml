@@ -37,6 +37,19 @@
   </target>
 
 
+  <target name="01_site" depends="check-mvn.repo">
+
+    <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-P" />
+      <arg value="${mvn.repo},${mvn.profile.ci}" />
+      <arg value="-Dfile.encoding=${file.encoding}" />
+      <arg value="clean" />
+      <arg value="site" />
+    </exec>
+
+  </target>
+
   <target name="01_build" depends="check-test.skip">
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
