@@ -19,11 +19,11 @@ import java.io.File;
 
 import javax.annotation.Resource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
@@ -40,17 +40,18 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
     @Resource
     ApplicationContext appCtx;
 
+    @Before
     @Override
-    public void beforeTestClass(TestContext testContext) throws Exception {
+    public void setUp() {
         Selenium2Script converter = Selenium2Script.initInstance();
         File testScript = converter.convert(new File("seleniumscript/SeleniumIDETestScript.html"));
         testScriptPath = testScript.getAbsolutePath();
 
         // Commons BeanutilsのConverterが異なるApplicationContext間で共有となる事象の暫定対応
-        TableDataMapper dm = testContext.getApplicationContext().getBean(TableDataMapper.class);
+        TableDataMapper dm = appCtx.getBean(TableDataMapper.class);
         dm.initConverters();
 
-        super.beforeTestClass(testContext);
+        super.setUp();
     }
 
     @Test

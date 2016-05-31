@@ -73,7 +73,7 @@ public class DebugSupport {
         final int currentIndex = current.getCurrentIndex();
         int nextIndex = currentIndex + 1;
         TestScript testScript = current.getTestScript();
-
+        LOG.debug("debugging test context : {}", current);
         if (currentIndex < testScript.getTestStepCount()) {
 
             if (isDebug()) {

@@ -32,6 +32,7 @@ import org.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import org.sitoolkit.wt.domain.evidence.ScreenshotTiming;
 import org.sitoolkit.wt.domain.operation.OperationResult;
 import org.sitoolkit.wt.domain.testscript.TestScript;
+import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.TestException;
@@ -64,6 +65,9 @@ public class Tester {
     @Resource
     TestScriptDao dao;
 
+    @Resource
+    TestScriptCatalog catalog;
+
     // /**
     // * スクリーンショット操作
     // */
@@ -82,6 +86,16 @@ public class Tester {
         // opelog.beginScript();
     }
 
+    public void prepare(String scriptPath, String sheetName, String caseNo) {
+        log.info("テストスクリプトをロードします。{}, {}", scriptPath, sheetName);
+        testScript = catalog.get(scriptPath, sheetName);
+        current.setTestScript(testScript);
+        current.setScriptName(testScript.getName());
+        current.setCaseNo(caseNo);
+        current.reset();
+        log.debug("prepare test context {}", current);
+    }
+
     /**
      * テストスクリプトファイルを読み込み内部に保持します。
      *
@@ -91,7 +105,7 @@ public class Tester {
     public void setUpClass(String testScriptPath, String sheetName) {
         if (!isScriptLoaded()) {
             log.info("テストスクリプトをロードします。{}, {}", testScriptPath, sheetName);
-            testScript = dao.load(testScriptPath, sheetName, false);
+            testScript = catalog.get(testScriptPath, sheetName);
             current.setTestScript(testScript);
 
             if (debug.isDebug()) {
@@ -105,10 +119,6 @@ public class Tester {
 
     public void tearDown() {
         // NOP
-    }
-
-    public void tearDownClass() {
-        em.moveLogFile();
     }
 
     /**

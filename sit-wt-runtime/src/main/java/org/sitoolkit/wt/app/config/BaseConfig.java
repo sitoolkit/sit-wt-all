@@ -12,13 +12,24 @@ import org.sitoolkit.wt.domain.testscript.OperationConverter;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SpringBeanFactory;
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.support.SimpleThreadScope;
 
 @Configuration
 @Import(PropertyManager.class)
 public class BaseConfig {
+
+    @Bean
+    public static CustomScopeConfigurer customScopeConfigurer() {
+        CustomScopeConfigurer csc = new CustomScopeConfigurer();
+
+        csc.addScope("thread", new SimpleThreadScope());
+
+        return csc;
+    }
 
     @Bean
     public FileOverwriteChecker getFileOverwriteChecker() {

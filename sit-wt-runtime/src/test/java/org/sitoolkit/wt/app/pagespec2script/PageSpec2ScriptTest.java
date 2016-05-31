@@ -46,11 +46,9 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
     @Resource
     ApplicationContext appCtx;
 
-    PageSpec2Script converter;
-
     @Override
     public void beforeTestClass(TestContext testContext) throws Exception {
-        converter = PageSpec2Script.initInstance();
+        PageSpec2Script converter = PageSpec2Script.initInstance();
         File testScript = converter.convert(new File(converter.getPagespecDir(), "画面定義書_入力.xlsx"));
         testScript.deleteOnExit();
 
@@ -77,7 +75,8 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return new File(converter.getTestScriptDir(), "入力TestScript.xlsx").getAbsolutePath();
+        return new File(new PageSpec2Script().getTestScriptDir(), "入力TestScript.xlsx")
+                .getAbsolutePath();
     }
 
     @Override

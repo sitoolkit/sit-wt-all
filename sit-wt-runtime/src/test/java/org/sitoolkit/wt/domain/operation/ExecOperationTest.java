@@ -39,8 +39,10 @@ public class ExecOperationTest extends SitTesterTestBase {
     @Before
     public void before() {
         File dir = new File(TEST_DIR);
-        if (dir.isDirectory())
+        if (dir.isDirectory()) {
             dir.delete();
+        }
+        super.setUp();
     }
 
     @Test

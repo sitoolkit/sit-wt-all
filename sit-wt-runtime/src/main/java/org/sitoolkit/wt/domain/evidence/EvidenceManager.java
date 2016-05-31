@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -193,6 +194,7 @@ public class EvidenceManager implements ApplicationContextAware {
         return writer.toString();
     }
 
+    @PreDestroy
     public void moveLogFile() {
         try {
             File logFile = new File(logFilePath);

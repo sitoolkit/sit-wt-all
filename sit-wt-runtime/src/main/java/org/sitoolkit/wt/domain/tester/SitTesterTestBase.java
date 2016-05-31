@@ -27,7 +27,6 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 
@@ -69,21 +68,9 @@ public abstract class SitTesterTestBase extends AbstractTestExecutionListener {
         }
     }
 
-    @Override
-    public void beforeTestClass(TestContext testContext) throws Exception {
-        Tester tester = testContext.getApplicationContext().getBean(Tester.class);
-        tester.setUpClass(getTestScriptPath(), getSheetName());
-    }
-
-    @Override
-    public void afterTestClass(TestContext testContext) throws Exception {
-        Tester tester = testContext.getApplicationContext().getBean(Tester.class);
-        tester.tearDownClass();
-    }
-
     @Before
     public void setUp() {
-        tester.setUp(getCurrentCaseNo());
+        tester.prepare(getTestScriptPath(), getSheetName(), getCurrentCaseNo());
     }
 
     @After

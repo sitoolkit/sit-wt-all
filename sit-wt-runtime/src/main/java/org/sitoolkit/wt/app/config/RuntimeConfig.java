@@ -16,9 +16,9 @@ import org.sitoolkit.wt.domain.evidence.selenium.SeleniumScreenshotTaker;
 import org.sitoolkit.wt.domain.tester.ELSupport;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.tester.Tester;
-import org.sitoolkit.wt.domain.tester.selenium.SeleniumTester;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
+import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.springframework.context.annotation.Bean;
@@ -26,17 +26,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 
 @Configuration
 @Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptConfig.class })
 @ComponentScan("org.sitoolkit.wt.domain.operation")
 public class RuntimeConfig {
 
-    @Bean(name = "tester")
-    public Tester getTester(ScreenshotTaker screenshotTaker) {
-        SeleniumTester tester = new SeleniumTester();
-
-        return tester;
+    @Bean
+    @Scope(proxyMode = ScopedProxyMode.DEFAULT, scopeName = "thread")
+    public Tester tester() {
+        return new Tester();
     }
 
     @Bean
@@ -45,6 +45,7 @@ public class RuntimeConfig {
     }
 
     @Bean
+    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
     public TestContext testContext() {
         return new TestContext();
     }
@@ -67,6 +68,11 @@ public class RuntimeConfig {
     @Bean
     public DialogScreenshotSupport dialogScreenshotSupport() {
         return new SeleniumDialogScreenshotSupport();
+    }
+
+    @Bean
+    public TestScriptCatalog TestScriptCatalog() {
+        return new TestScriptCatalog();
     }
 
     @Bean
