@@ -193,9 +193,8 @@ public class PageSpec2Script implements ApplicationContextAware {
         // ケースデータ
         Map<String, String> testData = new HashMap<String, String>();
         testStep.setTestData(testData);
-        // TODO セレクトボックスに対する操作でケースデータ"y"はテスト実行時にエラーとなる。
-        // これを避けるためにselect操作はスキップさせる。
-        String caseData = "select".equals(operationName) ? "" : "y";
+        // TODO クリック操作以外は入力値となるケースデータを自動判別できないためスキップさせる
+        String caseData = "click".equals(operationName) ? "y" : "";
         testData.put(caseNo, caseData);
 
         return testStep;
