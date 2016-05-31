@@ -6,7 +6,6 @@
   <property name="testdir" value="${basedir}/target/${testArtifactId}" />
   <property name="file.encoding" value="UTF-8" />
 
-  <!-- TODO else~を修正 -->
   <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
     <os family="windows" />
   </condition>
@@ -18,62 +17,49 @@
 
 
   <target name="install">
-    <property name="mvn.phase" value="install" />
-    <property name="mvn.repo" value="local.repositories" />
-    <antcall target="all" />
+    <antcall target="01_commit-stage" />
+    <antcall target="02_local-install-stage" />
+    <antcall target="03_acceptance-stage" />
   </target>
 
 
   <target name="deploy">
-    <property name="mvn.phase" value="deploy" />
-    <property name="mvn.repo" value="sonatype.repositories" />
-    <antcall target="all" />
+    <antcall target="01_commit-stage" />
+    <antcall target="02_local-install-stage" />
+    <antcall target="03_acceptance-stage" />
+    <antcall target="04_deploy-stage" />
   </target>
 
 
-  <target name="all">
-    <antcall target="01_build" />
-    <antcall target="02_acceptance-test" />
-  </target>
+  <target name="01_commit-stage">
 
-
-  <target name="01_site" depends="check-mvn.repo">
-
-    <exec executable="${mvn.cmd}" dir="${basedir}/sit-wt-runtime" failonerror="true">
+    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
-      <arg value="${mvn.repo},${mvn.profile.ci}" />
+      <arg value="localhost,ci" />
       <arg value="-Dfile.encoding=${file.encoding}" />
+      <arg value="-Dmaven.test.skip=false" />
+      <arg value="-Dmpir.skip=true" />
       <arg value="clean" />
       <arg value="site" />
     </exec>
 
   </target>
 
-  <target name="01_build" depends="check-test.skip">
+  
+  <target name="02_local-install-stage">
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-P" />
-      <arg value="${mvn.repo},${mvn.profile.ci}" />
-      <arg value="-Dmaven.test.skip=${test.skip}" />
-      <arg value="-Dfile.encoding=${file.encoding}" />
+      <arg value="-Dmaven.test.skip=true" />
       <arg value="clean" />
-      <arg value="${mvn.phase}" />
+      <arg value="install" />
     </exec>
 
   </target>
 
 
-  <target name="check-test.skip" unless="test.skip">
-    <input message="select maven.test.skip"
-           addproperty="test.skip"
-           validargs="true,false"
-           defaultvalue="true" />
-  </target>
-
-
-  <target name="02_acceptance-test" depends="check-mvn.repo">
+  <target name="03_acceptance-stage">
 
     <copy file="${basedir}/distribution/pom.xml" todir="${testdir}" />
     <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" todir="${testdir}/testscript" />
@@ -82,8 +68,6 @@
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-Devidence.open=false" />
       <arg value="-Dsample.baseUrl=file:///${basedir}/sit-wt-runtime/" />
-      <arg value="-P" />
-      <arg value="${mvn.repo}" />
       <arg value="-e" />
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
@@ -93,11 +77,17 @@
   </target>
 
 
-  <target name="check-mvn.repo" unless="mvn.repo">
-    <input message="select mvn.repo"
-           addproperty="mvn.repo"
-           validargs="local.repositories,sonatype.repositores"
-           defaultvalue="local.repositories" />
+  <target name="04_deploy-stage">
+
+    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-P" />
+      <arg value="release" />
+      <arg value="-Dmaven.test.skip=true" />
+      <arg value="clean" />
+      <arg value="deploy" />
+    </exec>
+
   </target>
 
 

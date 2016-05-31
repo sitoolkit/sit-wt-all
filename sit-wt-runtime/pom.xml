@@ -107,6 +107,7 @@
     <slf4j.version>1.7.21</slf4j.version>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
+    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <build>
     <testResources>
@@ -119,22 +120,22 @@
     </testResources>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.7</version>
-          <configuration>
-            <target name="gen-test">
-              <property name="classpath" refid="maven.compile.classpath" />
-              <java classname="org.sitoolkit.wt.app.script2java.Script2Java" fork="true" failonerror="true">
-                <classpath>
-                  <pathelement path="${classpath}" />
-                </classpath>
-                <jvmarg value="-Dfile.encoding=${file.encoding}" />
-                <jvmarg value="-XX:-UseSplitVerifier" />
-              </java>
-            </target>
-          </configuration>
-        </plugin>
+<!--         <plugin> -->
+<!--           <artifactId>maven-antrun-plugin</artifactId> -->
+<!--           <version>1.7</version> -->
+<!--           <configuration> -->
+<!--             <target name="gen-test"> -->
+<!--               <property name="classpath" refid="maven.compile.classpath" /> -->
+<!--               <java classname="org.sitoolkit.wt.app.script2java.Script2Java" fork="true" failonerror="true"> -->
+<!--                 <classpath> -->
+<!--                   <pathelement path="${classpath}" /> -->
+<!--                 </classpath> -->
+<!--                 <jvmarg value="-Dfile.encoding=${file.encoding}" /> -->
+<!--                 <jvmarg value="-XX:-UseSplitVerifier" /> -->
+<!--               </java> -->
+<!--             </target> -->
+<!--           </configuration> -->
+<!--         </plugin> -->
         <plugin>
           <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-maven-plugin</artifactId>
@@ -151,59 +152,59 @@
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence
           on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.codehaus.mojo
-                    </groupId>
-                    <artifactId>
-                      build-helper-maven-plugin
-                    </artifactId>
-                    <versionRange>
-                      [1.8,)
-                    </versionRange>
-                    <goals>
-                      <goal>add-test-source</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
+<!--         <plugin> -->
+<!--           <groupId>org.eclipse.m2e</groupId> -->
+<!--           <artifactId>lifecycle-mapping</artifactId> -->
+<!--           <version>1.0.0</version> -->
+<!--           <configuration> -->
+<!--             <lifecycleMappingMetadata> -->
+<!--               <pluginExecutions> -->
+<!--                 <pluginExecution> -->
+<!--                   <pluginExecutionFilter> -->
+<!--                     <groupId> -->
+<!--                       org.codehaus.mojo -->
+<!--                     </groupId> -->
+<!--                     <artifactId> -->
+<!--                       build-helper-maven-plugin -->
+<!--                     </artifactId> -->
+<!--                     <versionRange> -->
+<!--                       [1.8,) -->
+<!--                     </versionRange> -->
+<!--                     <goals> -->
+<!--                       <goal>add-test-source</goal> -->
+<!--                     </goals> -->
+<!--                   </pluginExecutionFilter> -->
+<!--                   <action> -->
+<!--                     <ignore /> -->
+<!--                   </action> -->
+<!--                 </pluginExecution> -->
+<!--               </pluginExecutions> -->
+<!--             </lifecycleMappingMetadata> -->
+<!--           </configuration> -->
+<!--         </plugin> -->
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.9.1</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-test-sources/test/</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+<!--     <plugins> -->
+<!--       <plugin> -->
+<!--         <groupId>org.codehaus.mojo</groupId> -->
+<!--         <artifactId>build-helper-maven-plugin</artifactId> -->
+<!--         <version>1.9.1</version> -->
+<!--         <executions> -->
+<!--           <execution> -->
+<!--             <id>add-source</id> -->
+<!--             <phase>generate-test-sources</phase> -->
+<!--             <goals> -->
+<!--               <goal>add-test-source</goal> -->
+<!--             </goals> -->
+<!--             <configuration> -->
+<!--               <sources> -->
+<!--                 <source>${project.build.directory}/generated-test-sources/test/</source> -->
+<!--               </sources> -->
+<!--             </configuration> -->
+<!--           </execution> -->
+<!--         </executions> -->
+<!--       </plugin> -->
+<!--     </plugins> -->
   </build>
 
   <profiles>
@@ -253,17 +254,17 @@
               </execution>
             </executions>
           </plugin>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
+<!--           <plugin> -->
+<!--             <artifactId>maven-antrun-plugin</artifactId> -->
+<!--             <executions> -->
+<!--               <execution> -->
+<!--                 <phase>generate-test-sources</phase> -->
+<!--                 <goals> -->
+<!--                   <goal>run</goal> -->
+<!--                 </goals> -->
+<!--               </execution> -->
+<!--             </executions> -->
+<!--           </plugin> -->
         </plugins>
       </build>
     </profile>
