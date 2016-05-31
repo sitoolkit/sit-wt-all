@@ -24,26 +24,20 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@Component
-@Scope("prototype")
 public class TestScript {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
     /**
-     * テストスクリプトの中から
-     * ケース番号のカラムを識別するためのプレフィックス
+     * テストスクリプトの中から ケース番号のカラムを識別するためのプレフィックス
      */
     private String caseNoPrefix = "ケース_";
     /**
-     * テストスクリプト内で
-     * ケースのテストデータが記載された列番号
+     * テストスクリプト内で ケースのテストデータが記載された列番号
      */
     private int caseNoColIndex;
     /**
@@ -53,10 +47,9 @@ public class TestScript {
     /**
      * キー：ステップNo、値：ステップNoを持つTestScriptのtestStepList内のインデックス
      */
-    private Map<String, Integer> testStepNoMap  = new HashMap<String, Integer>();
+    private Map<String, Integer> testStepNoMap = new HashMap<String, Integer>();
     /**
-     * ケース番号マップ
-     * キー：ケース番号、値：テストデータ配列のインデックス
+     * ケース番号マップ キー：ケース番号、値：テストデータ配列のインデックス
      */
     private Map<String, Integer> caseNoMap = new HashMap<String, Integer>();
 
@@ -107,6 +100,7 @@ public class TestScript {
 
     /**
      * 当該テストスクリプト内のテストステップ数を取得します。
+     * 
      * @return 当該テストスクリプト内のテストステップ数
      */
     public int getTestStepCount() {
@@ -138,7 +132,6 @@ public class TestScript {
         return lastModified != scriptFile.lastModified();
     }
 
-
     public String getName() {
         return name;
     }
@@ -158,15 +151,15 @@ public class TestScript {
     }
 
     /**
-     * リスト内にコピー先テストステップと同じ項目名を持つものが存在する場合、
-     * ロケーターをコピーします。
+     * リスト内にコピー先テストステップと同じ項目名を持つものが存在する場合、 ロケーターをコピーします。
      *
-     * コピーは、コピー先テストステップのロケーターが空である場合に行います。
-     * ロケーターが空でない場合、または同じ項目名を持つものが存在しない場合は
+     * コピーは、コピー先テストステップのロケーターが空である場合に行います。 ロケーターが空でない場合、または同じ項目名を持つものが存在しない場合は
      * このメソッドは何も行いません。
      *
-     * @param list リスト
-     * @param testStep コピー先テストステップ
+     * @param list
+     *            リスト
+     * @param testStep
+     *            コピー先テストステップ
      */
     private void copyLocator(List<TestStep> list, TestStep testStep) {
         String itemName = testStep.getItemName();

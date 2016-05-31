@@ -13,11 +13,7 @@ import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope("prototype")
 class DebugCommand {
     private static Logger LOG = LoggerFactory.getLogger(DebugCommand.class);
 

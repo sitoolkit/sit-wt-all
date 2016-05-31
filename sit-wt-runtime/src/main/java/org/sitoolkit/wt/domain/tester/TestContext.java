@@ -21,13 +21,11 @@ import java.util.Map;
 
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@Component("current")
 public class TestContext {
 
     /**

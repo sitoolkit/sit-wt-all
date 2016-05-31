@@ -18,9 +18,7 @@ import org.sitoolkit.util.tabledata.excel.TableDataDaoExcelImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
-@Component
 public class TestScriptDao {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());

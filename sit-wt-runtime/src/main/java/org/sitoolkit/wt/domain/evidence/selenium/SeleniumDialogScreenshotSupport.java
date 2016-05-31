@@ -18,6 +18,9 @@ package org.sitoolkit.wt.domain.evidence.selenium;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -27,14 +30,11 @@ import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.annotation.Resource;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@Component
 public class SeleniumDialogScreenshotSupport implements DialogScreenshotSupport {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -53,11 +53,10 @@ public class SeleniumDialogScreenshotSupport implements DialogScreenshotSupport 
         for (int i = testSteps.size() - 1; i >= 0; i--) {
             TestStep testStep = testSteps.get(i);
             testStep.setCurrentCaseNo(caseNo);
-            if (!testStep.isSkip()
-                    && testStep.getOperation() instanceof DialogOperation
+            if (!testStep.isSkip() && testStep.getOperation() instanceof DialogOperation
                     && testStep.beforeScreenshot()) {
                 int reservedIdx = i;
-                while(reservedIdx > 0) {
+                while (reservedIdx > 0) {
                     TestStep reservedScript = testSteps.get(reservedIdx);
                     reservedScript.setCurrentCaseNo(caseNo);
                     if (reservedScript.isSkip()) {
@@ -81,7 +80,8 @@ public class SeleniumDialogScreenshotSupport implements DialogScreenshotSupport 
             log.debug("ウィンドウ位置、サイズを取得します");
             Point winPos = seleniumDriver.manage().window().getPosition();
             Dimension winSize = seleniumDriver.manage().window().getSize();
-            current.setWindowRect(winPos.getX(), winPos.getY(), winSize.getWidth(), winSize.getHeight());
+            current.setWindowRect(winPos.getX(), winPos.getY(), winSize.getWidth(),
+                    winSize.getHeight());
         }
     }
 }

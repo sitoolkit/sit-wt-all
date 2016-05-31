@@ -19,25 +19,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Resource;
-
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@Component
 public class ELSupport {
 
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
@@ -74,9 +70,8 @@ public class ELSupport {
 
     String eval(String expStr) {
         Expression exp = parser.parseExpression(expStr);
-        return StringUtils.defaultString(ctx == null
-            ? exp.getValue(String.class)
-            : exp.getValue(ctx, String.class));
+        return StringUtils.defaultString(
+                ctx == null ? exp.getValue(String.class) : exp.getValue(ctx, String.class));
 
     }
 }

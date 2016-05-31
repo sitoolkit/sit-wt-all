@@ -19,15 +19,11 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.tester.ELSupport;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@Component
-@Scope("prototype")
 public class Locator {
 
     @Resource
