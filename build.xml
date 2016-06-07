@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="sit-wt-all" basedir="." default="install">
+<project xmlns:if="ant:if" xmlns:unless="ant:unless" name="sit-wt-all" basedir="." default="install">
 
   <property environment="env" />
   <property name="testArtifactId" value="sit-wt-test" />
   <property name="testdir" value="${basedir}/target/${testArtifactId}" />
   <property name="file.encoding" value="UTF-8" />
-
+  <condition property="os.windows" value="true" else="false">
+    <os family="windows" />
+  </condition>
   <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
     <os family="windows" />
   </condition>
@@ -58,11 +60,14 @@
 
   </target>
 
-  
+
   <target name="03_acceptance-stage">
 
     <copy file="${basedir}/distribution/pom.xml" todir="${testdir}" />
-    <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" todir="${testdir}/testscript" />
+    <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" todir="${testdir}/testscript"
+      unless:true="${os.windows}" />
+    <fixcrlf file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" destdir="${testdir}/testscript"
+      encoding="UTF-8" outputencoding="MS932" if:true="${os.windows}"/>
 
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
@@ -100,9 +105,7 @@
 
     <property name="version" value="1.0-SNAPSHOT" />
 
-    <replaceregexp file="${basedir}/distribution/pom.xml"
-                   match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
-                   replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
+    <replaceregexp file="${basedir}/distribution/pom.xml" match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;" replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
 
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />
