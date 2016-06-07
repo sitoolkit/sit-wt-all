@@ -24,15 +24,11 @@ import org.junit.Test;
 import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@TestExecutionListeners(listeners = { DependencyInjectionTestExecutionListener.class,
-        Selenium2ScriptTest.class })
 public class Selenium2ScriptTest extends SitTesterTestBase {
 
     private String testScriptPath;

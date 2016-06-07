@@ -15,37 +15,30 @@
  */
 package org.sitoolkit.wt.domain.tester;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.sitoolkit.wt.domain.tester.TestResult;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@TestExecutionListeners(listeners = {
-	DependencyInjectionTestExecutionListener.class,
-	VerifyNGTest.class})
 public class VerifyNGTest extends SitTesterTestBase {
 
-	@Test
-	public void test001() {
+    @Test
+    public void test001() {
         TestResult result = tester.operate("001");
         assertEquals(3, result.getFailCount());
-	}
+    }
 
-	@Override
-	protected String getTestScriptPath() {
-		return "src/test/resources/VerifyNGTestScript.xlsx";
-	}
+    @Override
+    protected String getTestScriptPath() {
+        return "src/test/resources/VerifyNGTestScript.xlsx";
+    }
 
-	@Override
-	protected String getSheetName() {
-		return "TestScript";
-	}
+    @Override
+    protected String getSheetName() {
+        return "TestScript";
+    }
 
 }

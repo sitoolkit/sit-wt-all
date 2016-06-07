@@ -17,30 +17,25 @@ package org.sitoolkit.wt.domain.operation;
 
 import org.junit.Test;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@TestExecutionListeners(listeners = {
-    DependencyInjectionTestExecutionListener.class,
-    GoToOperationTest.class })
 public class GoToOperationTest extends SitTesterTestBase {
 
-	@Test
-	public void test001() {
-		test();
-	}
+    @Test
+    public void test001() {
+        test();
+    }
 
-	@Override
-	protected String getTestScriptPath() {
-		return"src/test/resources/GoToTestScript.xlsx";
-	}
+    @Override
+    protected String getTestScriptPath() {
+        return "src/test/resources/GoToTestScript.xlsx";
+    }
 
-	@Override
-	protected String getSheetName() {
-		return "TestScript";
-	}
+    @Override
+    protected String getSheetName() {
+        return "TestScript";
+    }
 }

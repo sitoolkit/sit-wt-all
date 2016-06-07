@@ -11,9 +11,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 /**
  *
  */
-@TestExecutionListeners(listeners = {
-    DependencyInjectionTestExecutionListener.class,
-    ${test.fileBase}.class })
 public class ${test.fileBase} extends SitTesterTestBase {
 
 #foreach ($caseNo in $test.caseNos)

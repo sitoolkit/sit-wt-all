@@ -26,9 +26,10 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AbstractTestExecutionListener;
 
 /**
  *
@@ -36,12 +37,13 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = RuntimeConfig.class)
-public abstract class SitTesterTestBase extends AbstractTestExecutionListener {
+public abstract class SitTesterTestBase {
+
+    protected Logger log = LoggerFactory.getLogger(getClass());
 
     @Rule
     public TestName testName = new TestName();
 
-    @Resource
     protected Tester tester;
 
     protected String getCurrentCaseNo() {
@@ -70,6 +72,7 @@ public abstract class SitTesterTestBase extends AbstractTestExecutionListener {
 
     @Before
     public void setUp() {
+        log.info("setUp {}, {}", this, tester);
         tester.prepare(getTestScriptPath(), getSheetName(), getCurrentCaseNo());
     }
 
@@ -84,5 +87,13 @@ public abstract class SitTesterTestBase extends AbstractTestExecutionListener {
 
     protected interface AfterTest {
         void callback();
+    }
+
+    // Field injection doesn't work in multi-thread sometime.
+    // So tester field must be method injection.
+    @Resource
+    public void setTester(Tester tester) {
+        this.tester = tester;
+        log.info("set {} {}", this, tester);
     }
 }

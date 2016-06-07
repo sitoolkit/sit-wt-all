@@ -2,11 +2,7 @@ package org.sitoolkit.wt.domain.operation.selenium;
 
 import org.junit.Test;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-@TestExecutionListeners(listeners = { DependencyInjectionTestExecutionListener.class,
-        ElementNotVisibleTest.class })
 public class ElementNotVisibleTest extends SitTesterTestBase {
 
     @Test

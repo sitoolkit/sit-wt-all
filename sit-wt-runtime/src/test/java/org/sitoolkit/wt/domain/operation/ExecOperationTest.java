@@ -23,15 +23,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  *
  * @author yu.kawai
  */
-@TestExecutionListeners(listeners = { DependencyInjectionTestExecutionListener.class,
-        ExecOperationTest.class })
 public class ExecOperationTest extends SitTesterTestBase {
 
     private static final String TEST_DIR = "./testdir";

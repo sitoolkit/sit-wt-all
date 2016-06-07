@@ -15,8 +15,8 @@
  */
 package org.sitoolkit.wt.domain.operation;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import javax.annotation.Resource;
 
@@ -25,16 +25,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  *
  * @author yu.kawai
  */
-@TestExecutionListeners(listeners = {
-        DependencyInjectionTestExecutionListener.class,
-        IncludeOperationTest.class })
 public class IncludeOperationTest extends SitTesterTestBase {
 
     @Resource

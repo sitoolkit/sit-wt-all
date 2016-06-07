@@ -19,6 +19,7 @@ import java.io.File;
 
 import javax.annotation.Resource;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -28,16 +29,11 @@ import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.wt.app.OperationExecutor;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.TestContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@TestExecutionListeners(listeners = { DependencyInjectionTestExecutionListener.class,
-        PageSpec2ScriptTest.class })
 public class PageSpec2ScriptTest extends SitTesterTestBase {
 
     @Rule
@@ -46,17 +42,18 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
     @Resource
     ApplicationContext appCtx;
 
+    @Before
     @Override
-    public void beforeTestClass(TestContext testContext) throws Exception {
+    public void setUp() {
         PageSpec2Script converter = PageSpec2Script.initInstance();
         File testScript = converter.convert(new File(converter.getPagespecDir(), "画面定義書_入力.xlsx"));
         testScript.deleteOnExit();
 
         // TODO Commons BeanutilsのConverterが異なるApplicationContext間で共有となる事象の暫定対応
-        TableDataMapper dm = testContext.getApplicationContext().getBean(TableDataMapper.class);
+        TableDataMapper dm = appCtx.getBean(TableDataMapper.class);
         dm.initConverters();
 
-        super.beforeTestClass(testContext);
+        super.setUp();
     }
 
     @Test

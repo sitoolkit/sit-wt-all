@@ -16,32 +16,26 @@
 package org.sitoolkit.wt.domain.tester;
 
 import org.junit.Test;
-import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-@TestExecutionListeners(listeners = {
-	DependencyInjectionTestExecutionListener.class,
-	FieUploadTest.class})
 public class FieUploadTest extends SitTesterTestBase {
 
-	@Test
-	public void test001() {
-		test();
-	}
+    @Test
+    public void test001() {
+        test();
+    }
 
-	@Override
-	protected String getTestScriptPath() {
-		return "src/test/resources/FileUploadTestScript.xlsx";
-	}
+    @Override
+    protected String getTestScriptPath() {
+        return "src/test/resources/FileUploadTestScript.xlsx";
+    }
 
-	@Override
-	protected String getSheetName() {
-		return "TestScript";
-	}
+    @Override
+    protected String getSheetName() {
+        return "TestScript";
+    }
 
 }

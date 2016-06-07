@@ -108,8 +108,6 @@
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
     <checkstyle.skip>false</checkstyle.skip>
-    <parallel>methods</parallel>
-    <threadCount>3</threadCount>
   </properties>
   <build>
     <testResources>
@@ -230,6 +228,10 @@
       <id>ci</id>
       <properties>
         <file.encoding>UTF-8</file.encoding>
+        <parallel>classesAndMethods</parallel>
+        <perCoreThreadCount>false</perCoreThreadCount>
+        <threadCountClasses>2</threadCountClasses>
+        <threadCountMethods>2</threadCountMethods>
       </properties>
       <build>
         <plugins>
