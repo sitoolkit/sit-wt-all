@@ -109,8 +109,8 @@
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
     <checkstyle.skip>false</checkstyle.skip>
-    <file.encoding>UTF-8</file.encoding>
   </properties>
+
   <build>
     <testResources>
       <testResource>

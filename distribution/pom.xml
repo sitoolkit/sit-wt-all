@@ -26,7 +26,7 @@
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.report.encoding>UTF-8</project.report.encoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <sitwt.version>1.0-SNAPSHOT</sitwt.version>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
@@ -58,6 +58,9 @@
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>2.19.1</version>
+        <configuration>
+          <argLine>-Dfile.encoding=${file.encoding} -XX:-UseSplitVerifier</argLine>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -69,7 +72,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <!-- Environment Settings -->
   <profiles>
     <profile>
@@ -89,5 +92,5 @@
       </build>
     </profile>
   </profiles>
-  
+
 </project>
