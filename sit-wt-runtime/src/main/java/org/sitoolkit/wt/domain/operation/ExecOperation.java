@@ -69,7 +69,9 @@ public class ExecOperation implements Operation {
             throw new TestException(e);
         } finally {
             IOUtils.closeQuietly(is);
-            process.destroy();
+            if (process != null) {
+                process.destroy();
+            }
         }
 
         if (!StringUtils.isEmpty(cmdlog)) {
