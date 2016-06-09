@@ -67,8 +67,10 @@
     <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" todir="${testdir}/testscript"
       unless:true="${os.windows}" />
     <mkdir dir="${testdir}/testscript" if:true="${os.windows}"/>
+    <!-- skip until ci server charset problem is soleved
     <fixcrlf file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" destdir="${testdir}/testscript"
       encoding="UTF-8" outputencoding="MS932" if:true="${os.windows}" />
+	-->
 
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
