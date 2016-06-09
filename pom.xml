@@ -80,6 +80,7 @@
           <artifactId>cobertura-maven-plugin</artifactId>
           <version>2.7</version>
           <configuration>
+            <aggregate>true</aggregate>
             <instrumentation>
               <excludes>
                 <exclude>**/*Test.class</exclude>
@@ -103,6 +104,14 @@
           <configuration>
             <configLocation>${project.parent.basedir}/config/sit_checks.xml</configLocation>
           </configuration>
+          <executions>
+            <execution>
+              <phase>post-site</phase>
+              <goals>
+                <goal>checkstyle-aggregate</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>

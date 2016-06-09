@@ -3,7 +3,7 @@
 
   <property environment="env" />
   <property name="testArtifactId" value="sit-wt-test" />
-  <property name="testdir" value="${basedir}/target/${testArtifactId}" />
+  <property name="testdir" value="${basedir}/${testArtifactId}" />
   <property name="file.encoding" value="UTF-8" />
   <condition property="os.windows" value="true" else="false">
     <os family="windows" />
@@ -47,6 +47,9 @@
 
   <target name="02_commit-stage">
 
+    <property name="project.report" value="${basedir}/site"/>
+    <delete dir="${project.report}"/>
+
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
@@ -58,11 +61,22 @@
       <arg value="site" />
     </exec>
 
+    <move todir="${project.report}/sit-wt-all">
+      <fileset dir="${basedir}/target"/>
+    </move>
+    <move todir="${project.report}/sit-wt-maven-plugin">
+      <fileset dir="${basedir}/sit-wt-maven-plugin/target"/>
+    </move>
+    <move todir="${project.report}/sit-wt-runtime">
+      <fileset dir="${basedir}/sit-wt-runtime/target"/>
+    </move>
+    
   </target>
 
 
   <target name="03_acceptance-stage">
 
+    <delete dir="${testdir}"/>
     <copy file="${basedir}/distribution/pom.xml" todir="${testdir}" />
     <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" todir="${testdir}/testscript"
       unless:true="${os.windows}" />
