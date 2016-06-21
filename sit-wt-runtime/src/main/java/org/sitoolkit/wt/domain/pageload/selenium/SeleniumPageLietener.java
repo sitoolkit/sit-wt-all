@@ -36,7 +36,7 @@ public class SeleniumPageLietener implements PageListener {
 
     @Override
     public void tearDown() {
-        driver.quit();
+        // driver.quit();
     }
 
 }

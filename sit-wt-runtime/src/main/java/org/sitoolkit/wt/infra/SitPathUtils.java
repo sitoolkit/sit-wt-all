@@ -16,12 +16,17 @@
 package org.sitoolkit.wt.infra;
 
 import java.io.File;
+import java.net.MalformedURLException;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author yuichi.kuwahara
  */
 public class SitPathUtils {
+
+    private static final String LOCAL_BASE_URL = "src/main/webapp";
 
     public static String relatvePath(File parent, File child) {
         return parent.toURI().relativize(child.toURI()).getPath();
@@ -30,4 +35,41 @@ public class SitPathUtils {
     public static String relatvePath(String parent, String child) {
         return relatvePath(new File(parent), new File(child));
     }
+
+    /**
+     * オープン先となるURLを構築します。
+     *
+     * @param baseUrl
+     *            基準となるURL
+     * @param path
+     *            基準となるURLからの相対パス
+     * @return オープン先となるURLの文字列
+     */
+    public static String buildUrl(String baseUrl, String path) {
+        if (path.startsWith("http:") || path.startsWith("https:")) {
+            return path;
+        }
+        if (StringUtils.isEmpty(baseUrl)) {
+            return file2url(concatPath(LOCAL_BASE_URL, path));
+        } else {
+            if (baseUrl.startsWith("http:") || baseUrl.startsWith("https:")) {
+                return concatPath(baseUrl, path);
+            } else {
+                return concatPath(file2url(baseUrl), path);
+            }
+        }
+    }
+
+    public static String file2url(String path) {
+        try {
+            return new File(path).toURI().toURL().toString();
+        } catch (MalformedURLException e) {
+            throw new TestException(e);
+        }
+    }
+
+    public static String concatPath(String a, String b) {
+        return a.endsWith("/") ? a + b : a + "/" + b;
+    }
+
 }

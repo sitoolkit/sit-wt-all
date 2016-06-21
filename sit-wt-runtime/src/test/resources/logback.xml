@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-		</filter>
-    	<encoder>
-            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-7.7thread] %-5p %-30.30logger{0} - %m%n</pattern>
-		</encoder>
-	</appender>
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-7.7thread] %-5p %-30.30logger{0} - %m%n</pattern>
+    </encoder>
+  </appender>
 
-	<appender name="file" class="ch.qos.logback.core.FileAppender">
-		<file>target/sit-wt.log</file>
-		<encoding>UTF-8</encoding>
-		<append>false</append>
-		<encoder>
-			<pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-7.7thread] %-5p %-30.30logger{0} - %m%n</pattern>
-		</encoder>
-	</appender>
+  <appender name="file" class="ch.qos.logback.core.FileAppender">
+    <file>target/sit-wt.log</file>
+    <encoding>UTF-8</encoding>
+    <append>false</append>
+    <encoder>
+      <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-7.7thread] %-5p %-30.30logger{0} - %m%n</pattern>
+    </encoder>
+  </appender>
 
-	<logger name="org.sitoolkit" level="debug"/>
-	<logger name="org.sitoolkit.wt.SitSpELUtils" level="trace" additivity="false"/>
+  <logger name="org.sitoolkit" level="debug" additivity="true" />
+  <logger name="org.sitoolkit.wt.domain.tester.ELSupport" level="trace" additivity="true" />
+  <logger name="org.sitoolkit.wt.infra.selenium.WebElementMethodInterceptor" level="trace"
+    additivity="true" />
 
-	<logger name="org.springframework" level="info"/>
+  <logger name="org.springframework" level="info" />
 
-	<root level="info">
-		<appender-ref ref="stdout" />
-		<appender-ref ref="file" />
-	</root>
+  <root level="info">
+    <appender-ref ref="stdout" />
+    <appender-ref ref="file" />
+  </root>
 </configuration>

@@ -15,16 +15,12 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
-import java.io.File;
-import java.net.MalformedURLException;
-
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
-import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.sitoolkit.wt.infra.TestException;
+import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.SitPathUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,10 +30,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenOperation extends SeleniumOperation {
 
-    private static final String LOCAL_BASE_URL = "src/main/webapp";
-
     @Resource
-    protected TestContext current;
+    PropertyManager pm;
 
     /**
      * テストステップで指定されたURLを開きます。 URLはロケーターの値とシステムプロパティ<code>baseUrl</code>
@@ -49,44 +43,9 @@ public class OpenOperation extends SeleniumOperation {
      */
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
-        String url = buildUrl(System.getProperty("baseUrl"), testStep.getLocator().getValue());
+        String url = SitPathUtils.buildUrl(pm.getBaseUrl(), testStep.getLocator().getValue());
         ctx.info("URLをオープンします {}", url);
         seleniumDriver.get(url);
     }
 
-    /**
-     * オープン先となるURLを構築します。
-     *
-     * @param baseUrl
-     *            基準となるURL
-     * @param path
-     *            基準となるURLからの相対パス
-     * @return オープン先となるURLの文字列
-     */
-    protected String buildUrl(String baseUrl, String path) {
-        if (path.startsWith("http:") || path.startsWith("https:")) {
-            return path;
-        }
-        if (StringUtils.isEmpty(baseUrl)) {
-            return file2url(concatPath(LOCAL_BASE_URL, path));
-        } else {
-            if (baseUrl.startsWith("http:") || baseUrl.startsWith("https:")) {
-                return concatPath(baseUrl, path);
-            } else {
-                return concatPath(file2url(baseUrl), path);
-            }
-        }
-    }
-
-    private String file2url(String path) {
-        try {
-            return new File(path).toURI().toURL().toString();
-        } catch (MalformedURLException e) {
-            throw new TestException(e);
-        }
-    }
-
-    private String concatPath(String a, String b) {
-        return a.endsWith("/") ? a + b : a + "/" + b;
-    }
 }

@@ -52,6 +52,9 @@ public abstract class PropertyManager {
     @Value("${selenium.screenshot.pattern}")
     private String seleniumScreenshotPattern;
 
+    @Value("${baseUrl}")
+    private String baseUrl;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -113,5 +116,9 @@ public abstract class PropertyManager {
 
     public String getScreenthotMode() {
         return screenshotMode;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
     }
 }

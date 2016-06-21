@@ -1,6 +1,5 @@
 package org.sitoolkit.wt.domain.pageload.selenium;
 
-import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.openqa.selenium.By;
@@ -21,15 +20,14 @@ public abstract class SeleniumPageLoader {
 
     protected WebElement findLabelByForId(String forId) {
         try {
-            return driver.findElement(
-                    By.cssSelector("label[for='" + forId + "']"));
+            return driver.findElement(By.cssSelector("label[for='" + forId + "']"));
         } catch (NoSuchElementException e) {
             return null;
         }
     }
 
-    @PreDestroy
-    public void preDestroy() {
-        driver.quit();
-    }
+    // @PreDestroy
+    // public void preDestroy() {
+    // driver.quit();
+    // }
 }
