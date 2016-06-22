@@ -17,7 +17,6 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.appium</groupId>
@@ -29,7 +28,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <sitwt.version>1.0-SNAPSHOT</sitwt.version>
-    <sitwt.test.properties>${project.outputDirectory}/sit-wt-test.properties</sitwt.test.properties>
+    <sitwt.test.properties>${project.output.build}/sit-wt-test.properties</sitwt.test.properties>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
   </properties>
@@ -41,6 +40,18 @@
         <groupId>org.sitoolkit.wt</groupId>
         <artifactId>sit-wt-maven-plugin</artifactId>
         <version>${sitwt.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>${appium.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <id>generate-test-sources</id>

@@ -8,8 +8,12 @@ import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.domain.pageload.PageContext;
 import org.sitoolkit.wt.domain.pageload.PageListener;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SeleniumPageLietener implements PageListener {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SeleniumPageLietener.class);
 
     @Resource
     WebDriver driver;
@@ -31,7 +35,7 @@ public class SeleniumPageLietener implements PageListener {
 
     @Override
     public void setUp() {
-        // NOP
+        LOG.debug("ブラウザを起動します {}", driver);
     }
 
     @Override

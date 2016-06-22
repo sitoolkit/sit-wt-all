@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class Page2Script implements TestScriptGenerateTool, ApplicationContextAware {
@@ -40,11 +41,13 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
     }
 
     public static int staticStart() {
-        ApplicationContext appCtx = new AnnotationConfigApplicationContext(Page2ScriptConfig.class,
-                ExtConfig.class);
+        ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                Page2ScriptConfig.class, ExtConfig.class);
 
         Page2Script generator = appCtx.getBean(Page2Script.class);
-        return generator.start();
+        int ret = generator.start();
+        appCtx.close();
+        return ret;
     }
 
     public int start() {
