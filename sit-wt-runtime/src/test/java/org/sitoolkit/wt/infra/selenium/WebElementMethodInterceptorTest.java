@@ -90,7 +90,7 @@ public class WebElementMethodInterceptorTest {
      * が送出されるケース
      */
     @Test(expected = ElementNotVisibleException.class)
-    public void testDisabledWithNormalWebDriver() {
+    public void testHiddenWithNormalWebDriver() {
 
         WebDriver normalWebDriver = new FirefoxDriver();
         try {
@@ -107,17 +107,21 @@ public class WebElementMethodInterceptorTest {
      * が送出されるが再実行により正常終了するケース
      */
     @Test
-    public void testDisabledWithRetriableWebDriver() {
+    public void testHiddenWithRetriableWebDriver() {
         operate2(webDriver);
     }
 
     void operate2(WebDriver webDriver) {
         webDriver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
 
-        webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
-        webDriver.findElement(By.id("appearBtn")).click();
-        webDriver.findElement(By.id("hiddenBtn")).click();
+        try {
+            webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
+            webDriver.findElement(By.id("appearBtn")).click();
+            webDriver.findElement(By.id("hiddenBtn")).click();
+        } finally {
+            webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(),
+                    TimeUnit.MILLISECONDS);
+        }
 
-        webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
     }
 }

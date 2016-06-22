@@ -37,8 +37,8 @@ public class ExecOperation implements Operation {
 
     private static final String CMD_SEPARATOR = "[\\s]+";
 
-    // @Resource
-    // protected OperationLog opelog;
+    private static boolean OS_IS_WINDOWS = System.getProperty("os.name").toLowerCase()
+            .startsWith("windows");
 
     @Override
     public OperationResult operate(TestStep testStep) {
@@ -46,7 +46,7 @@ public class ExecOperation implements Operation {
 
         String command = testStep.getLocator().getValue();
 
-        if (System.getProperty("os.name").startsWith("windows")) {
+        if (OS_IS_WINDOWS) {
             command = "cmd /c " + command;
         }
 
