@@ -15,6 +15,8 @@
  */
 package org.sitoolkit.wt.app.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +52,8 @@ public class WebDriverConfig {
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
-    public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer) {
+    public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer)
+            throws MalformedURLException {
         RemoteWebDriver webDriver = null;
 
         String driverType = pm.getDriverType();
@@ -80,6 +83,11 @@ public class WebDriverConfig {
 
                 case "safari":
                     webDriver = new SafariDriver(capabilities);
+                    break;
+
+                case "remote":
+                    webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
+
                     break;
 
                 case "android":

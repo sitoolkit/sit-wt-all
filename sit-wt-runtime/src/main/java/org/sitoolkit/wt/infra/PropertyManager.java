@@ -55,6 +55,9 @@ public abstract class PropertyManager {
     @Value("${baseUrl}")
     private String baseUrl;
 
+    @Value("${hubUrl}")
+    private String hubUrl;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -120,5 +123,9 @@ public abstract class PropertyManager {
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    public String getHubUrl() {
+        return hubUrl;
     }
 }
