@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- The Basics -->
@@ -28,6 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <sitwt.version>1.0-SNAPSHOT</sitwt.version>
+    <sitwt.test.properties>${project.outputDirectory}/sit-wt-test.properties</sitwt.test.properties>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
   </properties>
@@ -56,10 +58,27 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>write-project-properties</goal>
+            </goals>
+            <configuration>
+              <outputFile>${sitwt.test.properties}</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>2.19.1</version>
         <configuration>
-          <argLine>-Dfile.encoding=${file.encoding} -XX:-UseSplitVerifier</argLine>
+          <systemPropertiesFile>${sitwt.test.properties}</systemPropertiesFile>
         </configuration>
         <executions>
           <execution>
