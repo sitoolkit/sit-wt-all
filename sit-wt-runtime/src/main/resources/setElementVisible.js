@@ -11,7 +11,9 @@ var setElementVisible = function(element) {
 		document.sitFuncRestoreElementVisibility = function() {
 
 			element.style.display = 'none';
-			console.debug(element);
+			if (typeof console.debug == 'function') {
+				console.debug(element);
+			}
 			return element;
 
 		};
