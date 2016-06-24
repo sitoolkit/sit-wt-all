@@ -109,6 +109,7 @@
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
     <checkstyle.skip>false</checkstyle.skip>
+    <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
   </properties>
 
   <build>
@@ -122,6 +123,14 @@
     </testResources>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.19.1</version>
+          <configuration>
+            <systemPropertiesFile>${sitwt.test.properties}</systemPropertiesFile>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-maven-plugin</artifactId>
@@ -138,6 +147,24 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>write-project-properties</goal>
+            </goals>
+            <configuration>
+              <outputFile>${sitwt.test.properties}</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <profiles>

@@ -15,10 +15,11 @@
  */
 package org.sitoolkit.wt.infra.selenium;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
+import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -28,8 +29,9 @@ import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
+import org.sitoolkit.wt.app.config.WebDriverConfig;
+import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SitPathUtils;
@@ -49,11 +51,13 @@ public class WebElementMethodInterceptorTest {
     /**
      * 通常の{@code WebDriver}で{@link #operate(WebDriver)}を実行し、
      * {@code StaleElementReferenceException}が送出されるケース
+     *
+     * @throws MalformedURLException
      */
     @Test(expected = StaleElementReferenceException.class)
-    public void testStaleElementNormalWebDriver() {
+    public void testStaleElementNormalWebDriver() throws MalformedURLException {
 
-        WebDriver normalWebDriver = new FirefoxDriver();
+        WebDriver normalWebDriver = getNormalWebDriver();
         try {
             operate(normalWebDriver);
             fail();
@@ -61,6 +65,12 @@ public class WebElementMethodInterceptorTest {
             normalWebDriver.close();
         }
 
+    }
+
+    private WebDriver getNormalWebDriver() throws MalformedURLException {
+        WebDriverConfig config = new WebDriverConfig();
+        return config.innerWebDriver(ApplicationContextHelper.getBean(PropertyManager.class),
+                ApplicationContextHelper.getBean(WebDriverCloser.class));
     }
 
     /**
@@ -74,7 +84,7 @@ public class WebElementMethodInterceptorTest {
     }
 
     /**
-     * 
+     *
      * @param webDriver
      */
     void operate(WebDriver webDriver) {
@@ -89,11 +99,13 @@ public class WebElementMethodInterceptorTest {
     /**
      * 通常の{@code WebDriver}で非表示項目を操作し{@code ElementNotVisibleException}
      * が送出されるケース
+     * 
+     * @throws MalformedURLException
      */
     @Test(expected = ElementNotVisibleException.class)
-    public void testHiddenWithNormalWebDriver() {
+    public void testHiddenWithNormalWebDriver() throws MalformedURLException {
 
-        WebDriver normalWebDriver = new FirefoxDriver();
+        WebDriver normalWebDriver = getNormalWebDriver();
         try {
             operate2(normalWebDriver);
             fail();

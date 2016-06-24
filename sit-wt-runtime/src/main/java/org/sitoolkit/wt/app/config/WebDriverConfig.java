@@ -25,6 +25,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -83,6 +84,10 @@ public class WebDriverConfig {
 
                 case "ie":
                     webDriver = new InternetExplorerDriver(capabilities);
+                    break;
+
+                case "edge":
+                    webDriver = new EdgeDriver(capabilities);
                     break;
 
                 case "safari":
