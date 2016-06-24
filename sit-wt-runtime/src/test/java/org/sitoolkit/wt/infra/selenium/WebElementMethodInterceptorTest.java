@@ -21,8 +21,6 @@ import static org.junit.Assert.fail;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -32,6 +30,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
+import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SitPathUtils;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,11 +40,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = RuntimeConfig.class)
 public class WebElementMethodInterceptorTest {
 
-    @Resource
-    WebDriver webDriver;
-
-    @Resource
-    PropertyManager pm;
+    // @Resource
+    // WebDriver webDriver;
+    //
+    // @Resource
+    // PropertyManager pm;
 
     /**
      * 通常の{@code WebDriver}で{@link #operate(WebDriver)}を実行し、
@@ -70,6 +69,7 @@ public class WebElementMethodInterceptorTest {
      */
     @Test
     public void testStaleElementRetriableWebDriver() {
+        WebDriver webDriver = ApplicationContextHelper.getBean(WebDriver.class);
         operate(webDriver);
     }
 
@@ -78,6 +78,7 @@ public class WebElementMethodInterceptorTest {
      * @param webDriver
      */
     void operate(WebDriver webDriver) {
+        PropertyManager pm = ApplicationContextHelper.getBean(PropertyManager.class);
         webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
         WebElement btn = webDriver.findElement(By.id("rewriteBtn"));
         WebElement txt = webDriver.findElement(By.id("rewritedTxt"));
@@ -108,10 +109,13 @@ public class WebElementMethodInterceptorTest {
      */
     @Test
     public void testHiddenWithRetriableWebDriver() {
+        WebDriver webDriver = ApplicationContextHelper.getBean(WebDriver.class);
         operate2(webDriver);
     }
 
     void operate2(WebDriver webDriver) {
+        PropertyManager pm = ApplicationContextHelper.getBean(PropertyManager.class);
+
         webDriver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
 
         try {

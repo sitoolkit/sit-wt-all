@@ -17,13 +17,9 @@ package org.sitoolkit.wt.app.selenium2script;
 
 import java.io.File;
 
-import javax.annotation.Resource;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.springframework.context.ApplicationContext;
 
 /**
  *
@@ -33,19 +29,12 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
 
     private String testScriptPath;
 
-    @Resource
-    ApplicationContext appCtx;
-
     @Before
     @Override
     public void setUp() {
         Selenium2Script converter = Selenium2Script.initInstance();
         File testScript = converter.convert(new File("seleniumscript/SeleniumIDETestScript.html"));
         testScriptPath = testScript.getAbsolutePath();
-
-        // Commons BeanutilsのConverterが異なるApplicationContext間で共有となる事象の暫定対応
-        TableDataMapper dm = appCtx.getBean(TableDataMapper.class);
-        dm.initConverters();
 
         super.setUp();
     }

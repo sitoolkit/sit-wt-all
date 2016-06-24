@@ -17,8 +17,6 @@ package org.sitoolkit.wt.domain.tester;
 
 import static org.junit.Assert.fail;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -26,6 +24,7 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
+import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
@@ -72,7 +71,15 @@ public abstract class SitTesterTestBase {
 
     @Before
     public void setUp() {
-        log.info("setUp {}, {}", this, tester);
+
+        // we must get tester instance from application context instead of field
+        // injection
+        // because field injection with surefire/failsafe parallel execution
+        // doesn't work.
+        // https://jira.spring.io/browse/SPR-12421
+        tester = ApplicationContextHelper.getBean(Tester.class);
+
+        log.trace("setUp {} {} {}", new Object[] { this, testName.getMethodName(), tester });
         tester.prepare(getTestScriptPath(), getSheetName(), getCurrentCaseNo());
     }
 
@@ -89,11 +96,4 @@ public abstract class SitTesterTestBase {
         void callback();
     }
 
-    // Field injection doesn't work in multi-thread sometime.
-    // So tester field must be method injection.
-    @Resource
-    public void setTester(Tester tester) {
-        this.tester = tester;
-        log.info("set {} {}", this, tester);
-    }
 }

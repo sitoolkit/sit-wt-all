@@ -20,6 +20,7 @@ import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -128,4 +129,10 @@ public class RuntimeConfig {
     public Evidence evidence() {
         return new Evidence();
     }
+
+    @Bean
+    public ApplicationContextHelper applicationContextHelper() {
+        return new ApplicationContextHelper();
+    }
+
 }

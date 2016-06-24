@@ -17,18 +17,15 @@ package org.sitoolkit.wt.app.pagespec2script;
 
 import java.io.File;
 
-import javax.annotation.Resource;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
-import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.wt.app.OperationExecutor;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.springframework.context.ApplicationContext;
+import org.sitoolkit.wt.infra.ApplicationContextHelper;
 
 /**
  *
@@ -39,32 +36,27 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
     @Rule
     public TestName name;
 
-    @Resource
-    ApplicationContext appCtx;
-
     @Before
     @Override
     public void setUp() {
-        PageSpec2Script converter = PageSpec2Script.initInstance();
-        File testScript = converter.convert(new File(converter.getPagespecDir(), "画面定義書_入力.xlsx"));
+        PageSpec2Script pagespec2script = PageSpec2Script.initInstance();
+        File testScript = pagespec2script
+                .convert(new File(pagespec2script.getPagespecDir(), "画面定義書_入力.xlsx"));
         testScript.deleteOnExit();
-
-        // TODO Commons BeanutilsのConverterが異なるApplicationContext間で共有となる事象の暫定対応
-        TableDataMapper dm = appCtx.getBean(TableDataMapper.class);
-        dm.initConverters();
 
         super.setUp();
     }
 
     @Test
     public void test001() {
-        OperationExecutor.execute(appCtx, "open", "input.html");
+        OperationExecutor.execute(ApplicationContextHelper.getApplicationContext(), "open",
+                "input.html");
         test();
     }
 
     @Override
     public void tearDown() {
-        WebDriver driver = appCtx.getBean(WebDriver.class);
+        WebDriver driver = ApplicationContextHelper.getBean(WebDriver.class);
         Alert alert = driver.switchTo().alert();
         alert.accept();
         super.tearDown();

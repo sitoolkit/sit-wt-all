@@ -22,7 +22,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.support.AopUtils;
 
 /**
  * WebDriverに次の機能を追加するMethodInterceptorです。
@@ -83,13 +82,14 @@ public class WebDriverMethodInterceptor implements MethodInterceptor {
      * @throws Throwable
      */
     private Object proceed(MethodInvocation mi) throws Throwable {
-        Object target = mi.getThis();
-        if (AopUtils.isAopProxy(target)) {
-            return AopUtils.invokeJoinpointUsingReflection(target, mi.getMethod(),
-                    mi.getArguments());
-        } else {
-            return mi.proceed();
-        }
+        // Object target = mi.getThis();
+        // if (AopUtils.isAopProxy(target)) {
+        // return AopUtils.invokeJoinpointUsingReflection(target,
+        // mi.getMethod(),
+        // mi.getArguments());
+        // } else {
+        return mi.proceed();
+        // }
     }
 
 }

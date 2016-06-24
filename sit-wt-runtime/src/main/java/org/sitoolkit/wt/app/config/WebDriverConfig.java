@@ -36,6 +36,8 @@ import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionChecker;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionCheckerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +51,8 @@ import io.appium.java_client.ios.IOSDriver;
 
 @Configuration
 public class WebDriverConfig {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WebDriverConfig.class);
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
@@ -113,6 +117,8 @@ public class WebDriverConfig {
 
         closer.register(webDriver);
 
+        LOG.debug("init webDriver:{}", webDriver);
+
         return webDriver;
     }
 
@@ -126,7 +132,11 @@ public class WebDriverConfig {
         proxyFactory.setProxyTargetClass(true);
         proxyFactory.setTarget(webDriver);
 
-        return (RemoteWebDriver) proxyFactory.getProxy();
+        Object proxy = proxyFactory.getProxy();
+
+        LOG.debug("proxy webDriver:{}", proxy);
+
+        return (RemoteWebDriver) proxy;
     }
 
     @Bean
