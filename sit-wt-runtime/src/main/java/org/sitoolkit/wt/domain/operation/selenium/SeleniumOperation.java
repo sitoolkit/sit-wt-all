@@ -25,6 +25,7 @@ import javax.annotation.Resource;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -107,18 +108,18 @@ public abstract class SeleniumOperation implements Operation {
 
     protected By by(Locator locator) {
         switch (locator.getTypeVo()) {
-        case css:
-            return By.cssSelector(locator.getValue());
-        case name:
-            return By.name(locator.getValue());
-        case xpath:
-            return By.xpath(locator.getValue());
-        case link:
-            return By.linkText(locator.getValue());
-        case tag:
-            return By.tagName(locator.getValue());
-        default:
-            return By.id(locator.getValue());
+            case css:
+                return By.cssSelector(locator.getValue());
+            case name:
+                return By.name(locator.getValue());
+            case xpath:
+                return By.xpath(locator.getValue());
+            case link:
+                return By.linkText(locator.getValue());
+            case tag:
+                return By.tagName(locator.getValue());
+            default:
+                return By.id(locator.getValue());
         }
     }
 
@@ -165,10 +166,30 @@ public abstract class SeleniumOperation implements Operation {
         log.debug("checkElement:{}, clickElement:{}, checked:{}", checkElement, clickElement,
                 checked);
         if (checkElement.isSelected() != checked) {
-            clickElement.click();
+            click(clickElement);
             return true;
         }
         return false;
     }
 
+    protected void click(WebElement element) {
+        if (pm.isEdgeDriver()) {
+            JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+            jse.executeScript("arguments[0].click();", element);
+
+        } else if (pm.isIEDriver()) {
+            String tag = element.getTagName().toLowerCase();
+            if ("label".equals(tag)) {
+                JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+                jse.executeScript("arguments[0].click();", element);
+            } else if ("a".equals(tag)) {
+                element.sendKeys(Keys.ENTER);
+            } else {
+                element.sendKeys(Keys.SPACE);
+            }
+
+        } else {
+            element.click();
+        }
+    }
 }

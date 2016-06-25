@@ -89,6 +89,18 @@ public abstract class PropertyManager {
         return driverType;
     }
 
+    public boolean isEdgeDriver() {
+        return "edge".equalsIgnoreCase(driverType);
+    }
+
+    public boolean isIEDriver() {
+        return "ie".equalsIgnoreCase(driverType);
+    }
+
+    public boolean isMsDriver() {
+        return isEdgeDriver() || isIEDriver();
+    }
+
     public URL getAppiumAddress() {
         try {
             return new URL(appiumAddress);

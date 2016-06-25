@@ -15,6 +15,8 @@
  */
 package org.sitoolkit.wt.infra.selenium;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.openqa.selenium.WebDriver;
@@ -26,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * WebElementの任意のメソッド実行時に例外が発生した場合、 かつその例外が
  * {@code WebElementExceptionChecker#isRetriable(Exception)}でtrueの場合、
  * WebDriver.findElementを再実行して同じメソッドを実行します。
- * 
+ *
  * @author yuichi.kuwahara
  * @see WebElementExceptionChecker
  */
@@ -47,7 +49,7 @@ public class WebElementMethodInterceptor implements MethodInterceptor {
     private WebElementExceptionChecker checker;
 
     /**
-     * 
+     *
      * @param webDriverFindElementInvocation
      *            WebDriver#findElementのMethodInvocationインスタンス
      * @param checker
@@ -74,18 +76,19 @@ public class WebElementMethodInterceptor implements MethodInterceptor {
             } else {
                 return invoke(invocation, webElement);
             }
-        } catch (Exception e) {
+        } catch (Throwable t) {
+            Throwable thr = t instanceof InvocationTargetException ? t.getCause() : t;
             LOG.trace("invoke method {} {} throws exception {}",
-                    new Object[] { className, methodName, e.getClass() });
+                    new Object[] { className, methodName, thr.getClass() });
 
-            if (checker.isRetriable(e)) {
+            if (checker.isRetriable(thr)) {
                 LOG.trace("re-invoke method {} {}", className, methodName);
 
                 webElement = webDriverFindElementInvocation.proceed();
                 return invoke(invocation, webElement);
             }
 
-            throw e;
+            throw thr;
         }
     }
 

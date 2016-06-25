@@ -17,7 +17,7 @@ package org.sitoolkit.wt.infra.selenium;
 
 /**
  * {@code WebElementMethodInterceptor}で再実行を行うべきか否かを判定するインターフェースです。
- * 
+ *
  * @see WebElementMethodInterceptor
  * @author yuichi.kuwahara
  *
@@ -26,11 +26,11 @@ public interface WebElementExceptionChecker {
 
     /**
      * 例外が{@code WebElementMethodInterceptor}で再実行を行うべきものである場合にtrueを返します。
-     * 
-     * @param exception
+     *
+     * @param throwable
      *            検査対象の例外
      * @return 例外が{@code WebElementMethodInterceptor}で再実行を行うべきものである場合にtrue
      */
-    boolean isRetriable(Exception exception);
+    boolean isRetriable(Throwable throwable);
 
 }

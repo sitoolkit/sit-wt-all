@@ -23,18 +23,17 @@ import org.openqa.selenium.WebDriverException;
 public class WebElementExceptionCheckerImpl implements WebElementExceptionChecker {
 
     @Override
-    public boolean isRetriable(Exception exception) {
-        Throwable cause = exception.getCause();
+    public boolean isRetriable(Throwable throwable) {
 
-        if (cause instanceof StaleElementReferenceException) {
+        if (throwable instanceof StaleElementReferenceException) {
             return true;
 
-        } else if (cause instanceof ElementNotVisibleException) {
+        } else if (throwable instanceof ElementNotVisibleException) {
             return true;
 
-        } else if (cause instanceof WebDriverException) {
+        } else if (throwable instanceof WebDriverException) {
 
-            if (StringUtils.startsWith(cause.getMessage(),
+            if (StringUtils.startsWith(throwable.getMessage(),
                     "Error determining if element is displayed")) {
                 return true;
             }

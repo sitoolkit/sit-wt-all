@@ -22,10 +22,13 @@ import static org.junit.Assert.*;
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -45,8 +48,12 @@ public class WebElementMethodInterceptorTest {
     // @Resource
     // WebDriver webDriver;
     //
-    // @Resource
-    // PropertyManager pm;
+    PropertyManager pm;
+
+    @Before
+    public void setUp() {
+        pm = ApplicationContextHelper.getBean(PropertyManager.class);
+    }
 
     /**
      * 通常の{@code WebDriver}で{@link #operate(WebDriver)}を実行し、
@@ -88,22 +95,28 @@ public class WebElementMethodInterceptorTest {
      * @param webDriver
      */
     void operate(WebDriver webDriver) {
-        PropertyManager pm = ApplicationContextHelper.getBean(PropertyManager.class);
         webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
         WebElement btn = webDriver.findElement(By.id("rewriteBtn"));
         WebElement txt = webDriver.findElement(By.id("rewritedTxt"));
-        btn.click(); // このタイミングでretry.htmlではtxtのDOMが書き換えられる。
+        click(webDriver, btn); // このタイミングでretry.htmlではtxtのDOMが書き換えられる。
+        assertThat("", txt.getAttribute("value"), is("rewrited"));
+
+        click(webDriver, btn); // このタイミングで再度retry.htmlではtxtのDOMが書き換えられる。
         assertThat("", txt.getAttribute("value"), is("rewrited"));
     }
 
     /**
      * 通常の{@code WebDriver}で非表示項目を操作し{@code ElementNotVisibleException}
      * が送出されるケース
-     * 
+     *
      * @throws MalformedURLException
      */
     @Test(expected = ElementNotVisibleException.class)
     public void testHiddenWithNormalWebDriver() throws MalformedURLException {
+
+        if (pm.isEdgeDriver()) {
+            throw new ElementNotVisibleException("EdgeはWebElement.clickが動作しないためテストできない");
+        }
 
         WebDriver normalWebDriver = getNormalWebDriver();
         try {
@@ -126,18 +139,26 @@ public class WebElementMethodInterceptorTest {
     }
 
     void operate2(WebDriver webDriver) {
-        PropertyManager pm = ApplicationContextHelper.getBean(PropertyManager.class);
-
-        webDriver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
+        webDriver.manage().timeouts().implicitlyWait(500, TimeUnit.MILLISECONDS);
 
         try {
             webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
-            webDriver.findElement(By.id("appearBtn")).click();
-            webDriver.findElement(By.id("hiddenBtn")).click();
+            click(webDriver, webDriver.findElement(By.id("appearBtn")));
+            click(webDriver, webDriver.findElement(By.id("hiddenBtn")));
         } finally {
             webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(),
                     TimeUnit.MILLISECONDS);
         }
 
+    }
+
+    private void click(WebDriver driver, WebElement element) {
+        if (pm.isEdgeDriver()) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click()", element);
+        } else if (pm.isIEDriver()) {
+            element.sendKeys(Keys.SPACE);
+        } else {
+            element.click();
+        }
     }
 }
