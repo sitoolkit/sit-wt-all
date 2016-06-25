@@ -15,10 +15,7 @@
  */
 package org.sitoolkit.wt.infra.selenium;
 
-import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriverException;
 
 public class WebElementExceptionCheckerImpl implements WebElementExceptionChecker {
 
@@ -27,16 +24,6 @@ public class WebElementExceptionCheckerImpl implements WebElementExceptionChecke
 
         if (throwable instanceof StaleElementReferenceException) {
             return true;
-
-        } else if (throwable instanceof ElementNotVisibleException) {
-            return true;
-
-        } else if (throwable instanceof WebDriverException) {
-
-            if (StringUtils.startsWith(throwable.getMessage(),
-                    "Error determining if element is displayed")) {
-                return true;
-            }
         }
 
         return false;

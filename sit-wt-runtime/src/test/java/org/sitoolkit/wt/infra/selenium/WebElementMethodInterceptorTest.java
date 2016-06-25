@@ -20,13 +20,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 import java.net.MalformedURLException;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -103,53 +101,6 @@ public class WebElementMethodInterceptorTest {
 
         click(webDriver, btn); // このタイミングで再度retry.htmlではtxtのDOMが書き換えられる。
         assertThat("", txt.getAttribute("value"), is("rewrited"));
-    }
-
-    /**
-     * 通常の{@code WebDriver}で非表示項目を操作し{@code ElementNotVisibleException}
-     * が送出されるケース
-     *
-     * @throws MalformedURLException
-     */
-    @Test(expected = ElementNotVisibleException.class)
-    public void testHiddenWithNormalWebDriver() throws MalformedURLException {
-
-        if (pm.isEdgeDriver()) {
-            throw new ElementNotVisibleException("EdgeはWebElement.clickが動作しないためテストできない");
-        }
-
-        WebDriver normalWebDriver = getNormalWebDriver();
-        try {
-            operate2(normalWebDriver);
-            fail();
-        } finally {
-            normalWebDriver.close();
-        }
-
-    }
-
-    /**
-     * 再実行付き{@code WebDriver}で非表示項目を操作し{@code ElementNotVisibleException}
-     * が送出されるが再実行により正常終了するケース
-     */
-    @Test
-    public void testHiddenWithRetriableWebDriver() {
-        WebDriver webDriver = ApplicationContextHelper.getBean(WebDriver.class);
-        operate2(webDriver);
-    }
-
-    void operate2(WebDriver webDriver) {
-        webDriver.manage().timeouts().implicitlyWait(500, TimeUnit.MILLISECONDS);
-
-        try {
-            webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
-            click(webDriver, webDriver.findElement(By.id("appearBtn")));
-            click(webDriver, webDriver.findElement(By.id("hiddenBtn")));
-        } finally {
-            webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(),
-                    TimeUnit.MILLISECONDS);
-        }
-
     }
 
     private void click(WebDriver driver, WebElement element) {
