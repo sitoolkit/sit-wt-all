@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sitoolkit.wt.domain.tester;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+package org.sitoolkit.wt.infra;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParserContext;
+import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -39,39 +35,33 @@ public class ELSupport {
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
 
     protected ExpressionParser parser = new SpelExpressionParser();
-    private static Pattern p = Pattern.compile("#\\{(.+?\\})");
+
+    protected ParserContext parserContext = new TemplateParserContext();
 
     private EvaluationContext ctx;
 
-    @Resource
-    protected TestContext current;
+    protected Object rootObject;
 
-    @PostConstruct
-    public void init() {
-        ctx = new StandardEvaluationContext(current);
+    public ELSupport(Object rootObject) {
+        super();
+        this.rootObject = rootObject;
+        ctx = new StandardEvaluationContext(rootObject);
     }
 
-    public String evaludate(String value) {
+    public String evaluate(String value) {
         if (StringUtils.isEmpty(value)) {
             return StringUtils.EMPTY;
         }
-
-        Matcher m = p.matcher(value);
-
-        while (m.find()) {
-            String expGroup = m.group();
-            LOG.trace("value:{}, el:{}", value, expGroup);
-            String expStr = expGroup.substring(2, expGroup.length() - 1);
-            value = value.replace(expGroup, eval(expStr));
-        }
-
-        return value;
-    }
-
-    String eval(String expStr) {
-        Expression exp = parser.parseExpression(expStr);
+        Expression exp = parser.parseExpression(value, parserContext);
         return StringUtils.defaultString(
                 ctx == null ? exp.getValue(String.class) : exp.getValue(ctx, String.class));
+    }
 
+    public Object getRootObject() {
+        return rootObject;
+    }
+
+    public void setRootObject(Object rootObject) {
+        this.rootObject = rootObject;
     }
 }

@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.operation.Operation;
-import org.sitoolkit.wt.domain.tester.ELSupport;
+import org.sitoolkit.wt.infra.ELSupport;
 
 /**
  *
@@ -89,7 +89,7 @@ public class TestStep {
 
     /**
      * 操作名を取得します。
-     * 
+     *
      * @return 操作名
      */
     public String getOperationName() {
@@ -98,7 +98,7 @@ public class TestStep {
 
     /**
      * 操作名を設定します。
-     * 
+     *
      * @param operationName
      *            操作名
      */
@@ -132,7 +132,7 @@ public class TestStep {
      */
     public String getValue() {
         String value = getTestData().get(getCurrentCaseNo());
-        return el.evaludate(value);
+        return el.evaluate(value);
     }
 
     public String[] getValues() {
@@ -200,7 +200,7 @@ public class TestStep {
 
     /**
      * 現在のケースでダイアログのスクリーンショットが必要な場合にtrueを返します。
-     * 
+     *
      * @return 現在のケースでダイアログのスクリーンショットが必要な場合にtrue
      */
     public boolean dialogScreenshot() {

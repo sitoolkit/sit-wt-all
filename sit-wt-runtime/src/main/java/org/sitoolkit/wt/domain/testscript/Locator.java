@@ -18,7 +18,7 @@ package org.sitoolkit.wt.domain.testscript;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.sitoolkit.wt.domain.tester.ELSupport;
+import org.sitoolkit.wt.infra.ELSupport;
 
 /**
  *
@@ -64,7 +64,7 @@ public class Locator {
     }
 
     public String getValue() {
-        return el == null ? value : el.evaludate(value);
+        return el == null ? value : el.evaluate(value);
     }
 
     public void setValue(String value) {

@@ -16,7 +16,6 @@
   </appender>
 
   <logger name="org.sitoolkit" level="debug" additivity="true" />
-  <logger name="org.sitoolkit.wt.domain.tester.ELSupport" level="debug" additivity="true" />
   <logger name="org.sitoolkit.wt.infra.selenium.WebElementMethodInterceptor" level="debug"
     additivity="true" />
   <logger name="org.sitoolkit.wt.app.config" level="debug" additivity="true" />

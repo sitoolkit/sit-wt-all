@@ -13,7 +13,6 @@ import org.sitoolkit.wt.domain.evidence.appium.HybridScreenshotTaker;
 import org.sitoolkit.wt.domain.evidence.selenium.ElementPositionSupport2;
 import org.sitoolkit.wt.domain.evidence.selenium.SeleniumDialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.selenium.SeleniumScreenshotTaker;
-import org.sitoolkit.wt.domain.tester.ELSupport;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.tester.Tester;
 import org.sitoolkit.wt.domain.testscript.Locator;
@@ -21,6 +20,7 @@ import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
+import org.sitoolkit.wt.infra.ELSupport;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -89,8 +89,8 @@ public class RuntimeConfig {
     }
 
     @Bean
-    public ELSupport elSupport() {
-        return new ELSupport();
+    public ELSupport elSupport(TestContext testContext) {
+        return new ELSupport(testContext);
     }
 
     @Bean
