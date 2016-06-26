@@ -1,5 +1,8 @@
 package org.sitoolkit.wt.app.page2script;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -36,15 +39,18 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
     private String outputDir = "pageobj";
 
+    private boolean openScript = true;
+
     public static void main(String[] args) {
-        System.exit(staticStart());
+        System.exit(staticStart(true));
     }
 
-    public static int staticStart() {
+    public static int staticStart(boolean openScript) {
         ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
                 Page2ScriptConfig.class, ExtConfig.class);
 
         Page2Script generator = appCtx.getBean(Page2Script.class);
+        generator.setOpenScript(openScript);
         int ret = generator.start();
         appCtx.close();
         return ret;
@@ -106,6 +112,14 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
         dao.write(filePath, pageCtx.asList());
 
+        if (isOpenScript()) {
+            try {
+                Desktop.getDesktop().open(new File(filePath));
+            } catch (IOException e) {
+                // NOP
+            }
+        }
+
     }
 
     public List<PageLoader> getLoaders() {
@@ -143,5 +157,13 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    public boolean isOpenScript() {
+        return openScript;
+    }
+
+    public void setOpenScript(boolean openScript) {
+        this.openScript = openScript;
     }
 }
