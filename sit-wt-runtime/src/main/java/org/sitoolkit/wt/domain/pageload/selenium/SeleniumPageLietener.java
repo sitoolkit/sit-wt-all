@@ -35,7 +35,9 @@ public class SeleniumPageLietener implements PageListener {
 
     @Override
     public void setUp() {
-        LOG.debug("ブラウザを起動します {}", driver);
+        // touch WebDriver instance to start Browser
+        String driverType = driver.toString();
+        LOG.info("ブラウザを起動します {}", driverType);
     }
 
     @Override
