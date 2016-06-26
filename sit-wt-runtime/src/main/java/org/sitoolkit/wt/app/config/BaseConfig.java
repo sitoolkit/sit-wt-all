@@ -32,7 +32,7 @@ public class BaseConfig {
     }
 
     @Bean
-    public FileOverwriteChecker getFileOverwriteChecker() {
+    public FileOverwriteChecker fileOverwriteChecker() {
         return new FileOverwriteChecker();
     }
 

@@ -16,4 +16,5 @@ public class Page2ScriptMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         Page2Script.staticStart(openScript);
     }
+
 }

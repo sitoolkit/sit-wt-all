@@ -15,6 +15,7 @@
  */
 package org.sitoolkit.wt.app.selenium2script;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -58,9 +59,13 @@ public class Selenium2Script implements ApplicationContextAware {
 
     private String seleniumScriptDirs = "seleniumscript,.";
 
-    private String outputDir = "target/testscript";
+    private String outputDir = "testscript";
 
     private String caseNo = "001";
+
+    private boolean openScript = true;
+
+    private boolean overwriteScript = false;
 
     public Selenium2Script() {
     }
@@ -90,9 +95,17 @@ public class Selenium2Script implements ApplicationContextAware {
             }
 
             boolean recursive = !".".equals(seleniumScriptDir);
-            for (File scriptFile : FileUtils.listFiles(scriptDir, new String[] { "html" },
+            for (File seleniumScript : FileUtils.listFiles(scriptDir, new String[] { "html" },
                     recursive)) {
-                convert(scriptFile);
+                File sitScript = convert(seleniumScript);
+
+                if (isOpenScript()) {
+                    try {
+                        Desktop.getDesktop().open(sitScript);
+                    } catch (IOException e) {
+                        // NOP
+                    }
+                }
             }
         }
 
@@ -111,7 +124,7 @@ public class Selenium2Script implements ApplicationContextAware {
         String sitScriptName = seleniumScript.getName().replace(".html", ".xlsx");
         File sitScriptFile = new File(outputDir, sitScriptName);
 
-        dao.write(sitScriptFile, testStepList);
+        dao.write(sitScriptFile, testStepList, overwriteScript);
 
         return sitScriptFile;
     }
@@ -238,6 +251,22 @@ public class Selenium2Script implements ApplicationContextAware {
 
     public void setSeleniumStepConverter(SeleniumStepConverter seleniumStepConverter) {
         this.seleniumStepConverter = seleniumStepConverter;
+    }
+
+    public boolean isOpenScript() {
+        return openScript;
+    }
+
+    public void setOpenScript(boolean openScript) {
+        this.openScript = openScript;
+    }
+
+    public boolean isOverwriteScript() {
+        return overwriteScript;
+    }
+
+    public void setOverwriteScript(boolean overwriteScript) {
+        this.overwriteScript = overwriteScript;
     }
 
 }
