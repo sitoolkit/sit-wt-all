@@ -31,6 +31,7 @@
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
+    <trimStackTrace>false</trimStackTrace>
 <!-- properties for parallel execution  -->
 <!--
     <parallel>classesAndMethods</parallel>
