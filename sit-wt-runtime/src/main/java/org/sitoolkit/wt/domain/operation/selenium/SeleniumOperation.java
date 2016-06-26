@@ -16,7 +16,9 @@
 package org.sitoolkit.wt.domain.operation.selenium;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -36,6 +38,7 @@ import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.ElementNotFoundException;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.TestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
@@ -191,5 +194,27 @@ public abstract class SeleniumOperation implements Operation {
         } else {
             element.click();
         }
+    }
+
+    protected void input(WebElement element, String value) {
+        if (pm.isEdgeDriver()) {
+            try {
+                String encoded = URLEncoder.encode(value, "UTF-8");
+                element.sendKeys(encoded);
+
+                JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+                jse.executeScript("arguments[0].value = decodeURI(arguments[0].value);", element);
+
+            } catch (UnsupportedEncodingException e) {
+                throw new TestException(e);
+            }
+
+        } else {
+            element.sendKeys(value);
+        }
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        System.out.println(URLEncoder.encode("試験太郎", "UTF-8"));
     }
 }

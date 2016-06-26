@@ -6,9 +6,9 @@
 <booleanAttribute key="M2_OFFLINE" value="false"/>
 <stringAttribute key="M2_PROFILES" value="localhost"/>
 <listAttribute key="M2_PROPERTIES">
-<listEntry value="test=PageSpec2ScriptTest"/>
-<listEntry value="-maven.surefire.debug=true"/>
-<listEntry value="driver.type=ie"/>
+<listEntry value="test=Selenium2ScriptTest"/>
+<listEntry value="maven.surefire.debug=true"/>
+<listEntry value="driver.type=edge"/>
 </listAttribute>
 <stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
 <booleanAttribute key="M2_SKIP_TESTS" value="false"/>
