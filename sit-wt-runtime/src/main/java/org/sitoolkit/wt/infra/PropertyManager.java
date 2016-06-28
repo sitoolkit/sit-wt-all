@@ -22,7 +22,7 @@ public abstract class PropertyManager {
     @Value("${window.height}")
     private int windowHeight;
 
-    @Value("${implicitly.wait}")
+    @Value("${implicitlyWait}")
     private int implicitlyWait;
 
     @Value("${window.resize}")
