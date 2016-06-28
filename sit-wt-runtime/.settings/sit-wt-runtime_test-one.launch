@@ -7,8 +7,8 @@
 <stringAttribute key="M2_PROFILES" value="localhost"/>
 <listAttribute key="M2_PROPERTIES">
 <listEntry value="test=Selenium2ScriptTest"/>
+<listEntry value="driver.type=ff"/>
 <listEntry value="maven.surefire.debug=true"/>
-<listEntry value="driver.type=edge"/>
 </listAttribute>
 <stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
 <booleanAttribute key="M2_SKIP_TESTS" value="false"/>

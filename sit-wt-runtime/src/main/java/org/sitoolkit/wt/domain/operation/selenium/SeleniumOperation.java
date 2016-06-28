@@ -38,7 +38,6 @@ import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.ElementNotFoundException;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.sitoolkit.wt.infra.TestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
@@ -182,7 +181,7 @@ public abstract class SeleniumOperation implements Operation {
 
         } else if (pm.isIEDriver()) {
             String tag = element.getTagName().toLowerCase();
-            if ("label".equals(tag)) {
+            if ("label".equals(tag) || "a".equals(tag)) {
                 JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
                 jse.executeScript("arguments[0].click();", element);
             } else if ("a".equals(tag)) {
@@ -198,16 +197,8 @@ public abstract class SeleniumOperation implements Operation {
 
     protected void input(WebElement element, String value) {
         if (pm.isEdgeDriver()) {
-            try {
-                String encoded = URLEncoder.encode(value, "UTF-8");
-                element.sendKeys(encoded);
-
-                JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
-                jse.executeScript("arguments[0].value = decodeURI(arguments[0].value);", element);
-
-            } catch (UnsupportedEncodingException e) {
-                throw new TestException(e);
-            }
+            JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+            jse.executeScript("arguments[0].value = arguments[1];", element, value);
 
         } else {
             element.sendKeys(value);
