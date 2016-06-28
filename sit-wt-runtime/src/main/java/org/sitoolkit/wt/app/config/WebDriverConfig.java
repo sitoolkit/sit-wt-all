@@ -31,6 +31,8 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
+import org.sitoolkit.wt.domain.tester.TestEventListener;
+import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.PropertyUtils;
@@ -160,5 +162,10 @@ public class WebDriverConfig {
     @Scope(proxyMode = ScopedProxyMode.INTERFACES, scopeName = "thread")
     public TakesScreenshot takesScreenshot(WebDriver webDriver) {
         return (TakesScreenshot) webDriver;
+    }
+
+    @Bean
+    public TestEventListener testEventListener() {
+        return new TestEventListenerWebDriverImpl();
     }
 }
