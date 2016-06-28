@@ -172,6 +172,7 @@ public class Tester {
                         ngList.add(e);
                         evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                                 "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
+                        log.debug("例外詳細", e);
                         addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
                         debug.pause();
                     } else {
@@ -185,8 +186,8 @@ public class Tester {
         } catch (Exception e) {
             evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                     "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
-            addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
             log.debug("例外詳細", e);
+            addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
             result.setErrorCause(e);
         } finally {
             em.flushEvidence(evidence);
@@ -244,7 +245,7 @@ public class Tester {
 
     /**
      * 操作実行後に待機する時間間隔を取得します。
-     * 
+     *
      * @return 操作実行後に待機する時間間隔
      */
     public int getOperationSpan() {

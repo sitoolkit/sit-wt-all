@@ -16,7 +16,9 @@
 package org.sitoolkit.wt.domain.operation.selenium;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -179,7 +181,7 @@ public abstract class SeleniumOperation implements Operation {
 
         } else if (pm.isIEDriver()) {
             String tag = element.getTagName().toLowerCase();
-            if ("label".equals(tag)) {
+            if ("label".equals(tag) || "a".equals(tag)) {
                 JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
                 jse.executeScript("arguments[0].click();", element);
             } else if ("a".equals(tag)) {
@@ -191,5 +193,19 @@ public abstract class SeleniumOperation implements Operation {
         } else {
             element.click();
         }
+    }
+
+    protected void input(WebElement element, String value) {
+        if (pm.isEdgeDriver()) {
+            JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+            jse.executeScript("arguments[0].value = arguments[1];", element, value);
+
+        } else {
+            element.sendKeys(value);
+        }
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        System.out.println(URLEncoder.encode("試験太郎", "UTF-8"));
     }
 }
