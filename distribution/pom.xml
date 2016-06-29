@@ -35,7 +35,6 @@
 <!-- properties for parallel execution  -->
 <!--
     <parallel>classesAndMethods</parallel>
-    <perCoreThreadCount>false</perCoreThreadCount>
     <threadCountClasses>2</threadCountClasses>
     <threadCountMethods>2</threadCountMethods>
 -->
