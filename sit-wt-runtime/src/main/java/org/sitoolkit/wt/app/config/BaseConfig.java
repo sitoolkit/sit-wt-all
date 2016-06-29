@@ -23,10 +23,15 @@ import org.springframework.context.support.SimpleThreadScope;
 public class BaseConfig {
 
     @Bean
-    public static CustomScopeConfigurer customScopeConfigurer() {
+    public static SimpleThreadScope threadScope() {
+        return new SimpleThreadScope();
+    }
+
+    @Bean
+    public static CustomScopeConfigurer customScopeConfigurer(SimpleThreadScope threadScope) {
         CustomScopeConfigurer csc = new CustomScopeConfigurer();
 
-        csc.addScope("thread", new SimpleThreadScope());
+        csc.addScope("thread", threadScope);
 
         return csc;
     }
