@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -56,6 +57,8 @@ import io.appium.java_client.ios.IOSDriver;
 public class WebDriverConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebDriverConfig.class);
+
+    private int windowShift = 0;
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
@@ -122,6 +125,9 @@ public class WebDriverConfig {
         if (!(webDriver instanceof AppiumDriver<?>)) {
             Dimension windowSize = new Dimension(pm.getWindowWidth(), pm.getWindowHeight());
             webDriver.manage().window().setSize(windowSize);
+            webDriver.manage().window()
+                    .setPosition(new Point(pm.getWindowLeft() + windowShift, pm.getWindowTop()));
+            windowShift += pm.getWindowShift();
         }
 
         closer.register(webDriver);

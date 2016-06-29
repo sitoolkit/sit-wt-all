@@ -22,6 +22,15 @@ public abstract class PropertyManager {
     @Value("${window.height}")
     private int windowHeight;
 
+    @Value("${window.top}")
+    private int windowTop;
+
+    @Value("${window.left}")
+    private int windowLeft;
+
+    @Value("${window.shift}")
+    private int windowShift;
+
     @Value("${implicitlyWait}")
     private int implicitlyWait;
 
@@ -139,5 +148,17 @@ public abstract class PropertyManager {
 
     public String getHubUrl() {
         return hubUrl;
+    }
+
+    public int getWindowTop() {
+        return windowTop;
+    }
+
+    public int getWindowLeft() {
+        return windowLeft;
+    }
+
+    public int getWindowShift() {
+        return windowShift;
     }
 }
