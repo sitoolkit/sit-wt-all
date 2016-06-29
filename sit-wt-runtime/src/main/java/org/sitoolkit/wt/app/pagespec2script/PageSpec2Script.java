@@ -131,7 +131,7 @@ public class PageSpec2Script implements ApplicationContextAware {
         }
 
         File testScript = new File(testScriptDir, testScriptName);
-        dao.write(testScript, testStepList);
+        dao.write(testScript, testStepList, false);
 
         return testScript;
     }

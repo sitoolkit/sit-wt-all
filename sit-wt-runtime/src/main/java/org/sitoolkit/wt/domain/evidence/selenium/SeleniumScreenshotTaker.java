@@ -14,11 +14,15 @@ import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import org.sitoolkit.wt.domain.tester.TestContext;
+import org.sitoolkit.wt.infra.PropertyManager;
 
 public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
@@ -31,6 +35,9 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
     @Resource
     TakesScreenshot takesScreenshot;
 
+    @Resource
+    PropertyManager pm;
+
     private boolean resizeWindow = false;
 
     /**
@@ -40,6 +47,8 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     private Robot robot;
 
+    private long waitTimeout;
+
     @PostConstruct
     public void init() {
         try {
@@ -47,6 +56,8 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         } catch (AWTException e) {
             log.warn("", e);
         }
+
+        waitTimeout = pm.getImplicitlyWait() / 1000;
     }
 
     @Override
@@ -59,6 +70,21 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             Dimension bodySize = driver.findElement(By.tagName("body")).getSize();
             driver.manage().window().setSize(bodySize);
             log.debug("bodySize {}", bodySize);
+        }
+
+        // Because MS Drivers(IE, Edge) ClickOperation is emulated by JS click
+        // function,
+        // we have to wait for finish to navigate and load page.
+        // See also
+        // org.sitoolkit.wt.domain.operation.selenium.SeleniumOperation#click
+        if (pm.isMsDriver()) {
+            new WebDriverWait(driver, waitTimeout).until(new ExpectedCondition<Boolean>() {
+                @Override
+                public Boolean apply(WebDriver driver) {
+                    return ((JavascriptExecutor) driver).executeScript("return document.readyState")
+                            .equals("complete");
+                }
+            });
         }
 
         String data = takesScreenshot.getScreenshotAs(OutputType.BASE64);

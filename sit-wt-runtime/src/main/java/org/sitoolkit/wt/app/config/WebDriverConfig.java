@@ -22,14 +22,18 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
+import org.sitoolkit.wt.domain.tester.TestEventListener;
+import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.PropertyUtils;
@@ -53,6 +57,8 @@ import io.appium.java_client.ios.IOSDriver;
 public class WebDriverConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebDriverConfig.class);
+
+    private int windowShift = 0;
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
@@ -82,7 +88,13 @@ public class WebDriverConfig {
                     break;
 
                 case "ie":
+                    capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION,
+                            true);
                     webDriver = new InternetExplorerDriver(capabilities);
+                    break;
+
+                case "edge":
+                    webDriver = new EdgeDriver(capabilities);
                     break;
 
                 case "safari":
@@ -113,6 +125,9 @@ public class WebDriverConfig {
         if (!(webDriver instanceof AppiumDriver<?>)) {
             Dimension windowSize = new Dimension(pm.getWindowWidth(), pm.getWindowHeight());
             webDriver.manage().window().setSize(windowSize);
+            webDriver.manage().window()
+                    .setPosition(new Point(pm.getWindowLeft() + windowShift, pm.getWindowTop()));
+            windowShift += pm.getWindowShift();
         }
 
         closer.register(webDriver);
@@ -153,5 +168,10 @@ public class WebDriverConfig {
     @Scope(proxyMode = ScopedProxyMode.INTERFACES, scopeName = "thread")
     public TakesScreenshot takesScreenshot(WebDriver webDriver) {
         return (TakesScreenshot) webDriver;
+    }
+
+    @Bean
+    public TestEventListener testEventListener() {
+        return new TestEventListenerWebDriverImpl();
     }
 }

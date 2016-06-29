@@ -31,10 +31,10 @@
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
     <selenium.version>2.53.0</selenium.version>
     <appium.version>3.4.1</appium.version>
+    <trimStackTrace>false</trimStackTrace>
 <!-- properties for parallel execution  -->
-<!--  
+<!--
     <parallel>classesAndMethods</parallel>
-    <perCoreThreadCount>false</perCoreThreadCount>
     <threadCountClasses>2</threadCountClasses>
     <threadCountMethods>2</threadCountMethods>
 -->
@@ -66,6 +66,11 @@
               <goal>selenium2script</goal>
               <goal>script2java</goal>
             </goals>
+            <configuration>
+              <openScript>false</openScript>
+              <overwriteScript>true</overwriteScript>
+              <seleniumOutputDir>target/testscript</seleniumOutputDir>
+            </configuration>
           </execution>
           <execution>
             <id>open-evidence</id>

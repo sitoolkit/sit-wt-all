@@ -15,6 +15,10 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
+import java.util.Arrays;
+
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.sitoolkit.wt.domain.evidence.MessagePattern;
@@ -31,6 +35,7 @@ public class SelectOperation extends SeleniumOperation {
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         WebElement element = findElement(testStep.getLocator());
+        ctx.info(element, MessagePattern.項目にXXをYYします, Arrays.toString(testStep.getValues()), "選択");
         Select select = new Select(element);
 
         StringBuilder sb = new StringBuilder();
@@ -45,13 +50,40 @@ public class SelectOperation extends SeleniumOperation {
                 select.selectByIndex(Integer.parseInt(value) - 1);
             } else if ("label".equals(testStep.getDataType())) {
                 sb.append(value);
-                select.selectByVisibleText(value);
+
+                // Edge webdriver bug: changing <select> does not fire onChange
+                // event
+                // https://connect.microsoft.com/IE/Feedback/Details/2204921
+                if (pm.isEdgeDriver()) {
+                    selectByVisibleTextForEdge(element, select, value);
+                } else {
+                    select.selectByVisibleText(value);
+                }
+
             } else {
                 sb.append("値=" + value);
                 select.selectByValue(value);
             }
         }
 
-        ctx.info(element, MessagePattern.項目にXXをYYします, sb.toString(), "選択");
+    }
+
+    protected void selectByVisibleTextForEdge(WebElement element, Select select, String value) {
+        boolean selected = false;
+        for (WebElement option : select.getOptions()) {
+            if (value.equals(option.getText())) {
+                ((JavascriptExecutor) seleniumDriver)
+                        .executeScript("arguments[0].selected = 'selected';", option);
+                selected = true;
+                ((JavascriptExecutor) seleniumDriver).executeScript(
+                        "if (typeof arguments[0].onchange == 'function') {arguments[0].onchange();}",
+                        element);
+                break;
+            }
+        }
+
+        if (!selected) {
+            throw new NoSuchElementException("Cannot locate element with text: " + value);
+        }
     }
 }

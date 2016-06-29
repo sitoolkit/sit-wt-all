@@ -22,7 +22,16 @@ public abstract class PropertyManager {
     @Value("${window.height}")
     private int windowHeight;
 
-    @Value("${implicitly.wait}")
+    @Value("${window.top}")
+    private int windowTop;
+
+    @Value("${window.left}")
+    private int windowLeft;
+
+    @Value("${window.shift}")
+    private int windowShift;
+
+    @Value("${implicitlyWait}")
     private int implicitlyWait;
 
     @Value("${window.resize}")
@@ -89,6 +98,18 @@ public abstract class PropertyManager {
         return driverType;
     }
 
+    public boolean isEdgeDriver() {
+        return "edge".equalsIgnoreCase(driverType);
+    }
+
+    public boolean isIEDriver() {
+        return "ie".equalsIgnoreCase(driverType);
+    }
+
+    public boolean isMsDriver() {
+        return isEdgeDriver() || isIEDriver();
+    }
+
     public URL getAppiumAddress() {
         try {
             return new URL(appiumAddress);
@@ -127,5 +148,17 @@ public abstract class PropertyManager {
 
     public String getHubUrl() {
         return hubUrl;
+    }
+
+    public int getWindowTop() {
+        return windowTop;
+    }
+
+    public int getWindowLeft() {
+        return windowLeft;
+    }
+
+    public int getWindowShift() {
+        return windowShift;
     }
 }

@@ -58,14 +58,14 @@ public class InputOperation extends SeleniumOperation {
                 element.clear();
             }
 
-            element.sendKeys(value);
+            input(element, value);
         }
     }
 
     /**
      * WebElementが属性を持っている場合にtrueを返します。
      * このメソッドは、Appium系のWebElementでgetAttributeメソッドがサポートされていないために必要になります。
-     * 
+     *
      * @param element
      *            WebElement
      * @param attr

@@ -15,21 +15,24 @@
  */
 package org.sitoolkit.wt.infra.selenium;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.util.concurrent.TimeUnit;
+import java.net.MalformedURLException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
+import org.sitoolkit.wt.app.config.WebDriverConfig;
+import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SitPathUtils;
@@ -43,17 +46,23 @@ public class WebElementMethodInterceptorTest {
     // @Resource
     // WebDriver webDriver;
     //
-    // @Resource
-    // PropertyManager pm;
+    PropertyManager pm;
+
+    @Before
+    public void setUp() {
+        pm = ApplicationContextHelper.getBean(PropertyManager.class);
+    }
 
     /**
      * 通常の{@code WebDriver}で{@link #operate(WebDriver)}を実行し、
      * {@code StaleElementReferenceException}が送出されるケース
+     *
+     * @throws MalformedURLException
      */
     @Test(expected = StaleElementReferenceException.class)
-    public void testStaleElementNormalWebDriver() {
+    public void testStaleElementNormalWebDriver() throws MalformedURLException {
 
-        WebDriver normalWebDriver = new FirefoxDriver();
+        WebDriver normalWebDriver = getNormalWebDriver();
         try {
             operate(normalWebDriver);
             fail();
@@ -61,6 +70,12 @@ public class WebElementMethodInterceptorTest {
             normalWebDriver.close();
         }
 
+    }
+
+    private WebDriver getNormalWebDriver() throws MalformedURLException {
+        WebDriverConfig config = new WebDriverConfig();
+        return config.innerWebDriver(ApplicationContextHelper.getBean(PropertyManager.class),
+                ApplicationContextHelper.getBean(WebDriverCloser.class));
     }
 
     /**
@@ -74,58 +89,27 @@ public class WebElementMethodInterceptorTest {
     }
 
     /**
-     * 
+     *
      * @param webDriver
      */
     void operate(WebDriver webDriver) {
-        PropertyManager pm = ApplicationContextHelper.getBean(PropertyManager.class);
         webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
         WebElement btn = webDriver.findElement(By.id("rewriteBtn"));
         WebElement txt = webDriver.findElement(By.id("rewritedTxt"));
-        btn.click(); // このタイミングでretry.htmlではtxtのDOMが書き換えられる。
+        click(webDriver, btn); // このタイミングでretry.htmlではtxtのDOMが書き換えられる。
+        assertThat("", txt.getAttribute("value"), is("rewrited"));
+
+        click(webDriver, btn); // このタイミングで再度retry.htmlではtxtのDOMが書き換えられる。
         assertThat("", txt.getAttribute("value"), is("rewrited"));
     }
 
-    /**
-     * 通常の{@code WebDriver}で非表示項目を操作し{@code ElementNotVisibleException}
-     * が送出されるケース
-     */
-    @Test(expected = ElementNotVisibleException.class)
-    public void testHiddenWithNormalWebDriver() {
-
-        WebDriver normalWebDriver = new FirefoxDriver();
-        try {
-            operate2(normalWebDriver);
-            fail();
-        } finally {
-            normalWebDriver.close();
+    private void click(WebDriver driver, WebElement element) {
+        if (pm.isEdgeDriver()) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click()", element);
+        } else if (pm.isIEDriver()) {
+            element.sendKeys(Keys.SPACE);
+        } else {
+            element.click();
         }
-
-    }
-
-    /**
-     * 再実行付き{@code WebDriver}で非表示項目を操作し{@code ElementNotVisibleException}
-     * が送出されるが再実行により正常終了するケース
-     */
-    @Test
-    public void testHiddenWithRetriableWebDriver() {
-        WebDriver webDriver = ApplicationContextHelper.getBean(WebDriver.class);
-        operate2(webDriver);
-    }
-
-    void operate2(WebDriver webDriver) {
-        PropertyManager pm = ApplicationContextHelper.getBean(PropertyManager.class);
-
-        webDriver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
-
-        try {
-            webDriver.get(SitPathUtils.buildUrl(pm.getBaseUrl(), "retry.html"));
-            webDriver.findElement(By.id("appearBtn")).click();
-            webDriver.findElement(By.id("hiddenBtn")).click();
-        } finally {
-            webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(),
-                    TimeUnit.MILLISECONDS);
-        }
-
     }
 }

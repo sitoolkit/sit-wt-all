@@ -18,8 +18,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.sitoolkit" level="debug" />
-  <logger name="org.sitoolkit.wt.SitSpELUtils" level="trace" additivity="false" />
+  <logger name="org.sitoolkit" level="debug" additivity="true"/>
 
   <logger name="org.springframework" level="info" />
 

@@ -51,15 +51,15 @@ public class WebDriverMethodInterceptor implements MethodInterceptor {
         Method method = mi.getMethod();
 
         if (!"findElement".equals(method.getName())) {
-            return proceed(mi);
+            return mi.proceed();
         }
 
-        Object ret = proceed(mi);
+        Object ret = mi.proceed();
 
         if (ret == null) {
             LOG.debug("{} {}でnullが返りました 再実行します", mi.getThis().getClass().getName(),
                     method.getName());
-            ret = proceed(mi);
+            ret = mi.proceed();
         }
 
         ProxyFactory proxyFactory = new ProxyFactory();
@@ -69,27 +69,6 @@ public class WebDriverMethodInterceptor implements MethodInterceptor {
 
         return proxyFactory.getProxy();
 
-    }
-
-    /**
-     * {@code MethodInvocation}を実行します。 {@link MethodInvocation}の対象オブジェクトがAOP
-     * Proxyされている場合、対象メソッドをリフレクションで実行します。 そうでない場合、
-     * {@code MethodInvocation#proceed()}を実行します。
-     * 
-     * @param mi
-     *            {@code MethodInvocation}インスタンス
-     * @return {@code MethodInvocation}インスタンスの実行結果
-     * @throws Throwable
-     */
-    private Object proceed(MethodInvocation mi) throws Throwable {
-        // Object target = mi.getThis();
-        // if (AopUtils.isAopProxy(target)) {
-        // return AopUtils.invokeJoinpointUsingReflection(target,
-        // mi.getMethod(),
-        // mi.getArguments());
-        // } else {
-        return mi.proceed();
-        // }
     }
 
 }

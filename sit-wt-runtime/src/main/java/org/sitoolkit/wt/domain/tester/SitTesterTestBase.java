@@ -15,7 +15,7 @@
  */
 package org.sitoolkit.wt.domain.tester;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -81,10 +81,16 @@ public abstract class SitTesterTestBase {
 
         log.trace("setUp {} {} {}", new Object[] { this, testName.getMethodName(), tester });
         tester.prepare(getTestScriptPath(), getSheetName(), getCurrentCaseNo());
+
+        TestEventListener listener = ApplicationContextHelper.getBean(TestEventListener.class);
+        listener.before();
     }
 
     @After
     public void tearDown() {
+        TestEventListener listener = ApplicationContextHelper.getBean(TestEventListener.class);
+        listener.after();
+
         tester.tearDown();
     }
 

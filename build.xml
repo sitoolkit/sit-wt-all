@@ -70,7 +70,7 @@
     <move todir="${project.report}/sit-wt-runtime">
       <fileset dir="${basedir}/sit-wt-runtime/target"/>
     </move>
-    
+
   </target>
 
 
@@ -93,7 +93,6 @@
       <arg value="-e" />
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="-Dparallel=classesAndMethods" />
-      <arg value="-DperCoreThreadCount=false" />
       <arg value="-DthreadCountClasses=2" />
       <arg value="-DthreadCountMethods=2" />
       <arg value="-DtrimStackTrace=false" />

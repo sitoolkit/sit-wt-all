@@ -31,6 +31,6 @@ public class ClickOperation extends SeleniumOperation {
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         WebElement element = findElement(testStep.getLocator());
         ctx.info(element, MessagePattern.項目をXXします, "クリック");
-        element.click();
+        click(element);
     }
 }

@@ -6,8 +6,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.util.tabledata.FileOverwriteChecker;
 import org.sitoolkit.util.tabledata.RowData;
 import org.sitoolkit.util.tabledata.TableData;
 import org.sitoolkit.util.tabledata.TableDataCatalog;
@@ -39,6 +39,9 @@ public class TestScriptDao {
 
     @Resource
     TableDataDaoCsvImpl csvDao;
+
+    @Resource
+    FileOverwriteChecker fileOverwriteChecker;
 
     public TestScript load(String scriptPath, String sheetName, boolean loadCaseOnly) {
         return load(new File(scriptPath), sheetName, loadCaseOnly);
@@ -87,11 +90,11 @@ public class TestScriptDao {
         }
     }
 
-    public void write(String filePath, List<TestStep> testStepList) {
-        write(new File(filePath), testStepList);
+    public void write(String filePath, List<TestStep> testStepList, boolean overwrite) {
+        write(new File(filePath), testStepList, overwrite);
     }
 
-    public void write(File file, List<TestStep> testStepList) {
+    public void write(File file, List<TestStep> testStepList, boolean overwrite) {
         File dir = file.getParentFile();
         if (dir == null) {
             dir = new File(".");
@@ -101,13 +104,9 @@ public class TestScriptDao {
 
         TableDataCatalog catalog = TestScriptConvertUtils.getTableDataCatalog(testStepList);
         String fileName = sanitizeFileName(file.getName());
+        file = new File(file.getParent(), fileName);
 
-        if (file.exists()) {
-            String baseName = FilenameUtils.getBaseName(fileName);
-            String extension = FilenameUtils.getExtension(fileName);
-            fileName = baseName + "_" + System.currentTimeMillis() + "." + extension;
-            file = new File(file.getParentFile(), fileName);
-        }
+        fileOverwriteChecker.setRebuild(overwrite);
 
         excelDao.write(catalog.get("TestScript"), TEMPLATE_PATH, file.getAbsolutePath(), null);
     }

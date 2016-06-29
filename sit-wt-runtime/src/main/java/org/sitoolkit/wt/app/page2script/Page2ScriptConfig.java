@@ -12,6 +12,7 @@ import org.sitoolkit.wt.domain.pageload.selenium.InputTagLoader;
 import org.sitoolkit.wt.domain.pageload.selenium.RadioCheckLoader;
 import org.sitoolkit.wt.domain.pageload.selenium.SelectTagLoader;
 import org.sitoolkit.wt.domain.pageload.selenium.SeleniumPageLietener;
+import org.sitoolkit.wt.domain.pageload.selenium.TextareaTagLoader;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,8 +51,13 @@ public class Page2ScriptConfig {
     }
 
     @Bean
-    public AnchorTagLoader geAnchorTagLoader() {
+    public AnchorTagLoader getAnchorTagLoader() {
         return new AnchorTagLoader();
+    }
+
+    @Bean
+    public TextareaTagLoader getTextareaTagLoader() {
+        return new TextareaTagLoader();
     }
 
     @Bean

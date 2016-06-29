@@ -15,16 +15,13 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -37,7 +34,6 @@ import org.sitoolkit.wt.infra.ElementNotFoundException;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
 
 /**
  *
@@ -56,29 +52,6 @@ public abstract class SeleniumOperation implements Operation {
     @Resource
     ElementPositionSupport2 position;
 
-    private static String setElementVisibleJs = "";
-
-    private boolean jsEnabled = false;
-
-    // TODO 非表示要素を可視化→戻しの処理がスレッドセーフでないため改良したい
-    private boolean visibilityChanged = false;
-
-    static {
-        Logger logger = LoggerFactory.getLogger(SelectOperation.class);
-        try {
-            URL resUrl = ResourceUtils.getURL("classpath:setElementVisible.js");
-            logger.debug("非表示要素操作関数のjsファイルを読み込みます {}", resUrl.toString());
-            setElementVisibleJs = IOUtils.toString(resUrl);
-        } catch (IOException e) {
-            logger.error("非表示要素操作関数のjsファイルを読み込みに失敗しました ", e);
-        }
-    }
-
-    @PostConstruct
-    public void init() {
-        jsEnabled = seleniumDriver instanceof JavascriptExecutor;
-    }
-
     @Override
     public OperationResult operate(TestStep testStep) {
 
@@ -88,14 +61,6 @@ public abstract class SeleniumOperation implements Operation {
         ctx.setElementPositionSupport(position);
 
         execute(testStep, ctx);
-
-        if (visibilityChanged) {
-            visibilityChanged = false;
-            WebElement effectedElement = (WebElement) ((JavascriptExecutor) seleniumDriver)
-                    .executeScript("return document.sitFuncRestoreElementVisibility();");
-            log.debug("要素:{} id={} class={}の可視状態を戻しました", effectedElement.getTagName(),
-                    effectedElement.getAttribute("id"), effectedElement.getAttribute("class"));
-        }
 
         OperationResult result = new OperationResult();
         result.setRecords(ctx.getRecords());
@@ -107,41 +72,27 @@ public abstract class SeleniumOperation implements Operation {
 
     protected By by(Locator locator) {
         switch (locator.getTypeVo()) {
-        case css:
-            return By.cssSelector(locator.getValue());
-        case name:
-            return By.name(locator.getValue());
-        case xpath:
-            return By.xpath(locator.getValue());
-        case link:
-            return By.linkText(locator.getValue());
-        case tag:
-            return By.tagName(locator.getValue());
-        default:
-            return By.id(locator.getValue());
+            case css:
+                return By.cssSelector(locator.getValue());
+            case name:
+                return By.name(locator.getValue());
+            case xpath:
+                return By.xpath(locator.getValue());
+            case link:
+                return By.linkText(locator.getValue());
+            case tag:
+                return By.tagName(locator.getValue());
+            default:
+                return By.id(locator.getValue());
         }
     }
 
     protected WebElement findElement(Locator locator) {
         try {
-            WebElement element = seleniumDriver.findElement(by(locator));
-
-            if (jsEnabled && !element.isDisplayed()) {
-                log.debug("要素:{}を可視にします", locator);
-                setElementVisible(element);
-            }
-            return element;
+            return seleniumDriver.findElement(by(locator));
         } catch (NoSuchElementException e) {
             throw ElementNotFoundException.create(locator, e);
         }
-    }
-
-    protected void setElementVisible(WebElement element) {
-        WebElement effectedElement = (WebElement) ((JavascriptExecutor) seleniumDriver)
-                .executeScript(setElementVisibleJs, element);
-        log.debug("要素:{} id={} class={}を可視にしました", effectedElement.getTagName(),
-                effectedElement.getAttribute("id"), effectedElement.getAttribute("class"));
-        visibilityChanged = true;
     }
 
     protected List<WebElement> findElements(Locator locator) {
@@ -165,10 +116,40 @@ public abstract class SeleniumOperation implements Operation {
         log.debug("checkElement:{}, clickElement:{}, checked:{}", checkElement, clickElement,
                 checked);
         if (checkElement.isSelected() != checked) {
-            clickElement.click();
+            click(clickElement);
             return true;
         }
         return false;
     }
 
+    protected void click(WebElement element) {
+        if (pm.isEdgeDriver()) {
+            JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+            jse.executeScript("arguments[0].click();", element);
+
+        } else if (pm.isIEDriver()) {
+            String tag = element.getTagName().toLowerCase();
+            if ("label".equals(tag) || "a".equals(tag)) {
+                JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+                jse.executeScript("arguments[0].click();", element);
+            } else if ("a".equals(tag)) {
+                element.sendKeys(Keys.ENTER);
+            } else {
+                element.sendKeys(Keys.SPACE);
+            }
+
+        } else {
+            element.click();
+        }
+    }
+
+    protected void input(WebElement element, String value) {
+        if (pm.isEdgeDriver()) {
+            JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
+            jse.executeScript("arguments[0].value = arguments[1];", element, value);
+
+        } else {
+            element.sendKeys(value);
+        }
+    }
 }
