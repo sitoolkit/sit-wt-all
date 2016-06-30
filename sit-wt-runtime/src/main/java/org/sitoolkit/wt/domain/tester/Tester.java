@@ -20,7 +20,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.Evidence;
@@ -35,6 +34,7 @@ import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.TestException;
 import org.sitoolkit.wt.infra.VerifyException;
 import org.slf4j.Logger;
@@ -53,6 +53,7 @@ public class Tester {
     TestContext current;
     @Resource
     DebugSupport debug;
+
     @Resource
     DialogScreenshotSupport dialog;
 
@@ -67,6 +68,9 @@ public class Tester {
 
     @Resource
     TestScriptCatalog catalog;
+
+    @Resource
+    PropertyManager pm;
 
     // /**
     // * スクリーンショット操作
@@ -231,7 +235,7 @@ public class Tester {
         evidence.commitScreenshot();
 
         try {
-            Thread.sleep(getOperationSpan());
+            Thread.sleep(pm.getOperationWait());
         } catch (InterruptedException e) {
             log.warn("スレッドの待機に失敗しました", e);
         }
@@ -241,15 +245,6 @@ public class Tester {
         Screenshot screenshot = screenshotTaker.get(timing);
         evidence.addScreenshot(screenshot, current.getScreenshotTiming());
         em.moveScreenshot(evidence, current.getTestStepNo(), current.getItemName());
-    }
-
-    /**
-     * 操作実行後に待機する時間間隔を取得します。
-     *
-     * @return 操作実行後に待機する時間間隔
-     */
-    public int getOperationSpan() {
-        return NumberUtils.toInt(System.getProperty("operationSpan"), 0);
     }
 
     public boolean isScriptLoaded() {

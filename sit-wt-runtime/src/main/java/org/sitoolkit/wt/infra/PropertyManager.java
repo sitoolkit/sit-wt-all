@@ -34,6 +34,9 @@ public abstract class PropertyManager {
     @Value("${implicitlyWait}")
     private int implicitlyWait;
 
+    @Value("${operationWait}")
+    private int operationWait;
+
     @Value("${window.resize}")
     private boolean resizeWindow;
 
@@ -110,6 +113,10 @@ public abstract class PropertyManager {
         return isEdgeDriver() || isIEDriver();
     }
 
+    public boolean isSafariDriver() {
+        return "safari".equalsIgnoreCase(driverType);
+    }
+
     public URL getAppiumAddress() {
         try {
             return new URL(appiumAddress);
@@ -160,5 +167,9 @@ public abstract class PropertyManager {
 
     public int getWindowShift() {
         return windowShift;
+    }
+
+    public int getOperationWait() {
+        return operationWait;
     }
 }
