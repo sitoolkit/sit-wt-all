@@ -16,7 +16,7 @@ No.,項目名,操作,"ロケーター
 12,利用規約リンク,click,link,利用規約,,前,,y,
 13,利用規約ウィンドウ,switchWindow,title,利用規約ページ,,,,y,
 14,閉じるリンク,click,link,閉じる,,前,,y,
-15,親ウィンドウ,switchWindow,titl,入力ページ,,,,y,
+15,親ウィンドウ,switchWindow,title,入力ページ,,,,y,
 16,確定ボタン,click,css,input[value='同意して確定'],,前,,y,y
 17,確認ダイアログ,dialog,,,,前,,OK,OK
 18,名前,verify,xpath,"//*[@id=""confirm""]/tbody/tr[1]/td",,前,,試験太郎,試験花子
