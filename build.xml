@@ -93,6 +93,7 @@
       <arg value="-e" />
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="-Dparallel=classesAndMethods" />
+      <arg value="-DpreCoreThreadCount=false" />
       <arg value="-DthreadCountClasses=2" />
       <arg value="-DthreadCountMethods=2" />
       <arg value="-DtrimStackTrace=false" />
