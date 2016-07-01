@@ -32,9 +32,16 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
     @Before
     @Override
     public void setUp() {
+        File testScript = new File("testscript/SeleniumIDETestScript.xlsx/");
+        if (testScript.exists()) {
+            testScript.delete();
+        }
+
         Selenium2Script converter = Selenium2Script.initInstance();
-        File testScript = converter.convert(new File("seleniumscript/SeleniumIDETestScript.html"));
+        testScript = converter.convert(new File("seleniumscript/SeleniumIDETestScript.html"));
         testScriptPath = testScript.getAbsolutePath();
+
+        testScript.deleteOnExit();
 
         super.setUp();
     }
