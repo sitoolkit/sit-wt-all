@@ -58,7 +58,8 @@ public class WebDriverConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebDriverConfig.class);
 
-    private int windowShift = 0;
+    private int windowShiftLeft = 0;
+    private int windowShiftTop = 0;
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
@@ -125,9 +126,10 @@ public class WebDriverConfig {
         if (!(webDriver instanceof AppiumDriver<?>)) {
             Dimension windowSize = new Dimension(pm.getWindowWidth(), pm.getWindowHeight());
             webDriver.manage().window().setSize(windowSize);
-            webDriver.manage().window()
-                    .setPosition(new Point(pm.getWindowLeft() + windowShift, pm.getWindowTop()));
-            windowShift += pm.getWindowShift();
+            webDriver.manage().window().setPosition(new Point(pm.getWindowLeft() + windowShiftLeft,
+                    pm.getWindowTop() + windowShiftTop));
+            windowShiftTop += pm.getWindowShiftTop();
+            windowShiftLeft += pm.getWindowShiftLeft();
         }
 
         closer.register(webDriver);

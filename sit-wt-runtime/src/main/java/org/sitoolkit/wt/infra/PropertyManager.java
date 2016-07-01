@@ -28,8 +28,11 @@ public abstract class PropertyManager {
     @Value("${window.left}")
     private int windowLeft;
 
-    @Value("${window.shift}")
-    private int windowShift;
+    @Value("${window.shift.top}")
+    private int windowShiftTop;
+
+    @Value("${window.shift.left}")
+    private int windowShiftLeft;
 
     @Value("${implicitlyWait}")
     private int implicitlyWait;
@@ -165,11 +168,15 @@ public abstract class PropertyManager {
         return windowLeft;
     }
 
-    public int getWindowShift() {
-        return windowShift;
-    }
-
     public int getOperationWait() {
         return operationWait;
+    }
+
+    public int getWindowShiftTop() {
+        return windowShiftTop;
+    }
+
+    public int getWindowShiftLeft() {
+        return windowShiftLeft;
     }
 }
