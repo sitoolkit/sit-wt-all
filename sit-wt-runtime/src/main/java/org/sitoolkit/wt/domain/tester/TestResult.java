@@ -3,13 +3,13 @@ package org.sitoolkit.wt.domain.tester;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.VerifyException;
 
 /**
- * テストの"一連"の実行結果を表すエンティティです。
- * "一連"の範囲は、{@link Tester#operate(String)}の1回の呼び出しで実行される
- * 全ての{@link TestStep}です。
+ * テストの"一連"の実行結果を表すエンティティです。 "一連"の範囲は、{@link Tester#operate(String)}
+ * の1回の呼び出しで実行される 全ての{@link TestStep}です。
  *
  * @author yuichi.kuwahara
  *
@@ -38,12 +38,12 @@ public class TestResult {
 
         if (errorCause != null) {
             sb.append("\n\t");
-            sb.append(errorCause.getLocalizedMessage());
+            sb.append(ExceptionUtils.getStackTrace(errorCause));
         }
 
         for (VerifyException ve : verifyExceptions) {
             sb.append("\n\t");
-            sb.append(ve.getLocalizedMessage());
+            sb.append(ExceptionUtils.getStackTrace(ve));
         }
 
         return sb.toString();
@@ -60,7 +60,9 @@ public class TestResult {
 
     /**
      * 検証失敗の例外を追加します。
-     * @param ve 検証失敗の例外
+     * 
+     * @param ve
+     *            検証失敗の例外
      */
     public void add(VerifyException ve) {
         this.verifyExceptions.add(ve);
@@ -77,6 +79,7 @@ public class TestResult {
 
     /**
      * テスト実行失敗の原因となった例外を取得します。
+     * 
      * @return テスト実行失敗の原因となった例外
      */
     public Throwable getErrorCause() {
@@ -85,7 +88,9 @@ public class TestResult {
 
     /**
      * テスト実行失敗の原因となった例外を設定します。
-     * @param errorCause テスト実行失敗の原因となった例外
+     * 
+     * @param errorCause
+     *            テスト実行失敗の原因となった例外
      */
     public void setErrorCause(Throwable errorCause) {
         this.errorCause = errorCause;
