@@ -39,8 +39,12 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
     @Before
     @Override
     public void setUp() {
+        File testScript = new File("pageobj/入力TestScript");
+        if (testScript.exists()) {
+            testScript.delete();
+        }
         PageSpec2Script pagespec2script = PageSpec2Script.initInstance();
-        File testScript = pagespec2script
+        testScript = pagespec2script
                 .convert(new File(pagespec2script.getPagespecDir(), "画面定義書_入力.xlsx"));
         testScript.deleteOnExit();
 
