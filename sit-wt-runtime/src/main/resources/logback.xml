@@ -18,12 +18,11 @@
     </encoder>
   </appender>
 
-  <logger name="org.sitoolkit" level="debug" additivity="true"/>
-
-  <logger name="org.springframework" level="info" />
+  <logger name="org.sitoolkit" level="debug" additivity="true">
+    <appender-ref ref="stdout" />
+  </logger>
 
   <root level="info">
-    <appender-ref ref="stdout" />
     <appender-ref ref="file" />
   </root>
 </configuration>
