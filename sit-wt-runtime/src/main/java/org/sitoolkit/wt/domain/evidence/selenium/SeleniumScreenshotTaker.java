@@ -19,6 +19,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import org.sitoolkit.wt.domain.tester.TestContext;
@@ -107,13 +108,10 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             return null;
         }
 
+        new WebDriverWait(driver, pm.getDialogWaitInSecond())
+                .until(ExpectedConditions.alertIsPresent());
+
         try {
-            try {
-                // TODO 待機＋タイムアウト
-                Thread.sleep(dialogWaitSpan);
-            } catch (InterruptedException e) {
-                log.warn("スレッドの待機に失敗");
-            }
             BufferedImage img = robot.createScreenCapture(windowRect);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(img, "png", baos);

@@ -16,6 +16,8 @@
 package org.sitoolkit.wt.domain.operation.selenium;
 
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,8 @@ public class DialogOperation extends SeleniumOperation {
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         try {
+            new WebDriverWait(seleniumDriver, pm.getDialogWaitInSecond())
+                    .until(ExpectedConditions.alertIsPresent());
             Alert alert = seleniumDriver.switchTo().alert();
             String alertText = alert.getText();
             testStep.getLocator().setValue(alertText);

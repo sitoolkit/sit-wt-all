@@ -40,6 +40,9 @@ public abstract class PropertyManager {
     @Value("${operationWait}")
     private int operationWait;
 
+    @Value("${dialogWaitInSecond}")
+    private int dialogWaitInSecond;
+
     @Value("${window.resize}")
     private boolean resizeWindow;
 
@@ -178,5 +181,9 @@ public abstract class PropertyManager {
 
     public int getWindowShiftLeft() {
         return windowShiftLeft;
+    }
+
+    public int getDialogWaitInSecond() {
+        return dialogWaitInSecond;
     }
 }
