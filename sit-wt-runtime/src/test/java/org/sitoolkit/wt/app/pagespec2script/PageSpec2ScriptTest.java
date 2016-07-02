@@ -39,7 +39,7 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
     @Before
     @Override
     public void setUp() {
-        File testScript = new File("pageobj/入力TestScript");
+        File testScript = new File("pageobj/入力TestScript.xlsx");
         if (testScript.exists()) {
             testScript.delete();
         }
