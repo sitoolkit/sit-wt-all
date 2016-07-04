@@ -66,7 +66,7 @@ public class DebugSupport {
 
     /**
      * テスト実行を継続する場合にtrueを返します。
-     * 
+     *
      * @return テスト実行を継続する場合にtrue
      */
     public boolean next() {
@@ -95,7 +95,7 @@ public class DebugSupport {
             }
 
             current.setCurrentIndex(nextIndex);
-            current.setTestStep(testScript.getTestStep(nextIndex));
+            current.setTestStep(current.getTestScript().getTestStep(nextIndex));
 
             return true;
         } else {
