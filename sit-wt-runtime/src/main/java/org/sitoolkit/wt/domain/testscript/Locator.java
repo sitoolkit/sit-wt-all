@@ -55,6 +55,23 @@ public class Locator {
         setValue(value);
     }
 
+    public boolean equalsByName(String name) {
+        Type type = getTypeVo();
+        switch (type) {
+            case name:
+                return value.equals(name);
+            case xpath:
+                return value.contains("[@name='" + name + "']");
+            case css:
+                return value.contains("[name=" + name + "]");
+            default:
+                break;
+
+        }
+
+        return false;
+    }
+
     public Type getTypeVo() {
         return Type.decode(getType());
     }

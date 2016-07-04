@@ -110,7 +110,7 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
         fileName = fileName + ".xlsx";
         String filePath = FilenameUtils.concat(outputDir, fileName);
 
-        dao.write(filePath, pageCtx.asList(), false);
+        filePath = dao.write(filePath, pageCtx.asList(), false);
 
         if (isOpenScript()) {
             try {

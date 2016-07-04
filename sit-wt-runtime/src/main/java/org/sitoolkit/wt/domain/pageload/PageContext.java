@@ -1,16 +1,17 @@
 package org.sitoolkit.wt.domain.pageload;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-
-import org.sitoolkit.wt.domain.evidence.ElementPosition;
-import org.sitoolkit.wt.domain.testscript.Locator;
-import org.sitoolkit.wt.domain.testscript.TestStep;
-
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.sitoolkit.wt.domain.evidence.ElementPosition;
+import org.sitoolkit.wt.domain.testscript.TestStep;
 
 public class PageContext {
 
@@ -19,6 +20,8 @@ public class PageContext {
     private String url;
 
     private SortedMap<ElementPosition, TestStep> map = new TreeMap<>(new PointComparator());
+
+    private Map<ElementId, List<TestStep>> formIdMap = new HashMap<>();
 
     private class PointComparator implements Comparator<ElementPosition> {
 
@@ -43,8 +46,18 @@ public class PageContext {
         }
     }
 
-    public void add(ElementPosition pos, TestStep step) {
+    public void add(ElementPosition pos, TestStep step, ElementId formId) {
         map.put(pos, step);
+
+        if (formId != null) {
+            List<TestStep> testSteps = formIdMap.get(formId);
+            if (testSteps == null) {
+                testSteps = new ArrayList<>();
+                formIdMap.put(formId, testSteps);
+            }
+            testSteps.add(step);
+        }
+
     }
 
     public List<TestStep> asList() {
@@ -60,11 +73,29 @@ public class PageContext {
         return list;
     }
 
-    public boolean containsName(String name) {
-        for (Entry<ElementPosition, TestStep> entry : map.entrySet()) {
-            if (entry.getValue().getLocator().getTypeVo() == Locator.Type.name
-                    && name.equals(entry.getValue().getLocator().getValue())) {
+    public boolean containsNameInForm(ElementId formId, String name) {
+        List<TestStep> testSteps = formIdMap.get(formId);
+
+        if (testSteps == null) {
+            return false;
+        }
+
+        for (TestStep testStep : testSteps) {
+            if (testStep.getLocator().equalsByName(name)) {
                 return true;
+            }
+
+        }
+        return false;
+    }
+
+    public boolean containsName(String name) {
+        for (Collection<TestStep> testSteps : formIdMap.values()) {
+            for (TestStep testStep : testSteps) {
+
+                if (testStep.getLocator() != null && testStep.getLocator().equalsByName(name)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -78,9 +109,9 @@ public class PageContext {
         return step;
     }
 
-    public TestStep registTestStep(ElementPosition pos) {
+    public TestStep registTestStep(ElementPosition pos, ElementId formId) {
         TestStep step = create();
-        add(pos, step);
+        add(pos, step, formId);
 
         return step;
     }

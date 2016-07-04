@@ -90,11 +90,11 @@ public class TestScriptDao {
         }
     }
 
-    public void write(String filePath, List<TestStep> testStepList, boolean overwrite) {
-        write(new File(filePath), testStepList, overwrite);
+    public String write(String filePath, List<TestStep> testStepList, boolean overwrite) {
+        return write(new File(filePath), testStepList, overwrite);
     }
 
-    public void write(File file, List<TestStep> testStepList, boolean overwrite) {
+    public String write(File file, List<TestStep> testStepList, boolean overwrite) {
         File dir = file.getParentFile();
         if (dir == null) {
             dir = new File(".");
@@ -109,6 +109,8 @@ public class TestScriptDao {
         fileOverwriteChecker.setRebuild(overwrite);
 
         excelDao.write(catalog.get("TestScript"), TEMPLATE_PATH, file.getAbsolutePath(), null);
+
+        return file.getAbsolutePath();
     }
 
     private String sanitizeFileName(String name) {

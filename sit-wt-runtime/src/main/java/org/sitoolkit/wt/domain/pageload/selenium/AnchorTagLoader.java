@@ -12,7 +12,7 @@ public class AnchorTagLoader extends SeleniumPageLoader implements PageLoader {
     @Override
     public void load(PageContext ctx) {
         for (WebElement element : driver.findElements(By.tagName("a"))) {
-            TestStep step = ctx.registTestStep(convert(element.getLocation()));
+            TestStep step = ctx.registTestStep(convert(element.getLocation()), null);
 
             String text = element.getText();
             step.setLocator(Locator.build("link", text));
