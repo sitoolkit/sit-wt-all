@@ -29,7 +29,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <sitwt.version>1.0-SNAPSHOT</sitwt.version>
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
-    <selenium.version>2.53.0</selenium.version>
+    <selenium.version>2.53.1</selenium.version>
     <appium.version>3.4.1</appium.version>
     <trimStackTrace>false</trimStackTrace>
 <!-- properties for parallel execution  -->
