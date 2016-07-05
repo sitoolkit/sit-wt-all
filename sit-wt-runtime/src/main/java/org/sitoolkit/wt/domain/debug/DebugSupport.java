@@ -52,7 +52,7 @@ public class DebugSupport {
     ApplicationContext appCtx;
 
     /**
-     * 一時停止する間隔
+     * ポーズ中にスレッドをsleepする間隔(ミリ秒)
      */
     private int pauseSpan = 800;
 
@@ -65,7 +65,9 @@ public class DebugSupport {
     private Boolean debug;
 
     /**
-     * テスト実行を継続する場合にtrueを返します。
+     * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき
+     * {@code TestStep}
+     * とテストステップインデックスを設定します。(テストステップインデックスはテストスクリプト内でのテストステップの順番です。)
      *
      * @return テスト実行を継続する場合にtrue
      */
@@ -81,9 +83,9 @@ public class DebugSupport {
                 LOG.debug("currentIndex:{}, testStepCount:{}", currentIndex,
                         testScript.getTestStepCount());
 
-                TestStep currentStep = testScript.getTestStep(currentIndex);
+                TestStep nexttStep = testScript.getTestStep(nextIndex);
 
-                if (currentStep != null && StringUtils.isNotEmpty(currentStep.getBreakPoint())) {
+                if (nexttStep != null && StringUtils.isNotEmpty(nexttStep.getBreakPoint())) {
                     LOG.info("ブレークポイントが設定されています。");
                     pause();
                 }
@@ -115,6 +117,13 @@ public class DebugSupport {
     }
 
     /**
+     * 次に実行すべきテストステップインデックスを返します。 また内部では以下の処理を行います。
+     * <ul>
+     * <li>テスト実行スレッドの待機(一時停止)
+     * <li>一時停止中のテストスクリプトの変更の監視と再読込
+     * <li>一時停止中の入力コマンドの制御
+     * <li>実行前後のテストステップのコンソール表示
+     * </ul>
      *
      * @param currentIndex
      *            現在のテストステップインデックス
@@ -154,12 +163,20 @@ public class DebugSupport {
             } else {
                 ret = cmdRet;
 
-                TestStep nextStep = current.getTestScript().getTestStep(ret);
-                if (nextStep == null) {
+                if (current.getTestScript().getTestStep(ret) == null) {
                     LOG.info("全てのテストステップが終了しました。");
-                } else {
-                    LOG.info("現在のテストステップは{} {}({})です。", new Object[] { nextStep.getNo(),
-                            nextStep.getItemName(), nextStep.getLocator() });
+                    break;
+                }
+
+                LOG.info("前後のテストステップ");
+                for (int i = ret - 1; i <= ret + 1; i++) {
+                    TestStep nextStep = current.getTestScript().getTestStep(i);
+                    if (nextStep == null) {
+                        continue;
+                    }
+                    String currentMark = i == ret ? " <- 現在" : "";
+                    LOG.info("{} {}({}){}", new Object[] { nextStep.getNo(), nextStep.getItemName(),
+                            nextStep.getLocator(), currentMark });
                 }
             }
 

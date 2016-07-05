@@ -64,7 +64,7 @@ class DebugCommand {
         int ret = idx;
         switch (key) {
             case START:
-                ret = idx;
+                ret = idx + 1;
                 break;
             case BACK:
                 ret = idx - 1;
