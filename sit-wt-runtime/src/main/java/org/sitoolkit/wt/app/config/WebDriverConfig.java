@@ -36,7 +36,6 @@ import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionChecker;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionCheckerImpl;
@@ -70,7 +69,7 @@ public class WebDriverConfig {
         String driverType = pm.getDriverType();
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        Map<String, String> map = PropertyUtils.loadAsMap("/capabilities", true);
+        Map<String, String> map = pm.getCapabilities();
 
         for (Entry<String, String> entry : map.entrySet()) {
             capabilities.setCapability(entry.getKey(), entry.getValue());
@@ -83,6 +82,10 @@ public class WebDriverConfig {
         } else {
 
             switch (driverType) {
+
+                case "firefox":
+                    webDriver = new FirefoxDriver(capabilities);
+                    break;
 
                 case "chrome":
                     webDriver = new ChromeDriver(capabilities);

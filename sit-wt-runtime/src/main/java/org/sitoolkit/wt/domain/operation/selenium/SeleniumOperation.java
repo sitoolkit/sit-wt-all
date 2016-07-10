@@ -127,7 +127,7 @@ public abstract class SeleniumOperation implements Operation {
             JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
             jse.executeScript("arguments[0].click();", element);
 
-        } else if (pm.isIEDriver()) {
+        } else if (pm.isIeDriver()) {
             String tag = element.getTagName().toLowerCase();
             if ("label".equals(tag) || "a".equals(tag)) {
                 JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;

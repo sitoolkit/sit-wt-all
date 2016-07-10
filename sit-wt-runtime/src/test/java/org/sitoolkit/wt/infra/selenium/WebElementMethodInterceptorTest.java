@@ -106,7 +106,7 @@ public class WebElementMethodInterceptorTest {
     private void click(WebDriver driver, WebElement element) {
         if (pm.isEdgeDriver()) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click()", element);
-        } else if (pm.isIEDriver()) {
+        } else if (pm.isIeDriver()) {
             element.sendKeys(Keys.SPACE);
         } else {
             element.click();

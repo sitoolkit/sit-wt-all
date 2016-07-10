@@ -78,12 +78,12 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         // we have to wait for finish to navigate and load page.
         // See also
         // org.sitoolkit.wt.domain.operation.selenium.SeleniumOperation#click
-        if (pm.isMsDriver()) {
+        if (pm.isMsDriver() || pm.isFirefoxDriver()) {
             new WebDriverWait(driver, waitTimeout).until(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver driver) {
-                    return ((JavascriptExecutor) driver).executeScript("return document.readyState")
-                            .equals("complete");
+                    return ((JavascriptExecutor) driver)
+                            .executeScript("return document.readyState;").equals("complete");
                 }
             });
         }

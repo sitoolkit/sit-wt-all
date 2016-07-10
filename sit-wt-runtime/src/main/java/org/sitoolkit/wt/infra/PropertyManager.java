@@ -2,8 +2,11 @@ package org.sitoolkit.wt.infra;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -76,11 +79,34 @@ public abstract class PropertyManager {
     @Value("${hubUrl}")
     private String hubUrl;
 
+    private Map<String, String> capabilities;
+
+    private boolean isFirefoxDriver;
+
+    private boolean isIeDriver;
+
+    private boolean isEdgeDriver;
+
+    private boolean isMsDriver;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
         pspc.setIgnoreUnresolvablePlaceholders(true);
         return pspc;
+    }
+
+    @PostConstruct
+    public void init() {
+        capabilities = PropertyUtils.loadAsMap("/capabilities", true);
+
+        String browserName = capabilities.get("browserName");
+        isFirefoxDriver = "firefox".equalsIgnoreCase(driverType)
+                || "firefox".equalsIgnoreCase(browserName);
+        isIeDriver = "ie".equalsIgnoreCase(driverType)
+                || "internet explorer".equalsIgnoreCase(browserName);
+        isEdgeDriver = "edge".equalsIgnoreCase(driverType) || "edge".equalsIgnoreCase(browserName);
+        isMsDriver = isIeDriver || isEdgeDriver;
     }
 
     public int getWindowWidth() {
@@ -107,16 +133,24 @@ public abstract class PropertyManager {
         return driverType;
     }
 
-    public boolean isEdgeDriver() {
-        return "edge".equalsIgnoreCase(driverType);
+    public String getDriverTypeInCapabilities() {
+        return capabilities.get("browserName");
     }
 
-    public boolean isIEDriver() {
-        return "ie".equalsIgnoreCase(driverType);
+    public boolean isFirefoxDriver() {
+        return isFirefoxDriver;
+    }
+
+    public boolean isEdgeDriver() {
+        return isEdgeDriver;
+    }
+
+    public boolean isIeDriver() {
+        return isIeDriver;
     }
 
     public boolean isMsDriver() {
-        return isEdgeDriver() || isIEDriver();
+        return isMsDriver;
     }
 
     public boolean isSafariDriver() {
@@ -186,4 +220,9 @@ public abstract class PropertyManager {
     public int getDialogWaitInSecond() {
         return dialogWaitInSecond;
     }
+
+    public Map<String, String> getCapabilities() {
+        return capabilities;
+    }
+
 }
