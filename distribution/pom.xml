@@ -32,12 +32,6 @@
     <selenium.version>2.53.1</selenium.version>
     <appium.version>3.4.1</appium.version>
     <trimStackTrace>false</trimStackTrace>
-<!-- properties for parallel execution  -->
-<!--
-    <parallel>classesAndMethods</parallel>
-    <threadCountClasses>2</threadCountClasses>
-    <threadCountMethods>2</threadCountMethods>
--->
   </properties>
 
   <!-- Build Settings -->
@@ -132,6 +126,15 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+
+    <profile>
+      <id>parallel</id>
+      <properties>
+        <parallel>classesAndMethods</parallel>
+        <threadCountClasses>1</threadCountClasses>
+        <threadCountMethods>1</threadCountMethods>
+      </properties>
     </profile>
   </profiles>
 
