@@ -17,7 +17,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @Configuration
 @PropertySource(ignoreResourceNotFound = true, value = { "classpath:sit-wt-default.properties",
         "classpath:sit-wt.properties" })
-public abstract class PropertyManager {
+public class PropertyManager {
 
     @Value("${window.width}")
     private int windowWidth;
@@ -100,13 +100,28 @@ public abstract class PropertyManager {
     public void init() {
         capabilities = PropertyUtils.loadAsMap("/capabilities", true);
 
-        String browserName = capabilities.get("browserName");
-        isFirefoxDriver = "firefox".equalsIgnoreCase(driverType)
-                || "firefox".equalsIgnoreCase(browserName);
-        isIeDriver = "ie".equalsIgnoreCase(driverType)
-                || "internet explorer".equalsIgnoreCase(browserName);
-        isEdgeDriver = "edge".equalsIgnoreCase(driverType) || "edge".equalsIgnoreCase(browserName);
+        setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
+    }
+
+    void setDriverFlags(String driverType, String browserName) {
+        isFirefoxDriver = equalsAny("firefox", driverType, browserName);
+        isIeDriver = equalsAny("internet explorer", driverType, browserName)
+                || "ie".equals(driverType);
+        isEdgeDriver = equalsAny("edge", driverType, browserName);
         isMsDriver = isIeDriver || isEdgeDriver;
+    }
+
+    private String toLowerCase(String str) {
+        return str == null ? "" : str.toLowerCase();
+    }
+
+    private boolean equalsAny(String str1, String... strs) {
+        for (String str : strs) {
+            if (str1.equals(str)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getWindowWidth() {

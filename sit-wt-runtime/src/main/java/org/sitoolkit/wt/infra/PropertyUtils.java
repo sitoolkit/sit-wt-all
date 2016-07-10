@@ -58,7 +58,7 @@ public class PropertyUtils {
         Map<String, String> map = new HashMap<>();
 
         for (Entry<Object, Object> entry : prop.entrySet()) {
-            map.put(entry.getKey().toString(), entry.getValue().toString());
+            map.put(entry.getKey().toString().trim(), entry.getValue().toString().trim());
         }
 
         return map;
