@@ -91,11 +91,11 @@
       <arg value="-Devidence.open=false" />
       <arg value="-Dsample.baseUrl=file:///${basedir}/sit-wt-runtime/" />
       <arg value="-e" />
+      <arg value="-P" />
+      <arg value="parallel" />
       <arg value="-Dfile.encoding=${file.encoding}" />
-      <arg value="-Dparallel=classesAndMethods" />
       <arg value="-DpreCoreThreadCount=false" />
-      <arg value="-DthreadCountClasses=2" />
-      <arg value="-DthreadCountMethods=2" />
+      <arg value="-DthreadCount=4" />
       <arg value="-DtrimStackTrace=false" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
       <arg value="verify" />
