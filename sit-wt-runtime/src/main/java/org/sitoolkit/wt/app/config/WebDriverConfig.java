@@ -143,7 +143,7 @@ public class WebDriverConfig {
         return webDriver;
     }
 
-    @Bean
+    @Bean(destroyMethod = "")
     @Primary
     public RemoteWebDriver webDriver(RemoteWebDriver webDriver,
             WebElementExceptionChecker checker) {
