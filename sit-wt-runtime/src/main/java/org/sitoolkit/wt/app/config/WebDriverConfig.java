@@ -128,12 +128,13 @@ public class WebDriverConfig {
         webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
 
         if (!(webDriver instanceof AppiumDriver<?>)) {
-            Dimension windowSize = new Dimension(pm.getWindowWidth(), pm.getWindowHeight());
-            webDriver.manage().window().setSize(windowSize);
             webDriver.manage().window().setPosition(new Point(pm.getWindowLeft() + windowShiftLeft,
                     pm.getWindowTop() + windowShiftTop));
             windowShiftTop += pm.getWindowShiftTop();
             windowShiftLeft += pm.getWindowShiftLeft();
+
+            Dimension windowSize = new Dimension(pm.getWindowWidth(), pm.getWindowHeight());
+            webDriver.manage().window().setSize(windowSize);
         }
 
         closer.register(webDriver);
