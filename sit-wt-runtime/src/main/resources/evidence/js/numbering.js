@@ -11,27 +11,28 @@ function buildPosStyle(basePos, pos) {
 		+ "height:" + (pos.h + 20) + "px;";
 }
 
-$(window).load(function() {
+function buildBox() {
+	var posMap = {};
+
+	/**
+	 * 同一座標に紐づく操作ログのNoをまとめる処理
+	 */
+	var checkPos = function(pos) {
+		var key = pos.x + "_" + pos.y
+		var mappedId = posMap[key] ;
+		if (mappedId) {
+			td.find("#" + mappedId).append("," + pos.no);
+			return;
+		}
+		var id = "numbring_" + pos.no;
+		posMap[key] = id;
+		return id;
+	};
+
 	$("td.screenshot").each(function() {
 		var td = $(this);
 		var basePos = td.find("img").offset();
 
-
-		var posMap = {};
-		/**
-		 * 同一座標に紐づく操作ログのNoをまとめる処理
-		 */
-		var checkPos = function(pos) {
-			var key = pos.x + "_" + pos.y
-			var mappedId = posMap[key] ;
-			if (mappedId) {
-				td.find("#" + mappedId).append("," + pos.no);
-				return;
-			}
-			var id = "numbring_" + pos.no;
-			posMap[key] = id;
-			return id;
-		};
 
 		td.find("input:hidden").each(function() {
 			var val = $(this).val();
@@ -50,4 +51,13 @@ $(window).load(function() {
 	$("div.box").click(function() {
 		$(this).toggleClass("box-hidden");
 	});
+}
+
+$(window).load(function() {
+	buildBox();
+});
+
+$(window).resize(function() {
+	$("div.box").remove();
+	buildBox();
 });
