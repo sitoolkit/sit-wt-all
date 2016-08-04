@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
@@ -12,9 +14,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="39.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="61.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <center>
-    <TextArea fx:id="console" editable="false" BorderPane.alignment="CENTER" />
+    <TextArea fx:id="console" editable="false" minHeight="0.0" prefHeight="0.0" BorderPane.alignment="CENTER" />
   </center>
    <top>
       <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar" BorderPane.alignment="CENTER">
@@ -28,7 +30,6 @@
                         <MenuItem mnemonicParsing="false" onAction="#getSample" text="サンプル取得" />
                     </items>
                   </MenuButton>
-              <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#toggleConsole" text="ログ" />
             </items>
           </ToolBar>
             <ToolBar fx:id="startGroup">
@@ -56,7 +57,22 @@
               <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプトを生成" />
                </items>
             </ToolBar>
+        <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#toggleConsole" text="ログ" />
          </children>
       </HBox>
    </top>
+   <bottom>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="statusLabel">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <padding>
+            <Insets left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+   </bottom>
 </BorderPane>

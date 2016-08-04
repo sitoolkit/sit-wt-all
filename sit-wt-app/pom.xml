@@ -15,7 +15,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.sitoolkit.wt.app.App</mainClass>
+              <mainClass>org.sitoolkit.wt.gui.pres.App</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

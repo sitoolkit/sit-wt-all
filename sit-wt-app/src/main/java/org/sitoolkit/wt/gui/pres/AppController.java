@@ -23,12 +23,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class AppController implements Initializable {
@@ -75,6 +74,9 @@ public class AppController implements Initializable {
     @FXML
     private ToggleButton logButton;
 
+    @FXML
+    private Label statusLabel;
+
     private ConversationProcess mvnProcess = new ConversationProcess();
 
     private ProjectState projectState = new ProjectState();
@@ -93,13 +95,17 @@ public class AppController implements Initializable {
         setVisible(debugGroup,
                 Bindings.and(projectState.getRunning(), debugCheck.selectedProperty()));
 
+        parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
+
         // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
         projectState.getInitialized().setValue(pomFile.exists());
         if (pomFile.exists()) {
             FxContext.setTitie(pomFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+            statusLabel.setText("");
+        } else {
+            statusLabel.setText("[プロジェクト]>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
         }
 
-        setVisible(console, logButton.selectedProperty());
     }
 
     private void setVisible(Node node, ObservableBooleanValue visible) {
@@ -110,6 +116,9 @@ public class AppController implements Initializable {
     @FXML
     public void createProject() {
         DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("プロジェクトを作成するフォルダを選択してください。");
+        dirChooser.setInitialDirectory(new File("."));
+
         File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
 
         if (projectDir == null) {
@@ -130,26 +139,45 @@ public class AppController implements Initializable {
         projectState.getInitialized().set(pomFile.exists());
         if (pomFile.exists()) {
             FxContext.setTitie(pomFile.getParentFile().getAbsolutePath());
+            statusLabel.setText("プロジェクトを作成しました。");
         }
     }
 
     @FXML
     public void openProject() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new ExtensionFilter("*.xml", "*.xml"));
-        pomFile = fileChooser.showOpenDialog(FxContext.getPrimaryStage());
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("プロジェクトのpom.xmlがあるフォルダを選択してください。");
+        dirChooser.setInitialDirectory(new File("."));
 
-        projectState.getInitialized().set(pomFile != null && pomFile.exists());
+        File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
+
+        if (projectDir == null) {
+            return;
+        }
+
+        pomFile = new File(projectDir, "pom.xml");
+
+        if (pomFile != null && pomFile.exists()) {
+            projectState.getInitialized().set(true);
+            statusLabel.setText("プロジェクトを作成しました。");
+        } else {
+            statusLabel.setText("pom.xmlの無いフォルダは無効です。");
+        }
     }
 
     @FXML
     public void getSample() {
+        statusLabel.setText("サンプルを取得します。");
+
         mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
                 MavenUtils.getCommand(), "sit-wt:sample");
+
+        statusLabel.setText("サンプルを取得しました。");
     }
 
     @FXML
     public void run() {
+        statusLabel.setText("テストを実行します。");
 
         List<String> command = new ArrayList<>();
         command.add(MavenUtils.getCommand());
@@ -160,7 +188,7 @@ public class AppController implements Initializable {
         if (debugCheck.isSelected()) {
             profiles.add("debug");
         }
-        if (parallelCheck.isSelected()) {
+        if (!parallelCheck.isDisabled() && parallelCheck.isSelected()) {
             profiles.add("parallel");
         }
         if (!profiles.isEmpty()) {
@@ -171,14 +199,19 @@ public class AppController implements Initializable {
                 pomFile.getAbsoluteFile().getParentFile(), command);
 
         projectState.getRunning().setValue(true);
-        mvnProcess.waitFor(() -> projectState.getRunning().set(false));
+        mvnProcess.waitFor(() -> {
+            projectState.getRunning().set(false);
+            statusLabel.setText("テストを終了します。");
+        });
     }
 
     @FXML
     public void pause() {
         if (mavenConsoleListener.isPausing()) {
+            pauseButton.setText("一時停止");
             mvnProcess.input("s");
         } else {
+            pauseButton.setText("再開");
             mvnProcess.input("");
         }
     }
@@ -214,10 +247,9 @@ public class AppController implements Initializable {
         Stage primaryStage = FxContext.getPrimaryStage();
         if (logButton.isSelected()) {
             primaryStage.setHeight(400);
-            primaryStage.setResizable(true);
         } else {
+            console.setPrefHeight(0);
             primaryStage.setHeight(primaryStage.getMinHeight());
-            primaryStage.setResizable(false);
         }
     }
 

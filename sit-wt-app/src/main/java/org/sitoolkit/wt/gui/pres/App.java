@@ -27,7 +27,6 @@ public class App extends Application {
         primaryStage.show();
 
         primaryStage.setMinHeight(primaryStage.getHeight());
-        primaryStage.setResizable(false);
     }
 
 }
