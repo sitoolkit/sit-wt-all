@@ -172,7 +172,7 @@ public class AppController implements Initializable {
         mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
                 MavenUtils.getCommand(), "sit-wt:sample");
 
-        statusLabel.setText("サンプルを取得しました。");
+        mvnProcess.waitFor(() -> statusLabel.setText("サンプルを取得しました。"));
     }
 
     @FXML

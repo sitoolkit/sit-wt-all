@@ -1,56 +1,84 @@
 package org.sitoolkit.wt.gui.infra;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 public class MavenUtils {
 
-    private static String mvnCommand = "";
+    private static final Logger LOG = Logger.getLogger(MavenUtils.class.getName());
 
-    static {
-        initCommand();
-    }
+    private static String mvnCommand = "";
 
     public static String getCommand() {
         return mvnCommand;
     }
 
-    private static void initCommand() {
-        // OS判定方法はorg.apache.commons.lang3.SystemUtilsを参照
-        String osName = System.getProperty("os.name");
-        boolean isOsWinows = osName.startsWith("Windows");
-        boolean isOsMac = osName.startsWith("Mac");
+    public static void findAndInstall() {
+        mvnCommand = find();
+        if (mvnCommand == null || mvnCommand.isEmpty()) {
+            mvnCommand = install();
+        }
+        LOG.info("mvn command is '" + mvnCommand + "'");
+    }
 
-        if (isOsMac) {
+    public static String find() {
+        LOG.info("finding installed maven");
+        if (SystemUtils.isOsX()) {
             File mvnFile = new File("/usr/local/bin/mvn");
             if (mvnFile.exists()) {
-                mvnCommand = mvnFile.getAbsolutePath();
-                return;
+                return mvnFile.getAbsolutePath();
             }
         }
 
         String mavenHome = System.getenv("MAVEN_HOME");
         String mvn = mavenHome + "/bin/mvn";
 
-        if (isOsMac) {
+        if (SystemUtils.isOsX()) {
             if (new File(mvn).exists()) {
-                mvnCommand = mvn;
-                return;
+                return mvn;
             }
         }
 
-        if (isOsWinows) {
+        if (SystemUtils.isWindows()) {
             File mvnFile = new File(mvn + ".cmd");
 
             if (mvnFile.exists()) {
-                mvnCommand = mvn;
+                return mvnFile.getAbsolutePath();
             } else {
                 mvnFile = new File(mvn + ".bat");
 
                 if (mvnFile.exists()) {
-                    mvnCommand = mvnFile.getAbsolutePath();
+                    return mvnFile.getAbsolutePath();
                 }
             }
         }
+
+        return "";
     }
 
+    public static String install() {
+        File sitRepo = SystemUtils.isWindows() ? new File(System.getenv("ProgramData"), "sitoolkit")
+                : new File(System.getProperty("user.home"), ".sitoolkit/repository");
+
+        // TODO 外部化
+        String url = "https://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip";
+        String fileName = url.substring(url.lastIndexOf("/"));
+        File destFile = new File(sitRepo, "maven/download/" + fileName);
+
+        if (destFile.exists()) {
+            LOG.info("Maven binary is already downloaded : " + destFile.getAbsolutePath());
+        } else {
+            FileIOUtils.download(url, destFile);
+        }
+
+        File destDir = new File(sitRepo, "maven/runtime");
+        FileIOUtils.unarchive(destFile, destDir);
+
+        File[] children = destDir.listFiles();
+        return children.length == 0 ? "" : children[0].getAbsolutePath();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(install());
+    }
 }

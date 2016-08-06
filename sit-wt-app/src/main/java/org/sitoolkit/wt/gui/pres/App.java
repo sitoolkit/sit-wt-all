@@ -1,6 +1,9 @@
 package org.sitoolkit.wt.gui.pres;
 
+import java.util.concurrent.Executors;
+
 import org.sitoolkit.wt.gui.infra.FxContext;
+import org.sitoolkit.wt.gui.infra.MavenUtils;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +14,7 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     public static void main(String[] args) {
+        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
         launch(args);
     }
 
