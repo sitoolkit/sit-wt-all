@@ -42,8 +42,8 @@ public class EvidenceManager implements ApplicationContextAware {
     /**
      * エビデンスの表示に関連する資源
      */
-    private String[] evidenceResources = new String[] { "css/style.css", "js/jquery.js",
-            "js/numbering.js" };
+    private String[] evidenceResources = new String[] { "css/bootstrap.min.css", "css/style.css",
+            "js/jquery.js", "js/numbering.js" };
 
     /**
      * エビデンスの出力先ディレクトリ

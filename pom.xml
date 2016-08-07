@@ -23,7 +23,6 @@
   <modules>
     <module>sit-wt-maven-plugin</module>
     <module>sit-wt-runtime</module>
-    <module>sit-wt-app</module>
   </modules>
 
   <!-- Build Settings -->

@@ -15,183 +15,172 @@ limitations under the License.
 -->
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>入力ページ</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <script>
-            var ADDRESS = {
-                P01: ["札幌", "函館", "富良野"],
-                P02: ["青森", "弘前", "八戸"],
-                P03: ["秋田", "北秋田", "大仙"]
-            };
-            function prefectureChange(prefecture) {
-                var city = document.getElementById("city");
-                city.innerHTML = "";
 
-                var selectedPrefecture =
-                        prefecture.options[prefecture.selectedIndex].value;
+<head>
+<title>入力ページ</title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+	var ADDRESS = {
+		P01 : [ "札幌", "函館", "富良野" ],
+		P02 : [ "青森", "弘前", "八戸" ],
+		P03 : [ "秋田", "北秋田", "大仙" ]
+	};
+	function prefectureChange(prefecture) {
+		var city = document.getElementById("city");
+		city.innerHTML = "";
 
-                var cities = ADDRESS[selectedPrefecture];
-                if (cities) {
-                    for (var i = 0; i < cities.length; i++) {
-                        city.innerHTML += "<option>" + cities[i] + "</option>";
-                    }
-                }
-            }
-            function inputConfirm() {
-                if (!window.confirm('よろしいですか？')) {
-                    return false;
-                }
-            }
-        </script>
-        <link rel="stylesheet" href="style.css"/>
-    </head>
-    <body>
-        <div id="container">
-            <div id="content">
-                <h1>入力ページ</h1>
-                <p>
-                    このページではフォームの入力操作を確認します。
-                    「利用規約」リンクをクリックすると利用規約ページが別ウィンドウで開きます。
-                    「同意して確定」ボタンをクリックすると確認ダイアログが表示されます。
-                    ダイアログを承諾すると完了ページに遷移します。拒否するとこのページに留まります。
-                </p>
-                <form action="done.html" method="get">
-                    <table class="input-form">
-                        <col style="width:15%;"/>
-                        <col style="width:30%;"/>
-                        <col style="width:55%;"/>
-                        <thead>
-                            <tr>
-                                <th>項目名</th>
-                                <th>項目</th>
-                                <th>サポートされる入力操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th>名前</th>
-                                <td><input id="name" name="名前" type="text"/></td>
-                                <td>
-                                    <ul>
-                                        <li>テキストボックスの入力
-                                            <ul>
-                                                <li>上書</li>
-                                                <li>追記</li>
-                                            </ul>
-                                        </li>
-                                        <li>Javascriptのアラートを承諾<br/>
-                                            (左の名前入力欄は「!"#$%&amp;'」のいずれかが含まれた状態でフォーカスアウトするとアラートを表示します。)</li>
-                                    </ul>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>性別</th>
-                                <td>
-                                    <input id="gender-male" type="radio" name="性別" value="m"/>
-                                    <label for="gender-male">男性</label>
-                                    <input id="gender-female"  type="radio" name="性別" value="f"/>
-                                    <label for="gender-female">女性</label>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <li>ラジオボタンの選択
-                                            <ul>
-                                                <li>input要素のid属性を指定して選択</li>
-                                                <li>input要素のvalue属性を指定して選択</li>
-                                                <li>label要素のtext文字列を指定して選択</li>
-                                            </ul>
-                                        </li>
-                                    </ul>
+		var selectedPrefecture = prefecture.options[prefecture.selectedIndex].value;
 
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>住所</th>
-                                <td>
-                                    都道府県：
-                                    <select id="prefecture" name="都道府県" onchange="prefectureChange(this);">
-                                        <option value="P00"></option>
-                                        <option value="P01">北海道</option>
-                                        <option value="P02">青森</option>
-                                        <option value="P03">秋田</option>
-                                    </select>
-                                    <br/>
-                                    市区町村：
-                                    <select id="city" name="市区町村">
-                                    </select>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <li>
-                                            セレクトボックスの選択
-                                            <ul>
-                                                <li>option要素のvalue属性を指定して選択</li>
-                                                <li>option要素のtext文字列を指定して選択</li>
-                                                <li>option要素の順番を指定して選択</li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            Javascriptの処理待ち<br/>
-                                            (左の市区町村の選択肢は都道府県の選択によって変わります。)
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>趣味</th>
-                                <td>
-                                    <input id="hobby-sports" name="趣味" type="checkbox" value="sports" />
-                                    <label for="hobby-sports">運動</label>
-                                    <input id="hobby-art" name="趣味" type="checkbox" value="art"/>
-                                    <label for="hobby-art">芸術</label>
-                                    <input id="hobby-work" name="趣味" type="checkbox" value="work"/>
-                                    <label for="hobby-work">仕事</label>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <li>チェックボックスのチェック
-                                            <ul>
-                                                <li>input要素のid属性を指定して選択</li>
-                                                <li>input要素のvalue属性を指定して選択</li>
-                                                <li>label要素のtext文字列を指定して選択</li>
-                                            </ul>
-                                        </li>
+		var cities = ADDRESS[selectedPrefecture];
+		if (cities) {
+			for (var i = 0; i < cities.length; i++) {
+				city.innerHTML += "<option>" + cities[i] + "</option>";
+			}
+		}
+	}
+	function inputConfirm() {
+		if (!window.confirm('よろしいですか？')) {
+			return false;
+		}
+	}
+</script>
+<link rel="stylesheet" href="bootstrap.min.css"/>
+</head>
 
-                                    </ul>
-                                    </td>
-                            </tr>
-                            <tr>
-                                <th>備考</th>
-                                <td>
-                                    <textarea id="remark" name="備考" rows="4" cols="30"></textarea>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <li>テキストエリアの入力
-                                            <ul>
-                                                <li>上書</li>
-                                                <li>追記</li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3">
-                                    <a href="javascript:void(0);" onclick="window.open('terms.html', 'terms');">利用規約</a>
-                                    <input id="confirm" type="submit" value="同意して確定" onclick="return inputConfirm();"/>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </form>
-            </div>
-            <div id="footer">
-                Copyright 2013 Monocrea Inc.
-            </div>
+<body>
+  <div class="container">
+      <div class="page-header">
+        <h1>入力ページ</h1>
+      </div>
+      <p>このページではフォームの入力操作を確認します。 「利用規約」リンクをクリックすると利用規約ページが別ウィンドウで開きます。
+        「同意して確定」ボタンをクリックすると確認ダイアログが表示されます。 ダイアログを承諾すると完了ページに遷移します。拒否するとこのページに留まります。</p>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-sm-2 panel-title"><strong>入力項目名</strong></div>
+            <div class="col-sm-4 panel-title"><strong>入力項目</strong></div>
+            <div class="col-sm-6 panel-title"><strong>サポートされる入力操作</strong></div>
+          </div>
         </div>
-    </body>
+      <form action="done.html" method="get" class="form-horizontal panel-body">
+        <div class="form-group">
+          <label for="name" class="col-sm-2 control-label">名前</label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="name" name="名前" placeholder="名前">
+          </div>
+          <div class="col-sm-6">
+            <ul>
+              <li>テキストボックスの入力
+                <ul>
+                  <li>上書</li>
+                  <li>追記</li>
+                </ul>
+              </li>
+              <li>Javascriptのアラートを承諾<br />
+                (左の名前入力欄は「!"#$%&amp;'」のいずれかが含まれた状態でフォーカスアウトするとアラートを表示します。)
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">性別</label>
+          <div class="col-sm-4">
+            <label for="gender-male" class="radio-inline"><input id="gender-male"
+              type="radio" name="性別" value="m" />男性</label> <label for="gender-female" class="radio-inline"><input
+              id="gender-female" type="radio" name="性別" value="f" />女性</label>
+          </div>
+          <div class="col-sm-6">
+            <ul>
+              <li>ラジオボタンの選択
+                <ul>
+                  <li>input要素のid属性を指定して選択</li>
+                  <li>input要素のvalue属性を指定して選択</li>
+                  <li>label要素のtext文字列を指定して選択</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">住所</label>
+          <div class="col-sm-4">
+            <label for="prefecture" class="control-label">都道府県：</label><select id="prefecture"
+              name="都道府県" onchange="prefectureChange(this);" class="form-control">
+              <option value="P00"></option>
+              <option value="P01">北海道</option>
+              <option value="P02">青森</option>
+              <option value="P03">秋田</option>
+            </select> <label for="city" class="control-label">市区町村：</label><select id="city" name="市区町村"
+              class="form-control">
+            </select>
+          </div>
+          <div class="col-sm-6">
+            <ul>
+              <li>セレクトボックスの選択
+                <ul>
+                  <li>option要素のvalue属性を指定して選択</li>
+                  <li>option要素のtext文字列を指定して選択</li>
+                  <li>option要素の順番を指定して選択</li>
+                </ul>
+              </li>
+              <li>Javascriptの処理待ち<br /> (左の市区町村の選択肢は都道府県の選択によって変わります。)
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">趣味</label>
+          <div class="col-sm-4">
+            <label for="hobby-sports" class="checkbox-inline"><input id="hobby-sports"
+              name="趣味" type="checkbox" value="sports" />運動</label> <label for="hobby-art"
+              class="checkbox-inline"><input id="hobby-art" name="趣味" type="checkbox"
+              value="art" />芸術</label> <label for="hobby-work" class="checkbox-inline"><input
+              id="hobby-work" name="趣味" type="checkbox" value="work" />仕事</label>
+          </div>
+          <div class="col-sm-6">
+            <ul>
+              <li>チェックボックスのチェック
+                <ul>
+                  <li>input要素のid属性を指定して選択</li>
+                  <li>input要素のvalue属性を指定して選択</li>
+                  <li>label要素のtext文字列を指定して選択</li>
+                </ul>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">備考</label>
+          <div class="col-sm-4">
+            <textarea id="remark" name="備考" rows="4" cols="30" class="form-control"></textarea>
+          </div>
+          <div class="col-sm-6">
+            <ul>
+              <li>テキストエリアの入力
+                <ul>
+                  <li>上書</li>
+                  <li>追記</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-4">
+            <a href="javascript:void(0);" onclick="window.open('terms.html', 'terms');">利用規約</a> <input
+              id="confirm" type="submit" value="同意して確定" onclick="return inputConfirm();"
+              class="btn btn-default" />
+
+          </div>
+
+        </div>
+      </form>
+    </div>
+    <footer class="text-muted">Copyright 2013 Monocrea Inc.</footer>
+  </div>
+</body>
+
 </html>

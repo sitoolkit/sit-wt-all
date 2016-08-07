@@ -4,11 +4,11 @@
 <stringAttribute key="M2_GOALS" value="verify"/>
 <booleanAttribute key="M2_NON_RECURSIVE" value="false"/>
 <booleanAttribute key="M2_OFFLINE" value="false"/>
-<stringAttribute key="M2_PROFILES" value="localhost"/>
+<stringAttribute key="M2_PROFILES" value="localhost,debug"/>
 <listAttribute key="M2_PROPERTIES">
 <listEntry value="test=Selenium2ScriptTest"/>
 <listEntry value="driver.type=ff"/>
-<listEntry value="maven.surefire.debug=true"/>
+<listEntry value="-maven.surefire.debug=true"/>
 </listAttribute>
 <stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
 <booleanAttribute key="M2_SKIP_TESTS" value="false"/>

@@ -15,60 +15,52 @@ limitations under the License.
 -->
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>完了ページ</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script>
-            function init() {
-                var qpos = location.href.indexOf("?") + 1;
-                var params = location.href.slice(qpos).split("&");
-                var conftab = document.getElementById("confirm").getElementsByTagName("tbody").item(0);
-                for (var i = 0; i < params.length; i++) {
-                    var pair = params[i].split("=");
+<head>
+<title>完了ページ</title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+	function init() {
+		var qpos = location.href.indexOf("?") + 1;
+		var params = location.href.slice(qpos).split("&");
+		var conftab = document.getElementById("confirm").getElementsByTagName(
+				"tbody").item(0);
+		for (var i = 0; i < params.length; i++) {
+			var pair = params[i].split("=");
 
-                    var tr = document.createElement("tr");
-                    conftab.appendChild(tr);
-                    var th = document.createElement("th");
-                    tr.appendChild(th);
-                    th.innerHTML = window.decodeURI(pair[0]);
-                    var td = document.createElement("td");
-                    tr.appendChild(td);
-                    td.innerHTML = window.decodeURI(pair[1]);
-                }
-            }
-
-        </script>
-        <link rel="stylesheet" href="style.css"/>
-    </head>
-    <body onload="init();">
-        <div id="container">
-            <div id="content">
-                <h1>完了ページ</h1>
-                <p>
-                    このページでは表示されている内容に対する検証操作を確認します。
-                </p>
-                <table id="confirm" class="list">
-                    <col style="width:50%;"/>
-                    <col style="width:50%;"/>
-                    <thead>
-                        <tr>
-                            <th>項目名</th>
-                            <th>入力値</th>
-                        </tr>
-                    </thead>
-                    <tfoot>
-                        <tr>
-                            <td colspan="2">
-                                <a href="#" onclick="window.location.href='input.html'">戻る</a>
-                            </td>
-                        </tr>
-                    </tfoot>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div id="footer">
-                Copyright 2013 Monocrea Inc.
-            </div>
-        </div>
-    </body>
+			var tr = document.createElement("tr");
+			conftab.appendChild(tr);
+			var th = document.createElement("th");
+			tr.appendChild(th);
+			th.innerHTML = window.decodeURI(pair[0]);
+			var td = document.createElement("td");
+			tr.appendChild(td);
+			td.innerHTML = window.decodeURI(pair[1]);
+		}
+	}
+</script>
+<link rel="stylesheet" href="bootstrap.min.css"/>
+</head>
+<body onload="init();">
+  <div class="container">
+    <div class="page-header">
+      <h1>完了ページ</h1>
+    </div>
+    <p>このページでは表示されている内容に対する検証操作を確認します。</p>
+    <table id="confirm" class="table table-striped">
+      <col style="width: 50%;" />
+      <col style="width: 50%;" />
+      <thead>
+        <tr>
+          <th>項目名</th>
+          <th>入力値</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <a href="#" onclick="window.location.href='input.html'">戻る</a>
+    <footer class="text-muted">Copyright 2013 Monocrea Inc.</footer>
+  </div>
+</body>
 </html>
