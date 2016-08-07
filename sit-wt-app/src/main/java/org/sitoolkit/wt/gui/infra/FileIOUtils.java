@@ -27,8 +27,7 @@ public class FileIOUtils {
         try (InputStream stream = new URL(url).openStream()) {
             Files.copy(stream, destFile.toPath());
         } catch (IOException e) {
-            // TODO 例外処理
-            e.printStackTrace();
+            throw new UnExpectedException(e);
         }
 
     }
@@ -66,13 +65,13 @@ public class FileIOUtils {
                 try (InputStream is = zipFile.getInputStream(zipEntry)) {
                     Files.copy(is, entryFile.toPath());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new UnExpectedException(e);
                 }
 
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UnExpectedException(e);
         }
     }
 

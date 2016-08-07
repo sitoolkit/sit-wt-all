@@ -15,6 +15,7 @@ import org.sitoolkit.wt.gui.infra.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
+import org.sitoolkit.wt.gui.infra.UnExpectedException;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -133,8 +134,7 @@ public class AppController implements Initializable {
         try (InputStream pom = new URL(pomUrl).openStream()) {
             Files.copy(pom, pomFile.toPath());
         } catch (IOException e) {
-            // TODO 例外処理
-            e.printStackTrace();
+            throw new UnExpectedException(e);
         }
 
         projectState.getInitialized().set(pomFile.exists());
@@ -247,6 +247,7 @@ public class AppController implements Initializable {
     public void toggleConsole() {
         Stage primaryStage = FxContext.getPrimaryStage();
         if (logButton.isSelected()) {
+            // TODO コンソールのサイズ設定
             primaryStage.setHeight(400);
         } else {
             console.setPrefHeight(0);

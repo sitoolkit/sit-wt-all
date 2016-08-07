@@ -17,4 +17,8 @@ public class LogUtils {
             LOG.info("log configured with " + configFile);
         }
     }
+
+    public static Logger get(Class<?> type) {
+        return Logger.getLogger(type.getName());
+    }
 }

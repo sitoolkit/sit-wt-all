@@ -31,8 +31,7 @@ public class ConversationProcess {
 
             processWriter = new PrintWriter(process.getOutputStream());
         } catch (IOException e) {
-            // TODO 例外処理
-            e.printStackTrace();
+            throw new UnExpectedException(e);
         }
     }
 
