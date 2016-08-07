@@ -5,15 +5,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 public class ConversationProcess {
+
+    private static final Logger LOG = Logger.getLogger(ConversationProcess.class.getName());
 
     private Process process;
 
     private PrintWriter processWriter;
-
-    private boolean running;
 
     public void start(Console console, File directory, String... command) {
         start(console, directory, Arrays.asList(command));
@@ -24,8 +24,11 @@ public class ConversationProcess {
         try {
             pb.directory(directory);
             process = pb.start();
-            running = true;
-            ExecutableStreamReader.read(process.getInputStream(), console);
+            LOG.info("process " + process + " starts");
+
+            ExecutorContainer.get()
+                    .execute(new ConsoleStreamReader(process.getInputStream(), console));
+
             processWriter = new PrintWriter(process.getOutputStream());
         } catch (IOException e) {
             // TODO 例外処理
@@ -40,14 +43,14 @@ public class ConversationProcess {
 
     public void destroy() {
         process.destroy();
-        running = false;
     }
 
     public void waitFor(WaitCallback callback) {
         if (process != null) {
-            Executors.newSingleThreadExecutor().execute(() -> {
+            ExecutorContainer.get().execute(() -> {
                 try {
-                    process.waitFor();
+                    int exitCode = process.waitFor();
+                    LOG.info("process " + process + " exits with code : " + exitCode);
                 } catch (InterruptedException e) {
                     // TODO 例外処理
                     e.printStackTrace();
@@ -62,7 +65,4 @@ public class ConversationProcess {
         void callback();
     }
 
-    public boolean isRunning() {
-        return running;
-    }
 }

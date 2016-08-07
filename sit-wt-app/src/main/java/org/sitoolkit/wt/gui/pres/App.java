@@ -2,6 +2,7 @@ package org.sitoolkit.wt.gui.pres;
 
 import java.util.concurrent.Executors;
 
+import org.sitoolkit.wt.gui.infra.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.LogUtils;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
@@ -15,9 +16,13 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     public static void main(String[] args) {
-        LogUtils.init();
-        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
-        launch(args);
+        try {
+            LogUtils.init();
+            Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
+            launch(args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -35,4 +40,8 @@ public class App extends Application {
         primaryStage.setMinHeight(primaryStage.getHeight());
     }
 
+    @Override
+    public void stop() throws Exception {
+        ExecutorContainer.get().shutdown();
+    }
 }

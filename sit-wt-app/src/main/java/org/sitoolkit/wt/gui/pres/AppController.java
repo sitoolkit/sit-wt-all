@@ -16,6 +16,7 @@ import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
@@ -172,7 +173,7 @@ public class AppController implements Initializable {
         mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
                 MavenUtils.getCommand(), "sit-wt:sample");
 
-        mvnProcess.waitFor(() -> statusLabel.setText("サンプルを取得しました。"));
+        mvnProcess.waitFor(() -> Platform.runLater(() -> statusLabel.setText("サンプルを取得しました。")));
     }
 
     @FXML
