@@ -36,6 +36,7 @@ import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 import org.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionChecker;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionCheckerImpl;
@@ -58,12 +59,18 @@ public class WebDriverConfig {
     private static final Logger LOG = LoggerFactory.getLogger(WebDriverConfig.class);
 
     private int windowShiftLeft = 0;
+
     private int windowShiftTop = 0;
 
     @Bean
+    public WebDriverInstaller webDriverInstaller() {
+        return new WebDriverInstaller();
+    }
+
+    @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
-    public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer)
-            throws MalformedURLException {
+    public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer,
+            WebDriverInstaller webDriverInstaller) throws MalformedURLException {
         RemoteWebDriver webDriver = null;
 
         String driverType = pm.getDriverType();
@@ -88,17 +95,20 @@ public class WebDriverConfig {
                     break;
 
                 case "chrome":
+                    webDriverInstaller.installChromeDriver();
                     webDriver = new ChromeDriver(capabilities);
                     break;
 
                 case "ie":
                 case "internet explorer":
+                    webDriverInstaller.installIeDriver();
                     capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION,
                             true);
                     webDriver = new InternetExplorerDriver(capabilities);
                     break;
 
                 case "edge":
+                    webDriverInstaller.installEdgeDriver();
                     webDriver = new EdgeDriver(capabilities);
                     break;
 

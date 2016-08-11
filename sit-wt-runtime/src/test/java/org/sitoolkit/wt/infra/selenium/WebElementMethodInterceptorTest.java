@@ -75,7 +75,8 @@ public class WebElementMethodInterceptorTest {
     private WebDriver getNormalWebDriver() throws MalformedURLException {
         WebDriverConfig config = new WebDriverConfig();
         return config.innerWebDriver(ApplicationContextHelper.getBean(PropertyManager.class),
-                ApplicationContextHelper.getBean(WebDriverCloser.class));
+                ApplicationContextHelper.getBean(WebDriverCloser.class),
+                ApplicationContextHelper.getBean(WebDriverInstaller.class));
     }
 
     /**

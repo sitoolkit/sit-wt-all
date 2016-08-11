@@ -5,6 +5,7 @@
   <property name="testArtifactId" value="sit-wt-test" />
   <property name="testdir" value="${basedir}/${testArtifactId}" />
   <property name="file.encoding" value="UTF-8" />
+  <property name="driver.type" value="firefox" />
   <condition property="os.windows" value="true" else="false">
     <os family="windows" />
   </condition>
@@ -97,6 +98,7 @@
       <arg value="-DpreCoreThreadCount=false" />
       <arg value="-DthreadCount=4" />
       <arg value="-DtrimStackTrace=false" />
+      <arg value="-Ddriver.type=${driver.type}" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
       <arg value="verify" />
     </exec>
