@@ -94,6 +94,9 @@
       <arg value="-e" />
       <arg value="-P" />
       <arg value="parallel" />
+<!--    	
+      <arg value="-Dmaven.failsafe.debug=true" />
+-->
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="-DpreCoreThreadCount=false" />
       <arg value="-DthreadCount=4" />

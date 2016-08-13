@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
@@ -31,6 +32,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.safari.SafariDriver;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
@@ -113,7 +115,15 @@ public class WebDriverConfig {
                     break;
 
                 case "safari":
-                    webDriver = new SafariDriver(capabilities);
+                    try {
+                        webDriver = new SafariDriver(capabilities);
+                    } catch (UnreachableBrowserException e) {
+                        if (StringUtils.startsWith(e.getMessage(),
+                                "Failed to connect to SafariDriver")) {
+                            webDriverInstaller.installSafariDriver();
+                            webDriver = new SafariDriver(capabilities);
+                        }
+                    }
                     break;
 
                 case "remote":

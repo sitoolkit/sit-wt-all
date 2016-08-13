@@ -7,15 +7,18 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.annotation.PostConstruct;
+import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.sitoolkit.wt.infra.ConfigurationException;
+import org.sitoolkit.wt.infra.ProcessUtils;
 import org.sitoolkit.wt.infra.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,7 @@ public class WebDriverInstaller {
     private WebDriverBinaryInfo macChromeBinaryInfo = new WebDriverBinaryInfo("mac", "chrome");
     private WebDriverBinaryInfo ieBinaryInfo = new WebDriverBinaryInfo("ie");
     private WebDriverBinaryInfo edgeBinaryInfo = new WebDriverBinaryInfo("edge");
+    private WebDriverBinaryInfo safariBinaryInfo = new WebDriverBinaryInfo("safari");
 
     class WebDriverBinaryInfo {
 
@@ -63,6 +67,7 @@ public class WebDriverInstaller {
         setProperties(prop, macChromeBinaryInfo);
         setProperties(prop, ieBinaryInfo);
         setProperties(prop, edgeBinaryInfo);
+        setProperties(prop, safariBinaryInfo);
     }
 
     private void setProperties(Map<String, String> prop, WebDriverBinaryInfo binaryInfo) {
@@ -92,6 +97,34 @@ public class WebDriverInstaller {
 
     public String installIeDriver() {
         return install(ieBinaryInfo);
+    }
+
+    public void installSafariDriver() {
+        File installFile = new File(safariBinaryInfo.installDir, safariBinaryInfo.installFile);
+
+        try {
+            if (!installFile.exists()) {
+                URL downloadUrl = new URL(safariBinaryInfo.downloadUrl);
+                LOG.info("Safari Driverをダウンロードします {} -> {}", downloadUrl,
+                        installFile.getAbsolutePath());
+                FileUtils.copyURLToFile(downloadUrl, installFile);
+            }
+
+            LOG.info("Safari Driverをインストールします {}", installFile.getAbsolutePath());
+
+            String script = IOUtils
+                    .toString(ClassLoader.getSystemResource("install-safaridriver.scpt"), "UTF-8");
+            ProcessUtils.exec("osascript", "-e", script, installFile.getAbsolutePath());
+
+            JOptionPane.showMessageDialog(null,
+                    "Safariで機能拡張\"WebDriver\"をインストールしたらOKボタンをクリックしてください。");
+
+            script = IOUtils.toString(ClassLoader.getSystemResource("quit-safari.scpt"), "UTF-8");
+            ProcessUtils.exec("osascript", "-e", script, installFile.getAbsolutePath());
+
+        } catch (IOException e) {
+            throw new ConfigurationException(e);
+        }
     }
 
     protected File findInstallFile(WebDriverBinaryInfo binaryInfo) {
@@ -138,14 +171,7 @@ public class WebDriverInstaller {
             if (downloadFile.getName().endsWith(".msi")) {
                 LOG.info("{}をインストーラを実行します {}",
                         new Object[] { binaryInfo.sysPropKey, downloadFile.getAbsolutePath() });
-                ProcessBuilder pb = new ProcessBuilder("msiexec", "/i",
-                        downloadFile.getAbsolutePath(), "/passive");
-                Process process = pb.start();
-                try {
-                    process.waitFor(20, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    LOG.warn("", e);
-                }
+                ProcessUtils.exec("msiexec", "/i", downloadFile.getAbsolutePath(), "/passive");
 
             } else if (StringUtils.isEmpty(binaryInfo.zipEntry)) {
                 LOG.info("{}を配置します {} -> {} ", new Object[] { binaryInfo.sysPropKey,
@@ -157,8 +183,12 @@ public class WebDriverInstaller {
                         downloadFile.getAbsolutePath(), installFile.getAbsolutePath() });
                 extractOne(downloadFile, binaryInfo.zipEntry, installFile);
             }
+
+            if (!SystemUtils.IS_OS_WINDOWS) {
+                ProcessUtils.exec("chmod", "u+x", installFile.getAbsolutePath());
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ConfigurationException(e);
         }
 
         return installFile.getAbsolutePath();
@@ -200,8 +230,14 @@ public class WebDriverInstaller {
         if (SystemUtils.IS_OS_WINDOWS) {
             return "C:\\ProgramData\\sitoolkit\\repository\\selenium\\" + driver;
         } else {
-            return System.getProperty("user.home") + "/.sitoolkit/selenium/" + driver;
+            return System.getProperty("user.home") + "/.sitoolkit/repository/selenium/" + driver;
         }
     }
 
+    public static void main(String[] args) throws IOException {
+        // WebDriverInstaller installer = new WebDriverInstaller();
+        // installer.init();
+        // installer.installSafariDriver();
+        // System.out.println("end");
+    }
 }
