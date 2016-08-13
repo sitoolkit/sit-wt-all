@@ -41,6 +41,7 @@ public class RuntimeConfig {
     }
 
     @Bean
+    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
     public ElementPositionSupport2 elementPositionSupport() {
         return new ElementPositionSupport2();
     }
