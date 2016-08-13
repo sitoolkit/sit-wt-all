@@ -234,10 +234,4 @@ public class WebDriverInstaller {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        // WebDriverInstaller installer = new WebDriverInstaller();
-        // installer.init();
-        // installer.installSafariDriver();
-        // System.out.println("end");
-    }
 }

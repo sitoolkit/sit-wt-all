@@ -20,13 +20,17 @@ public class WebDriverInstallerTest {
         File repositoryDir = new File(installer.getRrepositoryDir(""));
         FileUtils.deleteQuietly(repositoryDir);
 
-        File edgeDriver = new File(installer.installEdgeDriver());
-        // File ieDriver = new File(installer.installIeDriver());
-        // File chromeDriver = new File(installer.installChromeDriver());
+        File ieDriver = new File(installer.installIeDriver());
+        File chromeDriver = new File(installer.installChromeDriver());
 
-        assertThat("edgedriverのインストール失敗", edgeDriver.exists(), is(true));
-        // assertThat("iedriverのインストール失敗", ieDriver.exists(), is(true));
-        // assertThat("chromedriverのインストール失敗", chromeDriver.exists(), is(true));
+        assertThat("iedriverのインストール失敗", ieDriver.exists(), is(true));
+        assertThat("chromedriverのインストール失敗", chromeDriver.exists(), is(true));
+
+        boolean isWindows10 = "Windows 10".equals(System.getProperty("os.name"));
+        if (isWindows10) {
+            File edgeDriver = new File(installer.installEdgeDriver());
+            assertThat("edgedriverのインストール失敗", edgeDriver.exists(), is(true));
+        }
     }
 
 }
