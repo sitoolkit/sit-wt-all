@@ -17,7 +17,7 @@ function buildBox() {
 	/**
 	 * 同一座標に紐づく操作ログのNoをまとめる処理
 	 */
-	var checkPos = function(pos) {
+	var checkPos = function(pos, td) {
 		var key = pos.x + "_" + pos.y
 		var mappedId = posMap[key] ;
 		if (mappedId) {
@@ -38,7 +38,7 @@ function buildBox() {
 			var val = $(this).val();
 			var pos = $.parseJSON(val);
 
-			var id = checkPos(pos);
+			var id = checkPos(pos, td);
 			if (!id) {
 				return;
 			}
