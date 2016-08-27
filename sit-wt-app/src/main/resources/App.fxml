@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="61.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
+  <center>
+    <TextArea fx:id="console" editable="false" minHeight="0.0" prefHeight="0.0" BorderPane.alignment="CENTER" />
+  </center>
+   <top>
+      <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar" BorderPane.alignment="CENTER">
+         <children>
+          <ToolBar fx:id="projectGroup">
+            <items>
+                  <MenuButton mnemonicParsing="false" text="プロジェクト">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#createProject" text="新規作成" />
+                      <MenuItem mnemonicParsing="false" onAction="#openProject" text="開く" />
+                        <MenuItem mnemonicParsing="false" onAction="#getSample" text="サンプル取得" />
+                    </items>
+                  </MenuButton>
+            </items>
+          </ToolBar>
+            <ToolBar fx:id="startGroup">
+              <items>
+                  <Separator orientation="VERTICAL" />
+              <Button fx:id="runButton" mnemonicParsing="false" onAction="#run" text="実行" />
+                  <CheckBox fx:id="debugCheck" mnemonicParsing="false" text="デバッグ" />
+                  <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
+                  <ChoiceBox prefWidth="150.0" />
+              </items>
+            </ToolBar>
+            <ToolBar fx:id="runningGroup">
+               <items>
+                  <Separator orientation="VERTICAL" />
+              <Button fx:id="quitButton" mnemonicParsing="false" onAction="#quit" text="停止" />
+               </items>
+            </ToolBar>
+            <ToolBar fx:id="debugGroup">
+               <items>
+                  <Separator orientation="VERTICAL" />
+              <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="一時停止" />
+              <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="戻る" />
+              <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="進む" />
+                  <Button accessibleHelp="現在実行中のスクリプトを開きます。" mnemonicParsing="false" onAction="#openScript" text="スクリプトを開く" />
+              <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプトを生成" />
+               </items>
+            </ToolBar>
+        <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#toggleConsole" text="ログ" />
+         </children>
+      </HBox>
+   </top>
+   <bottom>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="statusLabel">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <padding>
+            <Insets left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+   </bottom>
+</BorderPane>
