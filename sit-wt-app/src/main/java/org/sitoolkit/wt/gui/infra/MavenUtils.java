@@ -75,7 +75,32 @@ public class MavenUtils {
         FileIOUtils.unarchive(destFile, destDir);
 
         File[] children = destDir.listFiles();
-        return children.length == 0 ? "" : children[0].getAbsolutePath();
+        if(children.length != 0){
+            String mvn = children[0].getAbsolutePath() + "/bin/mvn";
+            if (SystemUtils.isOsX()) {
+                if (new File(mvn).exists()) {
+                    return mvn;
+                }
+            }
+
+            if (SystemUtils.isWindows()) {
+                File mvnFile = new File(mvn + ".cmd");
+                if (mvnFile.exists()) {
+                    return mvnFile.getAbsolutePath();
+                } else {
+                    mvnFile = new File(mvn + ".bat");
+                    if (mvnFile.exists()) {
+                        return mvnFile.getAbsolutePath();
+                    }
+                }
+            }
+        }
+
+        return "";
+
+
+//        File[] children = destDir.listFiles();
+//        return children.length == 0 ? "" : children[0].getAbsolutePath();
     }
 
     public static void main(String[] args) {
