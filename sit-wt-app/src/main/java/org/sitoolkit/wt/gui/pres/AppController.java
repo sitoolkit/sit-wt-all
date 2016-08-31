@@ -25,6 +25,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
@@ -57,6 +58,9 @@ public class AppController implements Initializable {
 
     @FXML
     private CheckBox parallelCheck;
+
+    @FXML
+    private ChoiceBox<String> browserChoice;
 
     @FXML
     private Button pauseButton;
@@ -196,13 +200,16 @@ public class AppController implements Initializable {
             command.add("-P" + String.join(",", profiles));
         }
 
+        profiles.add("-Ddriver.type=" + browserChoice.getSelectionModel().getSelectedItem());
+
+
         mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);
 
         projectState.getRunning().setValue(true);
         mvnProcess.waitFor(() -> {
             projectState.getRunning().set(false);
-            statusLabel.setText("テストを終了します。");
+            Platform.runLater(() -> statusLabel.setText("テストを終了します。"));
         });
     }
 

@@ -13,6 +13,8 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="61.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <center>
@@ -38,7 +40,16 @@
               <Button fx:id="runButton" mnemonicParsing="false" onAction="#run" text="実行" />
                   <CheckBox fx:id="debugCheck" mnemonicParsing="false" text="デバッグ" />
                   <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
-                  <ChoiceBox prefWidth="150.0" />
+                  <ChoiceBox fx:id="browserChoice" value="firefox" prefWidth="150.0" >
+                      <items>
+                          <FXCollections fx:factory="observableArrayList">
+                              <String fx:value="firefox" />
+                              <String fx:value="chrome" />
+                              <String fx:value="ie" />
+                              <String fx:value="edge" />
+                          </FXCollections>
+                      </items>
+                  </ChoiceBox>
               </items>
             </ToolBar>
             <ToolBar fx:id="runningGroup">
