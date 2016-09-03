@@ -200,7 +200,7 @@ public class AppController implements Initializable {
             command.add("-P" + String.join(",", profiles));
         }
 
-        profiles.add("-Ddriver.type=" + browserChoice.getSelectionModel().getSelectedItem());
+        command.add("-Ddriver.type=" + browserChoice.getSelectionModel().getSelectedItem());
 
 
         mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
