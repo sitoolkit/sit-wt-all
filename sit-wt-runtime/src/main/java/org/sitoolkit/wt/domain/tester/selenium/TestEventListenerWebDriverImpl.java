@@ -35,6 +35,12 @@ public class TestEventListenerWebDriverImpl implements TestEventListener {
         if (pm.isEdgeDriver()) {
             LOG.debug("WebDriverを再作成します {}", driver);
             threadScope.remove("scopedTarget.innerWebDriver");
+
+        } else if (pm.isRemoteDriver()) {
+            LOG.debug("RemoteWebDriverのセッションを終了します {}", driver);
+            driver.quit();
+            threadScope.remove("scopedTarget.innerWebDriver");
+
         } else {
             LOG.debug("Coolkieを削除します {}", driver);
             driver.manage().deleteAllCookies();

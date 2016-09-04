@@ -89,6 +89,8 @@ public class PropertyManager {
 
     private boolean isMsDriver;
 
+    private boolean isRemoteDriver;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -109,6 +111,7 @@ public class PropertyManager {
                 || "ie".equals(driverType);
         isEdgeDriver = equalsAny("edge", driverType, browserName);
         isMsDriver = isIeDriver || isEdgeDriver;
+        isRemoteDriver = "remote".equals(driverType);
     }
 
     private String toLowerCase(String str) {
@@ -150,6 +153,10 @@ public class PropertyManager {
 
     public String getDriverTypeInCapabilities() {
         return capabilities.get("browserName");
+    }
+
+    public boolean isRemoteDriver() {
+        return isRemoteDriver;
     }
 
     public boolean isFirefoxDriver() {

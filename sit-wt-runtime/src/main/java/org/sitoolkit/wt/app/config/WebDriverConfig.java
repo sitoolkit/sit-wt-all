@@ -36,8 +36,8 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.safari.SafariDriver;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
-import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 import org.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionChecker;
@@ -201,4 +201,5 @@ public class WebDriverConfig {
     public TestEventListener testEventListener() {
         return new TestEventListenerWebDriverImpl();
     }
+
 }

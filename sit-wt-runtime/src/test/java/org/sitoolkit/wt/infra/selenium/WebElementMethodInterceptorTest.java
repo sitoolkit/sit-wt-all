@@ -32,7 +32,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.app.config.WebDriverConfig;
-import org.sitoolkit.wt.domain.tester.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SitPathUtils;
