@@ -43,7 +43,7 @@ public class EvidenceManager implements ApplicationContextAware {
      * エビデンスの表示に関連する資源
      */
     private String[] evidenceResources = new String[] { "css/bootstrap.min.css", "css/style.css",
-            "js/jquery.js", "js/numbering.js" };
+            "js/jquery.js", "js/numbering.js", "js/image.js" };
 
     /**
      * エビデンスの出力先ディレクトリ
@@ -132,7 +132,7 @@ public class EvidenceManager implements ApplicationContextAware {
 
     /**
      * エビデンスをファイルに書き出します。
-     * 
+     *
      * @param evidence
      *            エビデンス
      */

@@ -1,3 +1,21 @@
+h1 {
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    letter-spacing: 0.3rem;
+}
+table {
+	border-collapse: collapse;
+}
+table tr th, table tr td {
+	border-bottom: solid 1px gray;
+	padding: 0.7rem;
+	vertical-align: top;
+}
+table > thead > tr > th {
+	border-bottom: double 3px gray;
+	letter-spacing: 0.5rem;
+}
+
 table tr td img {
 	box-shadow: 3px 3px 10px #777777;
 	display: block;
@@ -14,4 +32,47 @@ div.box {
 
 div.box-hidden {
 	border: none;
+}
+
+.verified {
+	font-weight: bold;
+	font-style: italic;
+	color: green;
+}
+
+.mismatched {
+	font-weight: bold;
+	font-style: italic;
+	color: red;
+}
+
+#toolBox {
+	position: fixed;
+	opacity: 0.8;
+	width: 1000px;
+}
+
+#initialFusenPos {
+	position: fixed;
+}
+
+div.fusen {
+	width: 150px;
+    height: 60px;
+	background: yellow;
+	opacity: 0.8;
+	z-index: 1;
+}
+
+#trashBox {
+	width: 200px;
+    height: 200px;
+	background: gray;
+}
+
+.tooltip {
+	color: blue;
+	font-weight: bold;
+	vertical-align: super;
+  	font-size: 0.8em;
 }
