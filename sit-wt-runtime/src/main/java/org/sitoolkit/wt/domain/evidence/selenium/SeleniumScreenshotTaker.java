@@ -18,6 +18,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -82,8 +83,13 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             new WebDriverWait(driver, waitTimeout).until(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver driver) {
-                    return ((JavascriptExecutor) driver)
-                            .executeScript("return document.readyState;").equals("complete");
+                    try {
+                        return ((JavascriptExecutor) driver)
+                                .executeScript("return document.readyState;").equals("complete");
+                    } catch (WebDriverException e) {
+                        log.debug("this exception is no effect for testing", e);
+                        return true;
+                    }
                 }
             });
         }
