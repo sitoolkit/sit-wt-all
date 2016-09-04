@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>テストエビデンスdiff $diff.evidenceName </title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="css/style.css"/>
+		<script src="js/jquery.js"></script>
+		<script src="js/numbering.js"></script>
+		<script src="js/diff.js"></script>
+	</head>
+	<body>
+        <a href="./">エビデンスフォルダへ</a>
+		<h1>テストエビデンスdiff $diff.evidenceName</h1>
+		<table>
+			<thead>
+				<tr>
+					<th>$diff.leftFileName</th>
+					<th>$diff.rightFileName</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<div id="left_evidence">
+$diff.leftFile
+						</div>
+					</td>
+					<td>
+						<div id="right_evidence">
+$diff.rightFile
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>

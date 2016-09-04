@@ -21,7 +21,7 @@ public class GetSampleMojo extends AbstractMojo {
     private File basedir;
 
     @Parameter(defaultValue = "src/main/webapp/input.html,src/main/webapp/terms.html,src/main/webapp/done.html,src/main/webapp/bootstrap.min.css,"
-            + "testscript/ExcelTestScript.xlsx", property = "sample.resources")
+            + "testscript/ExcelTestScript.xlsx,src/site/site.xml", property = "sample.resources")
     private String resources;
 
     @Override

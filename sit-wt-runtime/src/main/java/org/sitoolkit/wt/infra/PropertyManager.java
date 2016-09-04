@@ -1,13 +1,23 @@
 package org.sitoolkit.wt.infra;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +28,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @PropertySource(ignoreResourceNotFound = true, value = { "classpath:sit-wt-default.properties",
         "classpath:sit-wt.properties" })
 public class PropertyManager {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PropertyManager.class);
 
     @Value("${window.width}")
     private int windowWidth;
@@ -79,7 +91,7 @@ public class PropertyManager {
     @Value("${hubUrl}")
     private String hubUrl;
 
-    private Map<String, String> capabilities;
+    private Map<String, String> capabilities = new HashMap<>();
 
     private boolean isFirefoxDriver;
 
@@ -103,6 +115,28 @@ public class PropertyManager {
         capabilities = PropertyUtils.loadAsMap("/capabilities", true);
 
         setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
+    }
+
+    public void save(File dir) {
+        try (FileWriter writer = new FileWriter(new File(dir, "sit-wt.properties"))) {
+
+            Map<String, String> map = new TreeMap<>();
+            map.putAll(BeanUtils.describe(this));
+
+            Properties prop = new Properties();
+
+            for (Entry<String, String> entry : map.entrySet()) {
+                prop.setProperty(entry.getKey(), StringUtils.defaultString(entry.getValue()));
+            }
+
+            prop.store(writer, "");
+
+        } catch (Exception e) {
+            LOG.error("プロパティの保存で例外が発生しました", e);
+        }
+    }
+
+    public static void main(String[] args) {
     }
 
     void setDriverFlags(String driverType, String browserName) {
@@ -181,7 +215,7 @@ public class PropertyManager {
 
     public URL getAppiumAddress() {
         try {
-            return new URL(appiumAddress);
+            return appiumAddress == null ? null : new URL(appiumAddress);
         } catch (MalformedURLException e) {
             throw new ConfigurationException("appium.address", e);
         }
@@ -201,7 +235,8 @@ public class PropertyManager {
 
     public Pattern getSeleniumScreenshotPattern() {
         try {
-            return Pattern.compile(seleniumScreenshotPattern);
+            return seleniumScreenshotPattern == null ? null
+                    : Pattern.compile(seleniumScreenshotPattern);
         } catch (PatternSyntaxException e) {
             throw new ConfigurationException("selenium.screenshot.pattern", e);
         }

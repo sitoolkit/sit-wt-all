@@ -32,27 +32,54 @@
     <selenium.version>2.53.1</selenium.version>
     <appium.version>3.4.1</appium.version>
     <trimStackTrace>false</trimStackTrace>
+    <mpir.skip>true</mpir.skip>
   </properties>
 
   <!-- Build Settings -->
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.sitoolkit.wt</groupId>
+          <artifactId>sit-wt-maven-plugin</artifactId>
+          <version>${sitwt.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.seleniumhq.selenium</groupId>
+              <artifactId>selenium-java</artifactId>
+              <version>${selenium.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>io.appium</groupId>
+              <artifactId>java-client</artifactId>
+              <version>${appium.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.9</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>site</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.sitoolkit.wt</groupId>
         <artifactId>sit-wt-maven-plugin</artifactId>
-        <version>${sitwt.version}</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>${selenium.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>io.appium</groupId>
-            <artifactId>java-client</artifactId>
-            <version>${appium.version}</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
             <id>generate-test-sources</id>
@@ -69,7 +96,8 @@
           <execution>
             <id>open-evidence</id>
             <goals>
-              <goal>open-evidence</goal>
+              <goal>attach-evidence-link</goal>
+              <goal>open-report</goal>
             </goals>
           </execution>
         </executions>
@@ -109,6 +137,19 @@
     </plugins>
   </build>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.17</version>
+        <configuration>
+          <skipSurefireReport>true</skipSurefireReport>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
   <!-- Environment Settings -->
   <profiles>
     <profile>
@@ -135,6 +176,26 @@
         <threadCountClasses>1</threadCountClasses>
         <threadCountMethods>1</threadCountMethods>
       </properties>
+    </profile>
+
+    <profile>
+      <id>compare-evidence</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sitoolkit.wt</groupId>
+            <artifactId>sit-wt-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>compare-evidence</id>
+                <goals>
+                  <goal>compare-evidence</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 

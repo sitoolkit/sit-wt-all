@@ -3,3 +3,4 @@
 /testscript/入力TestScript*.xlsx
 ~$*
 .DS_Store
+/base-evidence/

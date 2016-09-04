@@ -34,6 +34,25 @@ public class TemplateEngineVelocityImpl implements TemplateEngine {
     @Override
     public void write(TemplateModel model) {
 
+        String str = writeToString(model);
+
+        File outdir = new File(model.getOutDir());
+        if (!outdir.exists()) {
+            outdir.mkdirs();
+        }
+
+        File file = new File(outdir, model.getFileBase() + "." + model.getFileExt());
+        try {
+            FileUtils.writeStringToFile(file, str);
+            LOG.info("ファイルに書き込みました {}", file.getAbsolutePath());
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public String writeToString(TemplateModel model) {
+
         Template template = templateCache.get(model.getTemplate());
         if (template == null) {
             template = Velocity.getTemplate(model.getTemplate());
@@ -45,18 +64,7 @@ public class TemplateEngineVelocityImpl implements TemplateEngine {
         StringWriter writer = new StringWriter();
         template.merge(context, writer);
 
-        File outdir = new File(model.getOutDir());
-        if (!outdir.exists()) {
-            outdir.mkdirs();
-        }
-
-        File file = new File(outdir, model.getFileBase() + "." + model.getFileExt());
-        try {
-            FileUtils.writeStringToFile(file, writer.toString());
-            LOG.info("ファイルに書き込みました {}", file.getAbsolutePath());
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        return writer.toString();
     }
 
     public String getVelocityProperties() {

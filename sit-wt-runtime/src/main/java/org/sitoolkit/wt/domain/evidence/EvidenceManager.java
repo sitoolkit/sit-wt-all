@@ -14,12 +14,14 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.SitPathUtils;
 import org.sitoolkit.wt.infra.TestException;
@@ -56,6 +58,9 @@ public class EvidenceManager implements ApplicationContextAware {
     private String logFilePath = "target/sit-wt.log";
     private Template tmpl;
     private ApplicationContext appCtx;
+
+    @Resource
+    PropertyManager pm;
 
     @PostConstruct
     public void init() {
@@ -132,7 +137,7 @@ public class EvidenceManager implements ApplicationContextAware {
 
     /**
      * エビデンスをファイルに書き出します。
-     * 
+     *
      * @param evidence
      *            エビデンス
      */
@@ -195,7 +200,9 @@ public class EvidenceManager implements ApplicationContextAware {
     }
 
     @PreDestroy
-    public void moveLogFile() {
+    public void preDestory() {
+        pm.save(evidenceDir);
+
         try {
             File logFile = new File(logFilePath);
             FileUtils.copyFileToDirectory(logFile, evidenceDir, true);
