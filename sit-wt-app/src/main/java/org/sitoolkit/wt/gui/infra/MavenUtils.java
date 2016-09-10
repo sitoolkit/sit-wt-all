@@ -1,6 +1,7 @@
 package org.sitoolkit.wt.gui.infra;
 
 import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MavenUtils {
@@ -10,6 +11,16 @@ public class MavenUtils {
     private static String mvnCommand = "";
 
     public static String getCommand() {
+        while (mvnCommand == null || mvnCommand.isEmpty()) {
+            LOG.info("wait for installing Maven...");
+
+            try {
+                Thread.sleep(3000L);
+            } catch (InterruptedException e) {
+                LOG.log(Level.WARNING, "", e);
+            }
+        }
+
         return mvnCommand;
     }
 
@@ -57,7 +68,7 @@ public class MavenUtils {
     }
 
     public static String install() {
-        File sitRepo = SystemUtils.isWindows() ? new File(System.getenv("ProgramData"), "sitoolkit")
+        File sitRepo = SystemUtils.isWindows() ? new File(System.getenv("ProgramData"), "sitoolkit/repository")
                 : new File(System.getProperty("user.home"), ".sitoolkit/repository");
 
         // TODO 外部化
