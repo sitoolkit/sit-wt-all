@@ -6,7 +6,7 @@
   <!-- The Basics -->
   <groupId>org.sitoolkit.wt</groupId>
   <artifactId>sit-wt-all</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <packaging>pom</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,6 +21,7 @@
     <version>7</version>
   </parent>
   <modules>
+    <module>sit-wt-app</module>
     <module>sit-wt-maven-plugin</module>
     <module>sit-wt-runtime</module>
   </modules>
