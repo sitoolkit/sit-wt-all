@@ -15,11 +15,18 @@
  */
 package org.sitoolkit.wt.app.selenium2script;
 
-import java.io.File;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import org.sitoolkit.wt.infra.TestException;
 
 /**
  *
@@ -29,16 +36,23 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
 
     private String testScriptPath;
 
+    private String backupedScriptPath = "seleniumscript-bk/SeleniumIDETestScript.html";
+
     @Before
     @Override
     public void setUp() {
-        File testScript = new File("testscript/SeleniumIDETestScript.xlsx/");
+        File testScript = new File("testscript/SeleniumIDETestScript.xlsx");
         if (testScript.exists()) {
             testScript.delete();
         }
 
         Selenium2Script converter = Selenium2Script.initInstance();
-        testScript = converter.convert(new File("seleniumscript/SeleniumIDETestScript.html"));
+        converter.setOpenScript(false);
+        int ret = converter.execute();
+
+        assertThat("実行結果コード", ret, is(0));
+        assertThat("バックアップされたSeleniumScriptファイル", new File(backupedScriptPath).exists(), is(true));
+
         testScriptPath = testScript.getAbsolutePath();
 
         testScript.deleteOnExit();
@@ -49,6 +63,19 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
     @Test
     public void test001() {
         test();
+    }
+
+    @After
+    @Override
+    public void tearDown() {
+        super.tearDown();
+
+        File seleniumScript = new File("seleniumscript-bk/SeleniumIDETestScript.html");
+        try {
+            FileUtils.moveFileToDirectory(seleniumScript, new File("seleniumscript"), false);
+        } catch (IOException e) {
+            throw new TestException(e);
+        }
     }
 
     @Override

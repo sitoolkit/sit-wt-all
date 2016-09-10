@@ -61,6 +61,8 @@ public class Selenium2Script implements ApplicationContextAware {
 
     private String outputDir = "testscript";
 
+    private String backupDir = "seleniumscript-bk";
+
     private String caseNo = "001";
 
     private boolean openScript = true;
@@ -88,6 +90,9 @@ public class Selenium2Script implements ApplicationContextAware {
      */
     public int execute() {
 
+        int ret = 0;
+        File bkdir = new File(backupDir);
+
         for (String seleniumScriptDir : seleniumScriptDirs.split(",")) {
             File scriptDir = new File(seleniumScriptDir);
             if (!scriptDir.exists()) {
@@ -99,17 +104,27 @@ public class Selenium2Script implements ApplicationContextAware {
                     recursive)) {
                 File sitScript = convert(seleniumScript);
 
+                try {
+                    log.info("Seleniumスクリプトを退避します {} -> {}", seleniumScript.getAbsolutePath(),
+                            bkdir.getAbsolutePath());
+                    FileUtils.moveFileToDirectory(seleniumScript, bkdir, true);
+                } catch (IOException e) {
+                    log.warn("Seleniumスクリプトの退避に失敗しました", e);
+                    ret = 1;
+                }
+
                 if (isOpenScript()) {
                     try {
                         Desktop.getDesktop().open(sitScript);
                     } catch (IOException e) {
-                        // NOP
+                        log.error("変換後のスクリプトを開けませんでした", e);
+                        ret = 2;
                     }
                 }
             }
         }
 
-        return 0;
+        return ret;
     }
 
     public File convert(File seleniumScript) {
