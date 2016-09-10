@@ -132,6 +132,10 @@ public class AppController implements Initializable {
         }
 
         pomFile = new File(projectDir, "pom.xml");
+        if (pomFile.exists()) {
+            statusLabel.setText("プロジェクトは既に存在します。");
+            return;
+        }
 
         // TODO 外部化
         String pomUrl = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml";
