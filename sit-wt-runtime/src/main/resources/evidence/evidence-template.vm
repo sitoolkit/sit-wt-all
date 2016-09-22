@@ -8,19 +8,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/jquery-ui.min.css" />
     <script src="js/jquery.js"></script>
     <script src="js/numbering.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/image.js"></script>
   </head>
   <body>
-    <div class="container">
-      <a href="./">エビデンスフォルダへ</a>
-      <div class="page-header">
-        <h1>テストエビデンス $testScriptName ケース_$caseNo $result</h1>
-      </div>
-    <table class="table">
+        <a href="./">エビデンスフォルダへ</a>
+    <h1>テストエビデンス $testScriptName ケース_$caseNo $result</h1>
+    <table>
       <thead>
         <tr>
           <th>No</th>
+          <th>タイムスタンプ</th>
           <th>操作ログ</th>
         </tr>
       </thead>
@@ -28,20 +29,20 @@
 #foreach ($rec in $records)
         <tr>
           <th>$rec.no</th>
+          <td>$rec.timestamp</td>
 #if ($rec.screenshot)
-                    <td class="screenshot">[$rec.timestamp] $rec.screenshot.fileName
-            <img src="$rec.screenshot.filePath" class="img-responsive"/>
+                    <td class="screenshot">$rec.screenshot.fileName
+            <img src="$rec.screenshot.filePath"/>
 #foreach ($pos in $rec.screenshot.positions)
             <input type="hidden" value='{"no":"$pos.no","x":$pos.x,"y":$pos.y,"w":$pos.w,"h":$pos.h}'/>
 #end ## foreach
 #else
-                    <td>[$rec.timestamp] $rec.log
+                    <td>$rec.log
 #end ## if
           </td>
         </tr>
 #end
       </tbody>
     </table>
-    </div>
   </body>
 </html>
