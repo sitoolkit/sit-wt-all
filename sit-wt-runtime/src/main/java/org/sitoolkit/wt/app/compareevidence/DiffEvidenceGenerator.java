@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.domain.evidence;
+package org.sitoolkit.wt.app.compareevidence;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.wt.domain.evidence.DiffEvidence;
+import org.sitoolkit.wt.domain.evidence.EvidenceDir;
+import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
 import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
 import org.slf4j.Logger;
@@ -46,6 +49,8 @@ public class DiffEvidenceGenerator {
 
     private TemplateEngine templateEngine;
 
+    private ScreenshotComparator screenshotComparator = new ScreenshotComparator();
+
     public static void main(String[] args) {
         DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
         generator.setCompareEvidence(new DiffEvidence());
@@ -58,36 +63,60 @@ public class DiffEvidenceGenerator {
     }
 
     /**
-     * 基準エビデンスと比較対象エビデンスとを比較し、差分エビデンスを生成します。
-     * 差分エビデンスは、対象エビデンスディレクトリ内のエビデンスファイル(html)と、同じファイル名の基準エビデンスに対し生成します。
-     * 差分エビデンスのファイルは対象エビデンスディレクトリ内に生成します。
+     * 基準エビデンスと対象エビデンスとの比較エビデンスを生成します。
+     * 比較エビデンスは、基準と対象それぞれのエビデンスディレクトリ内の同じファイル名のエビデンスファイル(html)に対して生成します。
+     * 比較エビデンスのファイルは対象エビデンスディレクトリ内に生成します。
+     * {@code compareScreenshot}に{@code true}を指定すると、
+     * エビデンス同士のスクリーンショットを比較し、それに対する比較エビデンスも生成します。
      *
-     * @param targetEvidenceDir
+     * @param baseDir
+     *            基準エビデンスディレクトリ
+     *
+     * @param targetDir
      *            対象エビデンスディレクトリ
-     * @param browser
-     *            対象エビデンスのテスト実行に使用したブラウザ
-     * @see EvidenceUtils#baseEvidenceDir(String)
+     *
+     * @param compareScreenshot
+     *            基準と対象のエビデンスのスクリーンショットの比較を行う場合にtrue
+     * @return 比較対象エビデンスの全スクリーンショットが基準と一致する場合にtrue (スクリーンショットの比較を行わない場合は常にtrue)
      */
-    public void generate(String targetEvidenceDir, String browser) {
-        File baseDir = EvidenceUtils.baseEvidenceDir(browser);
-        File targetDir = new File(targetEvidenceDir);
+    public boolean generate(EvidenceDir baseDir, EvidenceDir targetDir, boolean compareScreenshot) {
 
-        for (File htmlFile : FileUtils.listFiles(targetDir, new String[] { "html" }, true)) {
+        LOG.info("比較エビデンスを生成します {} <-> {}", baseDir.getDir(), targetDir.getDir());
 
-            String htmlName = htmlFile.getName();
-            if (htmlName.startsWith(COMPARE_PREFIX) || htmlName.equals(failsafeReportName)) {
-                continue;
+        boolean allSsMatches = false;
+
+        for (File evidenceFile : targetDir.getEvidenceFiles()) {
+
+            if (compareScreenshot) {
+                allSsMatches &= !screenshotComparator.compare(baseDir, targetDir, evidenceFile);
             }
 
-            generateDiffEvidence(baseDir, targetDir, htmlName);
+            generateDiffEvidence(baseDir, evidenceFile, false);
+
+            if (!allSsMatches) {
+                generateDiffEvidence(baseDir, evidenceFile, true);
+            }
         }
+
+        return allSsMatches;
 
     }
 
-    void generateDiffEvidence(File baseDir, File targetDir, String htmlName) {
+    /**
+     * 比較エビデンスを生成します。
+     *
+     * @param baseEvidenceDir
+     *            基準エビデンスディレクトリ
+     * @param evidenceFile
+     *            比較エビデンスの生成対象のエビデンス
+     * @param withUnmatch
+     *            不一致スクリーンショットに対する比較エビデンスを生成する場合にtrue
+     */
+    void generateDiffEvidence(EvidenceDir baseEvidenceDir, File evidenceFile, boolean withUnmatch) {
         // TODO 実装
     }
 
+    @Deprecated
     public void run(String mainBrowser, boolean isUnmatchCompare) {
         File latestEvidenceDir = EvidenceUtils.getLatestEvidenceDir();
 
@@ -108,8 +137,6 @@ public class DiffEvidenceGenerator {
         }
 
         File baseEvidenceDir = EvidenceUtils.baseEvidenceDir(baseBrowser);
-
-        LOG.info("{} <-> {}", baseEvidenceDir, latestEvidenceDir);
 
         for (File s : FileUtils.listFiles(latestEvidenceDir, new RegexFileFilter(evidenceFileRegex),
                 TrueFileFilter.INSTANCE)) {
@@ -201,7 +228,7 @@ public class DiffEvidenceGenerator {
             File imgLeftDirTo = new File(imgPathLeftTo);
             copy(imgLeftDirFrom, imgLeftDirTo);
 
-            LOG.info("差分エビデンスを生成しました {}", evidence);
+            LOG.info("比較エビデンスを生成しました {}", evidence);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,9 +1,11 @@
-package org.sitoolkit.wt.domain.evidence;
+package org.sitoolkit.wt.app.compareevidence;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.sitoolkit.wt.domain.evidence.EvidenceDir;
+import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,29 +17,23 @@ public class BaseEvidenceManager {
 
     public static void main(String[] args) {
         BaseEvidenceManager manager = new BaseEvidenceManager();
-        manager.setBaseEvidence(null, "default");
+        manager.setBaseEvidence(EvidenceDir.getLatest());
     }
 
     /**
      * 指定されたエビデンスを基準エビデンスとして確定します。
      *
-     *
-     * @param targetEvidenceDir
-     *            基準として確定するエビデンスのディレクトリ
-     * @param browser
-     *            対象エビデンスのテスト実行に使用したブラウザ
-     * @see EvidenceUtils#baseEvidenceDir(String)
+     * @param targetDir
+     *            基準として確定するエビデンスディレクトリ
      */
-    public void setBaseEvidence(String targetEvidenceDir, String browser) {
+    public void setBaseEvidence(EvidenceDir targetDir) {
 
-        File targetEvidenceDirObj = EvidenceUtils.targetEvidenceDir(targetEvidenceDir);
-
-        if (targetEvidenceDirObj == null) {
+        if (targetDir.exists()) {
             LOG.info("エビデンスがありません");
         } else {
-            File baseEvidenceDir = EvidenceUtils.baseEvidenceDir(browser);
-            LOG.info("エビデンス{}を基準エビデンスとして確定します {}", targetEvidenceDirObj, baseEvidenceDir);
-            copy(targetEvidenceDirObj, baseEvidenceDir);
+            EvidenceDir baseDir = EvidenceDir.getBase(targetDir.getBrowser());
+            LOG.info("基準エビデンスとして確定します {}", targetDir.getDir());
+            copy(targetDir.getDir(), baseDir.getDir());
 
         }
 

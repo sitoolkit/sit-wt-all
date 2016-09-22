@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.domain.evidence;
+package org.sitoolkit.wt.app.compareevidence;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
-import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
+import org.sitoolkit.wt.domain.evidence.EvidenceDir;
+import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +31,44 @@ public class ScreenshotComparator {
 
     private static final String UNMATCH_PREFIX = "unmatch_";
 
-    DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
+    // DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
 
     int openFileCount = 1;
 
     public static void main(String[] args) {
         ScreenshotComparator comparator = new ScreenshotComparator();
         comparator.compare(null, "default");
+    }
+
+    /**
+     * スクリーンショットを比較します。
+     *
+     * @param baseDir
+     *            基準エビデンスディレクトリ
+     * @param targetDir
+     *            比較対象エビデンスディレクトリ
+     * @param evidenceFile
+     *            比較対象エビデンス
+     * @return 比較対象エビデンスの全スクリーンショットが基準と一致する場合にtrue
+     */
+    public boolean compare(EvidenceDir baseDir, EvidenceDir targetDir, File evidenceFile) {
+        // TODO 実装
+
+        LOG.info("スクリーンショットを比較します {} {} <-> {}",
+                new Object[] { evidenceFile, baseDir.getDir(), targetDir.getDir() });
+
+        Map<String, File> baseSsMap = baseDir.getScreenshotFilesAsMap(evidenceFile.getName());
+        boolean match = false;
+
+        for (Entry<String, File> targetEntry : targetDir
+                .getScreenshotFilesAsMap(evidenceFile.getName()).entrySet()) {
+            File baseSs = baseSsMap.get(targetEntry.getKey());
+            File targetSs = targetEntry.getValue();
+
+            match |= compareOneScreenshot(baseSs, targetSs, 10, 10);
+        }
+
+        return match;
     }
 
     /**
@@ -45,6 +79,7 @@ public class ScreenshotComparator {
      *            対象エビデンスのテスト実行に使用したブラウザ
      * @see EvidenceUtils#baseEvidenceDir(String)
      */
+    @Deprecated
     public void compare(String targetEvidenceDir, String browser) {
 
         File latestEvidenceDir = EvidenceUtils.targetEvidenceDir(targetEvidenceDir);
@@ -79,16 +114,16 @@ public class ScreenshotComparator {
             }
         }
 
-        if (unmatchScreenshotNames.size() > 0) {
-
-            // スクリーンショットdiff作成
-            DiffEvidence diffEvidence = new DiffEvidence();
-            diffEvidence.setUnmatchScreenshotNames(unmatchScreenshotNames);
-            generator.setCompareEvidence(diffEvidence);
-            generator.setTemplateEngine(new TemplateEngineVelocityImpl());
-            generator.run(System.getProperty("main.browser"), true);
-
-        }
+        // if (unmatchScreenshotNames.size() > 0) {
+        //
+        // // スクリーンショットdiff作成
+        // DiffEvidence diffEvidence = new DiffEvidence();
+        // diffEvidence.setUnmatchScreenshotNames(unmatchScreenshotNames);
+        // generator.setCompareEvidence(diffEvidence);
+        // generator.setTemplateEngine(new TemplateEngineVelocityImpl());
+        // generator.run(System.getProperty("main.browser"), true);
+        //
+        // }
 
     }
 
@@ -247,12 +282,12 @@ public class ScreenshotComparator {
         return byteArray;
     }
 
-    public DiffEvidenceGenerator getBuilder() {
-        return generator;
-    }
-
-    public void setBuilder(DiffEvidenceGenerator builder) {
-        this.generator = builder;
-    }
+    // public DiffEvidenceGenerator getBuilder() {
+    // return generator;
+    // }
+    //
+    // public void setBuilder(DiffEvidenceGenerator builder) {
+    // this.generator = builder;
+    // }
 
 }

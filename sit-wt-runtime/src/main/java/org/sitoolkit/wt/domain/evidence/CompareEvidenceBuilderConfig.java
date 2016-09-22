@@ -2,6 +2,7 @@ package org.sitoolkit.wt.domain.evidence;
 
 import javax.annotation.Resource;
 
+import org.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
 import org.sitoolkit.wt.app.config.BaseConfig;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
 import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;

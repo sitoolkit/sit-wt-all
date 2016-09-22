@@ -1,21 +1,15 @@
 package org.sitoolkit.wt.infra;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,25 +112,7 @@ public class PropertyManager {
     }
 
     public void save(File dir) {
-        try (FileWriter writer = new FileWriter(new File(dir, "sit-wt.properties"))) {
-
-            Map<String, String> map = new TreeMap<>();
-            map.putAll(BeanUtils.describe(this));
-
-            Properties prop = new Properties();
-
-            for (Entry<String, String> entry : map.entrySet()) {
-                prop.setProperty(entry.getKey(), StringUtils.defaultString(entry.getValue()));
-            }
-
-            prop.store(writer, "");
-
-        } catch (Exception e) {
-            LOG.error("プロパティの保存で例外が発生しました", e);
-        }
-    }
-
-    public static void main(String[] args) {
+        PropertyUtils.save(this, new File(dir, "sit-wt.properties"));
     }
 
     void setDriverFlags(String driverType, String browserName) {

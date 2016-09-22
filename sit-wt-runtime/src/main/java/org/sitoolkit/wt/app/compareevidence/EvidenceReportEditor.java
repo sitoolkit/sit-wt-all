@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.domain.evidence;
+package org.sitoolkit.wt.app.compareevidence;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
+import org.sitoolkit.wt.domain.evidence.ReportOpener;
 import org.sitoolkit.wt.infra.TestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,7 @@ public class EvidenceReportEditor {
         editor.attachEvidenceLink();
     }
 
+    @Deprecated
     public void attachEvidenceLink() {
         File evidenceDir = EvidenceUtils.getLatestEvidenceDir();
 

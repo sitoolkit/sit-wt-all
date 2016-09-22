@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.domain.evidence;
+package org.sitoolkit.wt.app.compareevidence;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -17,12 +17,15 @@ import javax.json.JsonReader;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.wt.domain.evidence.EvidenceDir;
+import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
+import org.sitoolkit.wt.domain.evidence.MaskInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MaskEvidenceGenerator {
+public class MaskScreenshotGenerator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MaskEvidenceGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MaskScreenshotGenerator.class);
 
     private static final String BASE_EVIDENCE_PATH = "base_evidence";
 
@@ -33,7 +36,7 @@ public class MaskEvidenceGenerator {
     private List<String> maskedImageList = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
-        MaskEvidenceGenerator generator = new MaskEvidenceGenerator();
+        MaskScreenshotGenerator generator = new MaskScreenshotGenerator();
         generator.generate(null, "default");
     }
 
@@ -48,11 +51,48 @@ public class MaskEvidenceGenerator {
      * マスク処理に使用したマスク情報ファイルは基準エビデンスディレクトリ以下に移動します。
      * マスク処理後のスクリーンショットファイルは、処理前のファイルと同じディレクトリに保存し、ファイル名の先頭に"mask_"を付与します。
      *
-     * @param targetEvidenceDir
+     * @param targetDir
      *            マスク処理を行うエビデンスのディレクトリ
-     * @param browser
-     *            対象エビデンスのテスト実行に使用したブラウザ
+     * @return マスク後の画像ファイル
      */
+    public List<File> generate(EvidenceDir targetDir) {
+
+        LOG.info("スクリーンショットのマスク処理を行います ", targetDir.getDir());
+
+        EvidenceDir baseDir = EvidenceDir.getBase(targetDir.getBrowser());
+        MaskInfo maskInfo = MaskInfo.load(baseDir);
+
+        List<File> maskedFiles = new ArrayList<>();
+
+        for (File evidence : targetDir.getEvidenceFiles()) {
+
+            for (File screenshot : targetDir.getScreenshots(evidence.getName())) {
+                maskedFiles.add(mask(screenshot, maskInfo));
+            }
+
+        }
+
+        return maskedFiles;
+    }
+
+    /**
+     * 画像ファイルをマスク情報に従ってマスクします。
+     *
+     * @param imgFile
+     *            マスク対象の画像ファイル
+     * @param maskInfo
+     *            マスク情報
+     * @return マスク後の画像ファイル
+     *
+     */
+    public File mask(File imgFile, MaskInfo maskInfo) {
+
+        // TODO 実装
+
+        return null;
+    }
+
+    @Deprecated
     public void generate(String targetEvidenceDir, String browser) {
 
         File targetEvidenceDirObj = EvidenceUtils.targetEvidenceDir(targetEvidenceDir);
@@ -143,11 +183,10 @@ public class MaskEvidenceGenerator {
         }
     }
 
-    private void maskOneScreenshot(String imgPath, JsonArray posStyles, File screenshotFile) {
+    void maskOneScreenshot(String imgPath, JsonArray posStyles, File screenshotFile) {
 
-        BufferedImage bi;
         try {
-            bi = ImageIO.read(screenshotFile);
+            BufferedImage bi = ImageIO.read(screenshotFile);
             Graphics2D g = bi.createGraphics();
             g.setPaint(Color.BLACK);
             String maskedScreenshotName = MASK_PREFIX + screenshotFile.getName();
@@ -163,7 +202,7 @@ public class MaskEvidenceGenerator {
                 ImageIO.write(bi, "png",
                         new File(EvidenceUtils.concatPath(imgPath, maskedScreenshotName)));
             }
-            LOG.info("マスク処理済みスクリーンショット[{}]を生成しました。", maskedScreenshotName);
+            LOG.info("スクリーンショットをマスクしましたを生成しました {}", maskedScreenshotName);
 
         } catch (IOException e) {
             e.printStackTrace();

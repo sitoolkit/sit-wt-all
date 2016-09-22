@@ -74,6 +74,7 @@ public class EvidenceUtils {
         }
     }
 
+    @Deprecated
     public static String concatPath(String a, String b) {
         return a.endsWith("/") ? a + b : a + "/" + b;
     }
@@ -96,4 +97,5 @@ public class EvidenceUtils {
 
         return sb.toString();
     }
+
 }
