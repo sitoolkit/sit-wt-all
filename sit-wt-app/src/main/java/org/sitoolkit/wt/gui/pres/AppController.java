@@ -13,6 +13,7 @@ import org.sitoolkit.wt.gui.infra.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.StageResizer;
+import org.sitoolkit.wt.gui.infra.SystemUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
 
 import javafx.application.Platform;
@@ -106,6 +107,8 @@ public class AppController implements Initializable {
                 Bindings.and(projectState.getRunning(), debugCheck.selectedProperty()));
 
         parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
+
+        browserChoice.getItems().addAll(SystemUtils.getBrowsers());
 
         // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
         projectState.getInitialized().setValue(pomFile.exists());
