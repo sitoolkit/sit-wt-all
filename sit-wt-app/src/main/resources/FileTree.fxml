@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.FileTreeController">
+  <TreeView fx:id="fileTree">
+    <contextMenu>
+      <ContextMenu>
+        <items>
+          <MenuItem mnemonicParsing="false" onAction="#open" text="開く" />
+          <Menu text="新規">
+            <MenuItem mnemonicParsing="false" text="スクリプト" onAction="#newScript" />
+            <MenuItem mnemonicParsing="false" text="フォルダー" onAction="#newFolder" />
+          </Menu>
+          <MenuItem mnemonicParsing="false" onAction="#rename" text="名称変更" />
+<!-- 元に戻す機能を実装するまではコメントアウト
+          <MenuItem mnemonicParsing="false" onAction="#delete" text="削除" />
+ -->
+         </items>
+      </ContextMenu>
+    </contextMenu>
+  </TreeView>
+</VBox>
+

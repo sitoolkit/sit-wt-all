@@ -6,17 +6,18 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -39,7 +40,7 @@
    <center>
       <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
          <items>
-            <TreeView fx:id="fileTree" />
+          <fx:include fx:id="fileTree" source="FileTree.fxml"/>
           <TextArea fx:id="console" editable="false" />
          </items>
       </SplitPane>
@@ -51,18 +52,16 @@
               <menus>
                 <Menu mnemonicParsing="false" text="ファイル">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="プロジェクトを作成" onAction="#createProject"/>
-                    <MenuItem mnemonicParsing="false" text="プロジェクトを開く" onAction="#openProject"/>
-                    <MenuItem mnemonicParsing="false" text="サンプルを取得" onAction="#getSample"/>
-                    <MenuItem mnemonicParsing="false" text="閉じる" />
+                    <MenuItem mnemonicParsing="false" onAction="#createProject" text="プロジェクトを作成" />
+                    <MenuItem mnemonicParsing="false" onAction="#openProject" text="プロジェクトを開く" />
+                    <SeparatorMenuItem />
+                    <MenuItem mnemonicParsing="false" onAction="#getSample" text="サンプルを取得" />
+                    <SeparatorMenuItem />
+                    <MenuItem mnemonicParsing="false" text="テストスクリプトを作成" />
+                    <MenuItem mnemonicParsing="false" text="テストスクリプトを開く" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu mnemonicParsing="false" text="ヘルプ">
                   <items>
                     <MenuItem mnemonicParsing="false" text="About" />
                   </items>

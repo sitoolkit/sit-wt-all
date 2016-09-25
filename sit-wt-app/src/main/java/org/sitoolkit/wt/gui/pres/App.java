@@ -36,6 +36,8 @@ public class App extends Application {
         });
 
         FxContext.setPrimaryStage(primaryStage);
+        FxContext.setHostServices(getHostServices());
+
         LogUtils.init();
         Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
 

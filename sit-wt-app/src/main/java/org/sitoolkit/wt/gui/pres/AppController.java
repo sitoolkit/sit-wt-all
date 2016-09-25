@@ -1,23 +1,18 @@
 package org.sitoolkit.wt.gui.pres;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.gui.domain.MavenConsoleListener;
 import org.sitoolkit.wt.gui.domain.ProjectState;
 import org.sitoolkit.wt.gui.domain.SitWtRuntimeUtils;
-import org.sitoolkit.wt.gui.infra.CheckBoxFileTreeItem;
 import org.sitoolkit.wt.gui.infra.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.FileWrapper;
+import org.sitoolkit.wt.gui.infra.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
-import org.sitoolkit.wt.gui.infra.UnExpectedException;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -25,20 +20,21 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
-import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 public class AppController implements Initializable {
+
+    private static final String POM_URL = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml";
 
     @FXML
     private ToolBar projectGroup;
@@ -86,10 +82,10 @@ public class AppController implements Initializable {
     private ToggleButton logButton;
 
     @FXML
-    private TreeView<FileWrapper> fileTree;
+    private Label statusLabel;
 
     @FXML
-    private Label statusLabel;
+    private FileTreeController fileTreeController;
 
     private ConversationProcess mvnProcess = new ConversationProcess();
 
@@ -109,13 +105,12 @@ public class AppController implements Initializable {
         setVisible(debugGroup,
                 Bindings.and(projectState.getRunning(), debugCheck.selectedProperty()));
 
-        initFileTree();
-
         parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
 
         // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
         projectState.getInitialized().setValue(pomFile.exists());
         if (pomFile.exists()) {
+            fileTreeController.setFileTreeRoot(pomFile);
             FxContext.setTitie(pomFile.getAbsoluteFile().getParentFile().getAbsolutePath());
             statusLabel.setText("");
         } else {
@@ -127,22 +122,6 @@ public class AppController implements Initializable {
     private void setVisible(Node node, ObservableBooleanValue visible) {
         node.visibleProperty().bind(visible);
         node.managedProperty().bind(visible);
-    }
-
-    private void initFileTree() {
-        fileTree.setEditable(true);
-        fileTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        fileTree.setCellFactory(CheckBoxTreeCell.<FileWrapper> forTreeView());
-        fileTree.setShowRoot(true);
-    }
-
-    private void setFileTreeRoot() {
-        File testscriptDir = new File(pomFile.getParent(), "testscript");
-        if (!testscriptDir.exists()) {
-            testscriptDir.mkdirs();
-        }
-
-        fileTree.setRoot(new CheckBoxFileTreeItem(testscriptDir));
     }
 
     @FXML
@@ -164,16 +143,11 @@ public class AppController implements Initializable {
         }
 
         // TODO 外部化
-        String pomUrl = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml";
-        try (InputStream pom = new URL(pomUrl).openStream()) {
-            Files.copy(pom, pomFile.toPath());
-        } catch (IOException e) {
-            throw new UnExpectedException(e);
-        }
+        FileIOUtils.download(POM_URL, pomFile);
 
         projectState.getInitialized().set(pomFile.exists());
         if (pomFile.exists()) {
-            setFileTreeRoot();
+            fileTreeController.setFileTreeRoot(pomFile);
             FxContext.setTitie(pomFile.getParentFile().getAbsolutePath());
             statusLabel.setText("プロジェクトを作成しました。");
         }
@@ -194,7 +168,7 @@ public class AppController implements Initializable {
         pomFile = new File(projectDir, "pom.xml");
 
         if (pomFile.exists()) {
-            setFileTreeRoot();
+            fileTreeController.setFileTreeRoot(pomFile);
             projectState.getInitialized().set(true);
             statusLabel.setText("プロジェクトを開きました。");
         } else {
@@ -210,17 +184,26 @@ public class AppController implements Initializable {
                 MavenUtils.getCommand(), "sit-wt:sample");
 
         mvnProcess.waitFor(() -> Platform.runLater(() -> {
-            fileTree.refresh();
             statusLabel.setText("サンプルを取得しました。");
         }));
     }
 
     @FXML
     public void run() {
+        List<File> selectedFiles = fileTreeController.getSelectedFiles();
+
+        if (selectedFiles.isEmpty()) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("");
+            alert.setContentText("");
+            alert.setHeaderText("実行するテストスクリプトを選択してください。");
+            alert.show();
+            return;
+        }
+
         statusLabel.setText("テストを実行します。");
 
-        List<String> command = SitWtRuntimeUtils.buildCommand(
-                ((CheckBoxFileTreeItem) fileTree.getRoot()).getSelectedFiles(),
+        List<String> command = SitWtRuntimeUtils.buildCommand(selectedFiles,
                 debugCheck.isSelected(), !parallelCheck.isDisabled() && parallelCheck.isSelected(),
                 browserChoice.getSelectionModel().getSelectedItem());
 
