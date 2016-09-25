@@ -5,13 +5,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.gui.domain.MavenConsoleListener;
 import org.sitoolkit.wt.gui.domain.ProjectState;
+import org.sitoolkit.wt.gui.domain.SitWtRuntimeUtils;
+import org.sitoolkit.wt.gui.infra.CheckBoxFileTreeItem;
 import org.sitoolkit.wt.gui.infra.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.FileWrapper;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
@@ -27,9 +29,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -81,6 +86,9 @@ public class AppController implements Initializable {
     private ToggleButton logButton;
 
     @FXML
+    private TreeView<FileWrapper> fileTree;
+
+    @FXML
     private Label statusLabel;
 
     private ConversationProcess mvnProcess = new ConversationProcess();
@@ -101,6 +109,8 @@ public class AppController implements Initializable {
         setVisible(debugGroup,
                 Bindings.and(projectState.getRunning(), debugCheck.selectedProperty()));
 
+        initFileTree();
+
         parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
 
         // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
@@ -117,6 +127,22 @@ public class AppController implements Initializable {
     private void setVisible(Node node, ObservableBooleanValue visible) {
         node.visibleProperty().bind(visible);
         node.managedProperty().bind(visible);
+    }
+
+    private void initFileTree() {
+        fileTree.setEditable(true);
+        fileTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        fileTree.setCellFactory(CheckBoxTreeCell.<FileWrapper> forTreeView());
+        fileTree.setShowRoot(true);
+    }
+
+    private void setFileTreeRoot() {
+        File testscriptDir = new File(pomFile.getParent(), "testscript");
+        if (!testscriptDir.exists()) {
+            testscriptDir.mkdirs();
+        }
+
+        fileTree.setRoot(new CheckBoxFileTreeItem(testscriptDir));
     }
 
     @FXML
@@ -147,6 +173,7 @@ public class AppController implements Initializable {
 
         projectState.getInitialized().set(pomFile.exists());
         if (pomFile.exists()) {
+            setFileTreeRoot();
             FxContext.setTitie(pomFile.getParentFile().getAbsolutePath());
             statusLabel.setText("プロジェクトを作成しました。");
         }
@@ -166,9 +193,10 @@ public class AppController implements Initializable {
 
         pomFile = new File(projectDir, "pom.xml");
 
-        if (pomFile != null && pomFile.exists()) {
+        if (pomFile.exists()) {
+            setFileTreeRoot();
             projectState.getInitialized().set(true);
-            statusLabel.setText("プロジェクトを作成しました。");
+            statusLabel.setText("プロジェクトを開きました。");
         } else {
             statusLabel.setText("pom.xmlの無いフォルダは無効です。");
         }
@@ -181,31 +209,20 @@ public class AppController implements Initializable {
         mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
                 MavenUtils.getCommand(), "sit-wt:sample");
 
-        mvnProcess.waitFor(() -> Platform.runLater(() -> statusLabel.setText("サンプルを取得しました。")));
+        mvnProcess.waitFor(() -> Platform.runLater(() -> {
+            fileTree.refresh();
+            statusLabel.setText("サンプルを取得しました。");
+        }));
     }
 
     @FXML
     public void run() {
         statusLabel.setText("テストを実行します。");
 
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
-        command.add("clean");
-        command.add("verify");
-
-        List<String> profiles = new ArrayList<>();
-        if (debugCheck.isSelected()) {
-            profiles.add("debug");
-        }
-        if (!parallelCheck.isDisabled() && parallelCheck.isSelected()) {
-            profiles.add("parallel");
-        }
-        if (!profiles.isEmpty()) {
-            command.add("-P" + String.join(",", profiles));
-        }
-
-        command.add("-Ddriver.type=" + browserChoice.getSelectionModel().getSelectedItem());
-
+        List<String> command = SitWtRuntimeUtils.buildCommand(
+                ((CheckBoxFileTreeItem) fileTree.getRoot()).getSelectedFiles(),
+                debugCheck.isSelected(), !parallelCheck.isDisabled() && parallelCheck.isSelected(),
+                browserChoice.getSelectionModel().getSelectedItem());
 
         mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);

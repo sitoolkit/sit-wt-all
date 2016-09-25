@@ -24,7 +24,7 @@ public class ConversationProcess {
         try {
             pb.directory(directory);
             process = pb.start();
-            LOG.info("process " + process + " starts");
+            LOG.info("process " + process + " starts " + command);
 
             ExecutorContainer.get()
                     .execute(new ConsoleStreamReader(process.getInputStream(), console));
