@@ -70,6 +70,7 @@
             </MenuBar>
             <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
                <children>
+<!--  
                 <ToolBar fx:id="projectGroup">
                   <items>
                         <MenuButton mnemonicParsing="false" text="プロジェクト">
@@ -81,9 +82,12 @@
                         </MenuButton>
                   </items>
                 </ToolBar>
+-->
                   <ToolBar fx:id="startGroup">
                     <items>
-                        <Separator orientation="VERTICAL" />
+<!--  
+                     <Separator orientation="VERTICAL" />
+-->
                     <Button fx:id="runButton" mnemonicParsing="false" onAction="#run" text="実行" />
                         <CheckBox fx:id="debugCheck" mnemonicParsing="false" text="デバッグ" />
                         <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
@@ -111,11 +115,13 @@
                     <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="一時停止" />
                     <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="戻る" />
                     <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="進む" />
+<!--  
                         <Button accessibleHelp="現在実行中のスクリプトを開きます。" mnemonicParsing="false" onAction="#openScript" text="スクリプトを開く" />
+-->
                     <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプトを生成" />
                      </items>
                   </ToolBar>
-              <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#toggleConsole" text="ログ" />
+              <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow" text="縮小" />
                </children>
             </HBox>
          </children>

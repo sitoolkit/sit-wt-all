@@ -12,6 +12,7 @@ import org.sitoolkit.wt.gui.infra.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
+import org.sitoolkit.wt.gui.infra.StageResizer;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
 
 import javafx.application.Platform;
@@ -27,7 +28,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -36,8 +36,8 @@ public class AppController implements Initializable {
 
     private static final String POM_URL = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml";
 
-    @FXML
-    private ToolBar projectGroup;
+    // @FXML
+    // private ToolBar projectGroup;
 
     @FXML
     private ToolBar startGroup;
@@ -79,7 +79,7 @@ public class AppController implements Initializable {
     private Button exportButton;
 
     @FXML
-    private ToggleButton logButton;
+    private Button toggleButton;
 
     @FXML
     private Label statusLabel;
@@ -98,7 +98,7 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        setVisible(projectGroup, Bindings.not(projectState.getRunning()));
+        // setVisible(projectGroup, Bindings.not(projectState.getRunning()));
         setVisible(startGroup, Bindings.and(projectState.getInitialized(),
                 Bindings.not(projectState.getRunning())));
         setVisible(runningGroup, projectState.getRunning());
@@ -254,15 +254,26 @@ public class AppController implements Initializable {
         projectState.getRunning().set(false);
     }
 
+    private double stageHeight;
+
+    private double stageWidth;
+
     @FXML
-    public void toggleConsole() {
+    public void toggleWindow() {
         Stage primaryStage = FxContext.getPrimaryStage();
-        if (logButton.isSelected()) {
-            // TODO コンソールのサイズ設定
-            primaryStage.setHeight(400);
+
+        if ("拡大".equals(toggleButton.getText())) {
+            StageResizer.resize(primaryStage, stageWidth, stageHeight);
+            toggleButton.setText("縮小");
+
         } else {
-            console.setPrefHeight(0);
-            primaryStage.setHeight(primaryStage.getMinHeight());
+
+            stageHeight = primaryStage.getHeight();
+            stageWidth = primaryStage.getWidth();
+            // TODO コンソールのサイズ設定
+            StageResizer.resize(primaryStage, 450, 90);
+
+            toggleButton.setText("拡大");
         }
     }
 
