@@ -8,6 +8,7 @@ import org.sitoolkit.wt.gui.infra.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.LogUtils;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
+import org.sitoolkit.wt.gui.infra.PropertyManager;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -53,6 +54,7 @@ public class App extends Application {
 
     @Override
     public void stop() throws Exception {
+        PropertyManager.get().save();
         ExecutorContainer.get().shutdown();
     }
 }

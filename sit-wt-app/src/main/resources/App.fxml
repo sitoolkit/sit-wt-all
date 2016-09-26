@@ -1,30 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity"
-  prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="org.sitoolkit.wt.gui.pres.AppController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <bottom>
     <HBox BorderPane.alignment="CENTER">
       <children>
@@ -61,6 +54,11 @@
                 <SeparatorMenuItem />
                 <MenuItem mnemonicParsing="false" text="テストスクリプトを作成" />
                 <MenuItem mnemonicParsing="false" text="テストスクリプトを開く" />
+                        <Menu mnemonicParsing="false" text="基底URL" fx:id="baseUrlMenu">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="新規" onAction="#newBaseUrl" />
+                          </items>
+                        </Menu>
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="ヘルプ">
@@ -96,15 +94,13 @@
                 <Separator orientation="VERTICAL" />
                 <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="一時停止" />
                 <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="戻る" />
-                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward"
-                  text="進む" />
+                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="進む" />
                 <!-- <Button accessibleHelp="現在実行中のスクリプトを開きます。" mnemonicParsing="false" onAction="#openScript" 
                   text="スクリプトを開く" /> -->
                 <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプトを生成" />
               </items>
             </ToolBar>
-            <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow"
-              text="縮小" />
+            <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow" text="縮小" />
           </children>
         </HBox>
       </children>
