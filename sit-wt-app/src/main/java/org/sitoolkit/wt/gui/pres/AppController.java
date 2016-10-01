@@ -3,9 +3,7 @@ package org.sitoolkit.wt.gui.pres;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 import org.sitoolkit.wt.gui.domain.MavenConsoleListener;
 import org.sitoolkit.wt.gui.domain.ProjectState;
@@ -29,13 +27,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToolBar;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -72,6 +68,9 @@ public class AppController implements Initializable {
     private ChoiceBox<String> browserChoice;
 
     @FXML
+    private ComboBox<String> baseUrlCombo;
+
+    @FXML
     private Button pauseButton;
 
     @FXML
@@ -101,8 +100,6 @@ public class AppController implements Initializable {
 
     private File pomFile = new File("pom.xml");
 
-    private String baseUrl;
-
     private MavenConsoleListener mavenConsoleListener = new MavenConsoleListener();
 
     @Override
@@ -128,6 +125,10 @@ public class AppController implements Initializable {
             statusLabel.setText("[プロジェクト]>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
         }
 
+    }
+
+    public void destroy() {
+        PropertyManager.get().setBaseUrls(baseUrlCombo.getItems());
     }
 
     private void setVisible(Node node, ObservableBooleanValue visible) {
@@ -196,20 +197,11 @@ public class AppController implements Initializable {
         projectState.getInitialized().set(true);
         PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
 
-        for (String baseUrl : PropertyManager.get().getBaseUrls()) {
-            addBaseUrlMenu(baseUrl);
+        List<String> baseUrls = PropertyManager.get().getBaseUrls();
+        if (!baseUrls.isEmpty()) {
+            baseUrlCombo.getItems().addAll(baseUrls);
+            baseUrlCombo.setValue(baseUrls.get(0));
         }
-        String selectedBaseUrl = PropertyManager.get().getSelectedBaseUrl();
-        for (CheckMenuItem item : filter()) {
-            if (item.getText().equals(selectedBaseUrl)) {
-                item.setSelected(true);
-            }
-        }
-    }
-
-    private List<CheckMenuItem> filter() {
-        return baseUrlMenu.getItems().stream().filter(item -> item instanceof CheckMenuItem)
-                .map(item -> (CheckMenuItem) item).collect(Collectors.toList());
     }
 
     @FXML
@@ -222,59 +214,6 @@ public class AppController implements Initializable {
         mvnProcess.waitFor(() -> Platform.runLater(() -> {
             statusLabel.setText("サンプルを取得しました。");
         }));
-    }
-
-    @FXML
-    public void newBaseUrl() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setContentText("基底URLを入力してください。");
-
-        Optional<String> result = dialog.showAndWait();
-
-        result.ifPresent(baseUrl -> {
-
-            this.baseUrl = baseUrl;
-            addBaseUrlMenu(baseUrl);
-
-        });
-
-    }
-
-    private void addBaseUrlMenu(String baseUrl) {
-        CheckMenuItem mi = new CheckMenuItem(baseUrl);
-
-        if (baseUrlMenu.getItems().size() == 1) {
-
-            SeparatorMenuItem separator = new SeparatorMenuItem();
-            baseUrlMenu.getItems().add(separator);
-
-        } else {
-
-            long sameBaseUrlItemCount = baseUrlMenu.getItems().stream()
-                    .filter(item -> item instanceof CheckMenuItem)
-                    .filter(item -> item.getText().equals(baseUrl)).count();
-
-            if (sameBaseUrlItemCount > 0) {
-                return;
-            }
-
-        }
-
-        int historyCount = baseUrlMenu.getItems().size();
-        if (historyCount > 4) {
-            baseUrlMenu.getItems().remove(historyCount - 1);
-        }
-        baseUrlMenu.getItems().add(2, mi);
-        PropertyManager.get().addBaseUrl(baseUrl);
-
-        mi.setOnAction(event -> {
-
-            baseUrlMenu.getItems().stream().filter(item -> item instanceof CheckMenuItem)
-                    .map(item -> (CheckMenuItem) item).filter(item -> item != event.getSource())
-                    .forEach(item -> item.setSelected(false));
-
-            this.baseUrl = mi.getText();
-        });
     }
 
     @FXML
@@ -292,9 +231,12 @@ public class AppController implements Initializable {
 
         statusLabel.setText("テストを実行します。");
 
+        String baseUrl = baseUrlCombo.getValue();
+        addBaseUrl(baseUrl);
+
         List<String> command = SitWtRuntimeUtils.buildCommand(selectedFiles,
                 debugCheck.isSelected(), !parallelCheck.isDisabled() && parallelCheck.isSelected(),
-                browserChoice.getSelectionModel().getSelectedItem());
+                browserChoice.getSelectionModel().getSelectedItem(), baseUrl);
 
         mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);
@@ -304,6 +246,20 @@ public class AppController implements Initializable {
             projectState.getRunning().set(false);
             Platform.runLater(() -> statusLabel.setText("テストを終了します。"));
         });
+    }
+
+    private void addBaseUrl(String baseUrl) {
+        List<String> items = baseUrlCombo.getItems();
+        int limit = PropertyManager.get().getBaseUrlLimit();
+
+        if (!items.contains(baseUrl)) {
+            items.add(0, baseUrl);
+        }
+
+        if (items.size() > limit) {
+            items.remove(limit);
+        }
+        baseUrlCombo.setValue(baseUrl);
     }
 
     @FXML
@@ -360,7 +316,7 @@ public class AppController implements Initializable {
             stageHeight = primaryStage.getHeight();
             stageWidth = primaryStage.getWidth();
             // TODO コンソールのサイズ設定
-            StageResizer.resize(primaryStage, 450, 90);
+            StageResizer.resize(primaryStage, 600, 90);
 
             toggleButton.setText("拡大");
         }

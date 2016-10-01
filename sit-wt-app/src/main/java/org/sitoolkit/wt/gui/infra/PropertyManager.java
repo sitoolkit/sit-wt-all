@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -18,6 +19,8 @@ public class PropertyManager {
 
     private static final String BASE_URL = "baseUrl";
 
+    private static final String BASE_URL_LIMIT = "baseUrlLimit";
+
     private static final String SELECTED_BASE_URL = "selectedBaseUrl";
 
     private static final Logger LOG = Logger.getLogger(PropertyManager.class.getName());
@@ -27,6 +30,8 @@ public class PropertyManager {
     private Properties prop = new Properties();
 
     private File baseDir;
+
+    private List<String> baseUrls = new ArrayList<>();
 
     private PropertyManager() {
     }
@@ -49,7 +54,12 @@ public class PropertyManager {
         try (FileInputStream fis = new FileInputStream(propertyFile)) {
 
             prop.load(fis);
-            LOG.log(Level.INFO, "loaded properties : ", prop);
+            LOG.log(Level.INFO, "loaded properties : {0}", prop);
+
+            List<String> savedBaseUrls = Arrays.asList(getProp(BASE_URL).split(SEPARATOR));
+            savedBaseUrls = savedBaseUrls.subList(0,
+                    Math.min(savedBaseUrls.size(), getBaseUrlLimit()));
+            baseUrls.addAll(savedBaseUrls);
 
         } catch (IOException e) {
 
@@ -66,9 +76,10 @@ public class PropertyManager {
 
         try (FileOutputStream fos = new FileOutputStream(new File(baseDir, FILE_NAME), false)) {
 
-            prop.store(fos, "");
+            setProp(BASE_URL, StrUtils.join(baseUrls));
 
-            LOG.log(Level.INFO, "saved properties : ", prop);
+            prop.store(fos, "SI-Toolkit for Web Testing");
+            LOG.log(Level.INFO, "saved properties : {0}", prop);
 
         } catch (IOException e) {
 
@@ -78,41 +89,27 @@ public class PropertyManager {
 
     }
 
+    public void setBaseUrls(List<String> baseUrls) {
+        this.baseUrls = baseUrls;
+    }
+
     public List<String> getBaseUrls() {
-
-        List<String> baseUrls = new ArrayList<>();
-
-        for (String baseUrl : prop.getProperty(BASE_URL).split(SEPARATOR)) {
-            baseUrls.add(baseUrl.trim());
-        }
-
         return baseUrls;
-
     }
 
-    public void addBaseUrl(String baseUrl) {
-
-        String existingBaseUrls = prop(BASE_URL);
-        if (!existingBaseUrls.isEmpty()) {
-            baseUrl = baseUrl + SEPARATOR;
-        }
-
-        prop(BASE_URL, baseUrl + prop(BASE_URL));
+    public int getBaseUrlLimit() {
+        return Integer.parseInt(getProp(BASE_URL_LIMIT, "5"));
     }
 
-    public String getSelectedBaseUrl() {
-        return prop(SELECTED_BASE_URL);
+    private String getProp(String key) {
+        return getProp(key, "");
     }
 
-    public void setSelectedBaseUrl(String selectedBaseUrl) {
-        prop(SELECTED_BASE_URL, selectedBaseUrl);
+    private String getProp(String key, String defaultValue) {
+        return prop.getProperty(key, defaultValue);
     }
 
-    private String prop(String key) {
-        return prop.getProperty(key, "");
-    }
-
-    private void prop(String key, String value) {
+    private void setProp(String key, String value) {
         prop.setProperty(key, value);
     }
 }

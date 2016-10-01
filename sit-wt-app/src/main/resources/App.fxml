@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ComboBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <bottom>
@@ -54,11 +55,6 @@
                 <SeparatorMenuItem />
                 <MenuItem mnemonicParsing="false" text="テストスクリプトを作成" />
                 <MenuItem mnemonicParsing="false" text="テストスクリプトを開く" />
-                        <Menu mnemonicParsing="false" text="基底URL" fx:id="baseUrlMenu">
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="新規" onAction="#newBaseUrl" />
-                          </items>
-                        </Menu>
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="ヘルプ">
@@ -81,6 +77,7 @@
                 <CheckBox fx:id="debugCheck" mnemonicParsing="false" text="デバッグ" />
                 <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
                 <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
+                <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL"/>
               </items>
             </ToolBar>
             <ToolBar fx:id="runningGroup">

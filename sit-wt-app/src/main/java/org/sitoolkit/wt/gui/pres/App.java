@@ -22,6 +22,8 @@ public class App extends Application {
 
     private static final Logger LOG = LogUtils.get(App.class);
 
+    private AppController controller;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -44,7 +46,9 @@ public class App extends Application {
 
         primaryStage.setTitle("SI-Toolkit for Web Testing");
 
-        Parent root = FXMLLoader.load(getClass().getResource("/App.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
+        Parent root = loader.load();
+        controller = loader.getController();
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
@@ -54,6 +58,7 @@ public class App extends Application {
 
     @Override
     public void stop() throws Exception {
+        controller.destroy();
         PropertyManager.get().save();
         ExecutorContainer.get().shutdown();
     }

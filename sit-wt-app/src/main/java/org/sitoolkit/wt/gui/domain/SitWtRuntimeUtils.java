@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sitoolkit.wt.gui.infra.MavenUtils;
+import org.sitoolkit.wt.gui.infra.StrUtils;
 
 public class SitWtRuntimeUtils {
 
     public static List<String> buildCommand(List<File> selectedFiles, boolean isDebug,
-            boolean isParallel, String browser) {
+            boolean isParallel, String browser, String baseUrl) {
         List<String> command = new ArrayList<>();
 
         command.add(MavenUtils.getCommand());
@@ -52,6 +53,10 @@ public class SitWtRuntimeUtils {
         }
 
         command.add("-Ddriver.type=" + browser);
+
+        if (StrUtils.isNotEmpty(baseUrl)) {
+            command.add("-DbaseUrl=" + baseUrl);
+        }
 
         return command;
     }
