@@ -46,15 +46,13 @@
       <children>
         <MenuBar>
           <menus>
-            <Menu mnemonicParsing="false" text="ファイル">
+            <Menu mnemonicParsing="false" text="プロジェクト">
               <items>
-                <MenuItem mnemonicParsing="false" onAction="#createProject" text="プロジェクトを作成" />
-                <MenuItem mnemonicParsing="false" onAction="#openProject" text="プロジェクトを開く" />
+                <MenuItem mnemonicParsing="false" onAction="#createProject" text="新規作成" />
+                <MenuItem mnemonicParsing="false" onAction="#openProject" text="開く" />
                 <SeparatorMenuItem />
                 <MenuItem mnemonicParsing="false" onAction="#getSample" text="サンプルを取得" />
                 <SeparatorMenuItem />
-                <MenuItem mnemonicParsing="false" text="テストスクリプトを作成" />
-                <MenuItem mnemonicParsing="false" text="テストスクリプトを開く" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="ヘルプ">
