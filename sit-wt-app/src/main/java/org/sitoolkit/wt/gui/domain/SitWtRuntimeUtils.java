@@ -9,14 +9,7 @@ import org.sitoolkit.wt.gui.infra.StrUtils;
 
 public class SitWtRuntimeUtils {
 
-    public static List<String> buildCommand(List<File> selectedFiles, boolean isDebug,
-            boolean isParallel, String browser, String baseUrl) {
-        List<String> command = new ArrayList<>();
-
-        command.add(MavenUtils.getCommand());
-        command.add("clean");
-        command.add("verify");
-
+    public static String findTestedClasses(List<File> selectedFiles) {
         StringBuilder testedClases = new StringBuilder();
         for (File file : selectedFiles) {
 
@@ -37,8 +30,20 @@ public class SitWtRuntimeUtils {
             testedClases.append(baseName);
             testedClases.append("IT");
         }
-        if (testedClases.length() > 0) {
-            command.add("-Dit.test=" + testedClases);
+
+        return testedClases.toString();
+    }
+
+    public static List<String> buildCommand(String testedClasses, boolean isDebug,
+            boolean isParallel, String browser, String baseUrl) {
+        List<String> command = new ArrayList<>();
+
+        command.add(MavenUtils.getCommand());
+        command.add("clean");
+        command.add("verify");
+
+        if (StrUtils.isNotEmpty(testedClasses)) {
+            command.add("-Dit.test=" + testedClasses);
         }
 
         List<String> profiles = new ArrayList<>();

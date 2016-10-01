@@ -2,6 +2,7 @@ package org.sitoolkit.wt.gui.pres;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -33,22 +34,42 @@ public class FileTreeController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         fileTree.setEditable(true);
         fileTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        fileTree.setCellFactory(CheckBoxTreeCell.<FileWrapper> forTreeView());
-        fileTree.setShowRoot(true);
+        fileTree.setCellFactory(CheckBoxTreeCell.forTreeView());
+        fileTree.setShowRoot(false);
 
     }
 
     public void setFileTreeRoot(File pomFile) {
-        File testscriptDir = new File(pomFile.getParent(), "testscript");
-        if (!testscriptDir.exists()) {
-            testscriptDir.mkdirs();
-        }
+        String baseDir = pomFile.getParent();
 
-        fileTree.setRoot(new CheckBoxFileTreeItem(testscriptDir));
+        TreeItem<FileWrapper> root = new TreeItem<>();
+        root.getChildren().add(new CheckBoxFileTreeItem(newDir(baseDir, "seleniumscript")));
+        // TODO pageobjディレクトリの選択を不可にする
+        root.getChildren().add(new CheckBoxFileTreeItem(newDir(baseDir, "pageobj"), false));
+        root.getChildren().add(new CheckBoxFileTreeItem(newDir(baseDir, "testscript")));
+
+        fileTree.setRoot(root);
+    }
+
+    private File newDir(String baseDir, String dir) {
+        File newDir = new File(baseDir, dir);
+        if (!newDir.exists()) {
+            newDir.mkdirs();
+        }
+        return newDir;
     }
 
     public List<File> getSelectedFiles() {
-        return ((CheckBoxFileTreeItem) fileTree.getRoot()).getSelectedFiles();
+        List<File> selectedFiles = new ArrayList<>();
+
+        for (TreeItem<?> item : fileTree.getRoot().getChildren()) {
+            CheckBoxFileTreeItem casted = (CheckBoxFileTreeItem) item;
+            if (casted.isSelectable()) {
+                selectedFiles.addAll(casted.getSelectedFiles());
+            }
+        }
+
+        return selectedFiles;
     }
 
     @FXML

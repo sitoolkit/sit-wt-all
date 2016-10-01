@@ -14,6 +14,7 @@ import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.PropertyManager;
 import org.sitoolkit.wt.gui.infra.StageResizer;
+import org.sitoolkit.wt.gui.infra.StrUtils;
 import org.sitoolkit.wt.gui.infra.SystemUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
 
@@ -218,9 +219,10 @@ public class AppController implements Initializable {
 
     @FXML
     public void run() {
-        List<File> selectedFiles = fileTreeController.getSelectedFiles();
+        String testedClasses = SitWtRuntimeUtils
+                .findTestedClasses(fileTreeController.getSelectedFiles());
 
-        if (selectedFiles.isEmpty()) {
+        if (StrUtils.isEmpty(testedClasses)) {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("");
             alert.setContentText("");
@@ -234,7 +236,7 @@ public class AppController implements Initializable {
         String baseUrl = baseUrlCombo.getValue();
         addBaseUrl(baseUrl);
 
-        List<String> command = SitWtRuntimeUtils.buildCommand(selectedFiles,
+        List<String> command = SitWtRuntimeUtils.buildCommand(testedClasses,
                 debugCheck.isSelected(), !parallelCheck.isDisabled() && parallelCheck.isSelected(),
                 browserChoice.getSelectionModel().getSelectedItem(), baseUrl);
 

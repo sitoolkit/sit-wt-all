@@ -13,9 +13,15 @@ public final class CheckBoxFileTreeItem extends CheckBoxTreeItem<FileWrapper> {
     private boolean isLeaf;
     private boolean isFirstTimeChildren = true;
     private boolean isFirstTimeLeaf = true;
+    private boolean isSelectable = true;
 
     public CheckBoxFileTreeItem(File file) {
         this(new FileWrapper(file));
+    }
+
+    public CheckBoxFileTreeItem(File file, boolean isSelectable) {
+        this(new FileWrapper(file));
+        this.isSelectable = isSelectable;
     }
 
     public CheckBoxFileTreeItem(FileWrapper file) {
@@ -66,7 +72,10 @@ public final class CheckBoxFileTreeItem extends CheckBoxTreeItem<FileWrapper> {
                         .observableArrayList();
 
                 for (File childFile : files) {
-                    children.add(this.createNode(new FileWrapper(childFile)));
+                    CheckBoxFileTreeItem child = new CheckBoxFileTreeItem(
+                            new FileWrapper(childFile));
+                    child.isSelectable = this.isSelectable;
+                    children.add(child);
                 }
 
                 return children;
@@ -76,8 +85,8 @@ public final class CheckBoxFileTreeItem extends CheckBoxTreeItem<FileWrapper> {
         return FXCollections.emptyObservableList();
     }
 
-    private TreeItem<FileWrapper> createNode(FileWrapper f) {
-        return new CheckBoxFileTreeItem(f);
+    public boolean isSelectable() {
+        return isSelectable;
     }
 
 }
