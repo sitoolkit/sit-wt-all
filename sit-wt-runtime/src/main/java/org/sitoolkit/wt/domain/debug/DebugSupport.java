@@ -168,16 +168,18 @@ public class DebugSupport {
                     break;
                 }
 
+                LOG.info("");
                 LOG.info("前後のテストステップ");
                 for (int i = ret - 1; i <= ret + 1; i++) {
                     TestStep nextStep = current.getTestScript().getTestStep(i);
                     if (nextStep == null) {
                         continue;
                     }
-                    String currentMark = i == ret ? " <- 現在" : "";
+                    String nextMark = i == ret + 1 ? " <- 次に実行" : "";
                     LOG.info("{} {}({}){}", new Object[] { nextStep.getNo(), nextStep.getItemName(),
-                            nextStep.getLocator(), currentMark });
+                            nextStep.getLocator(), nextMark });
                 }
+                LOG.info("");
             }
 
             //

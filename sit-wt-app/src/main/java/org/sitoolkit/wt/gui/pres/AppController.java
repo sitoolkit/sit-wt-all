@@ -33,6 +33,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -73,6 +74,9 @@ public class AppController implements Initializable {
 
     @FXML
     private Button pauseButton;
+
+    @FXML
+    private TextField stepNoText;
 
     @FXML
     private Button quitButton;
@@ -268,6 +272,13 @@ public class AppController implements Initializable {
     public void pause() {
         if (mavenConsoleListener.isPausing()) {
             pauseButton.setText("一時停止");
+
+            String stepNo = stepNoText.getText();
+            if (!StrUtils.isEmpty(stepNo)) {
+                mvnProcess.input("!" + stepNo);
+                mvnProcess.input("#" + stepNo);
+            }
+
             mvnProcess.input("s");
         } else {
             pauseButton.setText("再開");

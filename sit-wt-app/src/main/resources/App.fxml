@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -12,11 +13,11 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.ComboBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <bottom>
@@ -75,7 +76,7 @@
                 <CheckBox fx:id="debugCheck" mnemonicParsing="false" text="デバッグ" />
                 <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
                 <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
-                <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL"/>
+                <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
               </items>
             </ToolBar>
             <ToolBar fx:id="runningGroup">
@@ -87,6 +88,7 @@
             <ToolBar fx:id="debugGroup">
               <items>
                 <Separator orientation="VERTICAL" />
+                <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
                 <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="一時停止" />
                 <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="戻る" />
                 <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="進む" />

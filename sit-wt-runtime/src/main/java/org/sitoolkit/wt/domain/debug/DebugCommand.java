@@ -79,7 +79,7 @@ class DebugCommand {
                 ret = testScript.getIndexByScriptNo(body);
                 break;
             case SET_STEP_NO:
-                ret = testScript.getIndexByScriptNo(body);
+                ret = testScript.getIndexByScriptNo(body) - 1;
                 break;
 
             case LOC:
