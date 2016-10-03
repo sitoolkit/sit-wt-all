@@ -17,6 +17,7 @@ import javax.json.JsonReader;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.wt.domain.evidence.ElementPosition;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
 import org.sitoolkit.wt.domain.evidence.MaskInfo;
@@ -67,6 +68,12 @@ public class MaskScreenshotGenerator {
         for (File evidence : targetDir.getEvidenceFiles()) {
 
             for (File screenshot : targetDir.getScreenshots(evidence.getName())) {
+
+                if (maskInfo.getMaskInfoAsMap().get(screenshot.getName()) == null) {
+                    LOG.info("スクリーンショットに対するマスク情報がありません {}", screenshot.getName());
+                    continue;
+                }
+
                 maskedFiles.add(mask(screenshot, maskInfo));
             }
 
@@ -87,7 +94,31 @@ public class MaskScreenshotGenerator {
      */
     public File mask(File imgFile, MaskInfo maskInfo) {
 
-        // TODO 実装
+        List<ElementPosition> posStyles = maskInfo.getMaskInfoAsMap().get(imgFile.getName());
+
+        try {
+            BufferedImage bi = ImageIO.read(imgFile);
+            Graphics2D g = bi.createGraphics();
+            g.setPaint(Color.BLACK);
+            String maskedImgName = MASK_PREFIX + imgFile.getName();
+
+            for (ElementPosition elementPosition : posStyles) {
+
+                int x = elementPosition.getX();
+                int y = elementPosition.getY();
+                int width = elementPosition.getW();
+                int height = elementPosition.getH();
+                g.fillRect(x, y, width, height);
+
+                File maskedImg = new File(imgFile.getParent(), maskedImgName);
+                ImageIO.write(bi, "png", maskedImg);
+
+                LOG.info("マスク済み画像ファイルを生成しました {}", maskedImg.getPath());
+            }
+
+        } catch (IOException e) {
+            LOG.error("画像ファイルのマスク処理で例外が発生しました", e);
+        }
 
         return null;
     }

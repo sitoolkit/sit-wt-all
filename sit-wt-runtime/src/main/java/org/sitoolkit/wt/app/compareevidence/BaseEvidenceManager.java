@@ -28,7 +28,7 @@ public class BaseEvidenceManager {
      */
     public void setBaseEvidence(EvidenceDir targetDir) {
 
-        if (targetDir.exists()) {
+        if (!(targetDir.exists())) {
             LOG.info("エビデンスがありません");
         } else {
             EvidenceDir baseDir = EvidenceDir.getBase(targetDir.getBrowser());

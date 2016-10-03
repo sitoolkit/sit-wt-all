@@ -41,7 +41,7 @@ public class CompareEvidenceMojo extends AbstractMojo {
         DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
         generator.setCompareEvidence(new DiffEvidence());
         generator.setTemplateEngine(new TemplateEngineVelocityImpl());
-        generator.run(baseBrowser, isUnmatchCompare);
+        // generator.run(baseBrowser, isUnmatchCompare);
 
         EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
                 : EvidenceDir.getInstance(targetEvidence);

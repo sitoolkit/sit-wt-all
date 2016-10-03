@@ -52,20 +52,23 @@ public class ScreenshotComparator {
      * @return 比較対象エビデンスの全スクリーンショットが基準と一致する場合にtrue
      */
     public boolean compare(EvidenceDir baseDir, EvidenceDir targetDir, File evidenceFile) {
-        // TODO 実装
 
         LOG.info("スクリーンショットを比較します {} {} <-> {}",
                 new Object[] { evidenceFile, baseDir.getDir(), targetDir.getDir() });
 
         Map<String, File> baseSsMap = baseDir.getScreenshotFilesAsMap(evidenceFile.getName());
-        boolean match = false;
+        boolean match = true;
 
         for (Entry<String, File> targetEntry : targetDir
                 .getScreenshotFilesAsMap(evidenceFile.getName()).entrySet()) {
             File baseSs = baseSsMap.get(targetEntry.getKey());
             File targetSs = targetEntry.getValue();
 
-            match |= compareOneScreenshot(baseSs, targetSs, 10, 10);
+            if (true) {
+                // TODO mask済みイメージが存在する場合、変換前のイメージは比較対象外にする
+            }
+
+            match &= compareOneScreenshot(baseSs, targetSs, 10, 10);
         }
 
         return match;

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.infra.PropertyUtils;
 
 public class EvidenceDir {
@@ -21,7 +22,9 @@ public class EvidenceDir {
 
     static final String UNMATCH_PREFIX = "unmatch_";
 
-    static final String FAILAFE_REPORT_NAME = "failsafe-report.html";
+    static final String FAILSAFE_REPORT_NAME = "failsafe-report.html";
+
+    static final String PROJECT_REPORTS_NAME = "project-reports.html";
 
     private File dir;
 
@@ -39,7 +42,9 @@ public class EvidenceDir {
     }
 
     public static EvidenceDir getBase(String browser) {
-        return getInstance(new File(BASE_EVIDENCE_ROOT, browser));
+        String baseEvidence = System.getProperty("baseEvidence");
+        return baseEvidence == null ? getInstance(new File(BASE_EVIDENCE_ROOT, browser))
+                : EvidenceDir.getInstance(new File(baseEvidence, browser));
     }
 
     public static EvidenceDir getLatest() {
@@ -52,7 +57,8 @@ public class EvidenceDir {
         for (File evidenceFile : FileUtils.listFiles(dir, new String[] { "html" }, true)) {
 
             String htmlName = evidenceFile.getName();
-            if (htmlName.startsWith(COMPARE_PREFIX) || htmlName.equals(FAILAFE_REPORT_NAME)) {
+            if (htmlName.startsWith(COMPARE_PREFIX) || htmlName.equals(FAILSAFE_REPORT_NAME)
+                    || htmlName.equals(PROJECT_REPORTS_NAME)) {
                 continue;
             }
 
@@ -67,11 +73,14 @@ public class EvidenceDir {
     }
 
     public Map<String, File> getScreenshotFilesAsMap(String evidenceFileName) {
+
+        String imgPrefix = StringUtils.removeEnd(evidenceFileName, ".html");
+
         Map<String, File> screenshotFiles = new HashMap<>();
 
-        for (File imgFile : FileUtils.listFiles(dir, new String[] { "img" }, true)) {
+        for (File imgFile : FileUtils.listFiles(dir, new String[] { "png" }, true)) {
 
-            if (imgFile.getName().startsWith(evidenceFileName)) {
+            if (imgFile.getName().startsWith(imgPrefix)) {
                 screenshotFiles.put(imgFile.getName(), imgFile);
             }
         }

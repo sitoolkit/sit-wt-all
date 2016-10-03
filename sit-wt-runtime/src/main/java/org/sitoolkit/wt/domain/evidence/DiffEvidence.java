@@ -22,6 +22,7 @@ public class DiffEvidence extends TemplateModel {
     public DiffEvidence() {
         setTemplate("/evidence/evidence-template-diff.vm");
         setVar("diff");
+        setFileExt("html");
     }
 
     public String getEvidenceName() {
