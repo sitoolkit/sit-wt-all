@@ -11,7 +11,7 @@ function init(){
 	var saveHelp = "スクリーンショット上に配置した付箋の情報をJSON形式で保存します。";
 	var deleteHelp = "配置済みの付箋をすべて削除します。";
 
-	$("body >:first").after("<div id='modeSelect'></div>");
+	$("body").prepend("<div id='modeSelect'></div>");
 	$("#modeSelect").append("<p><button id='switch'>切替</button> 付箋モード<span class='tooltip' title='" + modeHelp + "'>[?]</span>：<span id='mode'>OFF</span></p>");
 	$("#modeSelect").append("<hr/>");
 
