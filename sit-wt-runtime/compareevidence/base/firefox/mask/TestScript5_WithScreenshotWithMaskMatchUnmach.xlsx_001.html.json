@@ -1,0 +1,43 @@
+{
+	"evidenceName": "TestScript5_WithScreenshotWithMaskMatchUnmach.xlsx_001.html",
+	"maskInfo": [
+		{
+			"imgSrc": "img/TestScript5_WithScreenshotWithMaskMatchUnmach.xlsx_001_1_開始URL_AFTER_OPERATION.png",
+			"posStyle": [
+				{
+					"x": 469,
+					"y": 237,
+					"width": 308,
+					"height": 638
+				}
+			]
+		},
+		{
+			"imgSrc": "img/TestScript5_WithScreenshotWithMaskMatchUnmach.xlsx_001_10_利用規約リンク_BEFORE_OPERATION.png",
+			"posStyle": []
+		},
+		{
+			"imgSrc": "img/TestScript5_WithScreenshotWithMaskMatchUnmach.xlsx_001_12_閉じるリンク_BEFORE_OPERATION.png",
+			"posStyle": [
+				{
+					"x": 71,
+					"y": 111,
+					"width": 740,
+					"height": 82
+				}
+			]
+		},
+		{
+			"imgSrc": "img/TestScript5_WithScreenshotWithMaskMatchUnmach.xlsx_001_14_確定ボタン_BEFORE_OPERATION.png",
+			"posStyle": []
+		},
+		{
+			"imgSrc": "img/TestScript5_WithScreenshotWithMaskMatchUnmach.xlsx_001_15_確認ダイアログ_ON_DIALOG.png",
+			"posStyle": []
+		},
+		{
+			"imgSrc": "img/TestScript5_WithScreenshotWithMaskMatchUnmach.xlsx_001_16_名前_BEFORE_OPERATION.png",
+			"posStyle": []
+		}
+	]
+}
