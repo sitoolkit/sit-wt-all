@@ -94,7 +94,7 @@ public class MaskInfo {
             for (int j = 0; j < posStyles.size(); j++) {
                 JsonObject obj2 = posStyles.getJsonObject(j);
                 double x = (double) obj2.getInt("x");
-                double y = (double) obj2.getInt("x");
+                double y = (double) obj2.getInt("y");
                 double w = (double) obj2.getInt("width");
                 double h = (double) obj2.getInt("height");
                 ElementPosition pos = new ElementPosition(x, y, w, h);
