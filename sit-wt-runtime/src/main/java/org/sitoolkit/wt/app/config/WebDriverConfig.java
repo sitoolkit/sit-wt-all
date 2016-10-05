@@ -104,8 +104,6 @@ public class WebDriverConfig {
                 case "ie":
                 case "internet explorer":
                     webDriverInstaller.installIeDriver();
-                    capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION,
-                            true);
                     webDriver = new InternetExplorerDriver(capabilities);
                     break;
 
