@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import org.sitoolkit.wt.gui.infra.CheckBoxFileTreeItem;
 import org.sitoolkit.wt.gui.infra.FileIOUtils;
+import org.sitoolkit.wt.gui.infra.FileTreeItem;
 import org.sitoolkit.wt.gui.infra.FileWrapper;
 import org.sitoolkit.wt.gui.infra.FxContext;
 
@@ -27,14 +27,18 @@ public class FileTreeController implements Initializable {
     @FXML
     private TreeView<FileWrapper> fileTree;
 
+    private Mode mode = Mode.NORMAL;
+
     public FileTreeController() {
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         fileTree.setEditable(true);
-        fileTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        fileTree.setCellFactory(CheckBoxTreeCell.forTreeView());
+        fileTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        if (mode == Mode.CHECKBOX) {
+            fileTree.setCellFactory(CheckBoxTreeCell.forTreeView());
+        }
         fileTree.setShowRoot(false);
 
     }
@@ -43,10 +47,10 @@ public class FileTreeController implements Initializable {
         String baseDir = pomFile.getParent();
 
         TreeItem<FileWrapper> root = new TreeItem<>();
-        root.getChildren().add(new CheckBoxFileTreeItem(newDir(baseDir, "seleniumscript")));
+        root.getChildren().add(createNode(newDir(baseDir, "seleniumscript")));
         // TODO pageobjディレクトリの選択を不可にする
-        root.getChildren().add(new CheckBoxFileTreeItem(newDir(baseDir, "pageobj"), false));
-        root.getChildren().add(new CheckBoxFileTreeItem(newDir(baseDir, "testscript")));
+        root.getChildren().add(createNode(newDir(baseDir, "pageobj")));
+        root.getChildren().add(createNode(newDir(baseDir, "testscript")));
 
         fileTree.setRoot(root);
     }
@@ -62,10 +66,17 @@ public class FileTreeController implements Initializable {
     public List<File> getSelectedFiles() {
         List<File> selectedFiles = new ArrayList<>();
 
+        if (mode == Mode.NORMAL) {
+           fileTree.getSelectionModel().getSelectedItems().forEach(item -> selectedFiles.add(item.getValue().getFile()));
+           return selectedFiles;
+        }
+
         for (TreeItem<?> item : fileTree.getRoot().getChildren()) {
-            CheckBoxFileTreeItem casted = (CheckBoxFileTreeItem) item;
-            if (casted.isSelectable()) {
-                selectedFiles.addAll(casted.getSelectedFiles());
+            if (item instanceof FileTreeItem) {
+                FileTreeItem casted = (FileTreeItem) item;
+                if (casted.isSelectable()) {
+                    selectedFiles.addAll(casted.getSelectedFiles());
+                }
             }
         }
 
@@ -96,7 +107,7 @@ public class FileTreeController implements Initializable {
                 }
 
                 newDir.mkdir();
-                selectedItem.getChildren().add(new CheckBoxFileTreeItem(newDir));
+                selectedItem.getChildren().add(createNode(newDir));
             });
 
         });
@@ -119,7 +130,7 @@ public class FileTreeController implements Initializable {
                 }
 
                 FileIOUtils.download(TESTSCRIPT_URL, newTestScript);
-                selectedItem.getChildren().add(new CheckBoxFileTreeItem(newTestScript));
+                selectedItem.getChildren().add(createNode(newTestScript));
             });
 
         });
@@ -180,9 +191,18 @@ public class FileTreeController implements Initializable {
         });
     }
 
+    private TreeItem<FileWrapper> createNode(File file) {
+        return new FileTreeItem(file);
+    }
+
     @FunctionalInterface
-    public interface Operation {
+    interface Operation {
         void operate(TreeItem<FileWrapper> selectedItem);
+    }
+
+    enum Mode {
+        NORMAL,
+        CHECKBOX
     }
 
 }

@@ -4,15 +4,15 @@ import java.util.Collection;
 
 public class StrUtils {
 
-    public static String join(Collection<String> strs) {
+    public static String join(Collection<? extends Object> objects) {
 
-        if (strs == null || strs.isEmpty()) {
+        if (objects == null || objects.isEmpty()) {
             return "";
         }
 
         StringBuilder sb = new StringBuilder();
 
-        for (String str : strs) {
+        for (Object str : objects) {
 
             if (sb.length() > 0) {
                 sb.append(",");

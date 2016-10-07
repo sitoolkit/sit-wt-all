@@ -207,6 +207,8 @@ public class AppController implements Initializable {
             baseUrlCombo.getItems().addAll(baseUrls);
             baseUrlCombo.setValue(baseUrls.get(0));
         }
+
+        PropertyManager.get().setClasspath(SitWtRuntimeUtils.getTestRunnerClasspath(pomFile));
     }
 
     @FXML
@@ -240,8 +242,8 @@ public class AppController implements Initializable {
         String baseUrl = baseUrlCombo.getValue();
         addBaseUrl(baseUrl);
 
-        List<String> command = SitWtRuntimeUtils.buildCommand(testedClasses,
-                debugCheck.isSelected(), !parallelCheck.isDisabled() && parallelCheck.isSelected(),
+        List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(fileTreeController.getSelectedFiles(),
+                debugCheck.isSelected(),
                 browserChoice.getSelectionModel().getSelectedItem(), baseUrl);
 
         mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),

@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 public class PropertyManager {
 
+    private static final String SIT_WT_CLASSPATH = "sitWtClasspath";
+
     private static final String FILE_NAME = "sit-wt-app.properties";
 
     private static final String SEPARATOR = ",";
@@ -101,6 +103,14 @@ public class PropertyManager {
         return Integer.parseInt(getProp(BASE_URL_LIMIT, "5"));
     }
 
+    public void setClasspath(String classpath) {
+        setProp(SIT_WT_CLASSPATH, classpath);
+    }
+
+    public String getClasspath() {
+        return getProp(SIT_WT_CLASSPATH);
+    }
+
     private String getProp(String key) {
         return getProp(key, "");
     }
@@ -112,4 +122,5 @@ public class PropertyManager {
     private void setProp(String key, String value) {
         prop.setProperty(key, value);
     }
+
 }

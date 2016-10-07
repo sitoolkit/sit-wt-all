@@ -68,8 +68,7 @@ public class MavenUtils {
     }
 
     public static String install() {
-        File sitRepo = SystemUtils.isWindows() ? new File(System.getenv("ProgramData"), "sitoolkit/repository")
-                : new File(System.getProperty("user.home"), ".sitoolkit/repository");
+        File sitRepo = SystemUtils.getSitRepository();
 
         // TODO 外部化
         String url = "https://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip";

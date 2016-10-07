@@ -2,6 +2,7 @@ package org.sitoolkit.wt.gui.infra;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -79,5 +80,22 @@ public class FileIOUtils {
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(input))) {
             return buffer.lines().collect(Collectors.joining("\n"));
         }
+    }
+
+    public static String file2str(File file) {
+
+        StringBuilder sb = new StringBuilder();
+
+         try (BufferedReader br =  new BufferedReader(new FileReader(file))) {
+             br.lines().forEach(line -> {
+                 sb.append(line);
+                 sb.append(System.lineSeparator());
+             });
+
+         } catch (IOException e) {
+             throw new UnExpectedException(e);
+         }
+
+         return sb.toString();
     }
 }

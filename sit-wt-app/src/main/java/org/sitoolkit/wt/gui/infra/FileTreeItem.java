@@ -9,22 +9,22 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeItem;
 
-public final class CheckBoxFileTreeItem extends CheckBoxTreeItem<FileWrapper> {
+public final class FileTreeItem extends CheckBoxTreeItem<FileWrapper> {
     private boolean isLeaf;
     private boolean isFirstTimeChildren = true;
     private boolean isFirstTimeLeaf = true;
     private boolean isSelectable = true;
 
-    public CheckBoxFileTreeItem(File file) {
+    public FileTreeItem(File file) {
         this(new FileWrapper(file));
     }
 
-    public CheckBoxFileTreeItem(File file, boolean isSelectable) {
+    public FileTreeItem(File file, boolean isSelectable) {
         this(new FileWrapper(file));
         this.isSelectable = isSelectable;
     }
 
-    public CheckBoxFileTreeItem(FileWrapper file) {
+    public FileTreeItem(FileWrapper file) {
         super(file);
     }
 
@@ -36,7 +36,7 @@ public final class CheckBoxFileTreeItem extends CheckBoxTreeItem<FileWrapper> {
         }
 
         for (TreeItem<FileWrapper> child : getChildren()) {
-            selectedFiles.addAll(((CheckBoxFileTreeItem) child).getSelectedFiles());
+            selectedFiles.addAll(((FileTreeItem) child).getSelectedFiles());
         }
 
         return selectedFiles;
@@ -72,7 +72,7 @@ public final class CheckBoxFileTreeItem extends CheckBoxTreeItem<FileWrapper> {
                         .observableArrayList();
 
                 for (File childFile : files) {
-                    CheckBoxFileTreeItem child = new CheckBoxFileTreeItem(
+                    FileTreeItem child = new FileTreeItem(
                             new FileWrapper(childFile));
                     child.isSelectable = this.isSelectable;
                     children.add(child);

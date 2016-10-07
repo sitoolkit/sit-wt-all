@@ -1,5 +1,6 @@
 package org.sitoolkit.wt.gui.infra;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,5 +40,16 @@ public class SystemUtils {
         }
 
         return browsers;
+    }
+
+    public static File getSitRepository() {
+        File repo = isWindows() ? new File(System.getenv("ProgramData"), "sitoolkit/repository")
+                : new File(System.getProperty("user.home"), ".sitoolkit/repository");
+
+        if (!repo.exists()) {
+            repo.mkdirs();
+        }
+
+        return repo;
     }
 }
