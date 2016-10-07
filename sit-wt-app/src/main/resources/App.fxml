@@ -77,12 +77,19 @@
                 <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
                 <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
                 <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
+                <Button mnemonicParsing="false" onAction="#page2script" text="ブラウザ起動" />
+              </items>
+            </ToolBar>
+            <ToolBar fx:id="browsingGroup">
+              <items>
+                <Button mnemonicParsing="false" onAction="#export" text="スクリプト生成" />
+                <Button mnemonicParsing="false" onAction="#quitBrowsing" text="終了" />
               </items>
             </ToolBar>
             <ToolBar fx:id="runningGroup">
               <items>
                 <Separator orientation="VERTICAL" />
-                <Button fx:id="quitButton" mnemonicParsing="false" onAction="#quit" text="停止" />
+                <Button mnemonicParsing="false" onAction="#quit" text="停止" />
               </items>
             </ToolBar>
             <ToolBar fx:id="debugGroup">
@@ -94,7 +101,7 @@
                 <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="進む" />
                 <!-- <Button accessibleHelp="現在実行中のスクリプトを開きます。" mnemonicParsing="false" onAction="#openScript" 
                   text="スクリプトを開く" /> -->
-                <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプトを生成" />
+                <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプト生成" />
               </items>
             </ToolBar>
             <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow" text="縮小" />

@@ -41,7 +41,9 @@ public class ConversationProcess {
     }
 
     public void destroy() {
-        process.destroy();
+        if (process.isAlive()) {
+            process.destroy();
+        }
     }
 
     public void waitFor(WaitCallback callback) {

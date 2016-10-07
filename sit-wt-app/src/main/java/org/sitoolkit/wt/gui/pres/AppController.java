@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.gui.domain.MavenConsoleListener;
 import org.sitoolkit.wt.gui.domain.ProjectState;
+import org.sitoolkit.wt.gui.domain.ProjectState.State;
 import org.sitoolkit.wt.gui.domain.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.FileIOUtils;
@@ -19,7 +20,6 @@ import org.sitoolkit.wt.gui.infra.SystemUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -50,6 +50,9 @@ public class AppController implements Initializable {
 
     @FXML
     private ToolBar runningGroup;
+
+    @FXML
+    private ToolBar browsingGroup;
 
     @FXML
     private ToolBar debugGroup;
@@ -111,18 +114,17 @@ public class AppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         // setVisible(projectGroup, Bindings.not(projectState.getRunning()));
-        setVisible(startGroup, Bindings.and(projectState.getInitialized(),
-                Bindings.not(projectState.getRunning())));
-        setVisible(runningGroup, projectState.getRunning());
-        setVisible(debugGroup,
-                Bindings.and(projectState.getRunning(), debugCheck.selectedProperty()));
+        setVisible(startGroup, projectState.isLoaded());
+        setVisible(runningGroup, projectState.isRunning());
+        setVisible(browsingGroup, projectState.isBrowsing());
+        setVisible(debugGroup, projectState.isDebugging());
 
         parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
 
         browserChoice.getItems().addAll(SystemUtils.getBrowsers());
 
         // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
-        projectState.getInitialized().setValue(pomFile.exists());
+        projectState.setState(pomFile.exists() ? State.LOADED : State.NOT_LOADED);
         if (pomFile.exists()) {
             loadProject(pomFile);
             statusLabel.setText("");
@@ -133,6 +135,7 @@ public class AppController implements Initializable {
     }
 
     public void destroy() {
+        mvnProcess.destroy();
         PropertyManager.get().setBaseUrls(baseUrlCombo.getItems());
     }
 
@@ -162,7 +165,7 @@ public class AppController implements Initializable {
         // TODO 外部化
         FileIOUtils.download(POM_URL, pomFile);
 
-        projectState.getInitialized().set(pomFile.exists());
+        projectState.isLoaded().set(pomFile.exists());
 
         if (pomFile.exists()) {
 
@@ -199,7 +202,7 @@ public class AppController implements Initializable {
 
     private void loadProject(File pomFile) {
         fileTreeController.setFileTreeRoot(pomFile);
-        projectState.getInitialized().set(true);
+        projectState.setState(State.LOADED);
         PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
 
         List<String> baseUrls = PropertyManager.get().getBaseUrls();
@@ -242,16 +245,16 @@ public class AppController implements Initializable {
         String baseUrl = baseUrlCombo.getValue();
         addBaseUrl(baseUrl);
 
-        List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(fileTreeController.getSelectedFiles(),
-                debugCheck.isSelected(),
+        List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(
+                fileTreeController.getSelectedFiles(), debugCheck.isSelected(),
                 browserChoice.getSelectionModel().getSelectedItem(), baseUrl);
 
         mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);
 
-        projectState.getRunning().setValue(true);
+        projectState.setState(debugCheck.isSelected() ? State.DEBUGGING : State.RUNNING);
         mvnProcess.waitFor(() -> {
-            projectState.getRunning().set(false);
+            projectState.setState(State.LOADED);
             Platform.runLater(() -> statusLabel.setText("テストを終了します。"));
         });
     }
@@ -268,6 +271,28 @@ public class AppController implements Initializable {
             items.remove(limit);
         }
         baseUrlCombo.setValue(baseUrl);
+    }
+
+    @FXML
+    public void page2script() {
+        List<String> command = SitWtRuntimeUtils.buildPage2ScriptCommand(browserChoice.getValue(),
+                baseUrlCombo.getValue());
+
+        mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
+                pomFile.getAbsoluteFile().getParentFile(), command);
+
+        statusLabel.setText("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
+
+        projectState.setState(State.BROWSING);
+        mvnProcess.waitFor(() -> {
+            projectState.setState(State.LOADED);
+            Platform.runLater(() -> statusLabel.setText(""));
+        });
+    }
+
+    @FXML
+    public void quitBrowsing() {
+        mvnProcess.input("q");
     }
 
     @FXML
@@ -311,7 +336,7 @@ public class AppController implements Initializable {
     @FXML
     public void quit() {
         mvnProcess.destroy();
-        projectState.getRunning().set(false);
+        projectState.setState(State.LOADED);
     }
 
     private double stageHeight;

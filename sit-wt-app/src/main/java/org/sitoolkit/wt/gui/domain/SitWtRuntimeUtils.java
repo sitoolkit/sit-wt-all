@@ -89,8 +89,8 @@ public class SitWtRuntimeUtils {
         ProcessBuilder builder = new ProcessBuilder(command);
 
         try {
-           Process process = builder.start();
-           process.waitFor();
+            Process process = builder.start();
+            process.waitFor();
         } catch (IOException | InterruptedException e) {
             throw new UnExpectedException(e);
         }
@@ -99,7 +99,6 @@ public class SitWtRuntimeUtils {
     private static File getSitWtClasspathFile() {
         return new File(SystemUtils.getSitRepository(), "sit-wt-classpath");
     }
-
 
     public static String getTestRunnerClasspath(File pomFile) {
         File sitWtClasspathFile = getSitWtClasspathFile();
@@ -111,24 +110,46 @@ public class SitWtRuntimeUtils {
         return FileIOUtils.file2str(sitWtClasspathFile);
     }
 
-    public static List<String> buildSingleTestCommand(List<File> scriptFiles, boolean isDebug, String browser, String baseUrl) {
-        List<String> command = new ArrayList<>();
-
-        command.add("java");
+    public static List<String> buildSingleTestCommand(List<File> scriptFiles, boolean isDebug,
+            String browser, String baseUrl) {
+        List<String> command = buildJavaCommand();
+        addVmArgs(command, browser, baseUrl);
 
         command.add("-cp");
         command.add(PropertyManager.get().getClasspath());
-
-        command.add("-Ddriver.type=" + browser);
-
-        if (StrUtils.isNotEmpty(baseUrl)) {
-            command.add("-DbaseUrl=" + baseUrl);
-        }
 
         command.add("org.sitoolkit.wt.app.test.TestRunner");
 
         command.add(StrUtils.join(scriptFiles));
 
         return command;
+    }
+
+    public static List<String> buildPage2ScriptCommand(String browser, String baseUrl) {
+        List<String> command = buildJavaCommand();
+        addVmArgs(command, browser, baseUrl);
+
+        command.add("org.sitoolkit.wt.app.page2script.Page2Script");
+
+        return command;
+    }
+
+    private static List<String> buildJavaCommand() {
+        List<String> command = new ArrayList<>();
+        command.add("java");
+
+        command.add("-cp");
+        command.add(PropertyManager.get().getClasspath());
+
+        return command;
+    }
+
+    private static void addVmArgs(List<String> command, String browser, String baseUrl) {
+        command.add("-Ddriver.type=" + browser);
+
+        if (StrUtils.isNotEmpty(baseUrl)) {
+            command.add("-DbaseUrl=" + baseUrl);
+        }
+
     }
 }
