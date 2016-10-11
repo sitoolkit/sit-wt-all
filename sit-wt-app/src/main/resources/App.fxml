@@ -52,7 +52,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#createProject" text="新規作成" />
                 <MenuItem mnemonicParsing="false" onAction="#openProject" text="開く" />
                 <SeparatorMenuItem />
-                <MenuItem mnemonicParsing="false" onAction="#getSample" text="サンプルを取得" />
+                <MenuItem mnemonicParsing="false" onAction="#runSample" text="サンプルWebサイトを起動" />
                 <SeparatorMenuItem />
               </items>
             </Menu>
@@ -104,6 +104,7 @@
                 <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプト生成" />
               </items>
             </ToolBar>
+            <Separator orientation="VERTICAL" />
             <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow" text="縮小" />
           </children>
         </HBox>

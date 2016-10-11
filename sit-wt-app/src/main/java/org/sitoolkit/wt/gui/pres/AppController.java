@@ -201,7 +201,8 @@ public class AppController implements Initializable {
     }
 
     private void loadProject(File pomFile) {
-        fileTreeController.setFileTreeRoot(pomFile);
+
+        fileTreeController.setFileTreeRoot(pomFile.getParentFile());
         projectState.setState(State.LOADED);
         PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
 
@@ -211,19 +212,30 @@ public class AppController implements Initializable {
             baseUrlCombo.setValue(baseUrls.get(0));
         }
 
-        PropertyManager.get().setClasspath(SitWtRuntimeUtils.getTestRunnerClasspath(pomFile));
+        SitWtRuntimeUtils.loadSitWtClasspath(pomFile);
     }
 
     @FXML
-    public void getSample() {
-        statusLabel.setText("サンプルを取得します。");
+    public void runSample() {
+        statusLabel.setText("サンプルを起動します。");
 
         mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
-                MavenUtils.getCommand(), "sit-wt:sample");
+                SitWtRuntimeUtils.buildSampleCommand());
 
         mvnProcess.waitFor(() -> Platform.runLater(() -> {
-            statusLabel.setText("サンプルを取得しました。");
+            fileTreeController.refresh();
+
+            mvnProcess.start(new TextAreaConsole(console), new File(pomFile.getParent(), "sample"),
+                    MavenUtils.getCommand());
+
+            mvnProcess.waitFor(() -> Platform.runLater(() -> {
+                statusLabel.setText("サンプルを起動しました。");
+                // TODO URLの動的取得
+                baseUrlCombo.setValue("http://localhost:8280");
+                fileTreeController.refresh();
+            }));
         }));
+
     }
 
     @FXML

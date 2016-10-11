@@ -1,6 +1,8 @@
 package org.sitoolkit.wt.gui.infra;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,7 +87,7 @@ public class MavenUtils {
         FileIOUtils.unarchive(destFile, destDir);
 
         File[] children = destDir.listFiles();
-        if(children.length != 0){
+        if (children.length != 0) {
             String mvn = children[0].getAbsolutePath() + "/bin/mvn";
             if (SystemUtils.isOsX()) {
                 if (new File(mvn).exists()) {
@@ -108,9 +110,19 @@ public class MavenUtils {
 
         return "";
 
+        // File[] children = destDir.listFiles();
+        // return children.length == 0 ? "" : children[0].getAbsolutePath();
+    }
 
-//        File[] children = destDir.listFiles();
-//        return children.length == 0 ? "" : children[0].getAbsolutePath();
+    public static List<String> buildDownloadArtifactCommand(String artifact, String dest) {
+
+        List<String> command = new ArrayList<>();
+        command.add(getCommand());
+        command.add("dependency:get");
+        command.add("-Dartifact=" + artifact);
+        command.add("-Ddest=" + dest);
+
+        return command;
     }
 
     public static void main(String[] args) {

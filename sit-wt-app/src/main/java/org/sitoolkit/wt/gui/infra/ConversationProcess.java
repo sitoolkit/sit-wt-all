@@ -41,7 +41,7 @@ public class ConversationProcess {
     }
 
     public void destroy() {
-        if (process.isAlive()) {
+        if (process != null && process.isAlive()) {
             process.destroy();
         }
     }

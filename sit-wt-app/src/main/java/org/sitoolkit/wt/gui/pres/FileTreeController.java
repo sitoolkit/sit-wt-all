@@ -43,10 +43,11 @@ public class FileTreeController implements Initializable {
 
     }
 
-    public void setFileTreeRoot(File pomFile) {
-        String baseDir = pomFile.getParent();
+    public void setFileTreeRoot(File baseDir) {
 
         TreeItem<FileWrapper> root = new TreeItem<>();
+        root.setValue(new FileWrapper(baseDir));
+
         root.getChildren().add(createNode(newDir(baseDir, "seleniumscript")));
         // TODO pageobjディレクトリの選択を不可にする
         root.getChildren().add(createNode(newDir(baseDir, "pageobj")));
@@ -55,7 +56,7 @@ public class FileTreeController implements Initializable {
         fileTree.setRoot(root);
     }
 
-    private File newDir(String baseDir, String dir) {
+    private File newDir(File baseDir, String dir) {
         File newDir = new File(baseDir, dir);
         if (!newDir.exists()) {
             newDir.mkdirs();
@@ -67,8 +68,9 @@ public class FileTreeController implements Initializable {
         List<File> selectedFiles = new ArrayList<>();
 
         if (mode == Mode.NORMAL) {
-           fileTree.getSelectionModel().getSelectedItems().forEach(item -> selectedFiles.add(item.getValue().getFile()));
-           return selectedFiles;
+            fileTree.getSelectionModel().getSelectedItems()
+                    .forEach(item -> selectedFiles.add(item.getValue().getFile()));
+            return selectedFiles;
         }
 
         for (TreeItem<?> item : fileTree.getRoot().getChildren()) {
@@ -81,6 +83,10 @@ public class FileTreeController implements Initializable {
         }
 
         return selectedFiles;
+    }
+
+    public void refresh() {
+        setFileTreeRoot(fileTree.getRoot().getValue().getFile());
     }
 
     @FXML
@@ -201,8 +207,7 @@ public class FileTreeController implements Initializable {
     }
 
     enum Mode {
-        NORMAL,
-        CHECKBOX
+        NORMAL, CHECKBOX
     }
 
 }

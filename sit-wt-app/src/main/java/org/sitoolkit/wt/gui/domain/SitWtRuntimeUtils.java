@@ -4,18 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
-import org.sitoolkit.wt.gui.infra.PropertyManager;
 import org.sitoolkit.wt.gui.infra.StrUtils;
-import org.sitoolkit.wt.gui.infra.SystemUtils;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
+import org.sitoolkit.wt.gui.infra.UnInitializedException;
 
 public class SitWtRuntimeUtils {
 
     private static final Logger LOG = Logger.getLogger(SitWtRuntimeUtils.class.getName());
+
+    private static String sitwtClasspath;
 
     public static String findTestedClasses(List<File> selectedFiles) {
         StringBuilder testedClases = new StringBuilder();
@@ -76,7 +78,7 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
-    private static void createClasspathFile(File pomFile, File outputFile) {
+    private static String loadClasspath(File pomFile) {
 
         List<String> command = new ArrayList<>();
         command.add(MavenUtils.getCommand());
@@ -84,30 +86,49 @@ public class SitWtRuntimeUtils {
         command.add("dependency:build-classpath");
         command.add("-f");
         command.add(pomFile.getAbsolutePath());
-        command.add("-Dmdep.outputFile=" + outputFile.getAbsolutePath());
 
         ProcessBuilder builder = new ProcessBuilder(command);
 
         try {
             Process process = builder.start();
+            LOG.log(Level.INFO, "process {0} starts {1}",
+                    new Object[] { process, builder.command() });
+
             process.waitFor();
+            return FileIOUtils.read(process.getInputStream());
+
         } catch (IOException | InterruptedException e) {
             throw new UnExpectedException(e);
         }
     }
 
-    private static File getSitWtClasspathFile() {
-        return new File(SystemUtils.getSitRepository(), "sit-wt-classpath");
-    }
+    public static synchronized String loadSitWtClasspath(File pomFile) {
 
-    public static String getTestRunnerClasspath(File pomFile) {
-        File sitWtClasspathFile = getSitWtClasspathFile();
-
-        if (!sitWtClasspathFile.exists()) {
-            createClasspathFile(pomFile, sitWtClasspathFile);
+        if (sitwtClasspath == null) {
+            String out = loadClasspath(pomFile);
+            sitwtClasspath = filter(out, "[INFO] Dependencies classpath:", "[INFO]");
         }
 
-        return FileIOUtils.file2str(sitWtClasspathFile);
+        return sitwtClasspath;
+    }
+
+    private static String filter(String text, String startLine, String stopLine) {
+        int start = text.indexOf(startLine) + startLine.length();
+        int stop = text.indexOf(stopLine, start);
+
+        return text.substring(start, stop).trim();
+    }
+
+    public static void main(String[] args) {
+        MavenUtils.findAndInstall();
+        System.out.println(loadSitWtClasspath(new File("target", "pom.xml")));
+    }
+
+    public static List<String> buildSampleCommand() {
+        List<String> command = buildJavaCommand();
+        command.add("org.sitoolkit.wt.app.sample.SampleManager");
+
+        return command;
     }
 
     public static List<String> buildSingleTestCommand(List<File> scriptFiles, boolean isDebug,
@@ -116,7 +137,7 @@ public class SitWtRuntimeUtils {
         addVmArgs(command, browser, baseUrl);
 
         command.add("-cp");
-        command.add(PropertyManager.get().getClasspath());
+        command.add(getSitWtClasspath());
 
         command.add("org.sitoolkit.wt.app.test.TestRunner");
 
@@ -139,7 +160,7 @@ public class SitWtRuntimeUtils {
         command.add("java");
 
         command.add("-cp");
-        command.add(PropertyManager.get().getClasspath());
+        command.add(getSitWtClasspath());
 
         return command;
     }
@@ -152,4 +173,12 @@ public class SitWtRuntimeUtils {
         }
 
     }
+
+    private static String getSitWtClasspath() {
+        if (sitwtClasspath == null) {
+            throw new UnInitializedException();
+        }
+        return sitwtClasspath;
+    }
+
 }

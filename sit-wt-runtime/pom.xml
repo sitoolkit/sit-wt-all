@@ -114,6 +114,28 @@
   </properties>
 
   <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/src/main/webapp</directory>
+        <includes>
+          <include>input.html</include>
+          <include>terms.html</include>
+          <include>done.html</include>
+          <include>bootstrap.min.css</include>
+        </includes>
+        <targetPath>${project.build.outputDirectory}/sample</targetPath>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/testscript</directory>
+        <includes>
+          <include>ExcelTestScript.xlsx</include>
+        </includes>
+        <targetPath>${project.build.outputDirectory}/sample</targetPath>
+      </resource>
+    </resources>
     <testResources>
       <testResource>
         <directory>${basedir}/src/test/resources</directory>

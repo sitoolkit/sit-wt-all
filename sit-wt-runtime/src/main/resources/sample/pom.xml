@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- The Basics -->
+  <groupId>org.sitoolkit.wt.</groupId>
+  <artifactId>sit-wt-sample-basic</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <properties>
+    <httpPort>8280</httpPort>
+  </properties>
+
+  <!-- Build Settings -->
+  <build>
+    <defaultGoal>jetty:run</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.3.12.v20160915</version>
+        <configuration>
+          <webAppSourceDirectory>${project.basedir}</webAppSourceDirectory>
+          <httpConnector>
+            <port>${httpPort}</port>
+          </httpConnector>
+          <stopPort>9999</stopPort>
+          <stopKey>x</stopKey>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

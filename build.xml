@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:if="ant:if" xmlns:unless="ant:unless" name="sit-wt-all" basedir="." default="install">
+<project xmlns:if="ant:if"
+         xmlns:unless="ant:unless"
+         name="sit-wt-all"
+         basedir="."
+         default="install">
 
   <property environment="env" />
   <property name="testArtifactId" value="sit-wt-test" />
@@ -48,8 +52,8 @@
 
   <target name="02_commit-stage">
 
-    <property name="project.report" value="${basedir}/site"/>
-    <delete dir="${project.report}"/>
+    <property name="project.report" value="${basedir}/site" />
+    <delete dir="${project.report}" />
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
@@ -64,13 +68,13 @@
     </exec>
 
     <move todir="${project.report}/sit-wt-all">
-      <fileset dir="${basedir}/target"/>
+      <fileset dir="${basedir}/target" />
     </move>
     <move todir="${project.report}/sit-wt-maven-plugin">
-      <fileset dir="${basedir}/sit-wt-maven-plugin/target"/>
+      <fileset dir="${basedir}/sit-wt-maven-plugin/target" />
     </move>
     <move todir="${project.report}/sit-wt-runtime">
-      <fileset dir="${basedir}/sit-wt-runtime/target"/>
+      <fileset dir="${basedir}/sit-wt-runtime/target" />
     </move>
 
   </target>
@@ -78,37 +82,96 @@
 
   <target name="03_acceptance-stage">
 
-    <delete dir="${testdir}"/>
+    <delete dir="${testdir}" />
     <copy file="${basedir}/distribution/pom.xml" todir="${testdir}" />
-    <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" todir="${testdir}/testscript"
-      unless:true="${os.windows}" />
-    <mkdir dir="${testdir}/testscript" if:true="${os.windows}"/>
+    <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv"
+          todir="${testdir}/testscript"
+          unless:true="${os.windows}" />
+    <mkdir dir="${testdir}/testscript" if:true="${os.windows}" />
     <!-- skip until ci server charset problem is soleved
     <fixcrlf file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" destdir="${testdir}/testscript"
       encoding="UTF-8" outputencoding="MS932" if:true="${os.windows}" />
 	-->
-
+    
+    
+    <echo message="mvn sit-wt:sample"/>
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-Devidence.open=false" />
-      <arg value="-Dsample.baseUrl=file:///${basedir}/sit-wt-runtime/" />
       <arg value="-e" />
-      <arg value="-P" />
-      <arg value="parallel" />
-<!--
-      <arg value="-Dmaven.failsafe.debug=true" />
--->
-      <arg value="-Dfile.encoding=${file.encoding}" />
-      <arg value="-DpreCoreThreadCount=false" />
-      <arg value="-DthreadCount=4" />
-      <arg value="-DtrimStackTrace=false" />
-      <arg value="-Ddriver.type=${driver.type}" />
-      <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
-      <arg value="verify" />
+      <arg value="sit-wt:sample" />
     </exec>
+    
+    <parallel>
+  
+      <echo message="mvn -f sample   (jetty:run)"/>
+      <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
+        <env key="JAVA_HOME" value="${java.home}" />
+        <arg value="-f" />
+        <arg value="sample" />
+      </exec>
+      
+
+      <sequential>
+          <echo message="mvn verify -P parallel"/>
+          <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="false" resultproperty="result">
+          <env key="JAVA_HOME" value="${java.home}" />
+          <arg value="-e" />
+          <arg value="-P" />
+          <arg value="parallel" />
+          <!--
+                <arg value="-Dmaven.failsafe.debug=true" />
+          -->
+            <arg value="-DbaseUrl=http://localhost:8280" />
+          <arg value="-Devidence.open=false" />
+          <arg value="-Dfile.encoding=${file.encoding}" />
+          <arg value="-DpreCoreThreadCount=false" />
+          <arg value="-DthreadCount=4" />
+          <arg value="-DtrimStackTrace=false" />
+          <arg value="-Ddriver.type=${driver.type}" />
+          <arg value="verify" />
+        </exec>
+
+        <echo message="mvn jetty:stop"/>
+        <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="false">
+          <env key="JAVA_HOME" value="${java.home}" />
+          <arg value="-f" />
+          <arg value="sample" />
+          <arg value="jetty:stop" />
+        </exec>
+        
+        <fail>
+          <condition>
+            <not><equals arg1="${result}" arg2="0"/></not>
+          </condition>
+        </fail>
+        
+      </sequential>
+
+    </parallel>
+
 
   </target>
 
+  <target name="trial">
+
+    <parallel>
+      
+      <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
+        <env key="JAVA_HOME" value="${java.home}" />
+        <arg value="-f" />
+        <arg value="sample" />
+      </exec>
+      
+      <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
+        <env key="JAVA_HOME" value="${java.home}" />
+        <arg value="-f" />
+        <arg value="sample" />
+        <arg value="jetty:stop" />
+      </exec>
+      
+    </parallel>
+    
+  </target>
 
   <target name="04_deploy-stage">
 
@@ -128,7 +191,9 @@
 
     <property name="version" value="1.3-SNAPSHOT" />
 
-    <replaceregexp file="${basedir}/distribution/pom.xml" match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;" replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
+    <replaceregexp file="${basedir}/distribution/pom.xml"
+                   match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
+                   replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
 
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />
