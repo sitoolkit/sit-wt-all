@@ -30,7 +30,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -96,8 +95,8 @@ public class AppController implements Initializable {
     @FXML
     private Button toggleButton;
 
-    @FXML
-    private Label statusLabel;
+    // @FXML
+    // private Label statusLabel;
 
     @FXML
     private FileTreeController fileTreeController;
@@ -127,9 +126,8 @@ public class AppController implements Initializable {
         projectState.setState(pomFile.exists() ? State.LOADED : State.NOT_LOADED);
         if (pomFile.exists()) {
             loadProject(pomFile);
-            statusLabel.setText("");
         } else {
-            statusLabel.setText("[プロジェクト]>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
+            addMsg("[プロジェクト]>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
         }
 
     }
@@ -158,7 +156,7 @@ public class AppController implements Initializable {
 
         pomFile = new File(projectDir, "pom.xml");
         if (pomFile.exists()) {
-            statusLabel.setText("プロジェクトは既に存在します。");
+            addMsg("プロジェクトは既に存在します。");
             return;
         }
 
@@ -170,7 +168,7 @@ public class AppController implements Initializable {
         if (pomFile.exists()) {
 
             loadProject(pomFile);
-            statusLabel.setText("プロジェクトを作成しました。");
+            addMsg("プロジェクトを作成しました。");
         }
     }
 
@@ -191,11 +189,11 @@ public class AppController implements Initializable {
         if (pomFile.exists()) {
 
             loadProject(pomFile);
-            statusLabel.setText("プロジェクトを開きました。");
+            addMsg("プロジェクトを開きました。");
 
         } else {
 
-            statusLabel.setText("pom.xmlの無いフォルダは無効です。");
+            addMsg("pom.xmlの無いフォルダは無効です。");
 
         }
     }
@@ -217,7 +215,7 @@ public class AppController implements Initializable {
 
     @FXML
     public void runSample() {
-        statusLabel.setText("サンプルを起動します。");
+        startMsg("サンプルを起動します。");
 
         mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
                 SitWtRuntimeUtils.buildSampleCommand());
@@ -225,11 +223,14 @@ public class AppController implements Initializable {
         mvnProcess.waitFor(() -> Platform.runLater(() -> {
             fileTreeController.refresh();
 
-            mvnProcess.start(new TextAreaConsole(console), new File(pomFile.getParent(), "sample"),
-                    MavenUtils.getCommand());
+            File sampledir = new File(pomFile.getParent(), "sample");
+            if (!sampledir.exists()) {
+                sampledir.mkdirs();
+            }
+            mvnProcess.start(new TextAreaConsole(console), sampledir, MavenUtils.getCommand());
 
             mvnProcess.waitFor(() -> Platform.runLater(() -> {
-                statusLabel.setText("サンプルを起動しました。");
+                addMsg("サンプルを起動しました。");
                 // TODO URLの動的取得
                 baseUrlCombo.setValue("http://localhost:8280");
                 fileTreeController.refresh();
@@ -252,7 +253,7 @@ public class AppController implements Initializable {
             return;
         }
 
-        statusLabel.setText("テストを実行します。");
+        startMsg("テストを実行します。");
 
         String baseUrl = baseUrlCombo.getValue();
         addBaseUrl(baseUrl);
@@ -267,7 +268,7 @@ public class AppController implements Initializable {
         projectState.setState(debugCheck.isSelected() ? State.DEBUGGING : State.RUNNING);
         mvnProcess.waitFor(() -> {
             projectState.setState(State.LOADED);
-            Platform.runLater(() -> statusLabel.setText("テストを終了します。"));
+            Platform.runLater(() -> addMsg("テストを終了します。"));
         });
     }
 
@@ -293,12 +294,11 @@ public class AppController implements Initializable {
         mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);
 
-        statusLabel.setText("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
+        addMsg("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
 
         projectState.setState(State.BROWSING);
         mvnProcess.waitFor(() -> {
             projectState.setState(State.LOADED);
-            Platform.runLater(() -> statusLabel.setText(""));
         });
     }
 
@@ -372,6 +372,20 @@ public class AppController implements Initializable {
 
             toggleButton.setText("拡大");
         }
+    }
+
+    private void startMsg(String msg) {
+        if (StrUtils.isNotEmpty(console.getText())) {
+            console.appendText(System.lineSeparator());
+            console.appendText(System.lineSeparator());
+            console.appendText(System.lineSeparator());
+        }
+        addMsg(msg);
+    }
+
+    private void addMsg(String msg) {
+        console.appendText(msg);
+        console.appendText(System.lineSeparator());
     }
 
 }

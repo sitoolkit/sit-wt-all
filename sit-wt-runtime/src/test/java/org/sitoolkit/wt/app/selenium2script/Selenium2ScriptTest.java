@@ -36,7 +36,6 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
     private static String TARGET_SCRIPT = "testscript/SeleniumIDETestScript.html";
 
     private static String BACKUPED_SCRIPT = TARGET_SCRIPT + ".bk";
-    private String backupedScriptPath = "testscript/SeleniumIDETestScript.html.bk";
 
     @Before
     @Override
