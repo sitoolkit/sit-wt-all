@@ -1,6 +1,7 @@
 package org.sitoolkit.wt.infra.process;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class StreamReader implements Runnable {
 
     @Override
     public void run() {
-        Scanner scanner = new Scanner(stream);
+        Scanner scanner = new Scanner(stream, Charset.defaultCharset().name());
         StringBuilder sb = new StringBuilder();
 
         while (scanner.hasNextLine()) {

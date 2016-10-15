@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.internal.Executable;
@@ -21,9 +22,7 @@ public class FirefoxManager {
     }
 
     public static void main(String[] args) {
-        new FirefoxManager().open();
-
-        System.exit(0);
+        System.exit(new FirefoxManager().open());
     }
 
     /**
@@ -33,28 +32,33 @@ public class FirefoxManager {
      * <li>Firefoxを起動する
      * </ul>
      */
-    public void open() {
-        FirefoxBinaryExt ffBinary = getFirefoxBinary();
+    public int open() {
+        try {
+            FirefoxBinaryExt ffBinary = getFirefoxBinary();
 
-        if (ffBinary == null) {
+            if (ffBinary == null) {
 
-            installFirefox();
+                installFirefox();
 
-            reRunMySelf();
-
-        } else {
-
-            if (checkSeleniumIdeInstalled()) {
-
-                LOG.info("Firefoxを起動します");
-                ProcessUtils.execute(false, ffBinary.getExecutable().getPath(), "-foreground");
+                reRunMySelf();
 
             } else {
 
-                installSeleniumIde(ffBinary);
+                if (checkSeleniumIdeInstalledWindows()) {
+
+                    LOG.info("Firefoxを起動します");
+                    ProcessUtils.execute(false, ffBinary.getExecutable().getPath(), "-foreground");
+
+                } else {
+
+                    installSeleniumIde(ffBinary);
+
+                }
 
             }
-
+            return 0;
+        } catch (Exception e) {
+            return 1;
         }
     }
 
@@ -99,9 +103,11 @@ public class FirefoxManager {
         ProcessUtils.execute(javaCmd, "-cp", classpath, getClass().getName());
     }
 
-    private boolean checkSeleniumIdeInstalled() {
-        File ffProfile = new File(System.getProperty("user.home"),
-                "Library/Application Support/Firefox/Profiles");
+    private boolean checkSeleniumIdeInstalled(String profilePath) {
+
+        LOG.debug("Selenium IDEがインストールされているかチェックします");
+
+        File ffProfile = getFfProfileDir();
 
         File profile = null;
 
@@ -115,19 +121,45 @@ public class FirefoxManager {
             String extensions = FileUtils.readFileToString(new File(profile, "extensions.json"),
                     "UTF-8");
 
-            return extensions.contains("Selenium IDE");
+            boolean installed = extensions.contains("Selenium IDE");
+
+            LOG.debug("Selenium IDEがインストールされて{}", installed ? "います" : "いません");
+
+            return installed;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    private boolean checkSeleniumIdeInstalledWindows() {
+        return checkSeleniumIdeInstalled("AppData/Roaming/Mozilla/Firefox/Profiles");
+    }
+
+    private boolean checkSeleniumIdeInstalledMacOs() {
+        return checkSeleniumIdeInstalled("Library/Application Support/Firefox/Profiles");
+    }
+
+    private File getFfProfileDir() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new File(System.getProperty("user.home"),
+                    "AppData/Roaming/Mozilla/Firefox/Profiles");
+        } else if (SystemUtils.IS_OS_MAC) {
+            return new File(System.getProperty("user.home"),
+                    "Library/Application Support/Firefox/Profiles");
+        } else {
+            throw new UnsupportedOperationException("");
+        }
+
     }
 
     /**
      * Firefoxの実行ファイルを返します。 Firefoxがインストールされていない場合はnullを返します。
-     * 
+     *
      * @return Firefoxの実行ファイル
      */
-    FirefoxBinaryExt getFirefoxBinary() {
+    private FirefoxBinaryExt getFirefoxBinary() {
         try {
 
             return new FirefoxBinaryExt();
@@ -147,6 +179,39 @@ public class FirefoxManager {
         if (!repo.exists()) {
             repo.mkdir();
         }
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            installFirefoxWindows(repo);
+        } else if (SystemUtils.IS_OS_MAC) {
+            installFirefoxMacOs(repo);
+        } else {
+            throw new UnsupportedOperationException("サポートされていないOSです");
+        }
+    }
+
+    private void installFirefoxWindows(File repo) {
+        File ffInstaller = new File(repo, "Firefox Setup 48.0.1.exe");
+
+        if (!ffInstaller.exists()) {
+            try {
+                URL url = new URL(
+                        "https://ftp.mozilla.org/pub/firefox/releases/48.0.1/win64/ja/Firefox%20Setup%2048.0.1.exe");
+
+                LOG.info("Firefoxをダウンロードします {} -> {}", url, ffInstaller.getAbsolutePath());
+
+                FileUtils.copyURLToFile(url, ffInstaller);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        LOG.info("Firefoxをインストールします");
+        ProcessUtils.execute(ffInstaller.getAbsolutePath(), "-ms");
+
+    }
+
+    private void installFirefoxMacOs(File repo) {
 
         File ffInstaller = new File(repo, "Firefox 48.0.1.dmg");
 
@@ -176,7 +241,7 @@ public class FirefoxManager {
 
     }
 
-    static class FirefoxBinaryExt extends FirefoxBinary {
+    private class FirefoxBinaryExt extends FirefoxBinary {
 
         public Executable getExecutable() {
             return super.getExecutable();

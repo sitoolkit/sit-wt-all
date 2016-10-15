@@ -46,10 +46,10 @@ public class ProcessUtils {
                 return new ExecuteResult(stdout.getText(), stderr.getText(), 0);
             }
 
-            if (process.waitFor(30, TimeUnit.SECONDS)) {
-                throw new RuntimeException("コマンド実行がタイムアウトしました " + commandStr);
-            }
-            int exitValue = process.exitValue();
+            // if (process.waitFor(60, TimeUnit.SECONDS)) {
+            // throw new RuntimeException("コマンド実行がタイムアウトしました " + commandStr);
+            // }
+            int exitValue = process.waitFor();
 
             return new ExecuteResult(stdout.getText(), stderr.getText(), exitValue);
 
