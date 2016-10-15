@@ -308,6 +308,13 @@ public class AppController implements Initializable {
     }
 
     @FXML
+    public void ope2script() {
+        // Selenium IDEで記録したスクリプトを実行できます。
+        // https://addons.mozilla.org/ja/firefox/addon/selenium-ide/
+        // testscriptにHTML形式で保存してください。
+    }
+
+    @FXML
     public void pause() {
         if (mavenConsoleListener.isPausing()) {
             pauseButton.setText("一時停止");

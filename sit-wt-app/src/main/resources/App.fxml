@@ -63,6 +63,7 @@
                 <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
                 <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
                 <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
+                <Button mnemonicParsing="false" onAction="#ope2script" text="記録" />
                 <Button mnemonicParsing="false" onAction="#page2script" text="ブラウザ起動" />
               </items>
             </ToolBar>

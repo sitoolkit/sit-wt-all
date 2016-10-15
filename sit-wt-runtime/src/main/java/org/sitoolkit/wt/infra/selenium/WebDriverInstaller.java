@@ -18,8 +18,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.sitoolkit.wt.infra.ConfigurationException;
-import org.sitoolkit.wt.infra.ProcessUtils;
 import org.sitoolkit.wt.infra.PropertyUtils;
+import org.sitoolkit.wt.infra.SitRepository;
+import org.sitoolkit.wt.infra.process.ProcessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,11 +228,8 @@ public class WebDriverInstaller {
     }
 
     String getRrepositoryDir(String driver) {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return "C:\\ProgramData\\sitoolkit\\repository\\selenium\\" + driver;
-        } else {
-            return System.getProperty("user.home") + "/.sitoolkit/repository/selenium/" + driver;
-        }
+        return SitRepository.getRepositoryPath() + File.separator + "selenium" + File.separator
+                + driver;
     }
 
 }
