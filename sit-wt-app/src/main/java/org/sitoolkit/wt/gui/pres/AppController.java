@@ -101,7 +101,7 @@ public class AppController implements Initializable {
     @FXML
     private FileTreeController fileTreeController;
 
-    private ConversationProcess mvnProcess = new ConversationProcess();
+    private ConversationProcess conversationProcess = new ConversationProcess();
 
     private ProjectState projectState = new ProjectState();
 
@@ -133,7 +133,7 @@ public class AppController implements Initializable {
     }
 
     public void destroy() {
-        mvnProcess.destroy();
+        conversationProcess.destroy();
         PropertyManager.get().setBaseUrls(baseUrlCombo.getItems());
     }
 
@@ -201,7 +201,6 @@ public class AppController implements Initializable {
     private void loadProject(File pomFile) {
 
         fileTreeController.setFileTreeRoot(pomFile.getParentFile());
-        projectState.setState(State.LOADED);
         PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
 
         List<String> baseUrls = PropertyManager.get().getBaseUrls();
@@ -211,29 +210,38 @@ public class AppController implements Initializable {
         }
 
         SitWtRuntimeUtils.loadSitWtClasspath(pomFile);
+        projectState.reset();
     }
 
     @FXML
     public void runSample() {
-        startMsg("サンプルを起動します。");
+        projectState.setState(State.LOCKING);
+        startMsg("サンプルWebサイトを起動します。");
 
-        mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
-                SitWtRuntimeUtils.buildSampleCommand());
+        conversationProcess.start(new TextAreaConsole(console),
+                pomFile.getAbsoluteFile().getParentFile(), SitWtRuntimeUtils.buildSampleCommand());
 
-        mvnProcess.waitFor(() -> Platform.runLater(() -> {
-            fileTreeController.refresh();
+        conversationProcess.onExit(exitCode -> Platform.runLater(() -> {
 
             File sampledir = new File(pomFile.getParent(), "sample");
             if (!sampledir.exists()) {
                 sampledir.mkdirs();
             }
-            mvnProcess.start(new TextAreaConsole(console), sampledir, MavenUtils.getCommand());
 
-            mvnProcess.waitFor(() -> Platform.runLater(() -> {
-                addMsg("サンプルを起動しました。");
-                // TODO URLの動的取得
-                baseUrlCombo.setValue("http://localhost:8280");
+            conversationProcess.start(new TextAreaConsole(console), sampledir,
+                    MavenUtils.getCommand());
+
+            conversationProcess.onExit(exitCode1 -> Platform.runLater(() -> {
+
+                if (exitCode1 == 0) {
+                    addMsg("サンプルWebサイトを起動しました。");
+                    // TODO URLの動的取得
+                    baseUrlCombo.setValue("http://localhost:8280");
+                } else {
+                    addMsg("サンプルWebサイトの起動に失敗しました。");
+                }
                 fileTreeController.refresh();
+                projectState.reset();
             }));
         }));
 
@@ -241,6 +249,8 @@ public class AppController implements Initializable {
 
     @FXML
     public void run() {
+        projectState.setState(debugCheck.isSelected() ? State.DEBUGGING : State.RUNNING);
+
         String testedClasses = SitWtRuntimeUtils
                 .findTestedClasses(fileTreeController.getSelectedFiles());
 
@@ -250,6 +260,7 @@ public class AppController implements Initializable {
             alert.setContentText("");
             alert.setHeaderText("実行するテストスクリプトを選択してください。");
             alert.show();
+            projectState.reset();
             return;
         }
 
@@ -262,12 +273,11 @@ public class AppController implements Initializable {
                 fileTreeController.getSelectedFiles(), debugCheck.isSelected(),
                 browserChoice.getSelectionModel().getSelectedItem(), baseUrl);
 
-        mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
+        conversationProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);
 
-        projectState.setState(debugCheck.isSelected() ? State.DEBUGGING : State.RUNNING);
-        mvnProcess.waitFor(() -> {
-            projectState.setState(State.LOADED);
+        conversationProcess.onExit(exitCode -> {
+            projectState.reset();
             Platform.runLater(() -> addMsg("テストを終了します。"));
         });
     }
@@ -291,27 +301,27 @@ public class AppController implements Initializable {
         List<String> command = SitWtRuntimeUtils.buildPage2ScriptCommand(browserChoice.getValue(),
                 baseUrlCombo.getValue());
 
-        mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
+        conversationProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);
 
         addMsg("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
 
         projectState.setState(State.BROWSING);
-        mvnProcess.waitFor(() -> {
-            projectState.setState(State.LOADED);
+        conversationProcess.onExit(exitCode -> {
+            projectState.reset();
         });
     }
 
     @FXML
     public void quitBrowsing() {
-        mvnProcess.input("q");
+        conversationProcess.input("q");
     }
 
     @FXML
     public void ope2script() {
         List<String> command = SitWtRuntimeUtils.buildOpe2ScriptCommand();
 
-        mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
+        conversationProcess.start(new TextAreaConsole(console, mavenConsoleListener),
                 pomFile.getAbsoluteFile().getParentFile(), command);
     }
 
@@ -322,41 +332,41 @@ public class AppController implements Initializable {
 
             String stepNo = stepNoText.getText();
             if (!StrUtils.isEmpty(stepNo)) {
-                mvnProcess.input("!" + stepNo);
-                mvnProcess.input("#" + stepNo);
+                conversationProcess.input("!" + stepNo);
+                conversationProcess.input("#" + stepNo);
             }
 
-            mvnProcess.input("s");
+            conversationProcess.input("s");
         } else {
             pauseButton.setText("再開");
-            mvnProcess.input("");
+            conversationProcess.input("");
         }
     }
 
     @FXML
     public void back() {
-        mvnProcess.input("b");
+        conversationProcess.input("b");
     }
 
     @FXML
     public void forward() {
-        mvnProcess.input("f");
+        conversationProcess.input("f");
     }
 
     @FXML
     public void export() {
-        mvnProcess.input("e");
+        conversationProcess.input("e");
     }
 
     @FXML
     public void openScript() {
-        mvnProcess.input("o");
+        conversationProcess.input("o");
     }
 
     @FXML
     public void quit() {
-        mvnProcess.destroy();
-        projectState.setState(State.LOADED);
+        conversationProcess.destroy();
+        projectState.reset();
     }
 
     private double stageHeight;

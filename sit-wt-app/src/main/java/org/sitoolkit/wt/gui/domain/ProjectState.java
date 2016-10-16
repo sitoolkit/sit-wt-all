@@ -32,7 +32,7 @@ public class ProjectState {
     private BooleanProperty debugging = new SimpleBooleanProperty();
 
     public enum State {
-        NOT_LOADED, LOADED, RUNNING, DEBUGGING, BROWSING
+        NOT_LOADED, LOADED, RUNNING, DEBUGGING, BROWSING, LOCKING
     }
 
     public void setState(State state) {
@@ -56,5 +56,9 @@ public class ProjectState {
 
     public BooleanProperty isDebugging() {
         return debugging;
+    }
+
+    public void reset() {
+        setState(State.LOADED);
     }
 }
