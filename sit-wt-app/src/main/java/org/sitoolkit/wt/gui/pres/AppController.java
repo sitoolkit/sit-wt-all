@@ -5,11 +5,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.sitoolkit.wt.gui.domain.MavenConsoleListener;
+import org.sitoolkit.wt.gui.domain.JettyConsoleListener;
 import org.sitoolkit.wt.gui.domain.ProjectState;
 import org.sitoolkit.wt.gui.domain.ProjectState.State;
+import org.sitoolkit.wt.gui.domain.SitWtDebugConsoleListener;
 import org.sitoolkit.wt.gui.domain.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.MavenUtils;
@@ -31,6 +33,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
@@ -95,11 +98,14 @@ public class AppController implements Initializable {
     @FXML
     private Button toggleButton;
 
-    // @FXML
-    // private Label statusLabel;
-
     @FXML
     private FileTreeController fileTreeController;
+
+    @FXML
+    private MenuItem sampleRunMenu;
+
+    @FXML
+    private MenuItem sampleStopMenu;
 
     private ConversationProcess conversationProcess = new ConversationProcess();
 
@@ -107,7 +113,7 @@ public class AppController implements Initializable {
 
     private File pomFile = new File("pom.xml");
 
-    private MavenConsoleListener mavenConsoleListener = new MavenConsoleListener();
+    private SitWtDebugConsoleListener mavenConsoleListener = new SitWtDebugConsoleListener();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -216,35 +222,55 @@ public class AppController implements Initializable {
     @FXML
     public void runSample() {
         projectState.setState(State.LOCKING);
+        sampleRunMenu.setVisible(false);
         startMsg("サンプルWebサイトを起動します。");
 
         conversationProcess.start(new TextAreaConsole(console),
                 pomFile.getAbsoluteFile().getParentFile(), SitWtRuntimeUtils.buildSampleCommand());
 
-        conversationProcess.onExit(exitCode -> Platform.runLater(() -> {
+        conversationProcess.onExit(exitCode -> {
 
             File sampledir = new File(pomFile.getParent(), "sample");
             if (!sampledir.exists()) {
                 sampledir.mkdirs();
             }
 
-            conversationProcess.start(new TextAreaConsole(console), sampledir,
+            JettyConsoleListener listener = new JettyConsoleListener();
+            conversationProcess.start(new TextAreaConsole(console, listener), sampledir,
                     MavenUtils.getCommand());
 
-            conversationProcess.onExit(exitCode1 -> Platform.runLater(() -> {
-
-                if (exitCode1 == 0) {
+            ExecutorContainer.get().execute(() -> {
+                if (listener.isSuccess()) {
                     addMsg("サンプルWebサイトを起動しました。");
                     // TODO URLの動的取得
                     baseUrlCombo.setValue("http://localhost:8280");
+                    sampleStopMenu.setVisible(true);
                 } else {
                     addMsg("サンプルWebサイトの起動に失敗しました。");
+                    sampleRunMenu.setVisible(true);
                 }
                 fileTreeController.refresh();
                 projectState.reset();
-            }));
-        }));
+            });
 
+        });
+    }
+
+    @FXML
+    public void stopSample() {
+        sampleStopMenu.setVisible(false);
+        startMsg("サンプルWebサイトを停止します。");
+        File sampledir = new File(pomFile.getParent(), "sample");
+        conversationProcess.start(new TextAreaConsole(console), sampledir, MavenUtils.getCommand(),
+                "jetty:stop");
+
+        conversationProcess.onExit(exitCode -> {
+
+            Platform.runLater(() -> {
+                sampleRunMenu.setVisible(true);
+                addMsg("サンプルWebサイトを停止しました。");
+            });
+        });
     }
 
     @FXML

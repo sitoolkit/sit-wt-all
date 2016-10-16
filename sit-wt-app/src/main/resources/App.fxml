@@ -38,7 +38,8 @@
                 <MenuItem mnemonicParsing="false" onAction="#createProject" text="新規作成" />
                 <MenuItem mnemonicParsing="false" onAction="#openProject" text="開く" />
                 <SeparatorMenuItem />
-                <MenuItem mnemonicParsing="false" onAction="#runSample" text="サンプルWebサイトを起動" />
+                <MenuItem fx:id="sampleRunMenu" mnemonicParsing="false" onAction="#runSample" text="サンプルWebサイトを起動" />
+                <MenuItem fx:id="sampleStopMenu" mnemonicParsing="false" onAction="#stopSample" text="サンプルWebサイトを停止" visible="false"/>
                 <SeparatorMenuItem />
               </items>
             </Menu>

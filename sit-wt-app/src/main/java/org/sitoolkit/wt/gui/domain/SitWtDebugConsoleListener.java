@@ -2,7 +2,7 @@ package org.sitoolkit.wt.gui.domain;
 
 import org.sitoolkit.wt.gui.infra.ConsoleListener;
 
-public class MavenConsoleListener implements ConsoleListener {
+public class SitWtDebugConsoleListener implements ConsoleListener {
 
     private boolean pausing;
 
