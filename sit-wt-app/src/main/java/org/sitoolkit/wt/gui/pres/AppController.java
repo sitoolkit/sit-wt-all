@@ -309,9 +309,10 @@ public class AppController implements Initializable {
 
     @FXML
     public void ope2script() {
-        // Selenium IDEで記録したスクリプトを実行できます。
-        // https://addons.mozilla.org/ja/firefox/addon/selenium-ide/
-        // testscriptにHTML形式で保存してください。
+        List<String> command = SitWtRuntimeUtils.buildOpe2ScriptCommand();
+
+        mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
+                pomFile.getAbsoluteFile().getParentFile(), command);
     }
 
     @FXML

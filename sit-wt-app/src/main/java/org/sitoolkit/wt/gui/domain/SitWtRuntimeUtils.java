@@ -155,6 +155,15 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
+    public static List<String> buildOpe2ScriptCommand() {
+        List<String> command = buildJavaCommand();
+
+        command.add("org.sitoolkit.wt.app.ope2script.FirefoxManager");
+
+        return command;
+
+    }
+
     private static List<String> buildJavaCommand() {
         List<String> command = new ArrayList<>();
         command.add("java");

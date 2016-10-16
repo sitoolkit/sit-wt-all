@@ -75,6 +75,7 @@ public class FirefoxManager {
 
             try {
 
+                // TODO 外部化
                 URL xpiUrl = new URL(
                         "https://addons.mozilla.org/firefox/downloads/latest/selenium-ide/addon-2079-latest.xpi?src=dp-btn-primary");
 
@@ -190,12 +191,13 @@ public class FirefoxManager {
     }
 
     private void installFirefoxWindows(File repo) {
-        File ffInstaller = new File(repo, "Firefox Setup 48.0.1.exe");
+        File ffInstaller = new File(repo, "Firefox Setup 47.0.1.exe");
 
         if (!ffInstaller.exists()) {
             try {
+                // TODO 外部化
                 URL url = new URL(
-                        "https://ftp.mozilla.org/pub/firefox/releases/48.0.1/win64/ja/Firefox%20Setup%2048.0.1.exe");
+                        "https://ftp.mozilla.org/pub/firefox/releases/47.0.1/win64/ja/Firefox%20Setup%2047.0.1.exe");
 
                 LOG.info("Firefoxをダウンロードします {} -> {}", url, ffInstaller.getAbsolutePath());
 
@@ -213,12 +215,13 @@ public class FirefoxManager {
 
     private void installFirefoxMacOs(File repo) {
 
-        File ffInstaller = new File(repo, "Firefox 48.0.1.dmg");
+        File ffInstaller = new File(repo, "Firefox 47.0.1.dmg");
 
         if (!ffInstaller.exists()) {
             try {
+                // TODO 外部化
                 URL url = new URL(
-                        "https://ftp.mozilla.org/pub/firefox/releases/48.0.1/mac/ja-JP-mac/Firefox%2048.0.1.dmg");
+                        "https://ftp.mozilla.org/pub/firefox/releases/47.0.1/mac/ja-JP-mac/Firefox%2047.0.1.dmg");
 
                 LOG.info("Firefoxをダウンロードします {} -> {}", url, ffInstaller.getAbsolutePath());
 
