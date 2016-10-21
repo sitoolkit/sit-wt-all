@@ -32,4 +32,7 @@ public class StrUtils {
         return !isEmpty(str);
     }
 
+    public static boolean equals(String a, String b) {
+        return a == null ? b == null : a.equals(b);
+    }
 }

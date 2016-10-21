@@ -8,10 +8,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.FileIOUtils;
-import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.StrUtils;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
+import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 
 public class SitWtRuntimeUtils {
 

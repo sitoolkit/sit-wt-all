@@ -14,12 +14,12 @@ import org.sitoolkit.wt.gui.infra.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.FxContext;
-import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.PropertyManager;
 import org.sitoolkit.wt.gui.infra.StageResizer;
 import org.sitoolkit.wt.gui.infra.StrUtils;
 import org.sitoolkit.wt.gui.infra.SystemUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
+import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 
 import javafx.application.Platform;
 import javafx.beans.value.ObservableBooleanValue;
@@ -117,6 +117,8 @@ public class AppController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        ExecutorContainer.get().execute(() -> UpdateChecker.checkAndInstall());
 
         // setVisible(projectGroup, Bindings.not(projectState.getRunning()));
         setVisible(startGroup, projectState.isLoaded());

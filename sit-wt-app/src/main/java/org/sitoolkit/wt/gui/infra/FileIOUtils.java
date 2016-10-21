@@ -82,20 +82,24 @@ public class FileIOUtils {
         }
     }
 
+    public static void stream2file(InputStream stream) {
+
+    }
+
     public static String file2str(File file) {
 
         StringBuilder sb = new StringBuilder();
 
-         try (BufferedReader br =  new BufferedReader(new FileReader(file))) {
-             br.lines().forEach(line -> {
-                 sb.append(line);
-                 sb.append(System.lineSeparator());
-             });
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            br.lines().forEach(line -> {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+            });
 
-         } catch (IOException e) {
-             throw new UnExpectedException(e);
-         }
+        } catch (IOException e) {
+            throw new UnExpectedException(e);
+        }
 
-         return sb.toString();
+        return sb.toString();
     }
 }

@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 import org.sitoolkit.wt.gui.infra.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.LogUtils;
-import org.sitoolkit.wt.gui.infra.MavenUtils;
 import org.sitoolkit.wt.gui.infra.PropertyManager;
+import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
