@@ -32,6 +32,7 @@ public class WebDriverInstaller {
 
     private static Logger LOG = LoggerFactory.getLogger(WebDriverInstaller.class);
 
+    private WebDriverBinaryInfo winGeckoBinaryInfo = new WebDriverBinaryInfo("win", "gecko");
     private WebDriverBinaryInfo macGeckoBinaryInfo = new WebDriverBinaryInfo("mac", "gecko");
     private WebDriverBinaryInfo winChromeBinaryInfo = new WebDriverBinaryInfo("win", "chrome");
     private WebDriverBinaryInfo macChromeBinaryInfo = new WebDriverBinaryInfo("mac", "chrome");
@@ -69,6 +70,7 @@ public class WebDriverInstaller {
         Map<String, String> prop = PropertyUtils.loadAsMap("/webdriver-default.properties", false);
         prop.putAll(PropertyUtils.loadAsMap("/webdriver.properties", true));
 
+        setProperties(prop, winGeckoBinaryInfo);
         setProperties(prop, macGeckoBinaryInfo);
         setProperties(prop, winChromeBinaryInfo);
         setProperties(prop, macChromeBinaryInfo);
@@ -92,8 +94,7 @@ public class WebDriverInstaller {
 
     public String installGeckoDriver() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            // TODO 実装
-            return "";
+            return install(winGeckoBinaryInfo);
         } else if (SystemUtils.IS_OS_MAC) {
             return install(macGeckoBinaryInfo);
         } else {

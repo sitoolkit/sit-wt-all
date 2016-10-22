@@ -86,6 +86,7 @@ public class WebDriverConfig {
 
         if (driverType == null) {
 
+            webDriverInstaller.installGeckoDriver();
             webDriver = new FirefoxDriver(capabilities);
 
         } else {
@@ -139,6 +140,7 @@ public class WebDriverConfig {
                     break;
 
                 default:
+                    webDriverInstaller.installGeckoDriver();
                     webDriver = new FirefoxDriver(capabilities);
             }
 
