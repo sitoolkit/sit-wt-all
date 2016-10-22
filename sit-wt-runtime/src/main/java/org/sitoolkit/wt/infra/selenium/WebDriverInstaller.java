@@ -1,6 +1,7 @@
 package org.sitoolkit.wt.infra.selenium;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -13,6 +14,9 @@ import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +32,7 @@ public class WebDriverInstaller {
 
     private static Logger LOG = LoggerFactory.getLogger(WebDriverInstaller.class);
 
+    private WebDriverBinaryInfo macGeckoBinaryInfo = new WebDriverBinaryInfo("mac", "gecko");
     private WebDriverBinaryInfo winChromeBinaryInfo = new WebDriverBinaryInfo("win", "chrome");
     private WebDriverBinaryInfo macChromeBinaryInfo = new WebDriverBinaryInfo("mac", "chrome");
     private WebDriverBinaryInfo ieBinaryInfo = new WebDriverBinaryInfo("ie");
@@ -64,6 +69,7 @@ public class WebDriverInstaller {
         Map<String, String> prop = PropertyUtils.loadAsMap("/webdriver-default.properties", false);
         prop.putAll(PropertyUtils.loadAsMap("/webdriver.properties", true));
 
+        setProperties(prop, macGeckoBinaryInfo);
         setProperties(prop, winChromeBinaryInfo);
         setProperties(prop, macChromeBinaryInfo);
         setProperties(prop, ieBinaryInfo);
@@ -81,6 +87,17 @@ public class WebDriverInstaller {
         String installDir = prop.get(os + binaryInfo.driver + ".installDir");
         if (StringUtils.isNotEmpty(installDir)) {
             binaryInfo.installDir = installDir;
+        }
+    }
+
+    public String installGeckoDriver() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            // TODO 実装
+            return "";
+        } else if (SystemUtils.IS_OS_MAC) {
+            return install(macGeckoBinaryInfo);
+        } else {
+            return "";
         }
     }
 
@@ -196,6 +213,15 @@ public class WebDriverInstaller {
     }
 
     private void extractOne(File srcFile, String entryName, File dstFile) throws IOException {
+        if (srcFile.getName().endsWith(".zip")) {
+            extractOneFromZip(srcFile, entryName, dstFile);
+        } else if (srcFile.getName().endsWith(".tar.gz")) {
+            extractOneFromTarGz(srcFile, entryName, dstFile);
+        }
+    }
+
+    private void extractOneFromZip(File srcFile, String entryName, File dstFile)
+            throws IOException {
 
         try (ZipFile zipFile = new ZipFile(srcFile)) {
             Enumeration<? extends ZipEntry> enu = zipFile.entries();
@@ -216,6 +242,25 @@ public class WebDriverInstaller {
                 }
 
             }
+        }
+    }
+
+    private void extractOneFromTarGz(File srcFile, String entryName, File dstFile)
+            throws IOException {
+        TarArchiveInputStream tarInput = new TarArchiveInputStream(
+                new GzipCompressorInputStream(new FileInputStream(srcFile)));
+        TarArchiveEntry currentEntry = tarInput.getNextTarEntry();
+        while (currentEntry != null) {
+
+            if (!currentEntry.getName().equals(entryName)) {
+                continue;
+            }
+
+            byte[] content = new byte[(int) currentEntry.getSize()];
+            IOUtils.read(tarInput, content);
+            FileUtils.writeByteArrayToFile(dstFile, content);
+
+            currentEntry = tarInput.getNextTarEntry();
         }
     }
 

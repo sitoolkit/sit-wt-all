@@ -93,6 +93,7 @@ public class WebDriverConfig {
             switch (driverType) {
 
                 case "firefox":
+                    webDriverInstaller.installGeckoDriver();
                     webDriver = new FirefoxDriver(capabilities);
                     break;
 
