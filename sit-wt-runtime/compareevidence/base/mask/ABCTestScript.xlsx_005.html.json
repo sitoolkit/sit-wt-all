@@ -1,0 +1,20 @@
+{
+	"evidenceName": "ABCTestScript.xlsx_005.html",
+	"maskInfo": [
+		{
+			"imgSrc": "img/ABCTestScript.xlsx_005_1_XXX.png",
+			"posStyle": []
+		},
+		{
+			"imgSrc": "img/ABCTestScript.xlsx_005_2_YYY.png",
+			"posStyle": [
+			             {
+			            	 "x": 728,
+			            	 "y": 8,
+			            	 "width": 137,
+			            	 "height": 28
+			             }
+			]
+		}
+	]
+}
