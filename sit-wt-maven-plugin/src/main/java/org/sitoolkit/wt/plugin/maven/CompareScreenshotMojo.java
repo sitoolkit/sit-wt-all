@@ -1,12 +1,13 @@
 package org.sitoolkit.wt.plugin.maven;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.sitoolkit.wt.app.compareevidence.ScreenshotComparator;
+import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 
 /**
  * Compares screenshot files between two evidence directories.
@@ -14,16 +15,17 @@ import org.sitoolkit.wt.app.compareevidence.ScreenshotComparator;
  * @author yu.takada
  *
  */
-@Mojo(name = "compare-screenshot", defaultPhase = LifecyclePhase.INTEGRATION_TEST)
+@Mojo(name = "compare-screenshot")
 public class CompareScreenshotMojo extends AbstractMojo {
 
-    @Parameter(property = "driver.type", defaultValue = "default", required = true)
-    @Deprecated
-    private String driverType;
+    @Parameter(property = "base.browser")
+    private String baseBrowser;
 
-    @Deprecated
-    @Parameter(property = "evidencedir.target")
-    private String targetEvidenceDir;
+    @Parameter(property = "evidence.base")
+    private String baseEvidence;
+
+    @Parameter(property = "evidence.target")
+    private String targetEvidence;
 
     /**
      * Open evidence after process finish.
@@ -34,8 +36,18 @@ public class CompareScreenshotMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
+        EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
+                : EvidenceDir.getInstance(targetEvidence);
+
+        String browser = StringUtils.defaultString(baseBrowser, targetDir.getBrowser());
+
+        EvidenceDir baseDir = baseEvidence == null ? EvidenceDir.getBase(browser)
+                : EvidenceDir.getInstance(baseEvidence);
+
         ScreenshotComparator comparator = new ScreenshotComparator();
-        comparator.compare(targetEvidenceDir, driverType);
+
+        comparator.staticExecute(baseDir, targetDir);
+
     }
 
 }

@@ -1,5 +1,4 @@
 
-// 操作ログ相違行の背景色を赤にする(table比較の場合)
 $(function() {
 	var rows = $("#right_evidence tbody").children().length;
 	var logIdx = $("#right_evidence thead > tr").children().length - 1;
@@ -7,17 +6,21 @@ $(function() {
 
 	for ( var i = 0; i < rows; i++) {
 
-		var leftLog = $("#left_evidence tr").eq(i).children().eq(logIdx).text();
-		var rightLog = $("#right_evidence tr").eq(i).children().eq(logIdx).text();
+		var leftLog = $("#left_evidence tbody > tr").eq(i).children().eq(logIdx).text();
+		var rightLog = $("#right_evidence tbody > tr").eq(i).children().eq(logIdx).text();
+
+		var dateFormat = "[yyyy/MM/dd HH:mm:ss] ";
+		leftLog = leftLog.substr(dateFormat.length - 1, leftLog.length);
+		rightLog = rightLog.substr(dateFormat.length - 1, rightLog.length);
 
 		if (leftLog != rightLog) {
-			$("#right_evidence tr").eq(i).css("background-color", "pink");
-			$("#left_evidence tr").eq(i).css("background-color", "pink");
+			$("#right_evidence tbody > tr").eq(i).css("background-color", "pink");
+			$("#left_evidence tbody > tr").eq(i).css("background-color", "pink");
 		}
 	}
 });
 
-//キー操作
+
 $(function() {
     $(window).keydown(function(e){
     	$('#left_evidence td.screenshot').each(function() {
@@ -81,8 +84,10 @@ $(function() {
     			img.css('position', 'absolute');
     			img.css('left', leftPos.left);
     			img.css('top', leftPos.top - margin_top);
+        		img.css('width', imgWidth);
         		img.css('opacity', '0.8');
         		img.css('z-index', '1');
+
 
     		} else if (e.keyCode == 74) { // Key[J]
 
@@ -104,20 +109,17 @@ $(function() {
     			img.css('position', 'absolute');
     			img.css('left', leftPos.left + imgWidth);
     			img.css('top', leftPos.top - margin_top);
-        		img.css('opacity', '1');
+        		img.css('width', imgWidth);
+    			img.css('opacity', '1');
 
     		}
     	});
-
-    	if (e.keyCode >= 37 && e.keyCode <= 40) {
-    		return false;
-    	}
 
     });
 
 });
 
-// キー移動
+
 function moveScreenshot(e, img) {
     switch(e.which){
 		case 39: // Key[→]

@@ -8,9 +8,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
-import org.sitoolkit.wt.domain.evidence.DiffEvidence;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
-import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
 
 /**
  * Compares evidence (html) between directories.
@@ -19,29 +17,26 @@ import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
  * @author yu.takada
  *
  */
-@Mojo(name = "compare-evidence", defaultPhase = LifecyclePhase.INTEGRATION_TEST)
+@Mojo(name = "compare-evidence", defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST)
 public class CompareEvidenceMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "firefox", property = "baseBrowser")
+    @Parameter(property = "base.browser")
     private String baseBrowser;
 
-    private static final boolean isUnmatchCompare = false;
-
-    @Parameter(property = "baseEvidence")
+    @Parameter(property = "evidence.base")
     private String baseEvidence;
 
-    @Parameter(property = "targetEvidence")
+    @Parameter(property = "evidence.target")
     private String targetEvidence;
 
     @Parameter(property = "compareScreenshot", defaultValue = "false")
     private boolean compareScreenshot;
 
+    @Parameter(property = "evidence.open", defaultValue = "true")
+    private String evidenceOpen;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
-        generator.setCompareEvidence(new DiffEvidence());
-        generator.setTemplateEngine(new TemplateEngineVelocityImpl());
-        // generator.run(baseBrowser, isUnmatchCompare);
 
         EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
                 : EvidenceDir.getInstance(targetEvidence);
@@ -51,7 +46,7 @@ public class CompareEvidenceMojo extends AbstractMojo {
         EvidenceDir baseDir = baseEvidence == null ? EvidenceDir.getBase(browser)
                 : EvidenceDir.getInstance(baseEvidence);
 
-        generator.generate(baseDir, targetDir, compareScreenshot);
+        DiffEvidenceGenerator.staticExecute(baseDir, targetDir, compareScreenshot, evidenceOpen);
     }
 
 }

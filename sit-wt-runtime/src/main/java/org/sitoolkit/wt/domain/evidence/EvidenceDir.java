@@ -20,6 +20,8 @@ public class EvidenceDir {
 
     static final String COMPARE_NG_PREFIX = "comp_ng_";
 
+    static final String MASK_PREFIX = "mask_";
+
     static final String UNMATCH_PREFIX = "unmatch_";
 
     static final String FAILSAFE_REPORT_NAME = "failsafe-report.html";
@@ -42,9 +44,7 @@ public class EvidenceDir {
     }
 
     public static EvidenceDir getBase(String browser) {
-        String baseEvidence = System.getProperty("baseEvidence");
-        return baseEvidence == null ? getInstance(new File(BASE_EVIDENCE_ROOT, browser))
-                : EvidenceDir.getInstance(new File(baseEvidence, browser));
+        return getInstance(new File(BASE_EVIDENCE_ROOT, browser));
     }
 
     public static EvidenceDir getLatest() {
@@ -57,7 +57,8 @@ public class EvidenceDir {
         for (File evidenceFile : FileUtils.listFiles(dir, new String[] { "html" }, true)) {
 
             String htmlName = evidenceFile.getName();
-            if (htmlName.startsWith(COMPARE_PREFIX) || htmlName.equals(FAILSAFE_REPORT_NAME)
+            if (htmlName.startsWith(COMPARE_PREFIX) || htmlName.startsWith(MASK_PREFIX)
+                    || htmlName.equals(FAILSAFE_REPORT_NAME)
                     || htmlName.equals(PROJECT_REPORTS_NAME)) {
                 continue;
             }
@@ -74,13 +75,18 @@ public class EvidenceDir {
 
     public Map<String, File> getScreenshotFilesAsMap(String evidenceFileName) {
 
-        String imgPrefix = StringUtils.removeEnd(evidenceFileName, ".html");
-
         Map<String, File> screenshotFiles = new HashMap<>();
+
+        String imgPrefix = StringUtils.removeEnd(evidenceFileName, ".html");
+        String maskPrefix = MASK_PREFIX + imgPrefix;
+        String unmatchPrefix = UNMATCH_PREFIX + imgPrefix;
+        String unmatchMaskPrefix = UNMATCH_PREFIX + MASK_PREFIX + imgPrefix;
 
         for (File imgFile : FileUtils.listFiles(dir, new String[] { "png" }, true)) {
 
-            if (imgFile.getName().startsWith(imgPrefix)) {
+            String imgName = imgFile.getName();
+            if (imgName.startsWith(imgPrefix) || imgName.startsWith(maskPrefix)
+                    || imgName.startsWith(unmatchPrefix) || imgName.startsWith(unmatchMaskPrefix)) {
                 screenshotFiles.put(imgFile.getName(), imgFile);
             }
         }

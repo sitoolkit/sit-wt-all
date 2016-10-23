@@ -14,6 +14,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,9 @@ public class MaskInfo {
 
     private static String USER_HOME = System.getProperty("user.home");
 
-    private static String DOWNLOAD_FOLDER = "downloads";
+    private static String DOWNLOAD_FOLDER = "Downloads";
+
+    private static String baseEvidence = System.getProperty("evidence.base");
 
     private Map<String, List<ElementPosition>> maskInfoAsMap = new HashMap<>();
 
@@ -32,16 +35,18 @@ public class MaskInfo {
 
     }
 
-    public static MaskInfo load(EvidenceDir baseDir) {
+    public static MaskInfo load(EvidenceDir targetDir) {
         MaskInfo maskInfo = new MaskInfo();
-        Map<String, List<ElementPosition>> oneImgMaskInfo = new HashMap<>();
+        Map<String, List<ElementPosition>> evdenceMaskInfo = new HashMap<>();
 
-        for (File evidenceFile : baseDir.getEvidenceFiles()) {
+        EvidenceDir baseDir = baseEvidence == null ? EvidenceDir.getBase(targetDir.getBrowser())
+                : EvidenceDir.getInstance(baseEvidence);
 
-            String maskFileName = evidenceFile.getName().concat(".json");
+        for (File evidenceFile : targetDir.getEvidenceFiles()) {
 
-            String maskFilePathInBase = StringUtils
-                    .join(new String[] { baseDir.getDir().getPath(), "mask" }, "/");
+            String maskFileName = evidenceFile.getName() + ".json";
+
+            String maskFilePathInBase = FilenameUtils.concat(baseDir.getDir().getPath(), "mask");
             File maskFileInBase = new File(maskFilePathInBase, maskFileName);
 
             String dlPath = StringUtils.join(new String[] { USER_HOME, DOWNLOAD_FOLDER }, "/");
@@ -54,11 +59,12 @@ public class MaskInfo {
                     jsonString = FileUtils.readFileToString(maskFileInBase, "UTF-8");
                 } else if (maskFileInDl.exists()) {
                     jsonString = FileUtils.readFileToString(maskFileInDl, "UTF-8");
+                    FileUtils.moveFileToDirectory(maskFileInDl, new File(maskFilePathInBase), true);
                 } else {
                     continue;
                 }
 
-                convertToMap(oneImgMaskInfo, jsonString);
+                convertToMap(evdenceMaskInfo, jsonString);
 
             } catch (IOException e) {
                 LOG.info("マスクファイル読み込み時に予期せぬエラーが発生しました", e);
@@ -66,15 +72,14 @@ public class MaskInfo {
 
         }
 
-        maskInfo.setMaskInfoAsMap(oneImgMaskInfo);
+        maskInfo.setMaskInfoAsMap(evdenceMaskInfo);
 
         return maskInfo;
     }
 
-    private static void convertToMap(Map<String, List<ElementPosition>> maskInfo,
+    private static void convertToMap(Map<String, List<ElementPosition>> evidenceMaskInfo,
             String jsonString) {
 
-        jsonString = StringUtils.replace(jsonString, "/", "\\/"); // JavaScriptで置換できなかったためここで実施
         JsonReader reader = Json.createReader(new StringReader(jsonString));
         JsonObject jsonObj = reader.readObject();
         reader.close();
@@ -86,22 +91,24 @@ public class MaskInfo {
             JsonObject obj = jsonArray.getJsonObject(i);
             JsonArray posStyles = obj.getJsonArray("posStyle");
 
-            String[] tmp = obj.getString("imgSrc").split("/");
-            String imgSrc = tmp[tmp.length - 1];
+            if (posStyles.isEmpty()) {
+                continue;
+            }
 
+            String imgSrc = FilenameUtils.getName(obj.getString("imgSrc"));
             List<ElementPosition> positions = new ArrayList<>();
 
             for (int j = 0; j < posStyles.size(); j++) {
                 JsonObject obj2 = posStyles.getJsonObject(j);
-                double x = (double) obj2.getInt("x");
-                double y = (double) obj2.getInt("y");
-                double w = (double) obj2.getInt("width");
-                double h = (double) obj2.getInt("height");
-                ElementPosition pos = new ElementPosition(x, y, w, h);
+                double posX = (double) obj2.getInt("x");
+                double posY = (double) obj2.getInt("y");
+                double width = (double) obj2.getInt("width");
+                double height = (double) obj2.getInt("height");
+                ElementPosition pos = new ElementPosition(posX, posY, width, height);
                 positions.add(pos);
             }
 
-            maskInfo.put(imgSrc, positions);
+            evidenceMaskInfo.put(imgSrc, positions);
 
         }
 

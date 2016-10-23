@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.sitoolkit.wt.app.config.BaseConfig;
 import org.sitoolkit.wt.domain.evidence.DiffEvidence;
+import org.sitoolkit.wt.domain.evidence.ReportOpener;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
 import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,7 @@ public class DiffEvidenceGeneratorConfig {
 
     @Resource
     @Bean
-    DiffEvidenceGenerator DiffEvidenceGenerator(DiffEvidence diffEvidence,
+    public DiffEvidenceGenerator DiffEvidenceGenerator(DiffEvidence diffEvidence,
             TemplateEngine templateEngine) {
         DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
         generator.setCompareEvidence(diffEvidence);
@@ -25,18 +26,32 @@ public class DiffEvidenceGeneratorConfig {
     }
 
     @Bean
-    DiffEvidence diffEvidence() {
+    public DiffEvidence diffEvidence() {
         return new DiffEvidence();
     }
 
     @Bean
-    TemplateEngine templateEngine() {
+    public TemplateEngine templateEngine() {
         return new TemplateEngineVelocityImpl();
     }
 
     @Bean
-    MaskScreenshotGenerator maskScreenshotGenerator() {
+    public MaskScreenshotGenerator maskScreenshotGenerator() {
         return new MaskScreenshotGenerator();
     }
 
+    @Bean
+    public MaskEvidenceGenerator maskEvidenceGenerator() {
+        return new MaskEvidenceGenerator();
+    }
+
+    @Bean
+    public EvidenceReportEditor evidenceReportEditor() {
+        return new EvidenceReportEditor();
+    }
+
+    @Bean
+    public ReportOpener reportOpener() {
+        return new ReportOpener();
+    }
 }

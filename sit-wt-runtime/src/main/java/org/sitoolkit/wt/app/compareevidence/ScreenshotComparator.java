@@ -7,9 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,9 +15,10 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
-import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class ScreenshotComparator {
 
@@ -27,17 +26,19 @@ public class ScreenshotComparator {
 
     private static final String MASK_PREFIX = "mask_";
 
-    public static final String SYSPROP_DRIVER_TYPE = "driver.type";
-
     private static final String UNMATCH_PREFIX = "unmatch_";
-
-    // DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
 
     int openFileCount = 1;
 
-    public static void main(String[] args) {
-        ScreenshotComparator comparator = new ScreenshotComparator();
-        comparator.compare(null, "default");
+    public void staticExecute(EvidenceDir baseDir, EvidenceDir targetDir) {
+
+        ApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                ScreenshotComparatorConfig.class);
+        ScreenshotComparator comparator = appCtx.getBean(ScreenshotComparator.class);
+
+        for (File evidenceFile : targetDir.getEvidenceFiles()) {
+            comparator.compare(baseDir, targetDir, evidenceFile);
+        }
     }
 
     /**
@@ -56,97 +57,34 @@ public class ScreenshotComparator {
         LOG.info("スクリーンショットを比較します {} {} <-> {}",
                 new Object[] { evidenceFile, baseDir.getDir(), targetDir.getDir() });
 
+        if (!baseDir.exists()) {
+            LOG.info("基準エビデンスディレクトリが存在しません {}", baseDir.getDir().getPath());
+            return true;
+        }
+
         Map<String, File> baseSsMap = baseDir.getScreenshotFilesAsMap(evidenceFile.getName());
         boolean match = true;
 
         for (Entry<String, File> targetEntry : targetDir
                 .getScreenshotFilesAsMap(evidenceFile.getName()).entrySet()) {
+
+            String maskedSsName = MASK_PREFIX + targetEntry.getKey();
+            if (baseSsMap.get(maskedSsName) != null) {
+                continue;
+            }
+
             File baseSs = baseSsMap.get(targetEntry.getKey());
             File targetSs = targetEntry.getValue();
 
-            if (true) {
-                // TODO mask済みイメージが存在する場合、変換前のイメージは比較対象外にする
+            if (baseSs == null) {
+                LOG.warn("基準エビデンスディレクトリに存在しないスクリーンショットです {}", targetEntry.getKey());
+                continue;
             }
 
             match &= compareOneScreenshot(baseSs, targetSs, 10, 10);
         }
 
         return match;
-    }
-
-    /**
-     *
-     * @param targetEvidenceDir
-     *            対象エビデンスディレクトリ
-     * @param browser
-     *            対象エビデンスのテスト実行に使用したブラウザ
-     * @see EvidenceUtils#baseEvidenceDir(String)
-     */
-    @Deprecated
-    public void compare(String targetEvidenceDir, String browser) {
-
-        File latestEvidenceDir = EvidenceUtils.targetEvidenceDir(targetEvidenceDir);
-        if (latestEvidenceDir == null) {
-            LOG.info("比較対象のエビデンスがありません");
-            return;
-        }
-
-        File baseEvidenceImgDir = new File(EvidenceUtils.baseEvidenceDir(browser), "img");
-        File targetEvidenceImgDir = new File(latestEvidenceDir, "img");
-        LOG.info("スクリーンショットを比較します {} <-> {}", baseEvidenceImgDir, targetEvidenceImgDir);
-
-        // スクリーンショット比較絞り込み
-        // img内すべて → マスク済みファイルが存在するスクリーンショットは、オリジナルを比較対象から除外
-        List<File> comparingTargetScreenshots = chooseTargetScreenshots(targetEvidenceImgDir);
-        LOG.info("比較対象となるスクリーンショット {}", comparingTargetScreenshots);
-
-        List<String> unmatchScreenshotNames = new ArrayList<>();
-
-        for (File targetImg : comparingTargetScreenshots) {
-            File baseImg = new File(baseEvidenceImgDir, targetImg.getName());
-
-            if (baseImg.exists()) {
-
-                if (!compareOneScreenshot(baseImg, targetImg, 10, 10)) {
-                    unmatchScreenshotNames.add(targetImg.getName());
-                }
-
-            } else {
-                LOG.info("基準スクリーンショットは存在しません {}", targetImg);
-                continue;
-            }
-        }
-
-        // if (unmatchScreenshotNames.size() > 0) {
-        //
-        // // スクリーンショットdiff作成
-        // DiffEvidence diffEvidence = new DiffEvidence();
-        // diffEvidence.setUnmatchScreenshotNames(unmatchScreenshotNames);
-        // generator.setCompareEvidence(diffEvidence);
-        // generator.setTemplateEngine(new TemplateEngineVelocityImpl());
-        // generator.run(System.getProperty("main.browser"), true);
-        //
-        // }
-
-    }
-
-    private List<File> chooseTargetScreenshots(File dir) {
-
-        String[] fileNameArray = dir.list();
-        List<String> targetFileNameList = new ArrayList<>(Arrays.asList(fileNameArray));
-
-        for (String str : fileNameArray) {
-            if (str.startsWith(MASK_PREFIX)) {
-                targetFileNameList.remove(str.replaceFirst(MASK_PREFIX, ""));
-            }
-        }
-
-        List<File> targetFileList = new ArrayList<>();
-        for (String s : targetFileNameList) {
-            targetFileList.add(new File(dir, s));
-        }
-
-        return targetFileList;
     }
 
     /**
@@ -204,30 +142,30 @@ public class ScreenshotComparator {
             for (int i = 0; i < splitImages.length; i++) {
                 for (int j = 0; j < splitImages[i].length; j++) {
 
-                    int x = bufferedImage.getWidth() / columns * j;
-                    int y = bufferedImage.getHeight() / rows * i;
+                    int posX = bufferedImage.getWidth() / columns * j;
+                    int posY = bufferedImage.getHeight() / rows * i;
 
-                    int w;
+                    int width;
                     if (j == splitImages[i].length - 1) {
-                        w = bufferedImage.getWidth() - x;
+                        width = bufferedImage.getWidth() - posX;
                     } else {
-                        w = bufferedImage.getWidth() / columns;
+                        width = bufferedImage.getWidth() / columns;
                     }
 
-                    int h;
+                    int height;
                     if (i == splitImages.length - 1) {
-                        h = bufferedImage.getHeight() - y;
+                        height = bufferedImage.getHeight() - posY;
                     } else {
-                        h = bufferedImage.getHeight() / rows;
+                        height = bufferedImage.getHeight() / rows;
                     }
 
-                    splitImages[i][j] = bufferedImage.getSubimage(x, y, w, h);
+                    splitImages[i][j] = bufferedImage.getSubimage(posX, posY, width, height);
 
                 }
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("スクリーンショットの分割処理で例外が発生しました", e);
         }
         return splitImages;
     }
@@ -239,13 +177,13 @@ public class ScreenshotComparator {
             BufferedImage imgBase = new BufferedImage(img.getWidth(), img.getHeight(),
                     BufferedImage.TYPE_INT_ARGB);
 
-            Graphics g = imgBase.getGraphics();
-            int x = bio[0][0].getWidth();
-            int y = bio[0][0].getHeight();
+            Graphics graphics = imgBase.getGraphics();
+            int posX = bio[0][0].getWidth();
+            int posY = bio[0][0].getHeight();
 
             for (int i = 0; i < bio.length; i++) {
                 for (int j = 0; j < bio[i].length; j++) {
-                    g.drawImage(bio[i][j], x * j, y * i, null);
+                    graphics.drawImage(bio[i][j], posX * j, posY * i, null);
                 }
             }
 
@@ -257,16 +195,16 @@ public class ScreenshotComparator {
             LOG.info("差分スクリーンショットを生成しました {}", maskedImg);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("差分スクリーンショット生成処理で例外が発生しました", e);
         }
 
     }
 
     private BufferedImage darken(BufferedImage bi) {
-        Graphics2D g = bi.createGraphics();
+        Graphics2D g2d = bi.createGraphics();
         Color color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
-        g.setPaint(color);
-        g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
+        g2d.setPaint(color);
+        g2d.fillRect(0, 0, bi.getWidth(), bi.getHeight());
         return bi;
     }
 
@@ -280,17 +218,9 @@ public class ScreenshotComparator {
             byteArray = baos.toByteArray();
             baos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("バイト配列変換処理で例外が発生しました", e);
         }
         return byteArray;
     }
-
-    // public DiffEvidenceGenerator getBuilder() {
-    // return generator;
-    // }
-    //
-    // public void setBuilder(DiffEvidenceGenerator builder) {
-    // this.generator = builder;
-    // }
 
 }

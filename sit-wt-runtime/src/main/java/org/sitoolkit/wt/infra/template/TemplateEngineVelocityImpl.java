@@ -43,7 +43,7 @@ public class TemplateEngineVelocityImpl implements TemplateEngine {
 
         File file = new File(outdir, model.getFileBase() + "." + model.getFileExt());
         try {
-            FileUtils.writeStringToFile(file, str);
+            FileUtils.writeStringToFile(file, str, "UTF-8");
             LOG.info("ファイルに書き込みました {}", file.getAbsolutePath());
         } catch (IOException e) {
             throw new IllegalStateException(e);

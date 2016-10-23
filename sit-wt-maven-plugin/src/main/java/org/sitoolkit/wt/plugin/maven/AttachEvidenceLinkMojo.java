@@ -7,12 +7,12 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.sitoolkit.wt.app.compareevidence.EvidenceReportEditor;
 
-@Mojo(name = "attach-evidence-link", defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST)
+@Mojo(name = "attach-evidence-link", defaultPhase = LifecyclePhase.VERIFY)
 public class AttachEvidenceLinkMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         EvidenceReportEditor editor = new EvidenceReportEditor();
-        editor.attachEvidenceLink();
+        editor.edit();
     }
 }

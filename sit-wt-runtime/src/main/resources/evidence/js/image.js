@@ -1,6 +1,4 @@
-/**
- *
- */
+
 function init(){
 
 	var modeHelp = "スクリーンショット比較時における除外箇所を指定するモードです。";
@@ -12,25 +10,25 @@ function init(){
 	var deleteHelp = "配置済みの付箋をすべて削除します。";
 
 	$("body").prepend("<div id='modeSelect'></div>");
-	$("#modeSelect").append("<p><button id='switch'>切替</button> 付箋モード<span class='tooltip' title='" + modeHelp + "'>[?]</span>：<span id='mode'>OFF</span></p>");
+	$("#modeSelect").append("<p><button id='switch'>切替</button> 付箋モード<span class='help' title='" + modeHelp + "'>[?]</span>：<span id='mode'>OFF</span></p>");
 	$("#modeSelect").append("<hr/>");
 
 	$("#modeSelect").after("<div id='toolBox'></div>");
-	$("#toolBox").append("付箋<span class='tooltip' title='" + fusenHelp + "'>[?]</span><br/>");
+	$("#toolBox").append("付箋<span class='help' title='" + fusenHelp + "'>[?]</span><br/>");
 	$("#toolBox").append("<div id='initialFusenPos'></div>");
 	$("#toolBox").append("<br/>");
 	$("#toolBox").append("<br/>");
 	$("#toolBox").append("<br/>");
 	$("#toolBox").append("<br/>");
-	$("#toolBox").append("ゴミ箱<span class='tooltip' title='" + trashBoxHelp + "'>[?]</span><br/>");
+	$("#toolBox").append("ゴミ箱<span class='help' title='" + trashBoxHelp + "'>[?]</span><br/>");
 	$("#toolBox").append("<div id='trashBox'></div>");
 	$("#toolBox").append("<br/>");
-	$("#toolBox").append("<button id='load'>読込</button><span class='tooltip' title='" + loadHelp + "'>[?]</span>");
-	$("#toolBox").append("<button id='save'>保存</button><span class='tooltip' title='" + saveHelp + "'>[?]</span> ");
-	$("#toolBox").append("<button id='delete' disabled='disabled'>削除</button><span class='tooltip' title='" + deleteHelp + "'>[?]</span>");
+	$("#toolBox").append("<button id='load'>読込</button><span class='help' title='" + loadHelp + "'>[?]</span>");
+	$("#toolBox").append("<button id='save'>保存</button><span class='help' title='" + saveHelp + "'>[?]</span> ");
+	$("#toolBox").append("<button id='delete' disabled='disabled'>削除</button><span class='help' title='" + deleteHelp + "'>[?]</span>");
 	$("#toolBox").after("<div id='movedFusen'></div>");
 
-	$(".tooltip").tooltip();
+	$(".help").tooltip();
 
 }
 
@@ -52,7 +50,7 @@ $(function() {
 
 			if (isOut(fusen, initialFusenPos)) {
 				createFusen();
-				$(this).css("position", "absolute").off("drag"); // .fusenはposition:relativeのため、ここでabsoluteにして新規付箋をfusenBaseに配置可能にする
+				$(this).css("position", "absolute").off("drag");
 			}
 
 		}).on("dragstop", function(event, ui) {
@@ -106,7 +104,6 @@ $(function() {
 			var img = $(this);
 
 			maskInfo.imgSrc = img.attr('src');
-//			maskInfo.imgSrc = img.attr('src').replace("/", "\\/"); // ← 置換後の文字列が"\\/"となるため、Javaで置換
 			maskInfo.posStyle = buildPosStyleArray(fusenArray, img);
 			maskInfoArray.push(maskInfo);
 
@@ -165,7 +162,6 @@ $(function() {
 		}
 	};
 
-	// inputタグ生成
 	var createInput = function() {
 
 		$("#toolBox").append("<input id='file' type='file' style='display: none;'>");
@@ -178,7 +174,7 @@ $(function() {
 			reader.readAsText($(this)[0].files[0]);
 			reader.onload = function() {
 
-				// jsonチェック（違うエビデンスのjsonならエラーメッセージを表示し、何もしない）
+				// JSONチェック
 				if(checkFile(input.val().split("\\").pop())){
 					if(movedFusen.children().length > 0){
 						confirmFusenRestore(reader.result);
@@ -186,18 +182,10 @@ $(function() {
 						relocateFusen(reader.result);
 					}
 					input.remove();
+
+					// ファイルの再読み込みを可能にするため、読込ボタンを再生成
 					createInput();
 				}
-//				if(checkFile(input.val().split("\\").pop())){
-//					var msg = "配置済みの付箋を削除してから付箋の配置を復元します。よろしいですか？";
-//					if(movedFusen.children().length > 0 && confirm(msg)){ // 「Confirm」ダイアログではOK, キャンセルでしか聞かれないため jQueryUIで実装
-//						movedFusen.children().remove();
-//					}
-//					relocateFusen(reader.result);
-//				}
-//
-//				input.remove();
-//				createInput();
 			};
 		});
 	};
@@ -327,7 +315,7 @@ $(function() {
 		}
 	});
 
-	// 初期表示では表示しない
+	// 初期表示では付箋を表示しない
 	$('#toolBox').toggle(false);
 
 	$("#switch").click(function() {
@@ -355,7 +343,7 @@ $(function() {
 
 });
 
-//キー操作で表示非表示切り替え
+//キー操作で付箋の表示・非表示切り替え
 $(window).keydown(function(e){
 	if (e.keyCode == 70) { // Key[F]
 		$('#toolBox').toggle();

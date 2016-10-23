@@ -1,8 +1,5 @@
 package org.sitoolkit.wt.domain.evidence;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sitoolkit.wt.infra.template.TemplateModel;
 
 public class DiffEvidence extends TemplateModel {
@@ -16,8 +13,6 @@ public class DiffEvidence extends TemplateModel {
     private String rightFileName;
 
     private String rightFile;
-
-    private List<String> unmatchScreenshotNames = new ArrayList<>();
 
     public DiffEvidence() {
         setTemplate("/evidence/evidence-template-diff.vm");
@@ -63,14 +58,6 @@ public class DiffEvidence extends TemplateModel {
 
     public void setRightFile(String rightFile) {
         this.rightFile = rightFile;
-    }
-
-    public List<String> getUnmatchScreenshotNames() {
-        return unmatchScreenshotNames;
-    }
-
-    public void setUnmatchScreenshotNames(List<String> unmatchScreenshotNames) {
-        this.unmatchScreenshotNames = unmatchScreenshotNames;
     }
 
 }

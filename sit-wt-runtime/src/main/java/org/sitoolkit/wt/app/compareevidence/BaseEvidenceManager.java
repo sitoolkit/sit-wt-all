@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
-import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,14 +49,14 @@ public class BaseEvidenceManager {
                 }
 
                 if (f1.isDirectory()) {
-                    File f2 = new File(EvidenceUtils.concatPath(destDir.getPath(), f1.getName()));
+                    File f2 = new File(destDir.getPath(), f1.getName());
                     copy(f1, f2);
                 } else {
                     FileUtils.copyFileToDirectory(f1, destDir);
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("エビデンスのコピー処理で例外が発生しました", e);
             }
         }
 

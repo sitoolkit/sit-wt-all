@@ -6,7 +6,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.sitoolkit.wt.app.compareevidence.BaseEvidenceManager;
-import org.sitoolkit.wt.app.compareevidence.MaskScreenshotGenerator;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 
 /**
@@ -23,14 +22,6 @@ import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 @Mojo(name = "set-base-evidence")
 public class SetBaseEvidenceMojo extends AbstractMojo {
 
-    @Parameter(property = "driver.type", defaultValue = "default", required = true)
-    @Deprecated
-    private String driverType;
-
-    @Deprecated
-    @Parameter(property = "evidencedir.target")
-    private String targetEvidenceDir;
-
     /**
      * Evidence directory to be copied to base evidence direcory. If not set,
      * target is latest evidence in ${project.build.directory}
@@ -40,8 +31,6 @@ public class SetBaseEvidenceMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        MaskScreenshotGenerator mask = new MaskScreenshotGenerator();
-        mask.generate(targetEvidenceDir, driverType);
 
         EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
                 : EvidenceDir.getInstance(targetEvidence);

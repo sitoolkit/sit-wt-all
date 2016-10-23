@@ -8,7 +8,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.sitoolkit.wt.domain.evidence.ReportOpener;
 
-@Mojo(name = "open-report", defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST)
+@Mojo(name = "open-report", defaultPhase = LifecyclePhase.VERIFY)
 public class ReportOpenMojo extends AbstractMojo {
 
     @Parameter(property = "evidence.open", defaultValue = "true")

@@ -1,6 +1,3 @@
-/**
- *
- */
 
 $(function() {
 
@@ -9,16 +6,13 @@ $(function() {
 			td.append(" <a href='" + input.data("mask") + "'>[ マスク版 ]</a>");
 		}
 		if (input.data("comp").length > 0) {
-			td.append(" <a href='" + input.data("comp") + "'>[ 比較 ]</a>"); // TODO メインブラウザとの比較、サブブラウザ同士の比較、区別
+			td.append(" <a href='" + input.data("comp") + "'>[ 比較 ]</a>");
 		}
 		if (input.data("compmask").length > 0) {
 			td.append(" <a href='" + input.data("compmask") + "'>[ 比較（マスク版） ]</a>");
 		}
 		if (input.data("compng").length > 0) {
 			td.append(" <a href='" + input.data("compng") + "'>[ スクリーンショット比較NG ]</a>");
-		}
-		if (input.data("compngmask").length > 0) {
-			td.append(" <a href='" + input.data("compngmask") + "'>[ スクリーンショット比較NG（マスク版） ]</a>");
 		}
 	};
 

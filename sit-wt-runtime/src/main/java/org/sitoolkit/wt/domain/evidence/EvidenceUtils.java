@@ -74,11 +74,6 @@ public class EvidenceUtils {
         }
     }
 
-    @Deprecated
-    public static String concatPath(String a, String b) {
-        return a.endsWith("/") ? a + b : a + "/" + b;
-    }
-
     public static String extractTable(File evidenceFile) throws IOException {
 
         List<String> lines = FileUtils.readLines(evidenceFile, "UTF-8");
@@ -96,6 +91,23 @@ public class EvidenceUtils {
         }
 
         return sb.toString();
+    }
+
+    public static String removeInputLine(String htmlString) throws IOException {
+
+        String[] lines = htmlString.split("\n");
+
+        StringBuilder sb = new StringBuilder();
+
+        for (String line : lines) {
+            if (line.trim().startsWith("<input")) {
+                continue;
+            }
+            sb.append(line + "\n");
+        }
+
+        return sb.toString();
+
     }
 
 }

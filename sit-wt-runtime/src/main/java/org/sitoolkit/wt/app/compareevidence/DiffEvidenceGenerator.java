@@ -3,24 +3,24 @@ package org.sitoolkit.wt.app.compareevidence;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.DiffEvidence;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.sitoolkit.wt.domain.evidence.EvidenceUtils;
+import org.sitoolkit.wt.domain.evidence.ReportOpener;
+import org.sitoolkit.wt.infra.TestException;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
-import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.util.ResourceUtils;
 
 /**
@@ -42,15 +42,11 @@ public class DiffEvidenceGenerator {
 
     private static final String COMPARE_NG_PREFIX = "comp_ng_";
 
+    private static final String MASK_PREFIX = "mask_";
+
     private static final String UNMATCH_PREFIX = "unmatch_";
 
-    private static final String failsafeReportName = "failsafe-report.html";
-
     private static final String IMG_BASE = "base";
-
-    private static final String IMG_BASE_DIFF = "base_diff";
-
-    private String evidenceFileRegex = ".*\\.html$";
 
     /**
      * エビデンスの表示に関連する資源
@@ -63,23 +59,39 @@ public class DiffEvidenceGenerator {
 
     private ScreenshotComparator screenshotComparator = new ScreenshotComparator();
 
-    public static void main(String[] args) {
-        DiffEvidenceGenerator generator = new DiffEvidenceGenerator();
-        generator.setCompareEvidence(new DiffEvidence());
-        // TODO
-        TemplateEngineVelocityImpl engine = new TemplateEngineVelocityImpl();
-        engine.init();
-        generator.setTemplateEngine(engine);
-        generator.run("default", false);
+    public static void staticExecute(EvidenceDir baseDir, EvidenceDir targetDir,
+            boolean compareScreenshot, String evidenceOpen) {
 
+        if (!(baseDir.exists())) {
+            LOG.info("基準エビデンスがありません");
+            return;
+        } else {
+
+            ApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                    DiffEvidenceGeneratorConfig.class);
+            DiffEvidenceGenerator generator = appCtx.getBean(DiffEvidenceGenerator.class);
+
+            boolean result = generator.generate(baseDir, targetDir, compareScreenshot);
+
+            if (!result) {
+                EvidenceReportEditor editor = appCtx.getBean(EvidenceReportEditor.class);
+                editor.edit();
+
+                if (Boolean.parseBoolean(evidenceOpen)) {
+                    ReportOpener opener = appCtx.getBean(ReportOpener.class);
+                    opener.open();
+                }
+                throw new TestException("基準と異なるスクリーンショットが存在します");
+            }
+        }
     }
 
     /**
      * 基準エビデンスと対象エビデンスとの比較エビデンスを生成します。
      * 比較エビデンスは、基準と対象それぞれのエビデンスディレクトリ内の同じファイル名のエビデンスファイル(html)に対して生成します。
      * 比較エビデンスのファイルは対象エビデンスディレクトリ内に生成します。
-     *  {@code compareScreenshot}に{@code true}を指定すると、 
-     *  エビデンス同士のスクリーンショットを比較し、それに対する比較エビデンスも生成します。
+     * {@code compareScreenshot}に{@code true}を指定すると、
+     * エビデンス同士のスクリーンショットを比較し、それに対する比較エビデンスも生成します。
      *
      * @param baseDir
      *            基準エビデンスディレクトリ
@@ -95,23 +107,35 @@ public class DiffEvidenceGenerator {
 
         LOG.info("比較エビデンスを生成します {} <-> {}", baseDir.getDir(), targetDir.getDir());
 
+        if (compareScreenshot) {
+            MaskScreenshotGenerator mask = appCtx.getBean(MaskScreenshotGenerator.class);
+            MaskEvidenceGenerator evidence = new MaskEvidenceGenerator();
+            mask.generate(targetDir);
+            evidence.generate(targetDir);
+        }
+
         boolean allSsMatches = true;
 
         for (File evidenceFile : targetDir.getEvidenceFiles()) {
 
-            generateDiffEvidence(baseDir, evidenceFile, false);
-
             if (compareScreenshot) {
-
-                MaskScreenshotGenerator mask = appCtx.getBean(MaskScreenshotGenerator.class);
-                mask.generate(targetDir);
-
                 if (!screenshotComparator.compare(baseDir, targetDir, evidenceFile)) {
                     generateDiffEvidence(baseDir, evidenceFile, true);
                     allSsMatches = false;
                 }
             }
 
+            generateDiffEvidence(baseDir, evidenceFile, false);
+            copyBaseScreenshots(baseDir, evidenceFile);
+
+        }
+
+        try {
+            URL url = ResourceUtils.getURL("classpath:evidence/" + compareEvidenceResource);
+            File dstFile = new File(targetDir.getDir(), compareEvidenceResource);
+            FileUtils.copyURLToFile(url, dstFile);
+        } catch (IOException e) {
+            LOG.error("リソースファイルのコピー処理で例外が発生しました", e);
         }
 
         return allSsMatches;
@@ -130,57 +154,63 @@ public class DiffEvidenceGenerator {
      */
     void generateDiffEvidence(EvidenceDir baseEvidenceDir, File evidenceFile, boolean withUnmatch) {
 
-        File baseEvidenceFile = null;
-        for (File f : baseEvidenceDir.getEvidenceFiles()) {
-            if (evidenceFile.getName().equals(f.getName())) {
-                baseEvidenceFile = f;
-                break;
-            }
-        }
-        if (baseEvidenceFile == null) {
-            LOG.info("基準エビデンスが存在しないため、比較エビデンス作成処理を終了します {}", evidenceFile.getName());
-            return;
-        }
+        File baseEvidence = new File(baseEvidenceDir.getDir(), evidenceFile.getName());
 
         DiffEvidence diffEvidence = appCtx.getBean(DiffEvidence.class);
-        load(diffEvidence, baseEvidenceFile, evidenceFile, withUnmatch);
+        load(diffEvidence, baseEvidenceDir, baseEvidence, evidenceFile, withUnmatch);
 
         templateEngine.write(diffEvidence);
 
-        copyBaseScreenshots(baseEvidenceDir, baseEvidenceFile, evidenceFile, withUnmatch);
-
-        try {
-            URL url = ResourceUtils.getURL("classpath:evidence/" + compareEvidenceResource);
-            File dstFile = new File(evidenceFile.getParent(), compareEvidenceResource);
-            FileUtils.copyURLToFile(url, dstFile);
-        } catch (IOException e) {
-            LOG.error("リソースファイルのコピー処理で例外が発生しました", e);
+        File maskEvidence = new File(evidenceFile.getParent(),
+                MASK_PREFIX + evidenceFile.getName());
+        if (!withUnmatch && maskEvidence.exists()) {
+            generateMaskDiffEvidence(diffEvidence, baseEvidence, evidenceFile, withUnmatch);
         }
 
     }
 
-    private void copyBaseScreenshots(EvidenceDir baseEvidenceDir, File baseEvidenceFile,
+    private void generateMaskDiffEvidence(DiffEvidence diffEvidence, File baseEvidenceFile,
             File evidenceFile, boolean withUnmatch) {
 
-        LOG.info("基準のスクリーンショットをエビデンスディレクトリにコピーします");
+        load(diffEvidence, baseEvidenceFile, evidenceFile, withUnmatch);
+        templateEngine.write(diffEvidence);
+
+    }
+
+    void load(DiffEvidence diffEvidence, EvidenceDir baseEvidenceDir, File baseEvidenceFile,
+            File evidenceFile, boolean withUnmatch) {
+
+        diffEvidence.setEvidenceName(StringUtils.removeEnd(evidenceFile.getName(), ".html"));
+
+        String prefix = withUnmatch ? COMPARE_NG_PREFIX : COMPARE_PREFIX;
+        diffEvidence.setFileBase(prefix + diffEvidence.getEvidenceName());
+
+        diffEvidence.setOutDir(evidenceFile.getParent());
+
+        diffEvidence.setLeftFileName(FilenameUtils.concat(baseEvidenceDir.getDir().getPath(),
+                baseEvidenceFile.getName()));
+        diffEvidence.setRightFileName(
+                FilenameUtils.concat(evidenceFile.getParent(), evidenceFile.getName()));
 
         try {
+            String leftHtmlTable = EvidenceUtils.extractTable(baseEvidenceFile);
+            leftHtmlTable = EvidenceUtils.removeInputLine(leftHtmlTable);
+            leftHtmlTable = StringUtils.replace(leftHtmlTable, "src=\"img",
+                    "src=\"img/" + IMG_BASE);
 
-            String baseImgFolder = withUnmatch ? IMG_BASE_DIFF : IMG_BASE;
-            File dstDir = new File(StringUtils
-                    .join(new String[] { evidenceFile.getParent(), "img", baseImgFolder }, "/"));
+            String rightHtmlTable = EvidenceUtils.extractTable(evidenceFile);
+            rightHtmlTable = EvidenceUtils.removeInputLine(rightHtmlTable);
 
-            Map<String, File> baseSsMap = baseEvidenceDir
-                    .getScreenshotFilesAsMap(baseEvidenceFile.getName());
-
-            for (Entry<String, File> imgFile : baseSsMap.entrySet()) {
-                LOG.info("基準のスクリーンショットをコピーします {}, {} -> {}", imgFile.getValue().getName(),
-                        imgFile.getValue().getParent(), dstDir.getPath());
-                FileUtils.copyFileToDirectory(imgFile.getValue(), dstDir);
+            if (withUnmatch) {
+                leftHtmlTable = replaceImgName(leftHtmlTable, baseEvidenceFile);
+                rightHtmlTable = replaceImgName(rightHtmlTable, evidenceFile);
             }
 
+            diffEvidence.setLeftFile(leftHtmlTable);
+            diffEvidence.setRightFile(rightHtmlTable);
+
         } catch (IOException e) {
-            LOG.error("スクリーンショットのコピー処理で例外が発生しました", e);
+            LOG.error("比較エビデンス生成処理で例外が発生しました", e);
         }
 
     }
@@ -188,167 +218,85 @@ public class DiffEvidenceGenerator {
     void load(DiffEvidence diffEvidence, File baseEvidenceFile, File evidenceFile,
             boolean withUnmatch) {
 
-        diffEvidence.setEvidenceName(StringUtils.removeEnd(evidenceFile.getName(), ".html"));
+        diffEvidence.setFileBase(
+                StringUtils.join(COMPARE_PREFIX, MASK_PREFIX, diffEvidence.getEvidenceName()));
+        diffEvidence.setLeftFile(
+                replaceMaskImgName(diffEvidence.getLeftFile(), baseEvidenceFile, withUnmatch));
+        diffEvidence.setRightFile(
+                replaceMaskImgName(diffEvidence.getRightFile(), evidenceFile, withUnmatch));
 
-        String prefix = withUnmatch ? COMPARE_NG_PREFIX : COMPARE_PREFIX;
-        diffEvidence.setFileBase(StringUtils.join(prefix, diffEvidence.getEvidenceName()));
+    }
 
-        diffEvidence.setOutDir(evidenceFile.getParent());
+    private String replaceImgName(String text, File evidenceFile) {
 
-        diffEvidence.setLeftFileName(StringUtils.join(
-                new String[] { baseEvidenceFile.getParent(), baseEvidenceFile.getName() }, "/"));
-        diffEvidence.setRightFileName(StringUtils
-                .join(new String[] { evidenceFile.getParent(), evidenceFile.getName() }, "/"));
+        EvidenceDir evidenceDir = EvidenceDir.getInstance(evidenceFile.getParent());
+        Map<String, File> imgMap = evidenceDir.getScreenshotFilesAsMap(evidenceFile.getName());
 
-        try {
-            String baseImgFolder = withUnmatch ? IMG_BASE_DIFF : IMG_BASE;
+        for (Entry<String, File> imgFile : imgMap.entrySet()) {
 
-            String leftHtmlTable = EvidenceUtils.extractTable(baseEvidenceFile);
-            diffEvidence.setLeftFile(StringUtils.replace(leftHtmlTable, "src=\"img",
-                    "src=\"img/".concat(baseImgFolder)));
+            String imgName = imgFile.getKey();
 
-            String rightHtmlTable = EvidenceUtils.extractTable(evidenceFile);
-
-            // TODO rightHtmlTableのスクリーンショットリンクにUNMATCH_PREFIXをつける
-            if (withUnmatch) {
-
+            if (imgName.startsWith(MASK_PREFIX) || imgName.startsWith(UNMATCH_PREFIX)) {
+                continue;
             }
 
-            diffEvidence.setRightFile(rightHtmlTable);
+            String unmatchMaskImgName = UNMATCH_PREFIX + MASK_PREFIX + imgName;
+            String unmatchImgName = UNMATCH_PREFIX + imgName;
+            String maskImgName = MASK_PREFIX + imgName;
+
+            if (imgMap.get(unmatchMaskImgName) != null) {
+                text = StringUtils.replace(text, imgName, unmatchMaskImgName);
+            } else if (imgMap.get(unmatchImgName) != null) {
+                text = StringUtils.replace(text, imgName, unmatchImgName);
+            } else if (imgMap.get(maskImgName) != null) {
+                text = StringUtils.replace(text, imgName, maskImgName);
+            }
+
+        }
+
+        return text;
+    }
+
+    private String replaceMaskImgName(String text, File evidenceFile, boolean withUnmatch) {
+
+        EvidenceDir evidenceDir = EvidenceDir.getInstance(evidenceFile.getParent());
+        Map<String, File> imgMap = evidenceDir.getScreenshotFilesAsMap(evidenceFile.getName());
+
+        for (Entry<String, File> imgFile : imgMap.entrySet()) {
+
+            String imgName = imgFile.getKey();
+
+            if (imgName.startsWith(MASK_PREFIX)) {
+                continue;
+            }
+
+            String maskImgName = MASK_PREFIX + imgName;
+            if (imgMap.get(maskImgName) != null) {
+                text = StringUtils.replace(text, imgName, maskImgName);
+            }
+
+        }
+
+        return text;
+    }
+
+    private void copyBaseScreenshots(EvidenceDir baseDir, File evidenceFile) {
+
+        LOG.info("基準のスクリーンショットをエビデンスディレクトリにコピーします");
+
+        try {
+
+            File dstDir = new File(StringUtils
+                    .join(new String[] { evidenceFile.getParent(), "img", IMG_BASE }, "/"));
+
+            Map<String, File> baseSsMap = baseDir.getScreenshotFilesAsMap(evidenceFile.getName());
+
+            for (Entry<String, File> imgFile : baseSsMap.entrySet()) {
+                FileUtils.copyFileToDirectory(imgFile.getValue(), dstDir);
+            }
 
         } catch (IOException e) {
-            LOG.info("比較エビデンス生成処理で例外が発生しました", e);
-        }
-
-    }
-
-    @Deprecated
-    public void run(String mainBrowser, boolean isUnmatchCompare) {
-        File latestEvidenceDir = EvidenceUtils.getLatestEvidenceDir();
-
-        if (latestEvidenceDir == null) {
-            return;
-        }
-
-        String driverType = System.getProperty("driver.type");
-
-        String baseBrowser;
-        if (isUnmatchCompare) { // or isScreenshotCompare
-            baseBrowser = driverType;
-        } else {
-            baseBrowser = mainBrowser;
-            if (mainBrowser.equals(driverType)) {
-                return;
-            }
-        }
-
-        File baseEvidenceDir = EvidenceUtils.baseEvidenceDir(baseBrowser);
-
-        for (File s : FileUtils.listFiles(latestEvidenceDir, new RegexFileFilter(evidenceFileRegex),
-                TrueFileFilter.INSTANCE)) {
-            String htmlName = s.getName();
-            if (!(htmlName.startsWith(COMPARE_PREFIX)) && !(failsafeReportName.equals(htmlName))) {
-                if (isUnmatchCompare
-                        && matchedEvidence(htmlName, compareEvidence.getUnmatchScreenshotNames())) {
-                    // 不一致スクリーンショットが存在しないエビデンスでは、比較エビデンスを作成しない
-                    continue;
-                }
-                createEvidence(baseEvidenceDir, latestEvidenceDir.getPath(), htmlName,
-                        isUnmatchCompare, compareEvidence.getUnmatchScreenshotNames());
-            }
-        }
-
-    }
-
-    private boolean matchedEvidence(String htmlName, List<String> errorScreenshotNames) {
-
-        for (String s : errorScreenshotNames) {
-            if (s.startsWith(htmlName.replaceFirst(".html$", ""))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void createEvidence(File baseEvidencePath, String targetEvidencePath,
-            String evidenceName, boolean isUnmatchCompare, List<String> errorScreenshotNames) {
-
-        // 基準エビデンスが存在しなければ何もしない
-        File baseEvidence = new File(baseEvidencePath, evidenceName);
-        if (!(baseEvidence.exists())) {
-            LOG.info("基準となるエビデンスが存在しませんでした {}", baseEvidence.getName());
-            return;
-        }
-
-        File targetEvidence = new File(EvidenceUtils.concatPath(targetEvidencePath, evidenceName));
-        File targetEvidenceDir = new File(targetEvidencePath);
-
-        try {
-
-            String baseEvidenceHtml = EvidenceUtils.extractTable(baseEvidence);
-            String targetEvidenceHtml = EvidenceUtils.extractTable(targetEvidence);
-
-            String baseEvidenceImgPath;
-            if (isUnmatchCompare) {
-                baseEvidenceImgPath = "img/base_ng";
-                compareEvidence.setEvidenceName(COMPARE_NG_PREFIX.concat(baseEvidence.getName()));
-            } else {
-                baseEvidenceImgPath = "img/base";
-                compareEvidence.setEvidenceName(COMPARE_PREFIX.concat(baseEvidence.getName()));
-            }
-
-            compareEvidence.setLeftFileName(
-                    EvidenceUtils.concatPath(baseEvidence.getParent(), baseEvidence.getName()));
-            compareEvidence.setRightFileName(
-                    EvidenceUtils.concatPath(targetEvidence.getParent(), targetEvidence.getName()));
-
-            compareEvidence.setLeftFile(StringUtils.replace(baseEvidenceHtml, "src=\"img",
-                    "src=\"".concat(baseEvidenceImgPath)));
-
-            if (isUnmatchCompare) {
-                for (String s : errorScreenshotNames) {
-                    if (s.startsWith(evidenceName.replaceFirst(".html$", ""))) {
-                        targetEvidenceHtml = targetEvidenceHtml.replaceAll(s,
-                                UNMATCH_PREFIX.concat(s));
-                    }
-                }
-            }
-
-            compareEvidence.setRightFile(targetEvidenceHtml);
-
-            String evidenceStr = templateEngine.writeToString(compareEvidence);
-
-            File evidence = new File(targetEvidenceDir, compareEvidence.getEvidenceName());
-            FileUtils.write(evidence, evidenceStr, "UTF-8");
-
-            // diff.jsのコピー
-            URL url;
-            url = ResourceUtils.getURL("classpath:evidence/" + compareEvidenceResource);
-            File dstFile = new File(targetEvidenceDir, compareEvidenceResource);
-            FileUtils.copyURLToFile(url, dstFile);
-
-            String imgPathLeftTo = EvidenceUtils.concatPath(targetEvidencePath,
-                    baseEvidenceImgPath);
-
-            File imgLeftDirFrom = new File(baseEvidence.getParent().concat("/img"));
-            File imgLeftDirTo = new File(imgPathLeftTo);
-            copy(imgLeftDirFrom, imgLeftDirTo);
-
-            LOG.info("比較エビデンスを生成しました {}", evidence);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    void copy(File srcDir, File destDir) {
-
-        for (File f : srcDir.listFiles()) {
-            try {
-                FileUtils.copyFileToDirectory(f, destDir);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            LOG.error("スクリーンショットのコピー処理で例外が発生しました", e);
         }
 
     }
