@@ -92,7 +92,6 @@ public class Tester {
     }
 
     public void prepare(String scriptPath, String sheetName, String caseNo) {
-        log.info("テストスクリプトをロードします。{}, {}", scriptPath, sheetName);
         testScript = catalog.get(scriptPath, sheetName);
         current.setTestScript(testScript);
         current.setScriptName(testScript.getName());
@@ -253,6 +252,10 @@ public class Tester {
 
     public boolean isScriptLoaded() {
         return scriptLoaded;
+    }
+
+    public TestScript getTestScript() {
+        return testScript;
     }
 
 }
