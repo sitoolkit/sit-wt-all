@@ -1,7 +1,9 @@
 package org.sitoolkit.wt.gui.pres;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -12,13 +14,13 @@ import org.sitoolkit.wt.gui.domain.SitWtDebugConsoleListener;
 import org.sitoolkit.wt.gui.domain.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.ExecutorContainer;
-import org.sitoolkit.wt.gui.infra.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.FxContext;
 import org.sitoolkit.wt.gui.infra.PropertyManager;
 import org.sitoolkit.wt.gui.infra.StageResizer;
 import org.sitoolkit.wt.gui.infra.StrUtils;
 import org.sitoolkit.wt.gui.infra.SystemUtils;
 import org.sitoolkit.wt.gui.infra.TextAreaConsole;
+import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 
 import javafx.application.Platform;
@@ -41,8 +43,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 public class AppController implements Initializable {
-
-    private static final String POM_URL = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml";
 
     @FXML
     private Menu baseUrlMenu;
@@ -168,8 +168,12 @@ public class AppController implements Initializable {
             return;
         }
 
-        // TODO 外部化
-        FileIOUtils.download(POM_URL, pomFile);
+        try {
+            URL pomUrl = getClass().getResource("/distribution-pom.xml");
+            Files.copy(pomUrl.openStream(), pomFile.toPath());
+        } catch (IOException e) {
+            throw new UnExpectedException(e);
+        }
 
         projectState.isLoaded().set(pomFile.exists());
 
