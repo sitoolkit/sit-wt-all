@@ -75,7 +75,7 @@ public class WebDriverConfig {
             WebDriverInstaller webDriverInstaller) throws MalformedURLException {
         RemoteWebDriver webDriver = null;
 
-        String driverType = pm.getDriverType();
+        String driverType = StringUtils.defaultString(pm.getDriverType());
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         Map<String, String> map = pm.getCapabilities();
@@ -84,66 +84,57 @@ public class WebDriverConfig {
             capabilities.setCapability(entry.getKey(), entry.getValue());
         }
 
-        if (driverType == null) {
+        LOG.info("WebDriverを起動します driverType:", driverType);
 
-            webDriverInstaller.installGeckoDriver();
-            webDriver = new FirefoxDriver(capabilities);
+        switch (driverType) {
 
-        } else {
+            case "chrome":
+                webDriverInstaller.installChromeDriver();
+                webDriver = new ChromeDriver(capabilities);
+                break;
 
-            switch (driverType) {
+            case "ie":
+            case "internet explorer":
+                webDriverInstaller.installIeDriver();
+                webDriver = new InternetExplorerDriver(capabilities);
+                break;
 
-                case "firefox":
-                    webDriverInstaller.installGeckoDriver();
-                    webDriver = new FirefoxDriver(capabilities);
-                    break;
+            case "edge":
+                webDriverInstaller.installEdgeDriver();
+                webDriver = new EdgeDriver(capabilities);
+                break;
 
-                case "chrome":
-                    webDriverInstaller.installChromeDriver();
-                    webDriver = new ChromeDriver(capabilities);
-                    break;
-
-                case "ie":
-                case "internet explorer":
-                    webDriverInstaller.installIeDriver();
-                    webDriver = new InternetExplorerDriver(capabilities);
-                    break;
-
-                case "edge":
-                    webDriverInstaller.installEdgeDriver();
-                    webDriver = new EdgeDriver(capabilities);
-                    break;
-
-                case "safari":
-                    try {
+            case "safari":
+                try {
+                    webDriver = new SafariDriver(capabilities);
+                } catch (UnreachableBrowserException e) {
+                    if (StringUtils.startsWith(e.getMessage(),
+                            "Failed to connect to SafariDriver")) {
+                        webDriverInstaller.installSafariDriver();
                         webDriver = new SafariDriver(capabilities);
-                    } catch (UnreachableBrowserException e) {
-                        if (StringUtils.startsWith(e.getMessage(),
-                                "Failed to connect to SafariDriver")) {
-                            webDriverInstaller.installSafariDriver();
-                            webDriver = new SafariDriver(capabilities);
-                        }
                     }
-                    break;
+                }
+                break;
 
-                case "remote":
-                    webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
+            case "remote":
+                webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
 
-                    break;
+                break;
 
-                case "android":
-                    webDriver = new AndroidDriver<>(pm.getAppiumAddress(), capabilities);
-                    break;
+            case "android":
+                webDriver = new AndroidDriver<>(pm.getAppiumAddress(), capabilities);
+                break;
 
-                case "ios":
-                    webDriver = new IOSDriver<>(pm.getAppiumAddress(), capabilities);
-                    break;
+            case "ios":
+                webDriver = new IOSDriver<>(pm.getAppiumAddress(), capabilities);
+                break;
 
-                default:
-                    webDriverInstaller.installGeckoDriver();
-                    webDriver = new FirefoxDriver(capabilities);
-            }
-
+            default: // include firefox
+                // geckodriver is not stable yet as of 2016/10
+                // so we doesn't support neigther selenium 3 nor firefox 48.x
+                // higher
+                // webDriverInstaller.installGeckoDriver();
+                webDriver = new FirefoxDriver(capabilities);
         }
 
         webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
