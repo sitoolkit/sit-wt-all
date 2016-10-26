@@ -143,6 +143,9 @@ public class AppController implements Initializable {
     public void destroy() {
         conversationProcess.destroy();
         PropertyManager.get().setBaseUrls(baseUrlCombo.getItems());
+
+        conversationProcess.start(new TextAreaConsole(console),
+                new File(pomFile.getParent(), "sample"), MavenUtils.getCommand(), "jetty:stop");
     }
 
     private void setVisible(Node node, ObservableBooleanValue visible) {
