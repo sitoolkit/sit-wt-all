@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.gui.domain.JettyConsoleListener;
@@ -31,6 +32,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -126,6 +128,8 @@ public class AppController implements Initializable {
         setVisible(browsingGroup, projectState.isBrowsing());
         setVisible(debugGroup, projectState.isDebugging());
 
+        sampleRunMenu.disableProperty().bind(projectState.isLoaded().not());
+
         parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
 
         browserChoice.getItems().addAll(SystemUtils.getBrowsers());
@@ -144,8 +148,12 @@ public class AppController implements Initializable {
         conversationProcess.destroy();
         PropertyManager.get().setBaseUrls(baseUrlCombo.getItems());
 
-        conversationProcess.start(new TextAreaConsole(console),
-                new File(pomFile.getParent(), "sample"), MavenUtils.getCommand(), "jetty:stop");
+        File sampleDir = new File(pomFile.getParent(), "sample");
+        if (sampleDir.exists()) {
+            conversationProcess.start(new TextAreaConsole(console), sampleDir,
+                    MavenUtils.getCommand(), "jetty:stop");
+        }
+
     }
 
     private void setVisible(Node node, ObservableBooleanValue visible) {
@@ -171,6 +179,11 @@ public class AppController implements Initializable {
             return;
         }
 
+        createPom();
+
+    }
+
+    private void createPom() {
         try {
             URL pomUrl = getClass().getResource("/distribution-pom.xml");
             Files.copy(pomUrl.openStream(), pomFile.toPath());
@@ -208,7 +221,13 @@ public class AppController implements Initializable {
 
         } else {
 
-            addMsg("pom.xmlの無いフォルダは無効です。");
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setContentText("pom.xmlがありません。作成しますか？");
+
+            Optional<ButtonType> answer = alert.showAndWait();
+            if (answer.get() == ButtonType.OK) {
+                createPom();
+            }
 
         }
     }
