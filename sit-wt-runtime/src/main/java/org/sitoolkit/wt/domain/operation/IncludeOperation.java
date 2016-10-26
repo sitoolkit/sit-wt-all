@@ -66,7 +66,7 @@ public class IncludeOperation implements Operation, TestContextListener {
 
         current.backup();
 
-        TestScript testScript = dao.load(new File(pm.getPageObjectDir(), testStepName), sheetName,
+        TestScript testScript = dao.load(new File(pm.getPageScriptDir(), testStepName), sheetName,
                 false);
 
         current.setTestScript(testScript);

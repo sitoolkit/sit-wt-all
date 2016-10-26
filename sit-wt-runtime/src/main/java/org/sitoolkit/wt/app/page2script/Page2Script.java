@@ -37,7 +37,7 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
     private ApplicationContext appCtx;
 
-    private String outputDir = "pageobj";
+    private String outputDir;
 
     private boolean openScript = true;
 

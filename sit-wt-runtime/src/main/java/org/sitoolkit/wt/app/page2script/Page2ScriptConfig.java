@@ -14,6 +14,7 @@ import org.sitoolkit.wt.domain.pageload.selenium.SelectTagLoader;
 import org.sitoolkit.wt.domain.pageload.selenium.SeleniumPageLietener;
 import org.sitoolkit.wt.domain.pageload.selenium.TextareaTagLoader;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
+import org.sitoolkit.wt.infra.PropertyManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -25,12 +26,13 @@ public class Page2ScriptConfig {
 
     @Bean
     public Page2Script getTestScriptGenerator(TestScriptDao dao, PageListener listener,
-            PageLoader... loaders) {
+            PropertyManager pm, PageLoader... loaders) {
         Page2Script gen = new Page2Script();
 
         gen.setDao(dao);
         gen.setLoaders(Arrays.asList(loaders));
         gen.setListener(listener);
+        gen.setOutputDir(pm.getPageScriptDir());
 
         return gen;
     }

@@ -48,9 +48,8 @@ public class FileTreeController implements Initializable {
         TreeItem<FileWrapper> root = new TreeItem<>();
         root.setValue(new FileWrapper(baseDir));
 
-        root.getChildren().add(createNode(newDir(baseDir, "seleniumscript")));
         // TODO pageobjディレクトリの選択を不可にする
-        root.getChildren().add(createNode(newDir(baseDir, "pageobj")));
+        root.getChildren().add(createNode(newDir(baseDir, "pagescript")));
         root.getChildren().add(createNode(newDir(baseDir, "testscript")));
 
         fileTree.setRoot(root);

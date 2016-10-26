@@ -410,6 +410,7 @@ public class AppController implements Initializable {
     @FXML
     public void export() {
         conversationProcess.input("e");
+        fileTreeController.refresh();
     }
 
     @FXML

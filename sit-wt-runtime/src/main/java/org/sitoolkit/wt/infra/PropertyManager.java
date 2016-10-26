@@ -49,8 +49,8 @@ public class PropertyManager {
     @Value("${window.resize}")
     private boolean resizeWindow;
 
-    @Value("${pageobj.dir}")
-    private String pageObjectDir;
+    @Value("${pagescript.dir}")
+    private String pageScriptDir;
 
     @Value("${driver.type}")
     private String driverType;
@@ -143,8 +143,8 @@ public class PropertyManager {
         return resizeWindow;
     }
 
-    public String getPageObjectDir() {
-        return pageObjectDir;
+    public String getPageScriptDir() {
+        return pageScriptDir;
     }
 
     public String getDriverType() {
