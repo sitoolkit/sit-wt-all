@@ -68,12 +68,6 @@ public class AppController implements Initializable {
     private Button runButton;
 
     @FXML
-    private CheckBox debugCheck;
-
-    @FXML
-    private CheckBox parallelCheck;
-
-    @FXML
     private ChoiceBox<String> browserChoice;
 
     @FXML
@@ -120,17 +114,16 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        ExecutorContainer.get().execute(() -> UpdateChecker.checkAndInstall());
+    	if (Boolean.getBoolean("checkUpdate")) {
+            ExecutorContainer.get().execute(() -> UpdateChecker.checkAndInstall());
+    	}
 
-        // setVisible(projectGroup, Bindings.not(projectState.getRunning()));
         setVisible(startGroup, projectState.isLoaded());
         setVisible(runningGroup, projectState.isRunning());
         setVisible(browsingGroup, projectState.isBrowsing());
         setVisible(debugGroup, projectState.isDebugging());
 
         sampleRunMenu.disableProperty().bind(projectState.isLoaded().not());
-
-        parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
 
         browserChoice.getItems().addAll(SystemUtils.getBrowsers());
 
@@ -277,7 +270,7 @@ public class AppController implements Initializable {
                     addMsg("サンプルWebサイトの起動に失敗しました。");
                     sampleRunMenu.setVisible(true);
                 }
-                fileTreeController.refresh();
+                Platform.runLater(() -> fileTreeController.refresh()); 
                 projectState.reset();
             });
 
@@ -303,7 +296,22 @@ public class AppController implements Initializable {
 
     @FXML
     public void run() {
-        projectState.setState(debugCheck.isSelected() ? State.DEBUGGING : State.RUNNING);
+    	runTest(false);
+    }
+    
+    @FXML
+    public void debug() {
+    	runTest(true);
+    }
+
+    @FXML
+    public void runParallel() {
+    	// TODO 並列
+    	runTest(false);
+    }
+
+    private void runTest(boolean debug) {
+        projectState.setState(debug ? State.DEBUGGING : State.RUNNING);
 
         String testedClasses = SitWtRuntimeUtils
                 .findTestedClasses(fileTreeController.getSelectedFiles());
@@ -324,7 +332,7 @@ public class AppController implements Initializable {
         addBaseUrl(baseUrl);
 
         List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(
-                fileTreeController.getSelectedFiles(), debugCheck.isSelected(),
+                fileTreeController.getSelectedFiles(), debug,
                 browserChoice.getSelectionModel().getSelectedItem(), baseUrl);
 
         conversationProcess.start(new TextAreaConsole(console, mavenConsoleListener),
@@ -382,7 +390,7 @@ public class AppController implements Initializable {
     @FXML
     public void pause() {
         if (mavenConsoleListener.isPausing()) {
-            pauseButton.setText("一時停止");
+            pauseButton.setText("\uE034");
 
             String stepNo = stepNoText.getText();
             if (!StrUtils.isEmpty(stepNo)) {
@@ -392,7 +400,7 @@ public class AppController implements Initializable {
 
             conversationProcess.input("s");
         } else {
-            pauseButton.setText("再開");
+            pauseButton.setText("\uE037");
             conversationProcess.input("");
         }
     }
@@ -432,9 +440,10 @@ public class AppController implements Initializable {
     public void toggleWindow() {
         Stage primaryStage = FxContext.getPrimaryStage();
 
-        if ("拡大".equals(toggleButton.getText())) {
+        if ("\uE5D0".equals(toggleButton.getText())) {
             StageResizer.resize(primaryStage, stageWidth, stageHeight);
-            toggleButton.setText("縮小");
+            toggleButton.setText("\uE5D1");
+            toggleButton.getTooltip().setText("ウィンドウを縮小します");
 
         } else {
 
@@ -443,7 +452,8 @@ public class AppController implements Initializable {
             // TODO コンソールのサイズ設定
             StageResizer.resize(primaryStage, 600, 90);
 
-            toggleButton.setText("拡大");
+            toggleButton.setText("\uE5D0");
+            toggleButton.getTooltip().setText("ウィンドウを拡大します");
         }
     }
 

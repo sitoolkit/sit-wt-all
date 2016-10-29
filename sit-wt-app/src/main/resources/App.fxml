@@ -18,6 +18,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Tooltip?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <center>
@@ -58,14 +59,34 @@
               /> </items> </MenuButton> </items> </ToolBar> -->
             <ToolBar fx:id="startGroup">
               <items>
-                <!-- <Separator orientation="VERTICAL" /> -->
-                <Button fx:id="runButton" mnemonicParsing="false" onAction="#run" text="&#xE039;" styleClass="material-icons" />
-                <CheckBox fx:id="debugCheck" mnemonicParsing="false" text="デバッグ" />
-                <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
-                <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
+                <Button fx:id="runButton" mnemonicParsing="false" onAction="#run" text="&#xE037;" styleClass="material-icons" >
+                  <tooltip>
+                    <Tooltip text="テストスクリプトを実行します"/>
+                  </tooltip>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#debug" text="&#xE868;" styleClass="material-icons" >
+                  <tooltip>
+                    <Tooltip text="テストスクリプトをデバッグします"/>
+                  </tooltip>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#runParallel" text="&#xE01F;" styleClass="material-icons" >
+                  <tooltip>
+                    <Tooltip text="テストスクリプトを並列実行します"/>
+                  </tooltip>
+                </Button>
                 <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
-                <Button mnemonicParsing="false" onAction="#ope2script" text="&#xE061;" styleClass="material-icons" />
-                <Button mnemonicParsing="false" onAction="#page2script" text="&#xE2C4;" styleClass="material-icons" />
+                <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
+                <Separator orientation="VERTICAL" />
+                <Button mnemonicParsing="false" onAction="#ope2script" text="&#xE061;" styleClass="material-icons" >
+                  <tooltip>
+                    <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します"/>
+                  </tooltip>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#page2script" text="&#xE2C4;" styleClass="material-icons" >
+                  <tooltip>
+                    <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します"/>
+                  </tooltip>
+                </Button>
               </items>
             </ToolBar>
             <ToolBar fx:id="browsingGroup">
@@ -84,16 +105,20 @@
               <items>
                 <Separator orientation="VERTICAL" />
                 <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
-                <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="一時停止" />
-                <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="戻る" />
-                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="進む" />
+                <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="&#xE034;" styleClass="material-icons" />
+                <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="&#xE044;" styleClass="material-icons" />
+                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="&#xE045;" styleClass="material-icons" />
                 <!-- <Button accessibleHelp="現在実行中のスクリプトを開きます。" mnemonicParsing="false" onAction="#openScript" 
                   text="スクリプトを開く" /> -->
-                <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプト生成" />
+                <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="&#xE2C4;" styleClass="material-icons"  />
               </items>
             </ToolBar>
             <Separator orientation="VERTICAL" />
-            <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow" text="縮小" />
+            <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow" text="&#xE5D1;" styleClass="material-icons" >
+              <tooltip>
+                <Tooltip text="ウィンドウを縮小します"/>
+              </tooltip>
+            </Button>
           </children>
         </HBox>
       </children>
