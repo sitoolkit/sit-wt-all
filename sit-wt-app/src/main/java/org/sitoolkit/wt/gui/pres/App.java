@@ -51,6 +51,8 @@ public class App extends Application {
         controller = loader.getController();
 
         Scene scene = new Scene(root);
+        // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Material+Icons");
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
 
