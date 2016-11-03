@@ -131,21 +131,23 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
-    public static List<String> buildSingleTestCommand(List<File> scriptFiles, boolean isDebug, boolean isParallel,
-            String browser, String baseUrl) {
+    public static List<String> buildSingleTestCommand(List<File> scriptFiles, boolean isDebug,
+            boolean isParallel, String browser, String baseUrl) {
         List<String> command = buildJavaCommand();
         addVmArgs(command, browser, baseUrl);
 
         command.add("-cp");
         command.add(getSitWtClasspath());
-        
+
         if (isDebug) {
-        	command.add("-Dsitwt.debug=true");
+            command.add("-Dsitwt.debug=true");
         }
-        
+
         if (isParallel) {
-        	command.add("-Dsitwt.parallel=true");
+            command.add("-Dsitwt.parallel=true");
         }
+
+        command.add("-Dsitwt.open-evidence=true");
 
         command.add("org.sitoolkit.wt.app.test.TestRunner");
 

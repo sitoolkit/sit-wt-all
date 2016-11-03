@@ -29,23 +29,41 @@ public class TestRunner {
         if (args.length < 1) {
             LOG.info("テストスクリプトを指定してください。");
             LOG.info(">java {} [path/to/TestScript.xlsx]", TestRunner.class.getName());
-            System.exit(0);
+            System.exit(1);
         }
 
         String caseNo = args.length > 2 ? args[1] : "";
+        boolean isParallel = Boolean.getBoolean("sitwt.parallel");
+        boolean isEvidenceOpen = Boolean.getBoolean("sitwt.open-evidence");
 
         TestRunner runner = new TestRunner();
-        runner.run(args[0], "TestScript", caseNo, true);
+        runner.runScript(args[0], "TestScript", caseNo, isParallel, isEvidenceOpen);
 
     }
 
-    public List<TestResult> run(String scriptPath, String sheetName, String caseNo,
-            boolean isEvidenceOpen) {
+    /**
+     * テストスクリプトを実行します。
+     *
+     * @param scriptPath
+     *            実行対象のテストスクリプト
+     * @param sheetName
+     *            テストスクリプト内で実行対象のシート名
+     * @param caseNo
+     *            実行対象のケース番号 指定しない場合はシート内の全ケースを実行します。
+     * @param isParallel
+     *            ケースを並列に実行する場合にtrue
+     * @param isEvidenceOpen
+     *            テスト実行後にエビデンスを開く場合にtrue
+     * @return テスト結果
+     */
+    public List<TestResult> runScript(String scriptPath, String sheetName, String caseNo,
+            boolean isParallel, boolean isEvidenceOpen) {
 
         ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
                 RuntimeConfig.class);
 
-        List<TestResult> result = run(appCtx, scriptPath, sheetName, caseNo, isEvidenceOpen);
+        List<TestResult> result = runScript(appCtx, scriptPath, sheetName, caseNo, isParallel,
+                isEvidenceOpen);
 
         appCtx.close();
 
@@ -56,29 +74,38 @@ public class TestRunner {
      * テストスクリプトを実行します。
      *
      * @param appCtx
-     *            {@link RuntimeConfig}で構成された{@code ConfigurableApplicationContext}
+     *            {@link RuntimeConfig}で構成された
+     *            {@code ConfigurableApplicationContext}
      * @param scriptPath
      *            実行対象のテストスクリプト
      * @param sheetName
      *            テストスクリプト内で実行対象のシート名
      * @param caseNo
      *            実行対象のケース番号 指定しない場合はシート内の全ケースを実行します。
+     * @param isParallel
+     *            ケースを並列に実行する場合にtrue
      * @param isEvidenceOpen
      *            テスト実行後にエビデンスを開く場合にtrue
-     * @return
+     * @return テスト結果
      */
-    public List<TestResult> run(ConfigurableApplicationContext appCtx, String scriptPath,
-            String sheetName, String caseNo, boolean isEvidenceOpen) {
+    public List<TestResult> runScript(ConfigurableApplicationContext appCtx, String scriptPath,
+            String sheetName, String caseNo, boolean isParallel, boolean isEvidenceOpen) {
+
+        LOG.info("テストスクリプトを実行します。{} {} {}", scriptPath, sheetName, caseNo);
 
         List<TestResult> results = new ArrayList<>();
 
         if (StringUtils.isEmpty(caseNo)) {
 
-            results.addAll(runAll(scriptPath, sheetName));
+            if (isParallel) {
+                results.addAll(runAllCasesInParallel(scriptPath, sheetName));
+            } else {
+                results.addAll(runAllCase(scriptPath, sheetName));
+            }
 
         } else {
 
-            results.add(run(scriptPath, sheetName, caseNo));
+            results.add(runCase(scriptPath, sheetName, caseNo));
 
         }
 
@@ -90,21 +117,48 @@ public class TestRunner {
         return results;
     }
 
-    private List<TestResult> runAll(String scriptPath, String sheetName) {
+    private List<TestResult> runAllCase(String scriptPath, String sheetName) {
 
         List<TestResult> results = new ArrayList<>();
         TestScriptCatalog catalog = ApplicationContextHelper.getBean(TestScriptCatalog.class);
         TestScript script = catalog.get(scriptPath, sheetName);
 
+        for (String caseNoInScript : script.getCaseNoMap().keySet()) {
+            results.add(runCase(scriptPath, sheetName, caseNoInScript));
+        }
+
+        return results;
+    }
+
+    private List<TestResult> runAllCasesInParallel(String scriptPath, String sheetName) {
+
+        List<TestResult> results = new ArrayList<>();
+        TestScriptCatalog catalog = ApplicationContextHelper.getBean(TestScriptCatalog.class);
+        TestScript script = catalog.get(scriptPath, sheetName);
+
+        // run last case in current thread to use WebDriver instance bound in
+        // current thread
+        List<String> caseNoList = new ArrayList<>(script.getCaseNoMap().keySet());
+
+        if (caseNoList.isEmpty()) {
+            LOG.warn("テストスクリプトにケースがありません　{} {}", scriptPath, sheetName);
+            return results;
+        }
+
+        String lastCaseNo = caseNoList.get(caseNoList.size() - 1);
+        caseNoList.remove(caseNoList.size() - 1);
+
         ExecutorService executor = Executors.newCachedThreadPool();
 
-        for (String caseNoInScript : script.getCaseNoMap().keySet()) {
+        for (String caseNoInScript : caseNoList) {
 
             executor.execute(() -> {
-                results.add(run(scriptPath, sheetName, caseNoInScript));
+                results.add(runCase(scriptPath, sheetName, caseNoInScript));
             });
 
         }
+
+        results.add(runCase(scriptPath, sheetName, lastCaseNo));
 
         executor.shutdown();
 
@@ -117,19 +171,25 @@ public class TestRunner {
         return results;
     }
 
-    private TestResult run(String scriptPath, String sheetName, String caseNo) {
+    private TestResult runCase(String scriptPath, String sheetName, String caseNo) {
         Tester tester = ApplicationContextHelper.getBean(Tester.class);
         TestEventListener listener = ApplicationContextHelper.getBean(TestEventListener.class);
 
         tester.prepare(scriptPath, sheetName, caseNo);
         listener.before();
 
-        TestResult result = tester.operate(caseNo);
+        TestResult result = null;
 
-        listener.after();
-        tester.tearDown();
+        try {
+            result = tester.operate(caseNo);
+        } finally {
+            listener.after();
+            tester.tearDown();
 
-        // TODO 例外処理
+            if (result != null) {
+                LOG.info("ケース{}が{}しました", caseNo, result.isSuccess() ? "成功" : "失敗");
+            }
+        }
 
         return result;
     }

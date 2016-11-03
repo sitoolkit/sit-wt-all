@@ -125,11 +125,11 @@ public class Tester {
     }
 
     /**
-     * ケース番号のテストスクリプトに従い、テストを実施します。
+     * ケース番号のテストスクリプトを実行します。
      *
      * @param caseNo
      *            ケース番号
-     * @return Verify操作がNGとなった数
+     * @return テスト結果
      */
     public TestResult operate(String caseNo) {
 
