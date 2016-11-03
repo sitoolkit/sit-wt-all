@@ -37,7 +37,11 @@ public class SystemUtils {
 
         if (isOsX()) {
             browsers.add("safari");
+            browsers.add("ios");
         }
+
+        browsers.add("android");
+        browsers.add("remote");
 
         return browsers;
     }

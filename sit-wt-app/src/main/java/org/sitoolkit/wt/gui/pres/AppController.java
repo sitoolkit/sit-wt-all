@@ -16,6 +16,7 @@ import org.sitoolkit.wt.gui.domain.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.FxContext;
+import org.sitoolkit.wt.gui.infra.LogConsole;
 import org.sitoolkit.wt.gui.infra.PropertyManager;
 import org.sitoolkit.wt.gui.infra.StageResizer;
 import org.sitoolkit.wt.gui.infra.StrUtils;
@@ -33,7 +34,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Menu;
@@ -114,9 +114,9 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-    	if (Boolean.getBoolean("checkUpdate")) {
+        if (Boolean.getBoolean("checkUpdate")) {
             ExecutorContainer.get().execute(() -> UpdateChecker.checkAndInstall());
-    	}
+        }
 
         setVisible(startGroup, projectState.isLoaded());
         setVisible(runningGroup, projectState.isRunning());
@@ -173,6 +173,7 @@ public class AppController implements Initializable {
         }
 
         createPom();
+        unpackResources();
 
     }
 
@@ -191,6 +192,19 @@ public class AppController implements Initializable {
             loadProject(pomFile);
             addMsg("プロジェクトを作成しました。");
         }
+    }
+
+    private void unpackResources() {
+        ConversationProcess process = new ConversationProcess();
+        process.start(new LogConsole(), pomFile.getParentFile(),
+                SitWtRuntimeUtils.buildUnpackCommand());
+
+        process.onExit(exitCode -> {
+            File f = new File(pomFile.getParentFile(),
+                    "src/main/resources/sit-wt-default.properties");
+            f.renameTo(new File(f.getParentFile(), "sit-wt.properties"));
+        });
+
     }
 
     @FXML
@@ -220,6 +234,7 @@ public class AppController implements Initializable {
             Optional<ButtonType> answer = alert.showAndWait();
             if (answer.get() == ButtonType.OK) {
                 createPom();
+                unpackResources();
             }
 
         }
@@ -270,7 +285,7 @@ public class AppController implements Initializable {
                     addMsg("サンプルWebサイトの起動に失敗しました。");
                     sampleRunMenu.setVisible(true);
                 }
-                Platform.runLater(() -> fileTreeController.refresh()); 
+                Platform.runLater(() -> fileTreeController.refresh());
                 projectState.reset();
             });
 
@@ -296,17 +311,17 @@ public class AppController implements Initializable {
 
     @FXML
     public void run() {
-    	runTest(false, false);
+        runTest(false, false);
     }
-    
+
     @FXML
     public void debug() {
-    	runTest(true, false);
+        runTest(true, false);
     }
 
     @FXML
     public void runParallel() {
-    	runTest(false, true);
+        runTest(false, true);
     }
 
     private void runTest(boolean isDebug, boolean isParallel) {

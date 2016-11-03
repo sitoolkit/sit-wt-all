@@ -84,7 +84,7 @@ public class WebDriverConfig {
             capabilities.setCapability(entry.getKey(), entry.getValue());
         }
 
-        LOG.info("WebDriverを起動します driverType:", driverType);
+        LOG.info("WebDriverを起動します driverType:{}, capabilities:{}", driverType, capabilities);
 
         switch (driverType) {
 
@@ -117,15 +117,18 @@ public class WebDriverConfig {
                 break;
 
             case "remote":
+                LOG.info("RemoteWebDriverの接続先:{}", pm.getHubUrl());
                 webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
 
                 break;
 
             case "android":
+                LOG.info("AndroidDriverの接続先:{}", pm.getAppiumAddress());
                 webDriver = new AndroidDriver<>(pm.getAppiumAddress(), capabilities);
                 break;
 
             case "ios":
+                LOG.info("IOSDriverの接続先:{}", pm.getAppiumAddress());
                 webDriver = new IOSDriver<>(pm.getAppiumAddress(), capabilities);
                 break;
 

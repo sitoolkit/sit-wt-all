@@ -136,6 +136,31 @@
         <threadCountMethods>1</threadCountMethods>
       </properties>
     </profile>
+    
+    <profile>
+      <id>unpack-property-resources</id>
+      <build>
+      <defaultGoal>dependency:unpack</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.10</version>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sitoolkit.wt</groupId>
+                  <artifactId>sit-wt-runtime</artifactId>
+                  <version>${sitwt.version}</version>
+                </artifactItem>
+              </artifactItems>
+              <includes>sit-wt-default.properties,capabilities.properties</includes>
+              <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 </project>

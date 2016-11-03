@@ -137,7 +137,7 @@ public class SitWtRuntimeUtils {
         addVmArgs(command, browser, baseUrl);
 
         command.add("-cp");
-        command.add(getSitWtClasspath());
+        command.add("src/main/resources" + File.pathSeparator + getSitWtClasspath());
 
         if (isDebug) {
             command.add("-Dsitwt.debug=true");
@@ -172,6 +172,15 @@ public class SitWtRuntimeUtils {
 
         return command;
 
+    }
+
+    public static List<String> buildUnpackCommand() {
+        List<String> command = new ArrayList<>();
+
+        command.add(MavenUtils.getCommand());
+        command.add("-Punpack-property-resources");
+
+        return command;
     }
 
     private static List<String> buildJavaCommand() {
