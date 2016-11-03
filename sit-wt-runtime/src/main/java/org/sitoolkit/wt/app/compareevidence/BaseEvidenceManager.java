@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +12,6 @@ import org.slf4j.LoggerFactory;
 public class BaseEvidenceManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseEvidenceManager.class);
-
-    private static final String COMPARE_PREFIX = "comp_";
-
-    public static void main(String[] args) {
-        BaseEvidenceManager manager = new BaseEvidenceManager();
-        manager.setBaseEvidence(EvidenceDir.getLatest());
-    }
 
     /**
      * 指定されたエビデンスを基準エビデンスとして確定します。
@@ -28,7 +22,7 @@ public class BaseEvidenceManager {
     public void setBaseEvidence(EvidenceDir targetDir) {
 
         if (!(targetDir.exists())) {
-            LOG.info("エビデンスがありません");
+            LOG.error("エビデンスがありません");
         } else {
             EvidenceDir baseDir = EvidenceDir.getBase(targetDir.getBrowser());
             LOG.info("基準エビデンスとして確定します {}", targetDir.getDir());
@@ -38,19 +32,17 @@ public class BaseEvidenceManager {
 
     }
 
-    void copy(File srcDir, File destDir) {
+    public void copy(File srcDir, File destDir) {
 
         for (File f1 : srcDir.listFiles()) {
             try {
 
-                if (f1.getName().startsWith(COMPARE_PREFIX)
-                        || (f1.isDirectory() && "base".equals(f1.getName()))) {
+                if (!isCopyTarget(f1)) {
                     continue;
                 }
 
                 if (f1.isDirectory()) {
-                    File f2 = new File(destDir.getPath(), f1.getName());
-                    copy(f1, f2);
+                    copy(f1, new File(destDir.getPath(), f1.getName()));
                 } else {
                     FileUtils.copyFileToDirectory(f1, destDir);
                 }
@@ -60,6 +52,20 @@ public class BaseEvidenceManager {
             }
         }
 
+    }
+
+    private boolean isCopyTarget(File f1) {
+        boolean result = true;
+        result &= !EvidenceDir.isBaseImgDir(f1);
+        result &= !EvidenceDir.isProjectReport(f1.getName());
+        result &= !EvidenceDir.isFailsafeReport(f1.getName());
+        result &= !EvidenceDir.isCompareEvidence(f1.getName());
+        result &= !EvidenceDir.isCompareNgEvidence(f1.getName());
+        result &= !EvidenceDir.isUnmatchScreenshot(f1.getName());
+        result &= !EvidenceDir.isUnmatchMaskScreenshot(f1.getName());
+        result &= !StringUtils.equals(f1.getName(), "sit-wt.log");
+        result &= !StringUtils.equals(f1.getName(), "sit-wt.properties");
+        return result;
     }
 
 }

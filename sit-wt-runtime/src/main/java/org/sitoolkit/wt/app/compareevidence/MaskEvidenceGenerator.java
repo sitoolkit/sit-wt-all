@@ -19,14 +19,12 @@ public class MaskEvidenceGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MaskEvidenceGenerator.class);
 
-    private static String MASK_PREFIX = "mask_";
-
     public void generate(EvidenceDir targetDir) {
 
         LOG.info("マスク済みエビデンスを生成します");
 
         if (!(targetDir.exists())) {
-            LOG.info("エビデンスがありません");
+            LOG.error("エビデンスがありません");
             return;
         }
 
@@ -35,8 +33,8 @@ public class MaskEvidenceGenerator {
             Map<String, File> ssMap = targetDir.getScreenshotFilesAsMap(evidenceFile.getName());
 
             for (Entry<String, File> screenshot : ssMap.entrySet()) {
-                if (screenshot.getKey().startsWith(MASK_PREFIX)) {
-                    generateMaskEvidence(targetDir, evidenceFile, ssMap);
+                if (EvidenceDir.isMaskScreenshot(screenshot.getKey())) {
+                    generateMaskEvidence(evidenceFile, ssMap);
                     break;
                 }
             }
@@ -45,17 +43,18 @@ public class MaskEvidenceGenerator {
 
     }
 
-    void generateMaskEvidence(EvidenceDir evidenceDir, File evidenceFile, Map<String, File> ssMap) {
+    void generateMaskEvidence(File evidenceFile, Map<String, File> ssMap) {
 
-        File maskEvidence = new File(evidenceDir.getDir(), MASK_PREFIX + evidenceFile.getName());
+        File maskEvidence = new File(evidenceFile.getParent(),
+                EvidenceDir.toMaskEvidenceName(evidenceFile.getName()));
 
         try {
             String evidenceHtml = FileUtils.readFileToString(evidenceFile, "UTF-8");
 
             for (Entry<String, File> ssName : ssMap.entrySet()) {
-                if (ssName.getKey().startsWith(MASK_PREFIX)) {
-                    String target = StringUtils.removeStart(ssName.getKey(), MASK_PREFIX);
-                    evidenceHtml = StringUtils.replace(evidenceHtml, target, ssName.getKey());
+                if (EvidenceDir.isMaskScreenshot(ssName.getKey())) {
+                    evidenceHtml = StringUtils.replace(evidenceHtml,
+                            EvidenceDir.toBeforeMaskSsName(ssName.getKey()), ssName.getKey());
                 }
             }
 

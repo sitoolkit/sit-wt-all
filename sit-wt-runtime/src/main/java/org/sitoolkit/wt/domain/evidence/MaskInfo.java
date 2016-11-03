@@ -39,8 +39,7 @@ public class MaskInfo {
         MaskInfo maskInfo = new MaskInfo();
         Map<String, List<ElementPosition>> evdenceMaskInfo = new HashMap<>();
 
-        EvidenceDir baseDir = baseEvidence == null ? EvidenceDir.getBase(targetDir.getBrowser())
-                : EvidenceDir.getInstance(baseEvidence);
+        EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(baseEvidence, targetDir.getBrowser());
 
         for (File evidenceFile : targetDir.getEvidenceFiles()) {
 

@@ -38,13 +38,9 @@ public class CompareEvidenceMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
-                : EvidenceDir.getInstance(targetEvidence);
-
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(targetEvidence);
         String browser = StringUtils.defaultString(baseBrowser, targetDir.getBrowser());
-
-        EvidenceDir baseDir = baseEvidence == null ? EvidenceDir.getBase(browser)
-                : EvidenceDir.getInstance(baseEvidence);
+        EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(baseEvidence, browser);
 
         DiffEvidenceGenerator.staticExecute(baseDir, targetDir, compareScreenshot, evidenceOpen);
     }

@@ -23,13 +23,13 @@ public class MaskEvidenceMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(targetEvidence);
+
         MaskScreenshotGenerator mask = new MaskScreenshotGenerator();
-        MaskEvidenceGenerator evidence = new MaskEvidenceGenerator();
-
-        EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
-                : EvidenceDir.getInstance(targetEvidence);
-
         mask.generate(targetDir);
+
+        MaskEvidenceGenerator evidence = new MaskEvidenceGenerator();
         evidence.generate(targetDir);
 
     }

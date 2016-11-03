@@ -22,6 +22,26 @@ limitations under the License.
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
+	function toDoubleDigits(num) {
+		return ("0" + num).substr(-2) ;
+	}
+	function getTimestamp() {
+		var currentDate = new Date();
+		var year = currentDate.getFullYear();
+		var month = toDoubleDigits(currentDate.getMonth() + 1);
+		var date = toDoubleDigits(currentDate.getDate());
+		var hours = toDoubleDigits(currentDate.getHours());
+		var day = '日月火水木金土'[currentDate.getDay()];
+		var minutes = toDoubleDigits(currentDate.getMinutes());
+		var seconds = toDoubleDigits(currentDate.getSeconds());
+		
+		var timestamp = year + "年" + month + "月" + date + "日" + "(" + day + ") " + hours + ":" + minutes + ":" + seconds;
+		document.getElementById("timestamp").innerHTML = timestamp;
+	}
+	window.onload = function () {
+		getTimestamp();
+	};
+	setInterval('getTimestamp()',1000);
 	var ADDRESS = {
 		P01 : [ "札幌", "函館", "富良野" ],
 		P02 : [ "青森", "弘前", "八戸" ],
@@ -52,6 +72,7 @@ limitations under the License.
 <body>
   <div class="container">
       <div class="page-header">
+        <p id="timestamp" class="text-right"></p>
         <h1>入力ページ</h1>
       </div>
       <p>このページではフォームの入力操作を確認します。 「利用規約」リンクをクリックすると利用規約ページが別ウィンドウで開きます。

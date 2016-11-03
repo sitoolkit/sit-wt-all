@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +23,9 @@ public class ScreenshotComparator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScreenshotComparator.class);
 
-    private static final String MASK_PREFIX = "mask_";
-
-    private static final String UNMATCH_PREFIX = "unmatch_";
-
     int openFileCount = 1;
 
-    public void staticExecute(EvidenceDir baseDir, EvidenceDir targetDir) {
+    public static void staticExecute(EvidenceDir baseDir, EvidenceDir targetDir) {
 
         ApplicationContext appCtx = new AnnotationConfigApplicationContext(
                 ScreenshotComparatorConfig.class);
@@ -68,8 +63,7 @@ public class ScreenshotComparator {
         for (Entry<String, File> targetEntry : targetDir
                 .getScreenshotFilesAsMap(evidenceFile.getName()).entrySet()) {
 
-            String maskedSsName = MASK_PREFIX + targetEntry.getKey();
-            if (baseSsMap.get(maskedSsName) != null) {
+            if (baseSsMap.get(EvidenceDir.toMaskSsName(targetEntry.getKey())) != null) {
                 continue;
             }
 
@@ -187,10 +181,8 @@ public class ScreenshotComparator {
                 }
             }
 
-            String screenshotName = StringUtils.join(targetImg.getParent(), "/", UNMATCH_PREFIX,
-                    targetImg.getName());
-
-            File maskedImg = new File(screenshotName);
+            File maskedImg = new File(targetImg.getParent(),
+                    EvidenceDir.toUnmatchSsName(targetImg.getName()));
             ImageIO.write(imgBase, "png", maskedImg);
             LOG.info("差分スクリーンショットを生成しました {}", maskedImg);
 

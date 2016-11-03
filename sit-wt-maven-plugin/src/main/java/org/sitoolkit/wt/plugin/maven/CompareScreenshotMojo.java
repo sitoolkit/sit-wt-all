@@ -36,17 +36,11 @@ public class CompareScreenshotMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
-                : EvidenceDir.getInstance(targetEvidence);
-
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(targetEvidence);
         String browser = StringUtils.defaultString(baseBrowser, targetDir.getBrowser());
+        EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(baseEvidence, browser);
 
-        EvidenceDir baseDir = baseEvidence == null ? EvidenceDir.getBase(browser)
-                : EvidenceDir.getInstance(baseEvidence);
-
-        ScreenshotComparator comparator = new ScreenshotComparator();
-
-        comparator.staticExecute(baseDir, targetDir);
+        ScreenshotComparator.staticExecute(baseDir, targetDir);
 
     }
 

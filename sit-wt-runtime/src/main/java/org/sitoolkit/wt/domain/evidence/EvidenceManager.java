@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -30,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.ResourceUtils;
 
 public class EvidenceManager implements ApplicationContextAware {
@@ -88,8 +91,25 @@ public class EvidenceManager implements ApplicationContextAware {
                 File dstFile = new File(evidenceDir, evidenceRes);
                 FileUtils.copyURLToFile(url, dstFile);
             }
+            copyEvidenceResources("img/icon/*", evidenceDir.getPath());
+            copyEvidenceResources("css/images/*", evidenceDir.getPath());
         } catch (IOException e) {
             throw new TestException(e);
+        }
+    }
+
+    public void copyEvidenceResources(String locationPattern, String evidenceDir)
+            throws IOException {
+
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        org.springframework.core.io.Resource[] resources = resolver
+                .getResources("classpath:evidence/" + locationPattern);
+
+        for (org.springframework.core.io.Resource res : resources) {
+            URL url = res.getURL();
+            String evidenceRes = StringUtils.substringAfterLast(url.toString(), "evidence/");
+            File dstFile = new File(FilenameUtils.concat(evidenceDir, evidenceRes));
+            FileUtils.copyURLToFile(url, dstFile);
         }
     }
 

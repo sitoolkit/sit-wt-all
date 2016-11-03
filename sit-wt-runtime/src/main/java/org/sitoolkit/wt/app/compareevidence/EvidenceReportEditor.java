@@ -19,30 +19,20 @@ public class EvidenceReportEditor {
 
     private static final String reportResourcePath = "target/site";
 
-    private static final String FAILSAFE_REPORT_NAME = "failsafe-report.html";
-
-    private static final String MASK_PREFIX = "mask_";
-
-    private static final String COMPARE_PREFIX = "comp_";
-
-    private static final String COMPARE_NG_PREFIX = "comp_ng_";
-
     private static final String[] scriptTags = new String[] {
             "    <script src=\"js/jquery.js\"></script>\n",
             "    <script src=\"js/report.js\"></script>\n" };
 
-    public void edit() {
-
-        EvidenceDir evidenceDir = EvidenceDir.getLatest();
+    public void edit(EvidenceDir evidenceDir) {
 
         if (!evidenceDir.exists()) {
-            LOG.info("エビデンスがありません");
-        } else if (!new File(reportResourcePath, FAILSAFE_REPORT_NAME).exists()) {
-            LOG.info("レポートファイルがありません");
+            LOG.error("エビデンスがありません");
+        } else if (!EvidenceDir.existsReport(reportResourcePath)) {
+            LOG.error("レポートファイルがありません");
         } else {
 
             try {
-                FileUtils.copyDirectory(new File(reportResourcePath), evidenceDir.getDir());
+                FileUtils.copyDirectory(new File(reportResourcePath), evidenceDir.getDir(), false);
 
                 URL url = ResourceUtils.getURL("classpath:evidence/" + evidenceRes);
                 File dstFile = new File(evidenceDir.getDir(), evidenceRes);
@@ -50,6 +40,7 @@ public class EvidenceReportEditor {
 
             } catch (IOException e) {
                 LOG.error("リソースのコピーに失敗しました", e);
+                return;
             }
 
             addTags(evidenceDir);
@@ -59,7 +50,7 @@ public class EvidenceReportEditor {
 
     private void addTags(EvidenceDir evidenceDir) {
 
-        File failsafeReport = new File(evidenceDir.getDir(), FAILSAFE_REPORT_NAME);
+        File failsafeReport = evidenceDir.getFailsafeReport();
 
         try {
             String reportHtml = FileUtils.readFileToString(failsafeReport, "UTF-8");
@@ -111,20 +102,13 @@ public class EvidenceReportEditor {
         sb.append(StringUtils.join("data-method='", methodName, "' "));
 
         sb.append(StringUtils.join("data-mask='",
-                fetchName(new File(evidenceDir.getDir().getPath(), MASK_PREFIX + evidenceName)),
-                "' "));
+                fetchName(evidenceDir.getMaskEvidence(evidenceName)), "' "));
         sb.append(StringUtils.join("data-comp='",
-                fetchName(new File(evidenceDir.getDir().getPath(), COMPARE_PREFIX + evidenceName)),
-                "' "));
-        sb.append(
-                StringUtils.join("data-compmask='",
-                        fetchName(new File(evidenceDir.getDir().getPath(),
-                                StringUtils.join(COMPARE_PREFIX, MASK_PREFIX, evidenceName))),
-                        "' "));
+                fetchName(evidenceDir.getCompareEvidence(evidenceName)), "' "));
+        sb.append(StringUtils.join("data-compmask='",
+                fetchName(evidenceDir.getCompareMaskEvidence(evidenceName)), "' "));
         sb.append(StringUtils.join("data-compng='",
-                fetchName(
-                        new File(evidenceDir.getDir().getPath(), COMPARE_NG_PREFIX + evidenceName)),
-                "' "));
+                fetchName(evidenceDir.getCompareNgEvidence(evidenceName)), "' "));
 
         return StringUtils.join("<input type='hidden' ", sb.toString(), "/>\n");
     }

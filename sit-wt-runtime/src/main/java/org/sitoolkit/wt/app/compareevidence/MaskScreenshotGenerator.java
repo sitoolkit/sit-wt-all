@@ -20,10 +20,9 @@ public class MaskScreenshotGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MaskScreenshotGenerator.class);
 
-    private static final String MASK_PREFIX = "mask_";
-
     /**
-     * 指定されたエビデンスディレクトリ以下のスクリーンショットに対してマスク処理を行います。マスク処理に使用するマスク情報ファイルは以下の優先度で有効になります。
+     * 指定されたエビデンスディレクトリ以下のスクリーンショットに対してマスク処理を行います。
+     * マスク処理に使用するマスク情報ファイルは以下の優先度で有効になります。
      *
      * <ol>
      * <li>基準エビデンスルート/${browser}/mask/*.json
@@ -44,7 +43,7 @@ public class MaskScreenshotGenerator {
         List<File> maskedFiles = new ArrayList<>();
 
         if (!(targetDir.exists())) {
-            LOG.info("エビデンスがありません");
+            LOG.error("エビデンスがありません");
             return maskedFiles;
         }
 
@@ -78,8 +77,7 @@ public class MaskScreenshotGenerator {
      */
     public File mask(File imgFile, MaskInfo maskInfo) {
 
-        String maskedImgName = MASK_PREFIX + imgFile.getName();
-        File maskedImg = new File(imgFile.getParent(), maskedImgName);
+        File maskedImg = new File(imgFile.getParent(), EvidenceDir.toMaskSsName(imgFile.getName()));
 
         try {
             BufferedImage bi = ImageIO.read(imgFile);

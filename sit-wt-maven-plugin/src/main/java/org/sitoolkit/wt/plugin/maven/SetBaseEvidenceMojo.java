@@ -32,8 +32,7 @@ public class SetBaseEvidenceMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        EvidenceDir targetDir = targetEvidence == null ? EvidenceDir.getLatest()
-                : EvidenceDir.getInstance(targetEvidence);
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(targetEvidence);
 
         BaseEvidenceManager baseEvidenceManager = new BaseEvidenceManager();
         baseEvidenceManager.setBaseEvidence(targetDir);
