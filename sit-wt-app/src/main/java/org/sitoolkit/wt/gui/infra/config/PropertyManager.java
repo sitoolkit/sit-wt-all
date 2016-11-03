@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.infra;
+package org.sitoolkit.wt.gui.infra.config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
 public class PropertyManager {
 

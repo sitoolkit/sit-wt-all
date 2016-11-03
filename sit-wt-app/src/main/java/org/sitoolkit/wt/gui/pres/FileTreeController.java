@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import org.sitoolkit.wt.gui.infra.FileIOUtils;
-import org.sitoolkit.wt.gui.infra.FileTreeItem;
-import org.sitoolkit.wt.gui.infra.FileWrapper;
-import org.sitoolkit.wt.gui.infra.FxContext;
+import org.sitoolkit.wt.gui.infra.fx.FileTreeItem;
+import org.sitoolkit.wt.gui.infra.fx.FileWrapper;
+import org.sitoolkit.wt.gui.infra.fx.FxContext;
+import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

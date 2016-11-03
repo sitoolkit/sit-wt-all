@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.infra;
+package org.sitoolkit.wt.gui.infra.fx;
 
 import java.io.File;
 import java.util.ArrayList;

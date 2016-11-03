@@ -8,22 +8,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import org.sitoolkit.wt.gui.app.project.ProjectService;
+import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.domain.JettyConsoleListener;
-import org.sitoolkit.wt.gui.domain.ProjectState;
-import org.sitoolkit.wt.gui.domain.ProjectState.State;
-import org.sitoolkit.wt.gui.domain.SitWtDebugConsoleListener;
-import org.sitoolkit.wt.gui.domain.SitWtRuntimeUtils;
-import org.sitoolkit.wt.gui.infra.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.ExecutorContainer;
-import org.sitoolkit.wt.gui.infra.FxContext;
-import org.sitoolkit.wt.gui.infra.LogConsole;
-import org.sitoolkit.wt.gui.infra.PropertyManager;
-import org.sitoolkit.wt.gui.infra.StageResizer;
-import org.sitoolkit.wt.gui.infra.StrUtils;
-import org.sitoolkit.wt.gui.infra.SystemUtils;
-import org.sitoolkit.wt.gui.infra.TextAreaConsole;
+import org.sitoolkit.wt.gui.domain.project.ProjectState;
+import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
+import org.sitoolkit.wt.gui.domain.test.SitWtDebugConsoleListener;
+import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
+import org.sitoolkit.wt.gui.domain.test.TestRunParams;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
+import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.gui.infra.config.PropertyManager;
+import org.sitoolkit.wt.gui.infra.fx.FxContext;
+import org.sitoolkit.wt.gui.infra.fx.StageResizer;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcess.OnExitCallback;
+import org.sitoolkit.wt.gui.infra.process.LogConsole;
+import org.sitoolkit.wt.gui.infra.process.TextAreaConsole;
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
+import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 import javafx.application.Platform;
 import javafx.beans.value.ObservableBooleanValue;
@@ -111,6 +115,10 @@ public class AppController implements Initializable {
 
     private SitWtDebugConsoleListener mavenConsoleListener = new SitWtDebugConsoleListener();
 
+    TestService testService = new TestService();
+
+    ProjectService projectService = new ProjectService();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -128,12 +136,21 @@ public class AppController implements Initializable {
         browserChoice.getItems().addAll(SystemUtils.getBrowsers());
 
         // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
-        projectState.setState(pomFile.exists() ? State.LOADED : State.NOT_LOADED);
-        if (pomFile.exists()) {
-            loadProject(pomFile);
-        } else {
+        pomFile = projectService.openProject(new File(""));
+        if (pomFile == null) {
             addMsg("[プロジェクト]>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
+            projectState.setState(State.NOT_LOADED);
+        } else {
+            loadProject(pomFile);
+            projectState.setState(State.LOADED);
         }
+        // projectState.setState(pomFile.exists() ? State.LOADED :
+        // State.NOT_LOADED);
+        // if (pomFile.exists()) {
+        // loadProject(pomFile);
+        // } else {
+        // addMsg("[プロジェクト]>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
+        // }
 
     }
 
@@ -156,6 +173,30 @@ public class AppController implements Initializable {
 
     @FXML
     public void createProject() {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("プロジェクトを作成するフォルダを選択してください。");
+        dirChooser.setInitialDirectory(new File("."));
+
+        File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
+
+        if (projectDir == null) {
+            return;
+        }
+
+        File pomFile = projectService.createProject(projectDir);
+
+        if (pomFile == null) {
+            addMsg("プロジェクトは既に存在します。");
+            return;
+        }
+
+        this.pomFile = pomFile;
+        loadProject(pomFile);
+        projectState.setState(State.LOADED);
+    }
+
+    @Deprecated
+    public void createProjectOld() {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("プロジェクトを作成するフォルダを選択してください。");
         dirChooser.setInitialDirectory(new File("."));
@@ -219,6 +260,39 @@ public class AppController implements Initializable {
             return;
         }
 
+        File pomFile = projectService.openProject(projectDir);
+
+        if (pomFile == null) {
+
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setContentText("pom.xmlがありません。作成しますか？");
+
+            Optional<ButtonType> answer = alert.showAndWait();
+            if (answer.get() == ButtonType.OK) {
+                projectService.createProject(projectDir);
+                loadProject(pomFile);
+            }
+
+        } else {
+
+            loadProject(pomFile);
+            addMsg("プロジェクトを開きました。");
+
+        }
+    }
+
+    @Deprecated
+    public void openProjectOld() {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("プロジェクトのpom.xmlがあるフォルダを選択してください。");
+        dirChooser.setInitialDirectory(new File("."));
+
+        File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
+
+        if (projectDir == null) {
+            return;
+        }
+
         pomFile = new File(projectDir, "pom.xml");
 
         if (pomFile.exists()) {
@@ -243,7 +317,6 @@ public class AppController implements Initializable {
     private void loadProject(File pomFile) {
 
         fileTreeController.setFileTreeRoot(pomFile.getParentFile());
-        PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
 
         List<String> baseUrls = PropertyManager.get().getBaseUrls();
         if (!baseUrls.isEmpty()) {
@@ -251,7 +324,6 @@ public class AppController implements Initializable {
             baseUrlCombo.setValue(baseUrls.get(0));
         }
 
-        SitWtRuntimeUtils.loadSitWtClasspath(pomFile);
         projectState.reset();
     }
 
@@ -325,6 +397,39 @@ public class AppController implements Initializable {
     }
 
     private void runTest(boolean isDebug, boolean isParallel) {
+        projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
+
+        TestRunParams params = new TestRunParams();
+        params.setScripts(fileTreeController.getSelectedFiles());
+        params.setBaseDir(pomFile.getParentFile());
+        params.setDebug(isDebug);
+        params.setParallel(isParallel);
+        params.setDriverType(browserChoice.getSelectionModel().getSelectedItem());
+        params.setBaseUrl(baseUrlCombo.getValue());
+
+        addBaseUrl(params.getBaseUrl());
+
+        OnExitCallback callback = exitCode -> {
+            projectState.reset();
+            Platform.runLater(() -> addMsg("テストを終了します。"));
+        };
+
+        boolean checkResult = testService.runTest(params,
+                new TextAreaConsole(console, mavenConsoleListener), callback);
+
+        if (!checkResult) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("");
+            alert.setContentText("");
+            alert.setHeaderText("実行するテストスクリプトを選択してください。");
+            alert.show();
+            projectState.reset();
+        }
+
+    }
+
+    @Deprecated
+    private void runTestOld(boolean isDebug, boolean isParallel) {
         projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
 
         String testedClasses = SitWtRuntimeUtils

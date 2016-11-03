@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.infra;
+package org.sitoolkit.wt.gui.infra.concurrent;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

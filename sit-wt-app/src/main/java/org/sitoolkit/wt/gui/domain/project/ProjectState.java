@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.domain;
+package org.sitoolkit.wt.gui.domain.project;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

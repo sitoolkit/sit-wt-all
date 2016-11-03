@@ -1,4 +1,6 @@
-package org.sitoolkit.wt.gui.infra;
+package org.sitoolkit.wt.gui.infra.fx;
+
+import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;

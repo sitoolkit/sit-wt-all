@@ -1,7 +1,7 @@
 package org.sitoolkit.wt.gui.infra.maven;
 
-import org.sitoolkit.wt.gui.infra.ConsoleListener;
-import org.sitoolkit.wt.gui.infra.StrUtils;
+import org.sitoolkit.wt.gui.infra.process.ConsoleListener;
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
 public class MavenVersionsListener implements ConsoleListener {
 

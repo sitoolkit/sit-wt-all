@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.FileIOUtils;
-import org.sitoolkit.wt.gui.infra.LogConsole;
-import org.sitoolkit.wt.gui.infra.StrUtils;
-import org.sitoolkit.wt.gui.infra.SystemUtils;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.LogConsole;
+import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
+import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 public class MavenUtils {
 

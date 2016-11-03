@@ -1,6 +1,6 @@
-package org.sitoolkit.wt.gui.domain;
+package org.sitoolkit.wt.gui.domain.test;
 
-import org.sitoolkit.wt.gui.infra.ConsoleListener;
+import org.sitoolkit.wt.gui.infra.process.ConsoleListener;
 
 public class SitWtDebugConsoleListener implements ConsoleListener {
 

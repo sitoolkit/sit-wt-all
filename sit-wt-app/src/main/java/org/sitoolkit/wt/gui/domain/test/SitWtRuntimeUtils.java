@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.domain;
+package org.sitoolkit.wt.gui.domain.test;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.FileIOUtils;
-import org.sitoolkit.wt.gui.infra.StrUtils;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
+import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
 public class SitWtRuntimeUtils {
 

@@ -1,6 +1,6 @@
 package org.sitoolkit.wt.gui.domain;
 
-import org.sitoolkit.wt.gui.infra.ConsoleListener;
+import org.sitoolkit.wt.gui.infra.process.ConsoleListener;
 
 public class JettyConsoleListener implements ConsoleListener {
 

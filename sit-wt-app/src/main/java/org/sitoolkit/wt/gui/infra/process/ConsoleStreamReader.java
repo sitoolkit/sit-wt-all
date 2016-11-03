@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.infra;
+package org.sitoolkit.wt.gui.infra.process;
 
 import java.io.InputStream;
 import java.util.Scanner;
