@@ -106,8 +106,8 @@
                 <Separator orientation="VERTICAL" />
                 <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
                 <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="&#xE034;" styleClass="material-icons" />
-                <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="&#xE044;" styleClass="material-icons" />
-                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="&#xE045;" styleClass="material-icons" />
+                <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="&#xE045;" styleClass="material-icons" />
+                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="&#xE044;" styleClass="material-icons" />
                 <!-- <Button accessibleHelp="現在実行中のスクリプトを開きます。" mnemonicParsing="false" onAction="#openScript" 
                   text="スクリプトを開く" /> -->
                 <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="&#xE2C4;" styleClass="material-icons"  />

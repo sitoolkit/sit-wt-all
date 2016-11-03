@@ -2,6 +2,9 @@ package org.sitoolkit.wt.app.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
@@ -12,60 +15,103 @@ import org.sitoolkit.wt.domain.tester.Tester;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class TestRunner {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TestRunner.class);
+
     public static void main(String[] args) {
 
         if (args.length < 1) {
-            System.out.println("テストスクリプトを指定してください。");
+            LOG.info("テストスクリプトを指定してください。");
+            LOG.info(">java {} [path/to/TestScript.xlsx]", TestRunner.class.getName());
             System.exit(0);
         }
-
-        ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
-                RuntimeConfig.class);
 
         String caseNo = args.length > 2 ? args[1] : "";
 
         TestRunner runner = new TestRunner();
-        runner.run(appCtx, args[0], "TestScript", caseNo, true);
+        runner.run(args[0], "TestScript", caseNo, true);
 
     }
 
+    public List<TestResult> run(String scriptPath, String sheetName, String caseNo,
+            boolean isEvidenceOpen) {
+
+        ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                RuntimeConfig.class);
+
+        List<TestResult> result = run(appCtx, scriptPath, sheetName, caseNo, isEvidenceOpen);
+
+        appCtx.close();
+
+        return result;
+    }
+
+    /**
+     * テストスクリプトを実行します。
+     *
+     * @param appCtx
+     *            {@link RuntimeConfig}で構成された{@code ConfigurableApplicationContext}
+     * @param scriptPath
+     *            実行対象のテストスクリプト
+     * @param sheetName
+     *            テストスクリプト内で実行対象のシート名
+     * @param caseNo
+     *            実行対象のケース番号 指定しない場合はシート内の全ケースを実行します。
+     * @param isEvidenceOpen
+     *            テスト実行後にエビデンスを開く場合にtrue
+     * @return
+     */
     public List<TestResult> run(ConfigurableApplicationContext appCtx, String scriptPath,
             String sheetName, String caseNo, boolean isEvidenceOpen) {
 
         List<TestResult> results = new ArrayList<>();
 
-        try {
+        if (StringUtils.isEmpty(caseNo)) {
 
-            if (StringUtils.isEmpty(caseNo)) {
+            results.addAll(runAll(scriptPath, sheetName));
 
-                TestScriptCatalog catalog = ApplicationContextHelper
-                        .getBean(TestScriptCatalog.class);
-                TestScript script = catalog.get(scriptPath, sheetName);
+        } else {
 
-                for (String caseNoInScript : script.getCaseNoMap().keySet()) {
-                    results.add(run(scriptPath, sheetName, caseNoInScript));
-                }
-
-            } else {
-
-                results.add(run(scriptPath, sheetName, caseNo));
-
-            }
-
-        } finally {
-
-            appCtx.close();
+            results.add(run(scriptPath, sheetName, caseNo));
 
         }
 
         if (isEvidenceOpen) {
             EvidenceOpener opener = new EvidenceOpener();
             opener.open();
+        }
+
+        return results;
+    }
+
+    private List<TestResult> runAll(String scriptPath, String sheetName) {
+
+        List<TestResult> results = new ArrayList<>();
+        TestScriptCatalog catalog = ApplicationContextHelper.getBean(TestScriptCatalog.class);
+        TestScript script = catalog.get(scriptPath, sheetName);
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+
+        for (String caseNoInScript : script.getCaseNoMap().keySet()) {
+
+            executor.execute(() -> {
+                results.add(run(scriptPath, sheetName, caseNoInScript));
+            });
+
+        }
+
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(5, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            LOG.warn("スレッドの待機で例外が発生しました", e);
         }
 
         return results;
@@ -82,6 +128,8 @@ public class TestRunner {
 
         listener.after();
         tester.tearDown();
+
+        // TODO 例外処理
 
         return result;
     }

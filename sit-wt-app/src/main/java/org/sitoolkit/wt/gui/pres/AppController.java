@@ -296,22 +296,21 @@ public class AppController implements Initializable {
 
     @FXML
     public void run() {
-    	runTest(false);
+    	runTest(false, false);
     }
     
     @FXML
     public void debug() {
-    	runTest(true);
+    	runTest(true, false);
     }
 
     @FXML
     public void runParallel() {
-    	// TODO 並列
-    	runTest(false);
+    	runTest(false, true);
     }
 
-    private void runTest(boolean debug) {
-        projectState.setState(debug ? State.DEBUGGING : State.RUNNING);
+    private void runTest(boolean isDebug, boolean isParallel) {
+        projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
 
         String testedClasses = SitWtRuntimeUtils
                 .findTestedClasses(fileTreeController.getSelectedFiles());
@@ -332,7 +331,7 @@ public class AppController implements Initializable {
         addBaseUrl(baseUrl);
 
         List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(
-                fileTreeController.getSelectedFiles(), debug,
+                fileTreeController.getSelectedFiles(), isDebug, isParallel,
                 browserChoice.getSelectionModel().getSelectedItem(), baseUrl);
 
         conversationProcess.start(new TextAreaConsole(console, mavenConsoleListener),
