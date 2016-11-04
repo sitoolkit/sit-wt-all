@@ -72,7 +72,7 @@ public class EvidenceDir {
         List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
                 FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
         evidenceDirs.remove(outputDir);
-        Collections.sort(evidenceDirs, new FileLastModifiedComarator(false));
+        Collections.sort(evidenceDirs, new FileNameComarator(false));
 
         if (evidenceDirs.isEmpty()) {
             LOG.info("エビデンスフォルダがありません {}", outputDir.getAbsolutePath());
@@ -83,15 +83,15 @@ public class EvidenceDir {
 
     }
 
-    public static class FileLastModifiedComarator implements Comparator<File> {
+    public static class FileNameComarator implements Comparator<File> {
 
         private int signum = 1;
 
-        public FileLastModifiedComarator() {
+        public FileNameComarator() {
             super();
         }
 
-        public FileLastModifiedComarator(boolean ascending) {
+        public FileNameComarator(boolean ascending) {
             this();
             signum = ascending ? 1 : -1;
         }
