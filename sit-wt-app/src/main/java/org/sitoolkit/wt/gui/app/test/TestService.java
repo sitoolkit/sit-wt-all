@@ -15,12 +15,12 @@ public class TestService {
         // TODO Auto-generated constructor stub
     }
 
-    public boolean runTest(TestRunParams params, Console console, OnExitCallback callback) {
+    public ConversationProcess runTest(TestRunParams params, Console console, OnExitCallback callback) {
 
         String testedClasses = SitWtRuntimeUtils.findTestedClasses(params.getScripts());
 
         if (StrUtils.isEmpty(testedClasses)) {
-            return false;
+            return null;
         }
 
         List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(params.getScripts(),
@@ -31,6 +31,6 @@ public class TestService {
 
         process.onExit(callback);
 
-        return true;
+        return process;
     }
 }

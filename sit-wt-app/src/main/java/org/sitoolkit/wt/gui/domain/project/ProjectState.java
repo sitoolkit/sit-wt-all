@@ -1,5 +1,7 @@
 package org.sitoolkit.wt.gui.domain.project;
 
+import java.io.File;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -23,42 +25,61 @@ import javafx.beans.property.SimpleBooleanProperty;
  */
 public class ProjectState {
 
-    private BooleanProperty running = new SimpleBooleanProperty();
+	private File pomFile;
 
-    private BooleanProperty loaded = new SimpleBooleanProperty();
+	private File baseDir;
 
-    private BooleanProperty browsing = new SimpleBooleanProperty();
+	private BooleanProperty running = new SimpleBooleanProperty();
 
-    private BooleanProperty debugging = new SimpleBooleanProperty();
+	private BooleanProperty loaded = new SimpleBooleanProperty();
 
-    public enum State {
-        NOT_LOADED, LOADED, RUNNING, DEBUGGING, BROWSING, LOCKING
-    }
+	private BooleanProperty browsing = new SimpleBooleanProperty();
 
-    public void setState(State state) {
-        loaded.set(state == State.LOADED);
-        running.set(state == State.RUNNING);
-        browsing.set(state == State.BROWSING);
-        debugging.set(state == State.DEBUGGING);
-    }
+	private BooleanProperty debugging = new SimpleBooleanProperty();
 
-    public BooleanProperty isRunning() {
-        return running;
-    }
+	public enum State {
+		NOT_LOADED, LOADED, RUNNING, DEBUGGING, BROWSING, LOCKING
+	}
 
-    public BooleanProperty isLoaded() {
-        return loaded;
-    }
+	public void setState(State state) {
+		loaded.set(state == State.LOADED);
+		running.set(state == State.RUNNING);
+		browsing.set(state == State.BROWSING);
+		debugging.set(state == State.DEBUGGING);
+	}
 
-    public BooleanProperty isBrowsing() {
-        return browsing;
-    }
+	public BooleanProperty isRunning() {
+		return running;
+	}
 
-    public BooleanProperty isDebugging() {
-        return debugging;
-    }
+	public BooleanProperty isLoaded() {
+		return loaded;
+	}
 
-    public void reset() {
-        setState(State.LOADED);
-    }
+	public BooleanProperty isBrowsing() {
+		return browsing;
+	}
+
+	public BooleanProperty isDebugging() {
+		return debugging;
+	}
+
+	public void init(File pomFile) {
+		this.pomFile = pomFile;
+		baseDir = pomFile.getAbsoluteFile().getParentFile();
+		setState(State.LOADED);
+	}
+
+	public void reset() {
+		setState(State.LOADED);
+	}
+
+	public File getPomFile() {
+		return pomFile;
+	}
+
+	public File getBaseDir() {
+		return baseDir;
+	}
+
 }

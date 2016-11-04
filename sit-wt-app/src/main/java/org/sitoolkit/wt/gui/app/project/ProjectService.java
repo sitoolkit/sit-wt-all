@@ -4,15 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.process.LogConsole;
+import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 public class ProjectService {
 
+	private static final Logger LOG = LogUtils.get(ProjectService.class); 
+	
     public ProjectService() {
     }
 
@@ -30,7 +35,8 @@ public class ProjectService {
     }
 
     public File openProject(File projectDir) {
-        File pomFile = new File(projectDir, "pom.xml");
+    	LOG.log(Level.INFO, "opening project in {0}", projectDir.getAbsolutePath());
+        File pomFile = new File(projectDir.getAbsolutePath(), "pom.xml");
 
         if (pomFile.exists()) {
             loadProject(pomFile);
@@ -57,6 +63,7 @@ public class ProjectService {
     }
 
     private void loadProject(File pomFile) {
+    	LOG.log(Level.INFO, "loading project with {0}", pomFile.getAbsolutePath());
         PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
         SitWtRuntimeUtils.loadSitWtClasspath(pomFile);
     }

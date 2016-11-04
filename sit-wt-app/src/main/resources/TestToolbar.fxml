@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.ChoiceBox?>
+
+
+<HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.TestToolbarController"
+  style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
+  <children>
+    <ToolBar fx:id="startGroup">
+      <items>
+        <Button mnemonicParsing="false" onAction="#run" text="&#xE037;" styleClass="material-icons">
+          <tooltip>
+            <Tooltip text="テストスクリプトを実行します" />
+          </tooltip>
+        </Button>
+        <Button mnemonicParsing="false" onAction="#debug" text="&#xE868;" styleClass="material-icons">
+          <tooltip>
+            <Tooltip text="テストスクリプトをデバッグします" />
+          </tooltip>
+        </Button>
+        <Button mnemonicParsing="false" onAction="#runParallel" text="&#xE01F;" styleClass="material-icons">
+          <tooltip>
+            <Tooltip text="テストスクリプトを並列実行します" />
+          </tooltip>
+        </Button>
+        <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
+        <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
+      </items>
+    </ToolBar>
+    <ToolBar fx:id="runningGroup">
+      <items>
+        <Separator orientation="VERTICAL" />
+        <Button mnemonicParsing="false" onAction="#quit" text="&#xE047;" styleClass="material-icons" />
+      </items>
+    </ToolBar>
+    <ToolBar fx:id="debugGroup">
+      <items>
+        <Separator orientation="VERTICAL" />
+        <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
+        <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="&#xE034;"
+          styleClass="material-icons" />
+        <Button mnemonicParsing="false" onAction="#back" text="&#xE045;" styleClass="material-icons" />
+        <Button mnemonicParsing="false" onAction="#forward" text="&#xE044;" styleClass="material-icons" />
+        <Button mnemonicParsing="false" onAction="#export" text="&#xE2C4;" styleClass="material-icons" />
+        <Button mnemonicParsing="false" onAction="#quit" text="&#xE047;" styleClass="material-icons" />
+      </items>
+    </ToolBar>
+  </children>
+</HBox>
+
