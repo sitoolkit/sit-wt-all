@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
@@ -19,25 +18,19 @@ public class EvidenceOpener {
 
     private static final Logger LOG = LoggerFactory.getLogger(EvidenceOpener.class);
     private int openFileCount = 1;
-    private String buildDir = "target";
-    private String evidenceDirRegex = "^evidence_.*";
     private String evidenceFileRegex = ".*\\.html$";
 
     public void open() {
-        File outputDir = new File(buildDir);
-        List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
-                FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
-        evidenceDirs.remove(outputDir);
-        Collections.sort(evidenceDirs, new FileLastModifiedComarator(false));
 
-        if (evidenceDirs.isEmpty()) {
-            LOG.info("エビデンスフォルダがありません {}", outputDir.getAbsolutePath());
+        File evidenceDir = EvidenceDir.getLatestEvidenceDir();
+
+        if (evidenceDir == null) {
             return;
         }
 
-        List<File> opelogFiles = new ArrayList<File>(FileUtils.listFiles(evidenceDirs.get(0),
+        List<File> opelogFiles = new ArrayList<File>(FileUtils.listFiles(evidenceDir,
                 new RegexFileFilter(evidenceFileRegex), TrueFileFilter.INSTANCE));
-        LOG.info("{}に{}のエビデンスがあります ", evidenceDirs.get(0).getName(), opelogFiles.size());
+        LOG.info("{}に{}のエビデンスがあります ", evidenceDir.getName(), opelogFiles.size());
 
         Collections.sort(opelogFiles, new FileLastModifiedComarator(true));
 
