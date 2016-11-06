@@ -111,7 +111,7 @@ public class Tester {
             testScript = catalog.get(testScriptPath, sheetName);
             current.setTestScript(testScript);
 
-            if (debug.isDebug()) {
+            if (pm.isDebug()) {
                 log.info("最後のステップにブレークポイントを設定します。");
                 TestStep lastStep = testScript.getLastStep();
                 lastStep.setBreakPoint("y");
@@ -169,13 +169,13 @@ public class Tester {
                             "期待と異なる結果になりました {}", e.getLocalizedMessage()));
                     addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
 
-                    if (debug.isDebug()) {
+                    if (pm.isDebug()) {
                         debug.pause();
                     }
 
                 } catch (Exception e) {
 
-                    if (debug.isDebug()) {
+                    if (pm.isDebug()) {
                         ngList.add(e);
                         evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                                 "予期しないエラーが発生しました {}", e.getLocalizedMessage()));

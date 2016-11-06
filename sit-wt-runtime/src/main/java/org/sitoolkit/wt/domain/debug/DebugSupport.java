@@ -28,6 +28,7 @@ import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -50,6 +51,9 @@ public class DebugSupport {
 
     @Resource
     ApplicationContext appCtx;
+
+    @Resource
+    PropertyManager pm;
 
     /**
      * ポーズ中にスレッドをsleepする間隔(ミリ秒)
@@ -78,7 +82,7 @@ public class DebugSupport {
         LOG.debug("debugging test context : {}", current);
         if (currentIndex < testScript.getTestStepCount()) {
 
-            if (isDebug()) {
+            if (pm.isDebug()) {
 
                 LOG.debug("currentIndex:{}, testStepCount:{}", currentIndex,
                         testScript.getTestStepCount());
@@ -105,16 +109,16 @@ public class DebugSupport {
         }
     }
 
-    public synchronized boolean isDebug() {
-        if (debug == null) {
-            debug = getSysPropAsBoolean("sitwt.debug");
-        }
-        return debug;
-    }
-
-    private boolean getSysPropAsBoolean(String key) {
-        return Boolean.parseBoolean(System.getProperty(key));
-    }
+    // public synchronized boolean isDebug() {
+    // if (debug == null) {
+    // debug = getSysPropAsBoolean("sitwt.debug");
+    // }
+    // return debug;
+    // }
+    //
+    // private boolean getSysPropAsBoolean(String key) {
+    // return Boolean.parseBoolean(System.getProperty(key));
+    // }
 
     /**
      * 次に実行すべきテストステップインデックスを返します。 また内部では以下の処理を行います。
@@ -196,11 +200,14 @@ public class DebugSupport {
 
     @PostConstruct
     public void init() {
-        if (!isDebug()) {
+        if (!pm.isDebug()) {
             return;
         }
 
-        LOG.info("デバッグモードでテストを実行します。" + "実行を一時停止するにはEnterキーをタイプしてください。");
+        LOG.info("デバッグモードでテストを実行します。");
+        if (pm.isCli()) {
+            LOG.info("実行を一時停止するにはEnterキーをタイプしてください。");
+        }
 
         executor = Executors.newSingleThreadExecutor();
         executor.submit(new Runnable() {
@@ -230,17 +237,22 @@ public class DebugSupport {
     }
 
     public void pause() {
-        LOG.info("テストスクリプトの実行を一時停止します。ブラウザの操作は可能です。" + "操作方法を表示するにはEnterキーをタイプしてください。");
+        LOG.info("テストスクリプトの実行を一時停止します。ブラウザの操作は可能です。");
+        if (pm.isCli()) {
+            LOG.info("操作方法を表示するにはEnterキーをタイプしてください。");
+        }
         setPaused(true);
     }
 
     private void showUsage() {
-        LOG.info(USAGE_DESC);
+        if (pm.isCli()) {
+            LOG.info(USAGE_DESC);
+        }
     }
 
     @PreDestroy
     public void destroy() {
-        if (isDebug()) {
+        if (pm.isDebug()) {
             executor.shutdownNow();
         }
     }

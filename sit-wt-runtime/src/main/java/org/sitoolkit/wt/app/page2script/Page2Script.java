@@ -41,6 +41,8 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
     private boolean openScript = true;
 
+    private boolean isCli = true;
+
     public static void main(String[] args) {
         System.exit(staticStart(true));
     }
@@ -49,9 +51,9 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
         ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
                 Page2ScriptConfig.class, ExtConfig.class);
 
-        Page2Script generator = appCtx.getBean(Page2Script.class);
-        generator.setOpenScript(openScript);
-        int ret = generator.start();
+        Page2Script page2script = appCtx.getBean(Page2Script.class);
+        page2script.setOpenScript(openScript);
+        int ret = page2script.start();
         appCtx.close();
         return ret;
     }
@@ -62,12 +64,17 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
             Scanner scan = new Scanner(System.in);
 
-            LOG.info("ブラウザが起動したらブラウザを操作してください。");
-            LOG.info(MSG);
+            if (isCli) {
+                LOG.info("ブラウザが起動したらブラウザを操作してください。");
+                LOG.info(MSG);
+            }
 
             while (!"q".equalsIgnoreCase(scan.nextLine())) {
                 generateFromPage();
-                LOG.info(MSG);
+
+                if (isCli) {
+                    LOG.info(MSG);
+                }
             }
 
             scan.close();
@@ -166,4 +173,9 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
     public void setOpenScript(boolean openScript) {
         this.openScript = openScript;
     }
+
+    public void setCli(boolean isCli) {
+        this.isCli = isCli;
+    }
+
 }

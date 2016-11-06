@@ -85,6 +85,12 @@ public class PropertyManager {
     @Value("${hubUrl}")
     private String hubUrl;
 
+    @Value("${sitwt.debug ?: false}")
+    private boolean isDebug;
+
+    @Value("${sitwt.cli ?: true}")
+    private boolean isCli;
+
     private Map<String, String> capabilities = new HashMap<>();
 
     private boolean isFirefoxDriver;
@@ -109,6 +115,7 @@ public class PropertyManager {
         capabilities = PropertyUtils.loadAsMap("/capabilities", true);
 
         setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
+
     }
 
     public void save(File dir) {
@@ -256,6 +263,14 @@ public class PropertyManager {
 
     public Map<String, String> getCapabilities() {
         return capabilities;
+    }
+
+    public boolean isDebug() {
+        return isDebug;
+    }
+
+    public boolean isCli() {
+        return isCli;
     }
 
 }

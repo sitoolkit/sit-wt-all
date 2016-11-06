@@ -27,14 +27,15 @@ public class Page2ScriptConfig {
     @Bean
     public Page2Script getTestScriptGenerator(TestScriptDao dao, PageListener listener,
             PropertyManager pm, PageLoader... loaders) {
-        Page2Script gen = new Page2Script();
+        Page2Script page2script = new Page2Script();
 
-        gen.setDao(dao);
-        gen.setLoaders(Arrays.asList(loaders));
-        gen.setListener(listener);
-        gen.setOutputDir(pm.getPageScriptDir());
+        page2script.setDao(dao);
+        page2script.setLoaders(Arrays.asList(loaders));
+        page2script.setListener(listener);
+        page2script.setOutputDir(pm.getPageScriptDir());
+        page2script.setCli(pm.isCli());
 
-        return gen;
+        return page2script;
     }
 
     @Bean
@@ -72,4 +73,5 @@ public class Page2ScriptConfig {
     public PageContext getPageContext() {
         return new PageContext();
     }
+
 }
