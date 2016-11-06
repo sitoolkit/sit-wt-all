@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />  
+
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
@@ -20,6 +23,10 @@
 
   <logger name="org.sitoolkit" level="debug" additivity="true">
     <appender-ref ref="stdout" />
+  </logger>
+
+  <logger name="ch.qos.logback" level="error" additivity="true">
+    <appender-ref ref="file" />
   </logger>
 
   <root level="info">
