@@ -31,191 +31,194 @@ import javafx.scene.control.ToolBar;
 
 public class TestToolbarController implements Initializable {
 
-	@FXML
-	private ToolBar startGroup;
+    @FXML
+    private ToolBar startGroup;
 
-	@FXML
-	private ToolBar runningGroup;
+    @FXML
+    private ToolBar runningGroup;
 
-	@FXML
-	private ToolBar debugGroup;
+    @FXML
+    private ToolBar debugGroup;
 
-	@FXML
-	private ChoiceBox<String> browserChoice;
+    @FXML
+    private ChoiceBox<String> browserChoice;
 
-	@FXML
-	private ComboBox<String> baseUrlCombo;
+    @FXML
+    private ComboBox<String> baseUrlCombo;
 
-	@FXML
-	private Button pauseButton;
+    @FXML
+    private Button pauseButton;
 
-	@FXML
-	private TextField stepNoText;
+    @FXML
+    private Button restartButton;
 
-	private TextArea console;
+    @FXML
+    private TextField stepNoText;
 
-	private FileTreeController fileTreeController;
+    private TextArea console;
 
-	private MessageView messageView;
+    private FileTreeController fileTreeController;
 
-	private ConversationProcess testProcess;
+    private MessageView messageView;
 
-	private ProjectState projectState;
+    private ConversationProcess testProcess;
 
-	private SitWtDebugConsoleListener debugConsoleListener = new SitWtDebugConsoleListener();
+    private ProjectState projectState;
 
-	private TestService testService = new TestService();
+    private SitWtDebugConsoleListener debugConsoleListener = new SitWtDebugConsoleListener();
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		browserChoice.getItems().addAll(SystemUtils.getBrowsers());
-	}
+    private TestService testService = new TestService();
 
-	public void initialize(TextArea console, MessageView messageView, FileTreeController fileTreeController,
-			ProjectState projectState) {
-		this.projectState = projectState;
-		this.console = console;
-		this.fileTreeController = fileTreeController;
-		this.messageView = messageView;
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        browserChoice.getItems().addAll(SystemUtils.getBrowsers());
 
-		FxUtils.bindVisible(startGroup, projectState.isLoaded());
-		FxUtils.bindVisible(runningGroup, projectState.isRunning());
-		FxUtils.bindVisible(debugGroup, projectState.isDebugging());
-	}
+        FxUtils.bindVisible(pauseButton, debugConsoleListener.getPausingProperty().not());
+        FxUtils.bindVisible(restartButton, debugConsoleListener.getPausingProperty());
+    }
 
-	public void loadProject() {
-		List<String> baseUrls = PropertyManager.get().getBaseUrls();
-		if (!baseUrls.isEmpty()) {
-			baseUrlCombo.getItems().addAll(baseUrls);
-			baseUrlCombo.setValue(baseUrls.get(0));
-		}
-	}
+    public void initialize(TextArea console, MessageView messageView,
+            FileTreeController fileTreeController, ProjectState projectState) {
+        this.projectState = projectState;
+        this.console = console;
+        this.fileTreeController = fileTreeController;
+        this.messageView = messageView;
 
-	public void destroy() {
-		PropertyManager.get().setBaseUrls(baseUrlCombo.getItems());
+        FxUtils.bindVisible(startGroup, projectState.isLoaded());
+        FxUtils.bindVisible(runningGroup, projectState.isRunning());
+        FxUtils.bindVisible(debugGroup, projectState.isDebugging());
+    }
 
-		if (testProcess != null) {
-			testProcess.destroy();
-		}
-	}
+    public void loadProject() {
+        List<String> baseUrls = PropertyManager.get().getBaseUrls();
+        if (!baseUrls.isEmpty()) {
+            baseUrlCombo.getItems().addAll(baseUrls);
+            baseUrlCombo.setValue(baseUrls.get(0));
+        }
+    }
 
-	@FXML
-	public void run() {
-		messageView.startMsg("テストを実行します。");
-		runTest(false, false);
-	}
+    public void destroy() {
+        PropertyManager.get().setBaseUrls(baseUrlCombo.getItems());
 
-	@FXML
-	public void debug() {
-		messageView.startMsg("テストをデバッグします。");
-		runTest(true, false);
-	}
+        if (testProcess != null) {
+            testProcess.destroy();
+        }
+    }
 
-	@FXML
-	public void runParallel() {
-		messageView.startMsg("テストを並列実行します。");
-		runTest(false, true);
-	}
+    @FXML
+    public void run() {
+        messageView.startMsg("テストを実行します。");
+        runTest(false, false);
+    }
 
-	private void runTest(boolean isDebug, boolean isParallel) {
-		projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
+    @FXML
+    public void debug() {
+        messageView.startMsg("テストをデバッグします。");
+        runTest(true, false);
+    }
 
-		TestRunParams params = new TestRunParams();
-		params.setScripts(fileTreeController.getSelectedFiles());
-		params.setBaseDir(projectState.getBaseDir());
-		params.setDebug(isDebug);
-		params.setParallel(isParallel);
-		params.setDriverType(getDriverType());
-		params.setBaseUrl(getBaseUrl());
+    @FXML
+    public void runParallel() {
+        messageView.startMsg("テストを並列実行します。");
+        runTest(false, true);
+    }
 
-		addBaseUrl(params.getBaseUrl());
+    private void runTest(boolean isDebug, boolean isParallel) {
+        projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
 
-		OnExitCallback callback = exitCode -> {
-			projectState.reset();
-			Platform.runLater(() -> messageView.addMsg("テストを終了します。"));
-		};
+        TestRunParams params = new TestRunParams();
+        params.setScripts(fileTreeController.getSelectedFiles());
+        params.setBaseDir(projectState.getBaseDir());
+        params.setDebug(isDebug);
+        params.setParallel(isParallel);
+        params.setDriverType(getDriverType());
+        params.setBaseUrl(getBaseUrl());
 
-		ConversationProcess testProcess = testService.runTest(params,
-				new TextAreaConsole(console, debugConsoleListener), callback);
+        addBaseUrl(params.getBaseUrl());
 
-		if (testProcess == null) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("");
-			alert.setContentText("");
-			alert.setHeaderText("実行するテストスクリプトを選択してください。");
-			alert.show();
-			projectState.reset();
-		} else {
-			this.testProcess = testProcess;
-		}
+        OnExitCallback callback = exitCode -> {
+            projectState.reset();
+            Platform.runLater(() -> messageView.addMsg("テストを終了します。"));
+        };
 
-	}
+        ConversationProcess testProcess = testService.runTest(params,
+                new TextAreaConsole(console, debugConsoleListener), callback);
 
-	private void addBaseUrl(String baseUrl) {
-		List<String> items = baseUrlCombo.getItems();
-		int limit = PropertyManager.get().getBaseUrlLimit();
+        if (testProcess == null) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("");
+            alert.setContentText("");
+            alert.setHeaderText("実行するテストスクリプトを選択してください。");
+            alert.show();
+            projectState.reset();
+        } else {
+            this.testProcess = testProcess;
+        }
 
-		if (!items.contains(baseUrl)) {
-			items.add(0, baseUrl);
-		}
+    }
 
-		if (items.size() > limit) {
-			items.remove(limit);
-		}
-		baseUrlCombo.setValue(baseUrl);
-	}
+    private void addBaseUrl(String baseUrl) {
+        List<String> items = baseUrlCombo.getItems();
+        int limit = PropertyManager.get().getBaseUrlLimit();
 
-	@FXML
-	public void pause() {
-		// TODO 状態判定のリファクタリング
-		if (debugConsoleListener.isPausing()) {
-			pauseButton.setText("\uE034");
+        if (!items.contains(baseUrl)) {
+            items.add(0, baseUrl);
+        }
 
-			String stepNo = stepNoText.getText();
-			if (!StrUtils.isEmpty(stepNo)) {
-				testProcess.input("!" + stepNo);
-				testProcess.input("#" + stepNo);
-			}
+        if (items.size() > limit) {
+            items.remove(limit);
+        }
+        baseUrlCombo.setValue(baseUrl);
+    }
 
-			testProcess.input("s");
-		} else {
-			pauseButton.setText("\uE037");
-			testProcess.input("");
-		}
-	}
+    @FXML
+    public void pause() {
+        testProcess.input("");
+    }
 
-	@FXML
-	public void back() {
-		testProcess.input("b");
-	}
+    @FXML
+    public void restart() {
+        String stepNo = stepNoText.getText();
+        if (!StrUtils.isEmpty(stepNo)) {
+            testProcess.input("!" + stepNo);
+            testProcess.input("#" + stepNo);
+        }
 
-	@FXML
-	public void forward() {
-		testProcess.input("f");
-	}
+        testProcess.input("s");
+    }
 
-	@FXML
-	public void export() {
-		testProcess.input("e");
-		fileTreeController.refresh();
-	}
+    @FXML
+    public void back() {
+        testProcess.input("b");
+    }
 
-	@FXML
-	public void quit() {
-		testProcess.destroy();
-		projectState.reset();
-	}
+    @FXML
+    public void forward() {
+        testProcess.input("f");
+    }
 
-	public void setBaseUrl(String baseUrl) {
-		baseUrlCombo.setValue(baseUrl);
-	}
+    @FXML
+    public void export() {
+        testProcess.input("e");
+        fileTreeController.refresh();
+    }
 
-	public String getBaseUrl() {
-		return baseUrlCombo.getValue();
-	}
+    @FXML
+    public void quit() {
+        testProcess.destroy();
+        projectState.reset();
+    }
 
-	public String getDriverType() {
-		return browserChoice.getValue();
-	}
+    public void setBaseUrl(String baseUrl) {
+        baseUrlCombo.setValue(baseUrl);
+    }
+
+    public String getBaseUrl() {
+        return baseUrlCombo.getValue();
+    }
+
+    public String getDriverType() {
+        return browserChoice.getValue();
+    }
 
 }

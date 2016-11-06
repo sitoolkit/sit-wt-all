@@ -61,14 +61,12 @@
             <ToolBar fx:id="genScriptGroup">
               <items>
                 <Separator orientation="VERTICAL" />
-                <Button mnemonicParsing="false" onAction="#ope2script" text="&#xE061;"
-                  styleClass="material-icons">
+                <Button mnemonicParsing="false" onAction="#ope2script" styleClass="image-btn,record-btn">
                   <tooltip>
                     <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します" />
                   </tooltip>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#page2script" text="&#xE2C4;"
-                  styleClass="material-icons">
+                <Button mnemonicParsing="false" onAction="#page2script" styleClass="image-btn,export-btn">
                   <tooltip>
                     <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します" />
                   </tooltip>
@@ -77,20 +75,24 @@
             </ToolBar>
             <ToolBar fx:id="browsingGroup">
               <items>
-                <Button mnemonicParsing="false" onAction="#export" text="&#xE2C4;"
-                  styleClass="material-icons" />
-                <Button mnemonicParsing="false" onAction="#quitBrowsing" text="&#xE047;"
-                  styleClass="material-icons" />
+                <Button mnemonicParsing="false" onAction="#export" styleClass="image-btn,export-btn" />
+                <Button mnemonicParsing="false" onAction="#quitBrowsing" styleClass="image-btn,quit-btn" />
               </items>
             </ToolBar>
           </children>
           <ToolBar>
             <items>
               <Separator orientation="VERTICAL" />
-              <Button fx:id="toggleButton" mnemonicParsing="false" onAction="#toggleWindow"
-                text="&#xE5D1;" styleClass="material-icons">
+              <Button fx:id="minimizeButton" mnemonicParsing="false" onAction="#minimizeWindow"
+                styleClass="image-btn,minimize-btn">
                 <tooltip>
                   <Tooltip text="ウィンドウを縮小します" />
+                </tooltip>
+              </Button>
+              <Button fx:id="maximizeButton" mnemonicParsing="false" onAction="#maximizeWindow"
+                styleClass="image-btn,maximize-btn">
+                <tooltip>
+                  <Tooltip text="ウィンドウを拡大します" />
                 </tooltip>
               </Button>
             </items>
