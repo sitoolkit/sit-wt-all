@@ -4,10 +4,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.domain.pageload.PageContext;
 import org.sitoolkit.wt.domain.pageload.PageListener;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.SitPathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,11 @@ public class SeleniumPageLietener implements PageListener {
         // touch WebDriver instance to start Browser
         String driverType = driver.toString();
         LOG.info("ブラウザを起動します {}", driverType);
+
+        String baseUrl = pm.getBaseUrl();
+        if (StringUtils.isNotEmpty(baseUrl)) {
+            driver.get(SitPathUtils.buildUrl(baseUrl, ""));
+        }
     }
 
     @Override

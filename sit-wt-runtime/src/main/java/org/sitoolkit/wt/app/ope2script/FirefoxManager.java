@@ -3,8 +3,11 @@ package org.sitoolkit.wt.app.ope2script;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -47,7 +50,18 @@ public class FirefoxManager {
                 if (checkSeleniumIdeInstalledWindows()) {
 
                     LOG.info("Firefoxを起動します");
-                    ProcessUtils.execute(false, ffBinary.getExecutable().getPath(), "-foreground");
+
+                    List<String> command = new ArrayList<>();
+                    command.add(ffBinary.getExecutable().getPath());
+                    command.add("-foreground");
+
+                    String url = System.getProperty("url");
+                    if (StringUtils.isNotEmpty(url)) {
+                        command.add("-url");
+                        command.add(url);
+                    }
+
+                    ProcessUtils.execute(false, command.toArray(new String[command.size()]));
 
                 } else {
 

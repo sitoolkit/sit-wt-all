@@ -264,7 +264,8 @@ public class AppController implements Initializable {
     public void ope2script() {
         messageView.startMsg("ブラウザ操作の記録はFirefoxとSelenium IDE Pluginを使用します。");
         messageView.addMsg("Selenium IDEで記録したテストソクリプトをhtml形式でtestcriptディレクトリに保存してください。");
-        List<String> command = SitWtRuntimeUtils.buildOpe2ScriptCommand();
+        List<String> command = SitWtRuntimeUtils
+                .buildOpe2ScriptCommand(testToolbarController.getBaseUrl());
 
         conversationProcess.start(textAreaConsole, projectState.getBaseDir(), command);
     }

@@ -64,8 +64,8 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
             Scanner scan = new Scanner(System.in);
 
+            LOG.info("ブラウザが起動したらブラウザを操作してください。");
             if (isCli) {
-                LOG.info("ブラウザが起動したらブラウザを操作してください。");
                 LOG.info(MSG);
             }
 

@@ -79,16 +79,16 @@ public class PropertyManager {
     @Value("${selenium.screenshot.pattern}")
     private String seleniumScreenshotPattern;
 
-    @Value("${baseUrl}")
+    @Value("${baseUrl:}")
     private String baseUrl;
 
     @Value("${hubUrl}")
     private String hubUrl;
 
-    @Value("${sitwt.debug ?: false}")
+    @Value("${sitwt.debug:false}")
     private boolean isDebug;
 
-    @Value("${sitwt.cli ?: true}")
+    @Value("${sitwt.cli:true}")
     private boolean isCli;
 
     private Map<String, String> capabilities = new HashMap<>();
