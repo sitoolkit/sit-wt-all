@@ -27,8 +27,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
@@ -47,10 +47,10 @@ public class AppController implements Initializable {
     private TextArea console;
 
     @FXML
-    private Button exportButton;
+    private Label exportButton;
 
     @FXML
-    private Button toggleButton;
+    private Label toggleButton;
 
     @FXML
     private FileTreeController fileTreeController;
@@ -292,10 +292,10 @@ public class AppController implements Initializable {
     private double stageWidth;
 
     @FXML
-    private Button maximizeButton;
+    private Label maximizeButton;
 
     @FXML
-    private Button minimizeButton;
+    private Label minimizeButton;
 
     private BooleanProperty windowMaximized = new SimpleBooleanProperty(true);
 

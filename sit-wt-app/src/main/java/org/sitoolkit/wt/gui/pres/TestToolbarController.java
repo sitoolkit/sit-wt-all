@@ -22,9 +22,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
@@ -47,10 +47,10 @@ public class TestToolbarController implements Initializable {
     private ComboBox<String> baseUrlCombo;
 
     @FXML
-    private Button pauseButton;
+    private Label pauseButton;
 
     @FXML
-    private Button restartButton;
+    private Label restartButton;
 
     @FXML
     private TextField stepNoText;

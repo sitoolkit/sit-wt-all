@@ -10,6 +10,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.control.Label?>
 
 
 <HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.TestToolbarController"
@@ -17,21 +18,21 @@
   <children>
     <ToolBar fx:id="startGroup">
       <items>
-        <Button mnemonicParsing="false" onAction="#run" styleClass="image-btn,run-btn">
+        <Label onMouseClicked="#run" styleClass="image-btn,run-btn">
           <tooltip>
             <Tooltip text="テストスクリプトを実行します" />
           </tooltip>
-        </Button>
-        <Button mnemonicParsing="false" onAction="#debug" styleClass="image-btn,debug-btn">
+        </Label>
+        <Label onMouseClicked="#debug" styleClass="image-btn,debug-btn">
           <tooltip>
             <Tooltip text="テストスクリプトをデバッグします" />
           </tooltip>
-        </Button>
-        <Button mnemonicParsing="false" onAction="#runParallel" styleClass="image-btn,parallel-btn">
+        </Label>
+        <Label onMouseClicked="#runParallel" styleClass="image-btn,parallel-btn">
           <tooltip>
             <Tooltip text="テストスクリプトを並列実行します" />
           </tooltip>
-        </Button>
+        </Label>
         <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
         <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
       </items>
@@ -39,21 +40,19 @@
     <ToolBar fx:id="runningGroup">
       <items>
         <Separator orientation="VERTICAL" />
-        <Button mnemonicParsing="false" onAction="#quit" styleClass="image-btn,quit-btn" />
+        <Label onMouseClicked="#quit" styleClass="image-btn,quit-btn" />
       </items>
     </ToolBar>
     <ToolBar fx:id="debugGroup">
       <items>
         <Separator orientation="VERTICAL" />
         <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
-        <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" 
-          styleClass="image-btn,pause-btn" />
-        <Button fx:id="restartButton" mnemonicParsing="false" onAction="#restart" 
-          styleClass="image-btn,run-btn" />
-        <Button mnemonicParsing="false" onAction="#back" styleClass="image-btn,back-btn" />
-        <Button mnemonicParsing="false" onAction="#forward" styleClass="image-btn,forward-btn" />
-        <Button mnemonicParsing="false" onAction="#export" styleClass="image-btn,export-btn" />
-        <Button mnemonicParsing="false" onAction="#quit" styleClass="image-btn,quit-btn" />
+        <Label fx:id="pauseButton" onMouseClicked="#pause" styleClass="image-btn,pause-btn" />
+        <Label fx:id="restartButton" onMouseClicked="#restart" styleClass="image-btn,run-btn" />
+        <Label onMouseClicked="#back" styleClass="image-btn,back-btn" />
+        <Label onMouseClicked="#forward" styleClass="image-btn,forward-btn" />
+        <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
+        <Label onMouseClicked="#quit" styleClass="image-btn,quit-btn" />
       </items>
     </ToolBar>
   </children>

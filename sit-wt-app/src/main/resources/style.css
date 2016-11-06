@@ -1,8 +1,14 @@
 .image-btn {
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
-    -fx-background-size: 13px;
+    -fx-background-size: 16px;
+    -fx-background-color: transparent;
     -fx-pref-width: 30px;
+    -fx-pref-height: 30px;
+}
+
+.image-btn:hover {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
 }
 
 .run-btn {
