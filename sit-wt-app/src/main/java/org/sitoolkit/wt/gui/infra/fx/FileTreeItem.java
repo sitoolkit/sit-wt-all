@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.ImageView;
 
 public final class FileTreeItem extends CheckBoxTreeItem<FileWrapper> {
     private boolean isLeaf;
@@ -17,6 +18,7 @@ public final class FileTreeItem extends CheckBoxTreeItem<FileWrapper> {
 
     public FileTreeItem(File file) {
         this(new FileWrapper(file));
+
     }
 
     public FileTreeItem(File file, boolean isSelectable) {
@@ -26,6 +28,10 @@ public final class FileTreeItem extends CheckBoxTreeItem<FileWrapper> {
 
     public FileTreeItem(FileWrapper file) {
         super(file);
+
+        String url = file.getFile().isDirectory() ? "/icon/ic_folder_open_black_18dp_1x.png"
+                : "/icon/ic_description_black_18dp_1x.png";
+        setGraphic(new ImageView(url));
     }
 
     public List<File> getSelectedFiles() {
@@ -72,8 +78,7 @@ public final class FileTreeItem extends CheckBoxTreeItem<FileWrapper> {
                         .observableArrayList();
 
                 for (File childFile : files) {
-                    FileTreeItem child = new FileTreeItem(
-                            new FileWrapper(childFile));
+                    FileTreeItem child = new FileTreeItem(new FileWrapper(childFile));
                     child.isSelectable = this.isSelectable;
                     children.add(child);
                 }
