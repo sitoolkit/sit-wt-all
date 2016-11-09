@@ -66,3 +66,7 @@
 .minimize-btn {
     -fx-background-image:url('/icon/ic_fullscreen_exit_black_18dp_1x.png');
 }
+
+.settings-btn {
+    -fx-background-image:url('/icon/ic_settings_black_18dp_1x.png');
+}

@@ -266,4 +266,8 @@ public class AppController implements Initializable {
         windowMaximized.set(true);
     }
 
+    @FXML
+    public void settings() {
+        FxContext.openFile(new File(projectState.getBaseDir(), "src/main/resources"));
+    }
 }

@@ -79,6 +79,11 @@
               <Tooltip text="ウィンドウを拡大します" />
             </tooltip>
           </Label>
+          <Label onMouseClicked="#settings" styleClass="image-btn,settings-btn">
+            <tooltip>
+              <Tooltip text="設定ファイルのフォルダを開きます" />
+            </tooltip>
+          </Label>
         </items>
       </ToolBar>
     </HBox>
