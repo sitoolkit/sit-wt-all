@@ -187,6 +187,15 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
+    public static List<String> buildUnpackTestscriptCommand() {
+        List<String> command = new ArrayList<>();
+
+        command.add(MavenUtils.getCommand());
+        command.add("-Punpack-testscript");
+
+        return command;
+    }
+
     private static List<String> buildJavaCommand() {
         List<String> command = new ArrayList<>();
         command.add("java");

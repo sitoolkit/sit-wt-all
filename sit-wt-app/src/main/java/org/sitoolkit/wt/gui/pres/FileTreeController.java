@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import org.sitoolkit.wt.gui.infra.fx.FileWrapper;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
-import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -28,6 +28,8 @@ public class FileTreeController implements Initializable {
     private TreeView<FileWrapper> fileTree;
 
     private Mode mode = Mode.NORMAL;
+
+    TestService testService = new TestService();
 
     public FileTreeController() {
     }
@@ -131,10 +133,11 @@ public class FileTreeController implements Initializable {
                 File newTestScript = new File(selectedItem.getValue().getFile(), name);
 
                 if (newTestScript.exists()) {
+                    // TODO ファイル名重複
                     return;
                 }
 
-                FileIOUtils.download(TESTSCRIPT_URL, newTestScript);
+                testService.createNewScript(fileTree.getRoot().getValue().getFile(), newTestScript);
                 selectedItem.getChildren().add(createNode(newTestScript));
             });
 

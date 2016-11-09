@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Enumeration;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -103,5 +104,15 @@ public class FileIOUtils {
         }
 
         return sb.toString();
+    }
+
+    public static void copy(File src, File dst) {
+        LOG.log(Level.INFO, "{0} copy to {1}",
+                new Object[] { src.getAbsolutePath(), dst.getAbsolutePath() });
+        try {
+            Files.copy(src.toPath(), dst.toPath());
+        } catch (IOException e) {
+            throw new UnExpectedException(e);
+        }
     }
 }
