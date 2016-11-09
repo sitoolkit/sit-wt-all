@@ -11,50 +11,50 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 
 
 <HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.TestToolbarController"
   style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
-  <children>
-    <ToolBar fx:id="startGroup">
-      <items>
-        <Label onMouseClicked="#run" styleClass="image-btn,run-btn">
-          <tooltip>
-            <Tooltip text="テストスクリプトを実行します" />
-          </tooltip>
-        </Label>
-        <Label onMouseClicked="#debug" styleClass="image-btn,debug-btn">
-          <tooltip>
-            <Tooltip text="テストスクリプトをデバッグします" />
-          </tooltip>
-        </Label>
-        <Label onMouseClicked="#runParallel" styleClass="image-btn,parallel-btn">
-          <tooltip>
-            <Tooltip text="テストスクリプトを並列実行します" />
-          </tooltip>
-        </Label>
-        <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
-        <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
-      </items>
-    </ToolBar>
-    <ToolBar fx:id="runningGroup">
-      <items>
-        <Separator orientation="VERTICAL" />
-        <Label onMouseClicked="#quit" styleClass="image-btn,quit-btn" />
-      </items>
-    </ToolBar>
-    <ToolBar fx:id="debugGroup">
-      <items>
-        <Separator orientation="VERTICAL" />
-        <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
-        <Label fx:id="pauseButton" onMouseClicked="#pause" styleClass="image-btn,pause-btn" />
-        <Label fx:id="restartButton" onMouseClicked="#restart" styleClass="image-btn,run-btn" />
-        <Label onMouseClicked="#back" styleClass="image-btn,back-btn" />
-        <Label onMouseClicked="#forward" styleClass="image-btn,forward-btn" />
-        <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
-        <Label onMouseClicked="#quit" styleClass="image-btn,quit-btn" />
-      </items>
-    </ToolBar>
-  </children>
+  <Separator orientation="VERTICAL" />
+  <ToolBar fx:id="startGroup">
+    <items>
+      <Label onMouseClicked="#run" styleClass="image-btn,run-btn">
+        <tooltip>
+          <Tooltip text="テストスクリプトを実行します" />
+        </tooltip>
+      </Label>
+      <Label onMouseClicked="#debug" styleClass="image-btn,debug-btn">
+        <tooltip>
+          <Tooltip text="テストスクリプトをデバッグします" />
+        </tooltip>
+      </Label>
+      <Label onMouseClicked="#runParallel" styleClass="image-btn,parallel-btn">
+        <tooltip>
+          <Tooltip text="テストスクリプトを並列実行します" />
+        </tooltip>
+      </Label>
+      <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
+      <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
+    </items>
+  </ToolBar>
+  <ToolBar fx:id="runningGroup">
+    <items>
+      <Separator orientation="VERTICAL" />
+      <Label onMouseClicked="#quit" styleClass="image-btn,quit-btn" />
+    </items>
+  </ToolBar>
+  <ToolBar fx:id="debugGroup">
+    <items>
+      <Separator orientation="VERTICAL" />
+      <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
+      <Label fx:id="pauseButton" onMouseClicked="#pause" styleClass="image-btn,pause-btn" />
+      <Label fx:id="restartButton" onMouseClicked="#restart" styleClass="image-btn,run-btn" />
+      <Label onMouseClicked="#back" styleClass="image-btn,back-btn" />
+      <Label onMouseClicked="#forward" styleClass="image-btn,forward-btn" />
+      <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
+      <Label onMouseClicked="#quit" styleClass="image-btn,quit-btn" />
+    </items>
+  </ToolBar>
 </HBox>
 
