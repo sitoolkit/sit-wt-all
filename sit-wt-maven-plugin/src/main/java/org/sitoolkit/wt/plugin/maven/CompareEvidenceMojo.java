@@ -29,7 +29,7 @@ public class CompareEvidenceMojo extends AbstractMojo {
     @Parameter(property = "evidence.target")
     private String targetEvidence;
 
-    @Parameter(property = "compareScreenshot", defaultValue = "false")
+    @Parameter(property = "compareScreenshot", defaultValue = "true")
     private boolean compareScreenshot;
 
     @Parameter(property = "evidence.open", defaultValue = "true")
