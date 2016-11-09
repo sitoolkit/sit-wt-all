@@ -1,5 +1,6 @@
 package org.sitoolkit.wt.gui.infra.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -11,6 +12,10 @@ public class LogUtils {
     private static final Logger LOG = Logger.getLogger(LogUtils.class.getName());
 
     public static void init() throws IOException {
+        File logDir = new File("log");
+        if (!logDir.exists()) {
+            logDir.mkdirs();
+        }
         URL configFile = ClassLoader.getSystemResource("logging.properties");
         try (InputStream is = configFile.openStream()) {
             LogManager.getLogManager().readConfiguration(is);
