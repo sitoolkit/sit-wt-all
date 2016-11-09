@@ -31,73 +31,56 @@
     </SplitPane>
   </center>
   <top>
-    <VBox prefHeight="60.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+    <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
       <children>
-        <MenuBar>
-          <menus>
-            <Menu text="プロジェクト">
-              <items>
-                <MenuItem onAction="#createProject" text="新規作成" />
-                <MenuItem onAction="#openProject" text="開く" />
-                <SeparatorMenuItem />
-                <MenuItem fx:id="sampleRunMenu" onAction="#runSample"
-                  text="サンプルWebサイトを起動" />
-                <MenuItem fx:id="sampleStopMenu" onAction="#stopSample"
-                  text="サンプルWebサイトを停止" visible="false" />
-                <SeparatorMenuItem />
-              </items>
-            </Menu>
-            <Menu text="ヘルプ">
-              <items>
-                <MenuItem text="About" />
-              </items>
-            </Menu>
-          </menus>
-        </MenuBar>
-        <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
+        <HBox fx:id="projectGroup" style="-fx-padding: 0 0 0 10px;" styleClass="tool-bar">
           <children>
-            <fx:include fx:id="testToolbar" source="TestToolbar.fxml" />
-            <ToolBar fx:id="genScriptGroup">
-              <items>
-                <Separator orientation="VERTICAL" />
-                <Label onMouseClicked="#ope2script" styleClass="image-btn,record-btn">
-                  <tooltip>
-                    <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します" />
-                  </tooltip>
-                </Label>
-                <Label onMouseClicked="#page2script" styleClass="image-btn,export-btn">
-                  <tooltip>
-                    <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します" />
-                  </tooltip>
-                </Label>
-              </items>
-            </ToolBar>
-            <ToolBar fx:id="browsingGroup">
-              <items>
-                <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
-                <Label onMouseClicked="#quitBrowsing" styleClass="image-btn,quit-btn" />
-              </items>
-            </ToolBar>
+            <Label onMouseClicked="#openProject" styleClass="image-btn,project-btn">
+              <tooltip>
+                <Tooltip text="プロジェクトを作成/開きます" />
+              </tooltip>
+            </Label>
           </children>
-          <ToolBar>
-            <items>
-              <Separator orientation="VERTICAL" />
-              <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow"
-                styleClass="image-btn,minimize-btn">
-                <tooltip>
-                  <Tooltip text="ウィンドウを縮小します" />
-                </tooltip>
-              </Label>
-              <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow"
-                styleClass="image-btn,maximize-btn">
-                <tooltip>
-                  <Tooltip text="ウィンドウを拡大します" />
-                </tooltip>
-              </Label>
-            </items>
-          </ToolBar>
         </HBox>
+        <fx:include fx:id="sampleToolbar" source="SampleToolbar.fxml" />
+        <fx:include fx:id="testToolbar" source="TestToolbar.fxml" />
+        <ToolBar fx:id="genScriptGroup">
+          <items>
+            <Separator orientation="VERTICAL" />
+            <Label onMouseClicked="#ope2script" styleClass="image-btn,record-btn">
+              <tooltip>
+                <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します" />
+              </tooltip>
+            </Label>
+            <Label onMouseClicked="#page2script" styleClass="image-btn,export-btn">
+              <tooltip>
+                <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します" />
+              </tooltip>
+            </Label>
+          </items>
+        </ToolBar>
+        <ToolBar fx:id="browsingGroup">
+          <items>
+            <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
+            <Label onMouseClicked="#quitBrowsing" styleClass="image-btn,quit-btn" />
+          </items>
+        </ToolBar>
       </children>
-    </VBox>
+      <ToolBar>
+        <items>
+          <Separator orientation="VERTICAL" />
+          <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn">
+            <tooltip>
+              <Tooltip text="ウィンドウを縮小します" />
+            </tooltip>
+          </Label>
+          <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn">
+            <tooltip>
+              <Tooltip text="ウィンドウを拡大します" />
+            </tooltip>
+          </Label>
+        </items>
+      </ToolBar>
+    </HBox>
   </top>
 </BorderPane>

@@ -1,7 +1,7 @@
 .image-btn {
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
-    -fx-background-size: 16px;
+    -fx-background-size: 18px;
     -fx-background-color: transparent;
     -fx-pref-width: 30px;
     -fx-pref-height: 30px;
@@ -9,6 +9,18 @@
 
 .image-btn:hover {
     -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+}
+
+.project-btn {
+    -fx-background-image:url('/icon/ic_folder_open_black_18dp_1x.png');
+}
+
+.run-sample-btn {
+    -fx-background-image:url('/icon/ic_play_circle_outline_black_18dp_1x.png');
+}
+
+.stop-sample-btn {
+    -fx-background-image:url('/icon/ic_pause_circle_outline_black_18dp_1x.png');
 }
 
 .run-btn {

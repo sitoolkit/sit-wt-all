@@ -8,7 +8,6 @@ import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.gui.app.project.ProjectService;
 import org.sitoolkit.wt.gui.app.test.TestService;
-import org.sitoolkit.wt.gui.domain.JettyConsoleListener;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
@@ -20,7 +19,6 @@ import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.process.TextAreaConsole;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -32,10 +30,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 public class AppController implements Initializable {
+
+    @FXML
+    private HBox projectGroup;
 
     @FXML
     private ToolBar genScriptGroup;
@@ -51,6 +53,9 @@ public class AppController implements Initializable {
 
     @FXML
     private Label toggleButton;
+
+    @FXML
+    private SampleToolbarController sampleToolbarController;
 
     @FXML
     private FileTreeController fileTreeController;
@@ -83,10 +88,9 @@ public class AppController implements Initializable {
             ExecutorContainer.get().execute(() -> UpdateChecker.checkAndInstall());
         }
 
+        FxUtils.bindVisible(projectGroup, projectState.isLocking().not());
         FxUtils.bindVisible(genScriptGroup, projectState.isLoaded());
         FxUtils.bindVisible(browsingGroup, projectState.isBrowsing());
-
-        sampleRunMenu.disableProperty().bind(projectState.isLoaded().not());
 
         FxUtils.bindVisible(maximizeButton, windowMaximized.not());
         FxUtils.bindVisible(minimizeButton, windowMaximized);
@@ -97,15 +101,16 @@ public class AppController implements Initializable {
         // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
         File pomFile = projectService.openProject(new File(""));
         if (pomFile == null) {
-            messageView.addMsg("[プロジェクト]メニュー>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
-            messageView.addMsg("既存のプロジェクトを開くには[プロジェクト]メニュー＞[開く]からプロジェクトフォルダを選択してください。");
             projectState.setState(State.NOT_LOADED);
+            openProject();
         } else {
             loadProject(pomFile);
             projectState.init(pomFile);
         }
 
         testToolbarController.initialize(console, messageView, fileTreeController, projectState);
+        sampleToolbarController.initialize(console, messageView, fileTreeController,
+                testToolbarController, projectState);
     }
 
     public void destroy() {
@@ -131,7 +136,6 @@ public class AppController implements Initializable {
         if (projectDir == null) {
             return;
         }
-        messageView.startMsg("プロジェクトを作成します。");
 
         File pomFile = projectService.createProject(projectDir);
 
@@ -149,7 +153,7 @@ public class AppController implements Initializable {
     @FXML
     public void openProject() {
         DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("プロジェクトのpom.xmlがあるフォルダを選択してください。");
+        dirChooser.setTitle("プロジェクトフォルダを選択してください。");
         dirChooser.setInitialDirectory(new File("."));
 
         File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
@@ -163,7 +167,7 @@ public class AppController implements Initializable {
         if (pomFile == null) {
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setContentText("pom.xmlがありません。作成しますか？");
+            alert.setContentText(projectDir.getAbsolutePath() + "にプロジェクトを作成しますか？");
 
             Optional<ButtonType> answer = alert.showAndWait();
             if (answer.get() == ButtonType.OK) {
@@ -174,71 +178,17 @@ public class AppController implements Initializable {
         } else {
 
             loadProject(pomFile);
-            messageView.addMsg("プロジェクトを開きました。");
 
         }
+
     }
 
     private void loadProject(File pomFile) {
-        fileTreeController.setFileTreeRoot(pomFile.getParentFile());
-        projectState.reset();
-    }
-
-    @FXML
-    public void runSample() {
-        projectState.setState(State.LOCKING);
-        sampleRunMenu.setVisible(false);
-        messageView.startMsg("サンプルWebサイトを起動します。");
-
-        conversationProcess.start(new TextAreaConsole(console), projectState.getBaseDir(),
-                SitWtRuntimeUtils.buildSampleCommand());
-
-        conversationProcess.onExit(exitCode -> {
-
-            File sampledir = new File(projectState.getBaseDir(), "sample");
-            if (!sampledir.exists()) {
-                sampledir.mkdirs();
-            }
-
-            JettyConsoleListener listener = new JettyConsoleListener();
-            conversationProcess.start(new TextAreaConsole(console, listener), sampledir,
-                    MavenUtils.getCommand());
-
-            ExecutorContainer.get().execute(() -> {
-                if (listener.isSuccess()) {
-                    String sampleBaseUrl = "http://localhost:8280";
-                    messageView.addMsg("サンプルWebサイトを起動しました。" + sampleBaseUrl + "/input.html");
-                    messageView.addMsg(
-                            "サンプルテストスクリプトtestscript/SampleTestScript.xlsxを左のツリーで選択して実行できます。");
-                    // TODO URLの動的取得
-                    testToolbarController.setBaseUrl(sampleBaseUrl);
-                    sampleStopMenu.setVisible(true);
-                } else {
-                    messageView.addMsg("サンプルWebサイトの起動に失敗しました。");
-                    sampleRunMenu.setVisible(true);
-                }
-                Platform.runLater(() -> fileTreeController.refresh());
-                projectState.reset();
-            });
-
-        });
-    }
-
-    @FXML
-    public void stopSample() {
-        sampleStopMenu.setVisible(false);
-        messageView.startMsg("サンプルWebサイトを停止します。");
-        File sampledir = new File(projectState.getBaseDir(), "sample");
-        conversationProcess.start(new TextAreaConsole(console), sampledir, MavenUtils.getCommand(),
-                "jetty:stop");
-
-        conversationProcess.onExit(exitCode -> {
-
-            Platform.runLater(() -> {
-                sampleRunMenu.setVisible(true);
-                messageView.addMsg("サンプルWebサイトを停止しました。");
-            });
-        });
+        File projectDir = pomFile.getAbsoluteFile().getParentFile();
+        fileTreeController.setFileTreeRoot(projectDir);
+        projectState.init(pomFile);
+        FxContext.setTitie(projectDir.getAbsolutePath());
+        messageView.addMsg("プロジェクトを開きました。");
     }
 
     @FXML
