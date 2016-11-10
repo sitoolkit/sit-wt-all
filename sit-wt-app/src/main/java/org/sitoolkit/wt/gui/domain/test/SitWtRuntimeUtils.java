@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,7 +95,7 @@ public class SitWtRuntimeUtils {
             LOG.log(Level.INFO, "process {0} starts {1}",
                     new Object[] { process, builder.command() });
 
-            process.waitFor();
+            process.waitFor(5, TimeUnit.SECONDS);
             return FileIOUtils.read(process.getInputStream());
 
         } catch (IOException | InterruptedException e) {
