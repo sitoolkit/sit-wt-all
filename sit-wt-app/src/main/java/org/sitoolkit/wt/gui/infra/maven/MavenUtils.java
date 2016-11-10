@@ -95,8 +95,8 @@ public class MavenUtils {
 
         File[] children = destDir.listFiles();
         if (children.length != 0) {
-        	String mavenHome = ".DS_Store".equals(children[0].getName()) ? children[1].getAbsolutePath()
-        			: children[0].getAbsolutePath();
+        	String mavenHome = SystemUtils.isOsX() && ".DS_Store".equals(children[0].getName())
+        			? children[1].getAbsolutePath() : children[0].getAbsolutePath();
             String mvn = mavenHome  + "/bin/mvn";
             if (SystemUtils.isOsX()) {
                 if (new File(mvn).exists()) {
