@@ -11,6 +11,7 @@ import org.sitoolkit.wt.gui.infra.process.LogConsole;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
+import org.sitoolkit.wt.infra.process.ProcessUtils;
 
 public class MavenUtils {
 
@@ -94,9 +95,12 @@ public class MavenUtils {
 
         File[] children = destDir.listFiles();
         if (children.length != 0) {
-            String mvn = children[0].getAbsolutePath() + "/bin/mvn";
+        	String mavenHome = ".DS_Store".equals(children[0].getName()) ? children[1].getAbsolutePath()
+        			: children[0].getAbsolutePath();
+            String mvn = mavenHome  + "/bin/mvn";
             if (SystemUtils.isOsX()) {
                 if (new File(mvn).exists()) {
+                    ProcessUtils.execute("chmod", "777", mvn);
                     return mvn;
                 }
             }
