@@ -3,25 +3,17 @@ package org.sitoolkit.wt.gui.domain.test;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FalseFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.sitoolkit.wt.domain.evidence.EvidenceDir.FileNameComarator;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
-import org.sitoolkit.wt.gui.infra.util.SystemUtils;
-import org.sitoolkit.wt.infra.process.ExecuteResult;
-import org.sitoolkit.wt.infra.process.ProcessUtils;
 
 public class SitWtRuntimeUtils {
 
@@ -117,33 +109,12 @@ public class SitWtRuntimeUtils {
     
     public static void putJavaHome(Map<String, String> map) {
 
-    	String env = System.getenv("JAVA_HOME");
-    	
-    	if (env != null && env.length() > 0) {
-			return;
-		} else if (javaHome != null) {
-	        map.put("JAVA_HOME", javaHome);
-	        return;
+    	if (javaHome == null) {
+    		javaHome = System.getProperty("java.home");
+    		LOG.log(Level.INFO, "set JAVA_HOME to {0}", new Object[] { javaHome });
 		}
-    	
-        if (SystemUtils.isOsX()) {
-        	File[] children = new File("/Library/Java/JavaVirtualMachines").listFiles();
-        	if (children.length > 0) {
-        		try {
-                	ProcessBuilder pb = new ProcessBuilder("/usr/libexec/java_home");
-                    Process process = pb.start();
-                    process.waitFor();
-                    javaHome = FileIOUtils.read(process.getInputStream());
-        		} catch (IOException | InterruptedException e) {
-        			throw new UnExpectedException(e);
-        		}
-        	} else {
-        		javaHome = "/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home";
-			}
-		}
-        
-        LOG.log(Level.INFO, "set JAVA_HOME to {0}", new Object[] { javaHome });
-        map.put("JAVA_HOME", javaHome);
+    	map.put("JAVA_HOME", javaHome);
+
 	}
 
     public static synchronized String loadSitWtClasspath(File pomFile) {
