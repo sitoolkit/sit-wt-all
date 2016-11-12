@@ -213,7 +213,7 @@ public class AppController implements Initializable {
     @FXML
     public void ope2script() {
         messageView.startMsg("ブラウザ操作の記録はFirefoxとSelenium IDE Pluginを使用します。");
-        messageView.addMsg("Selenium IDEで記録したテストソクリプトをhtml形式でtestcriptディレクトリに保存してください。");
+        messageView.addMsg("Selenium IDEで記録したテストスクリプトをhtml形式でtestscriptディレクトリに保存してください。");
         List<String> command = SitWtRuntimeUtils
                 .buildOpe2ScriptCommand(testToolbarController.getBaseUrl());
 

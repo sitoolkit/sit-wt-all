@@ -1,11 +1,13 @@
 package org.sitoolkit.wt.gui.infra.maven;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.process.LogConsole;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
@@ -94,9 +96,21 @@ public class MavenUtils {
 
         File[] children = destDir.listFiles();
         if (children.length != 0) {
-            String mvn = children[0].getAbsolutePath() + "/bin/mvn";
+        	String mavenHome = SystemUtils.isOsX() && ".DS_Store".equals(children[0].getName())
+        			? children[1].getAbsolutePath() : children[0].getAbsolutePath();
+            String mvn = mavenHome  + "/bin/mvn";
             if (SystemUtils.isOsX()) {
                 if (new File(mvn).exists()) {
+                    ProcessBuilder pb = new ProcessBuilder();
+                    pb.command("chmod", "777", mvn);
+                    try {
+                        Process process = pb.start();
+                        process.waitFor();
+                        LOG.log(Level.INFO, "process {0} starts {1}", 
+                        		new Object[] { process, pb.command() });
+                    } catch (IOException | InterruptedException e) {
+                        throw new UnExpectedException(e);
+					}
                     return mvn;
                 }
             }

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,6 +20,8 @@ public class SitWtRuntimeUtils {
     private static final Logger LOG = Logger.getLogger(SitWtRuntimeUtils.class.getName());
 
     private static String sitwtClasspath;
+    
+    private static String javaHome;
 
     public static String findTestedClasses(List<File> selectedFiles) {
         StringBuilder testedClases = new StringBuilder();
@@ -88,19 +92,30 @@ public class SitWtRuntimeUtils {
         command.add(pomFile.getAbsolutePath());
 
         ProcessBuilder builder = new ProcessBuilder(command);
+        putJavaHome(builder.environment());
 
         try {
             Process process = builder.start();
             LOG.log(Level.INFO, "process {0} starts {1}",
                     new Object[] { process, builder.command() });
 
-            process.waitFor();
+            process.waitFor(5, TimeUnit.SECONDS);
             return FileIOUtils.read(process.getInputStream());
 
         } catch (IOException | InterruptedException e) {
             throw new UnExpectedException(e);
         }
     }
+    
+    public static void putJavaHome(Map<String, String> map) {
+
+    	if (javaHome == null) {
+    		javaHome = System.getProperty("java.home");
+    		LOG.log(Level.INFO, "set JAVA_HOME to {0}", new Object[] { javaHome });
+		}
+    	map.put("JAVA_HOME", javaHome);
+
+	}
 
     public static synchronized String loadSitWtClasspath(File pomFile) {
 

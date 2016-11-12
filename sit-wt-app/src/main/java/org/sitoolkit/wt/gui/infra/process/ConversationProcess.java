@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
+import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 public class ConversationProcess {
 
@@ -37,6 +41,8 @@ public class ConversationProcess {
         }
 
         ProcessBuilder pb = new ProcessBuilder(command);
+        SitWtRuntimeUtils.putJavaHome(pb.environment());
+        
         try {
             pb.directory(directory);
             process = pb.start();
@@ -50,7 +56,7 @@ public class ConversationProcess {
             throw new UnExpectedException(e);
         }
     }
-
+    
     public void input(String input) {
         processWriter.println(input);
         processWriter.flush();
