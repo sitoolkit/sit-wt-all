@@ -18,18 +18,20 @@ public class MultiThreadUtils {
 
         Future<T> future = executor.submit(callable);
 
+        int loop = 0;
         while (!future.isDone()) {
 
-            System.out.print(".");
-
             try {
-                Thread.sleep(500);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 LOG.warn("スレッドの待機で例外が発生しました", e);
             }
 
+            if (loop++ % 7 == 1) {
+                System.out.println(":");
+            }
+
         }
-        System.out.println("");
         executor.shutdown();
 
         try {
