@@ -33,7 +33,7 @@ public abstract class ScreenshotTaker {
             screenshot.setTiming(timing);
 
         } catch (Exception e) {
-            log.error("スクリーンショットの取得に失敗しました {}", e.getLocalizedMessage());
+            log.error("スクリーンショットの取得に失敗しました {}", e);
             screenshot.clearElementPosition();
             screenshot.setErrorMesage(e.getLocalizedMessage());
         }
