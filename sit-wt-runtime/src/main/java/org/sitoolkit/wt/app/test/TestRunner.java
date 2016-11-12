@@ -1,5 +1,6 @@
 package org.sitoolkit.wt.app.test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -8,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
+import org.sitoolkit.wt.app.selenium2script.Selenium2Script;
 import org.sitoolkit.wt.domain.evidence.EvidenceOpener;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.TestResult;
@@ -93,6 +95,10 @@ public class TestRunner {
 
         LOG.info("テストスクリプトを実行します。{} {} {}", scriptPath, sheetName, caseNo);
 
+        if (scriptPath.endsWith(".html")) {
+            scriptPath = selenium2script(scriptPath).getAbsolutePath();
+        }
+
         List<TestResult> results = new ArrayList<>();
 
         if (StringUtils.isEmpty(caseNo)) {
@@ -115,6 +121,19 @@ public class TestRunner {
         }
 
         return results;
+    }
+
+    private File selenium2script(String seleniumScriptPath) {
+        Selenium2Script s2s = Selenium2Script.initInstance();
+        s2s.setOpenScript(false);
+        s2s.setOverwriteScript(false);
+
+        File seleniumScript = new File(seleniumScriptPath);
+
+        File script = s2s.convert(seleniumScript);
+        s2s.backup(seleniumScript);
+
+        return script;
     }
 
     private List<TestResult> runAllCase(String scriptPath, String sheetName) {

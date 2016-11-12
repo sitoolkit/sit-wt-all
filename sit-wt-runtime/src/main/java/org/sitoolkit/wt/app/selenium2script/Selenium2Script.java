@@ -101,12 +101,7 @@ public class Selenium2Script implements ApplicationContextAware {
                     recursive)) {
                 File sitScript = convert(seleniumScript);
 
-                File bkFile = new File(seleniumScript.getParentFile(),
-                        seleniumScript.getName() + ".bk");
-
-                log.info("Seleniumスクリプトを退避します {} -> {}", seleniumScript.getAbsolutePath(), bkFile);
-
-                seleniumScript.renameTo(bkFile);
+                backup(seleniumScript);
 
                 if (isOpenScript()) {
                     try {
@@ -137,6 +132,14 @@ public class Selenium2Script implements ApplicationContextAware {
         dao.write(sitScriptFile, testStepList, overwriteScript);
 
         return sitScriptFile;
+    }
+
+    public void backup(File seleniumScript) {
+        File bkFile = new File(seleniumScript.getParentFile(), seleniumScript.getName() + ".bk");
+
+        log.info("Seleniumスクリプトを退避します {} -> {}", seleniumScript.getAbsolutePath(), bkFile);
+
+        seleniumScript.renameTo(bkFile);
     }
 
     /**
