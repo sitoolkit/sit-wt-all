@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.sitoolkit.wt.infra.MultiThreadUtils;
 import org.sitoolkit.wt.infra.firefox.FirefoxManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,8 @@ public class FirefoxOpener {
 
             LOG.info("Firefoxを起動します {}", ffBinary);
 
-            WebDriver driver = new FirefoxDriver(ffBinary, profile);
+            WebDriver driver = MultiThreadUtils
+                    .submitWithProgress(() -> new FirefoxDriver(ffBinary, profile));
             String url = System.getProperty("url");
             if (StringUtils.isNotEmpty(url)) {
                 driver.get(url);

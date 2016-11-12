@@ -10,6 +10,7 @@ import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.sitoolkit.wt.infra.MultiThreadUtils;
 import org.sitoolkit.wt.infra.SitRepository;
 import org.sitoolkit.wt.infra.process.ProcessUtils;
 import org.slf4j.Logger;
@@ -20,17 +21,13 @@ public class FirefoxManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(FirefoxManager.class);
 
-    public FirefoxManager() {
-        // TODO Auto-generated constructor stub
-    }
-
     public FirefoxDriver startWebDriver(DesiredCapabilities capabilities) {
-        return new FirefoxDriver(getFirefoxBinary(), new FirefoxProfile(), capabilities);
+        return MultiThreadUtils.submitWithProgress(
+                () -> new FirefoxDriver(getFirefoxBinary(), new FirefoxProfile(), capabilities));
     }
 
     public FirefoxBinary getFirefoxBinary() {
-        File ffBinaryFile = new File(SitRepository.getRepositoryPath(),
-                "firefox/runtime/Firefox.app/Contents/MacOS/firefox-bin");
+        File ffBinaryFile = getFirefoxBinaryFile();
 
         if (ffBinaryFile.exists()) {
 
@@ -38,7 +35,7 @@ public class FirefoxManager {
 
         } else {
 
-            LOG.info("Firefoxがインストールされていません");
+            LOG.info("SIT-WT用のFirefoxがインストールされていません");
             installFirefox();
 
         }
@@ -78,6 +75,17 @@ public class FirefoxManager {
         return repo;
     }
 
+    protected File getFirefoxBinaryFile() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new File(SitRepository.getRepositoryPath(), "firefox/runtime/firefox.exe");
+        } else if (SystemUtils.IS_OS_MAC) {
+            return new File(SitRepository.getRepositoryPath(),
+                    "firefox/runtime/Firefox.app/Contents/MacOS/firefox-bin");
+        } else {
+            throw new UnsupportedOperationException("サポートされていないOSです");
+        }
+    }
+
     protected void installFirefox() {
         File repo = new File(SitRepository.getRepositoryPath(), "firefox");
 
@@ -97,7 +105,9 @@ public class FirefoxManager {
     protected void installFirefoxWindows(File repo) {
         File ffInstaller = new File(repo, "Firefox Setup 47.0.1.exe");
 
-        if (!ffInstaller.exists()) {
+        if (ffInstaller.exists()) {
+            LOG.info("Firefoxはダウンロード済みです {}", ffInstaller.getAbsolutePath());
+        } else {
             try {
                 // TODO 外部化
                 URL url = new URL(
@@ -105,15 +115,33 @@ public class FirefoxManager {
 
                 LOG.info("Firefoxをダウンロードします {} -> {}", url, ffInstaller.getAbsolutePath());
 
-                FileUtils.copyURLToFile(url, ffInstaller);
+                MultiThreadUtils.submitWithProgress(() -> {
+                    FileUtils.copyURLToFile(url, ffInstaller);
+                    return 0;
+                });
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Firefoxのダウンロードで例外が発生しました", e);
             }
         }
 
         LOG.info("Firefoxをインストールします");
-        ProcessUtils.execute(ffInstaller.getAbsolutePath(), "-ms");
+
+        try {
+            File iniFile = File.createTempFile("ff-inst", ".ini");
+            iniFile.deleteOnExit();
+
+            FileUtils.copyInputStreamToFile(ClassLoader.getSystemResourceAsStream("ff-inst.ini"),
+                    iniFile);
+
+            MultiThreadUtils.submitWithProgress(() -> {
+                ProcessUtils.execute(ffInstaller.getAbsolutePath(),
+                        "/INI=" + iniFile.getAbsolutePath());
+                return 0;
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("Firefoxのインストールで例外が発生しました", e);
+        }
 
     }
 
@@ -148,8 +176,12 @@ public class FirefoxManager {
         LOG.info("Firefoxをインストールします {}", ffRuntime.getAbsolutePath());
         // たまにcp -Rコマンドが失敗してFirefox.appがコピーされないので3回リトライ
         for (int i = 0; i < 3; i++) {
-            ProcessUtils.execute("cp", "-R", mountedFf.getAbsolutePath(),
-                    ffRuntime.getAbsolutePath());
+
+            MultiThreadUtils.submitWithProgress(() -> {
+                ProcessUtils.execute("cp", "-R", mountedFf.getAbsolutePath(),
+                        ffRuntime.getAbsolutePath());
+                return 0;
+            });
 
             if (new File(ffRuntime, "Firefox.app").exists()) {
                 break;

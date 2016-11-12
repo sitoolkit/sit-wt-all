@@ -28,7 +28,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -139,8 +138,8 @@ public class WebDriverConfig {
                 // so we doesn't support neigther selenium 3 nor firefox 48.x
                 // higher
                 // webDriverInstaller.installGeckoDriver();
-                // webDriver = firefoxManager.startWebDriver(capabilities);
-                webDriver = new FirefoxDriver(capabilities);
+
+                webDriver = firefoxManager.startWebDriver(capabilities);
         }
 
         webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
