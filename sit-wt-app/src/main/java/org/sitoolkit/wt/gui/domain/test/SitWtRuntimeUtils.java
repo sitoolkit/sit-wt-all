@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
@@ -23,29 +25,13 @@ public class SitWtRuntimeUtils {
 
     private static String javaHome;
 
-    public static String findTestedClasses(List<File> selectedFiles) {
-        StringBuilder testedClases = new StringBuilder();
-        for (File file : selectedFiles) {
+    private static final Pattern SCRIPT_FILE_PATTERN = Pattern
+            .compile(".*\\.xlsx$|.*\\.xls$|.*\\.csv$|.*\\.html$");
 
-            if (!file.isFile()) {
-                continue;
-            }
-
-            String baseName = file.getName().replaceFirst("\\.xlsx$|\\\\.xls$|\\.csv$", "");
-
-            if (baseName.equals(file.getName())) {
-                continue;
-            }
-
-            if (testedClases.length() > 0) {
-                testedClases.append(",");
-            }
-
-            testedClases.append(baseName);
-            testedClases.append("IT");
-        }
-
-        return testedClases.toString();
+    public static List<File> filterTestScripts(List<File> selectedFiles) {
+        return selectedFiles.stream()
+                .filter(file -> SCRIPT_FILE_PATTERN.matcher(file.getName()).matches())
+                .collect(Collectors.toList());
     }
 
     public static List<String> buildCommand(String testedClasses, boolean isDebug,

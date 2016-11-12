@@ -13,7 +13,6 @@ import org.sitoolkit.wt.gui.infra.process.ConversationProcess.OnExitCallback;
 import org.sitoolkit.wt.gui.infra.process.LogConsole;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.LogUtils;
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 public class TestService {
@@ -29,13 +28,13 @@ public class TestService {
     public ConversationProcess runTest(TestRunParams params, Console console,
             OnExitCallback callback) {
 
-        String testedClasses = SitWtRuntimeUtils.findTestedClasses(params.getScripts());
+        List<File> testScripts = SitWtRuntimeUtils.filterTestScripts(params.getScripts());
 
-        if (StrUtils.isEmpty(testedClasses)) {
+        if (testScripts.isEmpty()) {
             return null;
         }
 
-        List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(params.getScripts(),
+        List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(testScripts,
                 params.isDebug(), params.isParallel(), params.getDriverType(), params.getBaseUrl());
 
         ConversationProcess process = new ConversationProcess();

@@ -148,7 +148,7 @@ public class TestToolbarController implements Initializable {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("");
             alert.setContentText("");
-            alert.setHeaderText("実行するテストスクリプトを選択してください。");
+            alert.setHeaderText("実行するテストスクリプトを選択してください。テストスクリプトの拡張子はxlsx、xlsx、csv、htmlです。");
             alert.show();
             projectState.reset();
         } else {
