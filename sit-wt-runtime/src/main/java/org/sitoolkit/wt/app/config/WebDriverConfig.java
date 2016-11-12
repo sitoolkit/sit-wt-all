@@ -37,6 +37,7 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.firefox.FirefoxManager;
 import org.sitoolkit.wt.infra.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 import org.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
@@ -72,7 +73,8 @@ public class WebDriverConfig {
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
     public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer,
-            WebDriverInstaller webDriverInstaller) throws MalformedURLException {
+            WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
+            throws MalformedURLException {
         RemoteWebDriver webDriver = null;
 
         String driverType = StringUtils.defaultString(pm.getDriverType());
@@ -137,6 +139,7 @@ public class WebDriverConfig {
                 // so we doesn't support neigther selenium 3 nor firefox 48.x
                 // higher
                 // webDriverInstaller.installGeckoDriver();
+                // webDriver = firefoxManager.startWebDriver(capabilities);
                 webDriver = new FirefoxDriver(capabilities);
         }
 
@@ -195,6 +198,11 @@ public class WebDriverConfig {
     @Bean
     public TestEventListener testEventListener() {
         return new TestEventListenerWebDriverImpl();
+    }
+
+    @Bean
+    public FirefoxManager firefoxManager() {
+        return new FirefoxManager();
     }
 
 }
