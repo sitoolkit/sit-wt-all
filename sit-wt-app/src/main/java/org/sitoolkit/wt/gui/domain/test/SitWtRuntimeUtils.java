@@ -20,7 +20,7 @@ public class SitWtRuntimeUtils {
     private static final Logger LOG = Logger.getLogger(SitWtRuntimeUtils.class.getName());
 
     private static String sitwtClasspath;
-    
+
     private static String javaHome;
 
     public static String findTestedClasses(List<File> selectedFiles) {
@@ -106,16 +106,16 @@ public class SitWtRuntimeUtils {
             throw new UnExpectedException(e);
         }
     }
-    
+
     public static void putJavaHome(Map<String, String> map) {
 
-    	if (javaHome == null) {
-    		javaHome = System.getProperty("java.home");
-    		LOG.log(Level.INFO, "set JAVA_HOME to {0}", new Object[] { javaHome });
-		}
-    	map.put("JAVA_HOME", javaHome);
+        if (javaHome == null) {
+            javaHome = System.getProperty("java.home");
+            LOG.log(Level.INFO, "set JAVA_HOME to {0}", new Object[] { javaHome });
+        }
+        map.put("JAVA_HOME", javaHome);
 
-	}
+    }
 
     public static synchronized String loadSitWtClasspath(File pomFile) {
 
@@ -187,7 +187,7 @@ public class SitWtRuntimeUtils {
             command.add("-Durl=" + url);
         }
 
-        command.add("org.sitoolkit.wt.app.ope2script.FirefoxManager");
+        command.add("org.sitoolkit.wt.app.ope2script.FirefoxOpener");
 
         return command;
 
