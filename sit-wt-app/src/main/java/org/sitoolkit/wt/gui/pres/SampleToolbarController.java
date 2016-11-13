@@ -36,8 +36,6 @@ public class SampleToolbarController implements Initializable {
 
     private TextArea console;
 
-    private FileTreeController fileTreeController;
-
     private TestToolbarController testToolbarController;
 
     private MessageView messageView;
@@ -54,11 +52,9 @@ public class SampleToolbarController implements Initializable {
     }
 
     public void initialize(TextArea console, MessageView messageView,
-            FileTreeController fileTreeController, TestToolbarController testToolbarController,
-            ProjectState projectState) {
+            TestToolbarController testToolbarController, ProjectState projectState) {
         this.projectState = projectState;
         this.console = console;
-        this.fileTreeController = fileTreeController;
         this.testToolbarController = testToolbarController;
         this.messageView = messageView;
 
@@ -100,7 +96,6 @@ public class SampleToolbarController implements Initializable {
                     messageView.addMsg("サンプルWebサイトの起動に失敗しました。");
                     running.set(false);
                 }
-                Platform.runLater(() -> fileTreeController.refresh());
                 projectState.reset();
             });
 

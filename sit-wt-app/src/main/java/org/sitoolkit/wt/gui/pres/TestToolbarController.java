@@ -200,7 +200,6 @@ public class TestToolbarController implements Initializable {
     @FXML
     public void export() {
         testProcess.input("e");
-        fileTreeController.refresh();
     }
 
     @FXML

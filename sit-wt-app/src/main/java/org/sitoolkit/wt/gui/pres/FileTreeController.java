@@ -103,10 +103,6 @@ public class FileTreeController implements Initializable {
         return selectedFiles;
     }
 
-    public void refresh() {
-        setFileTreeRoot(fileTree.getRoot().getValue().getFile());
-    }
-
     @FXML
     public void open() {
         operateSelectedItem(selectedItem -> {

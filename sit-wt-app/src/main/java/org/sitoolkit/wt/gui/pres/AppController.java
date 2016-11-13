@@ -109,8 +109,8 @@ public class AppController implements Initializable {
         }
 
         testToolbarController.initialize(console, messageView, fileTreeController, projectState);
-        sampleToolbarController.initialize(console, messageView, fileTreeController,
-                testToolbarController, projectState);
+        sampleToolbarController.initialize(console, messageView, testToolbarController,
+                projectState);
     }
 
     public void destroy() {
@@ -224,7 +224,6 @@ public class AppController implements Initializable {
     @FXML
     public void export() {
         conversationProcess.input("e");
-        fileTreeController.refresh();
     }
 
     @FXML
