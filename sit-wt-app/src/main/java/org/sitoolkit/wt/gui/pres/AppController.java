@@ -116,6 +116,7 @@ public class AppController implements Initializable {
     public void destroy() {
         conversationProcess.destroy();
         testToolbarController.destroy();
+        fileTreeController.destroy();
 
         File sampleDir = new File(projectState.getBaseDir(), "sample");
         if (sampleDir.exists()) {

@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.gui.app.test.TestService;
+import org.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import org.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import org.sitoolkit.wt.gui.infra.fx.FileWrapper;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
@@ -31,6 +32,8 @@ public class FileTreeController implements Initializable {
 
     TestService testService = new TestService();
 
+    FileSystemWatchService fileSystemWatchService = new FileSystemWatchService();
+
     public FileTreeController() {
     }
 
@@ -43,6 +46,11 @@ public class FileTreeController implements Initializable {
         }
         fileTree.setShowRoot(false);
 
+        fileSystemWatchService.init();
+    }
+
+    public void destroy() {
+        fileSystemWatchService.destroy();
     }
 
     public void setFileTreeRoot(File baseDir) {
@@ -51,10 +59,17 @@ public class FileTreeController implements Initializable {
         root.setValue(new FileWrapper(baseDir));
 
         // TODO pagescriptディレクトリの選択を不可にする
-        root.getChildren().add(createNode(newDir(baseDir, "pagescript")));
-        root.getChildren().add(createNode(newDir(baseDir, "testscript")));
+        FileTreeItem pagescriptItem = new FileTreeItem(newDir(baseDir, "pagescript"));
+        pagescriptItem.buildChildren();
+        root.getChildren().add(pagescriptItem);
+        FileTreeItem testscriptItem = new FileTreeItem(newDir(baseDir, "testscript"));
+        testscriptItem.buildChildren();
+        root.getChildren().add(testscriptItem);
 
         fileTree.setRoot(root);
+
+        fileSystemWatchService.register(pagescriptItem);
+        fileSystemWatchService.register(testscriptItem);
     }
 
     private File newDir(File baseDir, String dir) {
@@ -62,6 +77,7 @@ public class FileTreeController implements Initializable {
         if (!newDir.exists()) {
             newDir.mkdirs();
         }
+
         return newDir;
     }
 
@@ -69,6 +85,7 @@ public class FileTreeController implements Initializable {
         List<File> selectedFiles = new ArrayList<>();
 
         if (mode == Mode.NORMAL) {
+            // TODO recursive
             fileTree.getSelectionModel().getSelectedItems()
                     .forEach(item -> selectedFiles.add(item.getValue().getFile()));
             return selectedFiles;
@@ -114,7 +131,6 @@ public class FileTreeController implements Initializable {
                 }
 
                 newDir.mkdir();
-                selectedItem.getChildren().add(createNode(newDir));
             });
 
         });
@@ -138,7 +154,6 @@ public class FileTreeController implements Initializable {
                 }
 
                 testService.createNewScript(fileTree.getRoot().getValue().getFile(), newTestScript);
-                selectedItem.getChildren().add(createNode(newTestScript));
             });
 
         });
@@ -161,7 +176,6 @@ public class FileTreeController implements Initializable {
                     return;
                 }
                 currentFile.renameTo(newFile);
-                selectedItem.setValue(new FileWrapper(newFile));
             });
         });
     }
@@ -197,10 +211,6 @@ public class FileTreeController implements Initializable {
             }
             operation.operate(selectedItem);
         });
-    }
-
-    private TreeItem<FileWrapper> createNode(File file) {
-        return new FileTreeItem(file);
     }
 
     @FunctionalInterface
