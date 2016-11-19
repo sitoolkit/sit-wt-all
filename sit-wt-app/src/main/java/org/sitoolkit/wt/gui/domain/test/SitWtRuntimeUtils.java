@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
+import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
@@ -103,14 +104,15 @@ public class SitWtRuntimeUtils {
 
     }
 
-    public static synchronized String loadSitWtClasspath(File pomFile) {
+    public static synchronized void loadSitWtClasspath(File pomFile) {
 
         if (sitwtClasspath == null) {
-            String out = loadClasspath(pomFile);
-            sitwtClasspath = filter(out, "[INFO] Dependencies classpath:", "[INFO]");
+            ExecutorContainer.get().submit(() -> {
+                String out = loadClasspath(pomFile);
+                sitwtClasspath = filter(out, "[INFO] Dependencies classpath:", "[INFO]");
+            });
         }
 
-        return sitwtClasspath;
     }
 
     private static String filter(String text, String startLine, String stopLine) {
@@ -118,11 +120,6 @@ public class SitWtRuntimeUtils {
         int stop = text.indexOf(stopLine, start);
 
         return text.substring(start, stop).trim();
-    }
-
-    public static void main(String[] args) {
-        MavenUtils.findAndInstall();
-        System.out.println(loadSitWtClasspath(new File("target", "pom.xml")));
     }
 
     public static List<String> buildSampleCommand() {
