@@ -8,34 +8,28 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.maven.DownloadCallback;
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.infra.maven.VersionCheckMode;
+import org.sitoolkit.wt.gui.app.update.UpdateService;
+import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
-public class UpdateChecker {
+public class UpdateController {
 
-    private static final Logger LOG = Logger.getLogger(UpdateChecker.class.getName());
+    private static final Logger LOG = LogUtils.get(UpdateController.class);
 
-    private UpdateChecker() {
+    UpdateService service = new UpdateService();
+
+    public UpdateController() {
     }
 
-    public static void checkAndInstall() {
+    public void checkAndInstall() {
         try {
-            File pom = unarchivePom();
+            File pomFile = unarchivePom();
 
-            MavenUtils.checkUpdate(pom, "org.sitoolkit.wt:sit-wt-all", VersionCheckMode.PARENT,
-                    newVersion -> {
-
-                        confirmAndInstall(newVersion, () -> {
-                            restart(new File("sit-wt-app-" + newVersion + ".jar"));
-                        });
-
-                    });
+            service.checkSitWtAppUpdate(pomFile, newVersion -> confirmAndInstall(newVersion));
 
         } catch (IOException e) {
             LOG.log(Level.WARNING, "can't unarchive pom.xml", e);
@@ -53,7 +47,7 @@ public class UpdateChecker {
         return pom;
     }
 
-    private static void confirmAndInstall(String newVersion, DownloadCallback callback) {
+    private void confirmAndInstall(String newVersion) {
         Platform.runLater(() -> {
             Alert conf = new Alert(AlertType.CONFIRMATION);
             conf.setContentText("SIT-WTの新しいバージョンがあります。ダウンロードしますか？");
@@ -61,14 +55,14 @@ public class UpdateChecker {
             Optional<ButtonType> result = conf.showAndWait();
 
             if (result.get() == ButtonType.OK) {
-                MavenUtils.buildDownloadArtifactCommand("org.sitoolkit.wt:sit-wt-app:" + newVersion,
-                        new File(""), callback);
+                service.downloadSitWtApp(new File("."), newVersion,
+                        downloadedFile -> restart(downloadedFile));
 
             }
         });
     }
 
-    private static void restart(File jar) {
+    private void restart(File jar) {
         Platform.runLater(() -> {
             Alert conf = new Alert(AlertType.CONFIRMATION);
             conf.setContentText("新しいバージョンは再起動後に有効になります。再起動しますか？");
@@ -90,4 +84,5 @@ public class UpdateChecker {
 
         });
     }
+
 }

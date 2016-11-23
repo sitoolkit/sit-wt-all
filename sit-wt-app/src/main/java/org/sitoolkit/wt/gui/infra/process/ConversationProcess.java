@@ -62,13 +62,6 @@ public class ConversationProcess {
         File directory = params.getDirectory();
         List<String> command = params.getCommand();
 
-        if (directory == null || !directory.exists()) {
-            LOG.log(Level.WARNING, "cannot start command {0} because directory {1} doesn't exist",
-                    new Object[] { command, directory });
-
-            return;
-        }
-
         if (process != null && process.isAlive()) {
             LOG.log(Level.WARNING, "process {0} is alive.", process);
         }

@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.infra.maven;
+package org.sitoolkit.wt.gui.domain.update;
 
 public enum VersionCheckMode {
     PARENT("versions:display-parent-updates",

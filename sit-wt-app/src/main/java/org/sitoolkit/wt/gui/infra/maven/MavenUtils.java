@@ -2,16 +2,11 @@ package org.sitoolkit.wt.gui.infra.maven;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.LogConsole;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 public class MavenUtils {
@@ -96,9 +91,9 @@ public class MavenUtils {
 
         File[] children = destDir.listFiles();
         if (children.length != 0) {
-        	String mavenHome = SystemUtils.isOsX() && ".DS_Store".equals(children[0].getName())
-        			? children[1].getAbsolutePath() : children[0].getAbsolutePath();
-            String mvn = mavenHome  + "/bin/mvn";
+            String mavenHome = SystemUtils.isOsX() && ".DS_Store".equals(children[0].getName())
+                    ? children[1].getAbsolutePath() : children[0].getAbsolutePath();
+            String mvn = mavenHome + "/bin/mvn";
             if (SystemUtils.isOsX()) {
                 if (new File(mvn).exists()) {
                     ProcessBuilder pb = new ProcessBuilder();
@@ -106,11 +101,11 @@ public class MavenUtils {
                     try {
                         Process process = pb.start();
                         process.waitFor();
-                        LOG.log(Level.INFO, "process {0} starts {1}", 
-                        		new Object[] { process, pb.command() });
+                        LOG.log(Level.INFO, "process {0} starts {1}",
+                                new Object[] { process, pb.command() });
                     } catch (IOException | InterruptedException e) {
                         throw new UnExpectedException(e);
-					}
+                    }
                     return mvn;
                 }
             }
@@ -134,56 +129,4 @@ public class MavenUtils {
         // return children.length == 0 ? "" : children[0].getAbsolutePath();
     }
 
-    public static void buildDownloadArtifactCommand(String artifact, File destDir,
-            DownloadCallback callback) {
-
-        List<String> command = new ArrayList<>();
-        command.add(getCommand());
-        command.add("dependency:copy");
-        command.add("-Dartifact=" + artifact);
-        command.add("-DoutputDirectory=" + destDir.getAbsolutePath());
-
-        ConversationProcess process = new ConversationProcess();
-        process.start(new LogConsole(), new File("."), command);
-
-        process.onExit(exitCode -> {
-            if (exitCode == 0) {
-                LOG.log(Level.INFO, "downloaded : {0}", destDir.getAbsolutePath());
-                callback.onDownloaded();
-            } else {
-                LOG.log(Level.WARNING, "fail to download :", artifact);
-            }
-        });
-    }
-
-    public static void checkUpdate(File pom, String artifact, VersionCheckMode mode,
-            UpdateCallback callback) {
-
-        LOG.log(Level.INFO, "check update for {0} in {1}",
-                new Object[] { artifact, pom.getAbsolutePath() });
-
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
-        command.add(mode.getPluginGoal());
-        command.add("-f");
-        command.add(pom.getAbsolutePath());
-
-        ConversationProcess process = new ConversationProcess();
-        MavenVersionsListener listener = new MavenVersionsListener(mode.getUpdateLine(),
-                artifact + " ..");
-        process.start(new LogConsole(listener), pom.getParentFile(), command);
-
-        process.onExit(exitCode -> {
-            String newVersion = listener.getNewVersion();
-
-            if (StrUtils.isEmpty(newVersion)) {
-                LOG.log(Level.INFO, "latest artifact : {0}", artifact);
-            } else {
-                LOG.log(Level.INFO, "new version is found : {0}", newVersion);
-                if (callback != null) {
-                    callback.callback(listener.getNewVersion());
-                }
-            }
-        });
-    }
 }

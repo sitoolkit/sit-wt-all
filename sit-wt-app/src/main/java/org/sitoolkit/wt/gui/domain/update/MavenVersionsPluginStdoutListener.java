@@ -1,9 +1,9 @@
-package org.sitoolkit.wt.gui.infra.maven;
+package org.sitoolkit.wt.gui.domain.update;
 
-import org.sitoolkit.wt.gui.infra.process.ConsoleListener;
+import org.sitoolkit.wt.gui.infra.process.StdoutListener;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
-public class MavenVersionsListener implements ConsoleListener {
+public class MavenVersionsPluginStdoutListener implements StdoutListener {
 
     private String updatePrefix;
 
@@ -13,17 +13,18 @@ public class MavenVersionsListener implements ConsoleListener {
 
     private String newVersion;
 
-    public MavenVersionsListener() {
+    public MavenVersionsPluginStdoutListener() {
+        // TODO Auto-generated constructor stub
     }
 
-    public MavenVersionsListener(String updatePrefix, String versionPrefix) {
+    public MavenVersionsPluginStdoutListener(String updatePrefix, String versionPrefix) {
         super();
         this.updatePrefix = updatePrefix;
         this.versionPrefix = versionPrefix;
     }
 
     @Override
-    public void readLine(String line) {
+    public void nextLine(String line) {
 
         if (StrUtils.equals(updatePrefix, line)) {
             update = true;

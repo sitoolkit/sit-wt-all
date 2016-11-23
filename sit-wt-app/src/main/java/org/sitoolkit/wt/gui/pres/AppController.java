@@ -78,6 +78,8 @@ public class AppController implements Initializable {
 
     private ProjectState projectState = new ProjectState();
 
+    UpdateController updateController = new UpdateController();
+
     TestService testService = new TestService();
 
     ProjectService projectService = new ProjectService();
@@ -86,7 +88,7 @@ public class AppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         if (!Boolean.getBoolean("skipUpdate")) {
-            ExecutorContainer.get().execute(() -> UpdateChecker.checkAndInstall());
+            ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
         }
 
         FxUtils.bindVisible(projectGroup, projectState.isLocking().not());
