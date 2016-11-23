@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
@@ -22,7 +23,7 @@ public class SitWtRuntimeProcessClient {
         params.setCommand(command);
         params.setDirectory(pomFile.getAbsoluteFile().getParentFile());
 
-        ConversationProcess process = new ConversationProcess();
+        ConversationProcess process = ConversationProcessContainer.create();
         process.start(params);
     }
 
@@ -51,7 +52,7 @@ public class SitWtRuntimeProcessClient {
 
         params.setCommand(command);
 
-        ConversationProcess process = new ConversationProcess();
+        ConversationProcess process = ConversationProcessContainer.create();
         process.start(params);
 
         return process;
@@ -64,7 +65,7 @@ public class SitWtRuntimeProcessClient {
         command.add("-Punpack-testscript");
         params.setCommand(command);
 
-        ConversationProcess process = new ConversationProcess();
+        ConversationProcess process = ConversationProcessContainer.create();
         process.start(params);
     }
 }

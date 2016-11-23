@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
@@ -15,7 +16,7 @@ public class ScriptProcessClient {
         SitWtRuntimeUtils.addVmArgs(command, driverType, baseUrl);
         command.add("org.sitoolkit.wt.app.page2script.Page2Script");
 
-        ConversationProcess process = new ConversationProcess();
+        ConversationProcess process = ConversationProcessContainer.create();
         params.setCommand(command);
 
         process.start(params);
@@ -35,7 +36,7 @@ public class ScriptProcessClient {
         ProcessParams params = new ProcessParams();
         params.setCommand(command);
 
-        ConversationProcess process = new ConversationProcess();
+        ConversationProcess process = ConversationProcessContainer.create();
         process.start(params);
 
         return process;

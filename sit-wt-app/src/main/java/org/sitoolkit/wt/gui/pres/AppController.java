@@ -15,6 +15,7 @@ import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
 import org.sitoolkit.wt.gui.infra.fx.StageResizer;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
 import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
 import org.sitoolkit.wt.gui.infra.process.TextAreaStdoutListener;
 
@@ -70,7 +71,7 @@ public class AppController implements Initializable {
 
     private MessageView messageView = new MessageView();
 
-    private ConversationProcess conversationProcess = new ConversationProcess();
+    private ConversationProcess conversationProcess;
 
     private ProjectState projectState = new ProjectState();
 
@@ -109,7 +110,7 @@ public class AppController implements Initializable {
     }
 
     public void destroy() {
-        conversationProcess.destroy();
+        ConversationProcessContainer.destroy();
         testToolbarController.destroy();
         fileTreeController.destroy();
         sampleToolbarController.destroy();

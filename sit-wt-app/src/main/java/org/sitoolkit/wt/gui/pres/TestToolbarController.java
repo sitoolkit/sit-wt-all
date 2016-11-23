@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
-import org.sitoolkit.wt.gui.domain.test.SitWtDebugConsoleListener;
+import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
@@ -61,7 +61,7 @@ public class TestToolbarController implements Initializable {
 
     private ProjectState projectState;
 
-    private SitWtDebugConsoleListener debugConsoleListener = new SitWtDebugConsoleListener();
+    private SitWtDebugStdoutListener debugStdoutListener = new SitWtDebugStdoutListener();
 
     private TestService testService = new TestService();
 
@@ -69,8 +69,8 @@ public class TestToolbarController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         browserChoice.getItems().addAll(SystemUtils.getBrowsers());
 
-        FxUtils.bindVisible(pauseButton, debugConsoleListener.getPausingProperty().not());
-        FxUtils.bindVisible(restartButton, debugConsoleListener.getPausingProperty());
+        FxUtils.bindVisible(pauseButton, debugStdoutListener.getPausingProperty().not());
+        FxUtils.bindVisible(restartButton, debugStdoutListener.getPausingProperty());
     }
 
     public void initialize(MessageView messageView, FileTreeController fileTreeController,
@@ -136,7 +136,8 @@ public class TestToolbarController implements Initializable {
             Platform.runLater(() -> messageView.addMsg("テストを終了します。"));
         };
 
-        ConversationProcess testProcess = testService.runTest(params, callback);
+        ConversationProcess testProcess = testService.runTest(params, debugStdoutListener,
+                callback);
 
         if (testProcess == null) {
             Alert alert = new Alert(AlertType.INFORMATION);

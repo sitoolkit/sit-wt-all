@@ -1,16 +1,16 @@
 package org.sitoolkit.wt.gui.domain.test;
 
-import org.sitoolkit.wt.gui.infra.process.ConsoleListener;
+import org.sitoolkit.wt.gui.infra.process.StdoutListener;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-public class SitWtDebugConsoleListener implements ConsoleListener {
+public class SitWtDebugStdoutListener implements StdoutListener {
 
     private BooleanProperty pausing = new SimpleBooleanProperty(false);
 
     @Override
-    public void readLine(String line) {
+    public void nextLine(String line) {
         if (line == null || line.isEmpty()) {
             return;
         }

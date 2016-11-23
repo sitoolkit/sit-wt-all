@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 
 public class UpdateProcessClient {
@@ -22,7 +23,7 @@ public class UpdateProcessClient {
         command.add(pomFile.getAbsolutePath());
         params.setCommand(command);
 
-        ConversationProcess process = new ConversationProcess();
+        ConversationProcess process = ConversationProcessContainer.create();
         process.start(params);
 
     }
@@ -36,8 +37,7 @@ public class UpdateProcessClient {
         command.add("-DoutputDirectory=" + destDir.getAbsolutePath());
         params.setCommand(command);
 
-        ConversationProcess process = new ConversationProcess();
-
+        ConversationProcess process = ConversationProcessContainer.create();
         process.start(params);
     }
 }
