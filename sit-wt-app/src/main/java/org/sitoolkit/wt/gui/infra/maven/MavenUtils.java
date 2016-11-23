@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 public class MavenUtils {
@@ -29,10 +30,12 @@ public class MavenUtils {
         return mvnCommand;
     }
 
-    public static void findAndInstall() {
-        mvnCommand = find();
-        if (mvnCommand == null || mvnCommand.isEmpty()) {
-            mvnCommand = install();
+    public static synchronized void findAndInstall() {
+        if (StrUtils.isEmpty(mvnCommand)) {
+            mvnCommand = find();
+            if (StrUtils.isEmpty(mvnCommand)) {
+                mvnCommand = install();
+            }
         }
         LOG.info("mvn command is '" + mvnCommand + "'");
     }

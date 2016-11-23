@@ -49,9 +49,15 @@ public class SampleService {
     }
 
     public void stop(File baseDir, SampleStoppedCallback callback) {
+
+        File sampleDir = getSampleDir(baseDir);
+        if (!sampleDir.exists()) {
+            return;
+        }
+
         ProcessParams params = new ProcessParams();
 
-        params.setDirectory(getSampleDir(baseDir));
+        params.setDirectory(sampleDir);
 
         if (callback != null) {
             params.getExitClallbacks().add(exitCode -> {

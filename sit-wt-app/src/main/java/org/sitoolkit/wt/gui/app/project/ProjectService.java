@@ -8,13 +8,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.app.test.SitWtRuntimeService;
+import org.sitoolkit.wt.gui.domain.project.ProjectProcessClient;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
-import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.LogConsole;
+import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 public class ProjectService {
@@ -23,8 +22,7 @@ public class ProjectService {
 
     SitWtRuntimeService runtimeService = new SitWtRuntimeService();
 
-    public ProjectService() {
-    }
+    ProjectProcessClient client = new ProjectProcessClient();
 
     public File createProject(File projectDir, ProjectState projectState) {
         File pomFile = new File(projectDir, "pom.xml");
@@ -34,7 +32,7 @@ public class ProjectService {
         }
 
         createPom(pomFile, projectState);
-        unpackResources(projectDir);
+        unpackResources(pomFile, projectDir);
 
         return pomFile;
     }
@@ -83,14 +81,16 @@ public class ProjectService {
         });
     }
 
-    private void unpackResources(File projectDir) {
-        ConversationProcess process = new ConversationProcess();
-        process.start(new LogConsole(), projectDir, SitWtRuntimeUtils.buildUnpackCommand());
+    private void unpackResources(File pomFile, File projectDir) {
+        ProcessParams params = new ProcessParams();
+        params.setDirectory(projectDir);
 
-        process.onExit(exitCode -> {
+        params.getExitClallbacks().add(exitCode -> {
             File f = new File(projectDir, "src/main/resources/sit-wt-default.properties");
             f.renameTo(new File(f.getParentFile(), "sit-wt.properties"));
         });
+
+        client.unpack(pomFile, params);
 
     }
 }
