@@ -1,13 +1,22 @@
-package org.sitoolkit.wt.gui.domain;
+package org.sitoolkit.wt.gui.domain.sample;
 
-import org.sitoolkit.wt.gui.infra.process.ConsoleListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class JettyConsoleListener implements ConsoleListener {
+import org.sitoolkit.wt.gui.infra.process.StdoutListener;
+import org.sitoolkit.wt.gui.infra.util.LogUtils;
+
+public class JettyMavenPluginStdoutListener implements StdoutListener {
+
+    private static final Logger LOG = LogUtils.get(JettyMavenPluginStdoutListener.class);
 
     private volatile int exitLevel = -1;
 
+    public JettyMavenPluginStdoutListener() {
+    }
+
     @Override
-    public void readLine(String line) {
+    public void nextLine(String line) {
         if (line == null || line.isEmpty()) {
             return;
         }
@@ -18,6 +27,7 @@ public class JettyConsoleListener implements ConsoleListener {
         } else if ("[INFO] BUILD FAILURE".equals(line)) {
             exitLevel = 2;
         }
+
     }
 
     public boolean isSuccess() {
@@ -25,9 +35,10 @@ public class JettyConsoleListener implements ConsoleListener {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.log(Level.WARNING, "", e);
             }
         }
         return exitLevel == 0;
     }
+
 }

@@ -1,18 +1,13 @@
 package org.sitoolkit.wt.gui.pres;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import org.sitoolkit.wt.gui.domain.JettyConsoleListener;
+import org.sitoolkit.wt.gui.app.sample.SampleService;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
-import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
-import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.gui.domain.sample.SampleStartedCallback;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.TextAreaConsole;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -20,7 +15,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 
 public class SampleToolbarController implements Initializable {
@@ -34,27 +28,24 @@ public class SampleToolbarController implements Initializable {
     @FXML
     private Label stopSampleButton;
 
-    private TextArea console;
-
     private TestToolbarController testToolbarController;
 
     private MessageView messageView;
 
-    private ConversationProcess sampleProcess = new ConversationProcess();
-
     private ProjectState projectState;
 
     private BooleanProperty running = new SimpleBooleanProperty(false);
+
+    SampleService service = new SampleService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
     }
 
-    public void initialize(TextArea console, MessageView messageView,
-            TestToolbarController testToolbarController, ProjectState projectState) {
+    public void initialize(MessageView messageView, TestToolbarController testToolbarController,
+            ProjectState projectState) {
         this.projectState = projectState;
-        this.console = console;
         this.testToolbarController = testToolbarController;
         this.messageView = messageView;
 
@@ -69,53 +60,45 @@ public class SampleToolbarController implements Initializable {
         projectState.setState(State.LOCKING);
         messageView.startMsg("サンプルWebサイトを起動します。");
 
-        sampleProcess.start(new TextAreaConsole(console), projectState.getBaseDir(),
-                SitWtRuntimeUtils.buildSampleCommand());
+        service.create(projectState.getBaseDir(), sampledir -> {
 
-        sampleProcess.onExit(exitCode -> {
-
-            File sampledir = new File(projectState.getBaseDir(), "sample");
-            if (!sampledir.exists()) {
-                sampledir.mkdirs();
-            }
-
-            JettyConsoleListener listener = new JettyConsoleListener();
-            sampleProcess.start(new TextAreaConsole(console, listener), sampledir,
-                    MavenUtils.getCommand());
-
-            ExecutorContainer.get().execute(() -> {
-                if (listener.isSuccess()) {
-                    String sampleBaseUrl = "http://localhost:8280";
-                    messageView.addMsg("サンプルWebサイトを起動しました。" + sampleBaseUrl + "/input.html");
-                    messageView.addMsg(
-                            "サンプルテストスクリプトtestscript/SampleTestScript.xlsxを左のツリーで選択して実行できます。");
-                    // TODO URLの動的取得
-                    testToolbarController.setBaseUrl(sampleBaseUrl);
-                    running.set(true);
-                } else {
-                    messageView.addMsg("サンプルWebサイトの起動に失敗しました。");
-                    running.set(false);
-                }
-                projectState.reset();
-            });
+            service.start(projectState.getBaseDir(), onStarted());
 
         });
+    }
+
+    private SampleStartedCallback onStarted() {
+        return success -> {
+            if (success) {
+                String sampleBaseUrl = "http://localhost:8280";
+                messageView.addMsg("サンプルWebサイトを起動しました。" + sampleBaseUrl + "/input.html");
+                messageView
+                        .addMsg("サンプルテストスクリプトtestscript/SampleTestScript.xlsxを左のツリーで選択して実行できます。");
+                // TODO サンプルURLの動的取得
+                testToolbarController.setBaseUrl(sampleBaseUrl);
+                running.set(true);
+            } else {
+                messageView.addMsg("サンプルWebサイトの起動に失敗しました。");
+                running.set(false);
+            }
+            projectState.reset();
+        };
     }
 
     @FXML
     public void stopSample() {
         messageView.startMsg("サンプルWebサイトを停止します。");
-        File sampledir = new File(projectState.getBaseDir(), "sample");
-        sampleProcess.start(new TextAreaConsole(console), sampledir, MavenUtils.getCommand(),
-                "jetty:stop");
 
-        sampleProcess.onExit(exitCode -> {
-
+        service.stop(projectState.getBaseDir(), () -> {
+            running.set(false);
             Platform.runLater(() -> {
-                running.set(false);
                 messageView.addMsg("サンプルWebサイトを停止しました。");
             });
         });
+    }
+
+    public void destroy() {
+        service.stop(projectState.getBaseDir());
     }
 
 }

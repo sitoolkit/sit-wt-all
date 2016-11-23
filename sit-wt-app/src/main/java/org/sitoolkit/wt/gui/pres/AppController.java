@@ -15,7 +15,6 @@ import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
 import org.sitoolkit.wt.gui.infra.fx.StageResizer;
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
 import org.sitoolkit.wt.gui.infra.process.TextAreaConsole;
@@ -109,47 +108,16 @@ public class AppController implements Initializable {
         }
 
         testToolbarController.initialize(console, messageView, fileTreeController, projectState);
-        sampleToolbarController.initialize(console, messageView, testToolbarController,
-                projectState);
+        sampleToolbarController.initialize(messageView, testToolbarController, projectState);
     }
 
     public void destroy() {
         conversationProcess.destroy();
         testToolbarController.destroy();
         fileTreeController.destroy();
-
-        File sampleDir = new File(projectState.getBaseDir(), "sample");
-        if (sampleDir.exists()) {
-            conversationProcess.start(new TextAreaConsole(console), sampleDir,
-                    MavenUtils.getCommand(), "jetty:stop");
-        }
+        sampleToolbarController.destroy();
 
     }
-
-    // @FXML
-    // public void createProject() {
-    // DirectoryChooser dirChooser = new DirectoryChooser();
-    // dirChooser.setTitle("プロジェクトを作成するフォルダを選択してください。");
-    // dirChooser.setInitialDirectory(new File("."));
-    //
-    // File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
-    //
-    // if (projectDir == null) {
-    // return;
-    // }
-    //
-    // File pomFile = projectService.createProject(projectDir);
-    //
-    // if (pomFile == null) {
-    // messageView.addMsg("プロジェクトは既に存在します。");
-    // return;
-    // }
-    //
-    // loadProject(pomFile);
-    // projectState.init(pomFile);
-    // messageView.addMsg("プロジェクトを作成しました。");
-    // messageView.addMsg("[プロジェクト]メニュー＞[サンプルWebサイトを起動]からサンプルを取得・起動することができます。");
-    // }
 
     @FXML
     public void openProject() {

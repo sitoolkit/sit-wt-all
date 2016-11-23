@@ -123,13 +123,6 @@ public class SitWtRuntimeUtils {
         return text.substring(start, stop).trim();
     }
 
-    public static List<String> buildSampleCommand() {
-        List<String> command = buildJavaCommand();
-        command.add("org.sitoolkit.wt.app.sample.SampleManager");
-
-        return command;
-    }
-
     public static List<String> buildSingleTestCommand(List<File> scriptFiles, boolean isDebug,
             boolean isParallel, String browser, String baseUrl) {
         List<String> command = buildJavaCommand();
@@ -195,7 +188,7 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
-    private static List<String> buildJavaCommand() {
+    public static List<String> buildJavaCommand() {
         List<String> command = new ArrayList<>();
         command.add("java");
 
