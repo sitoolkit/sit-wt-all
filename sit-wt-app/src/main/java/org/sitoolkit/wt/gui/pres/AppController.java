@@ -2,22 +2,20 @@ package org.sitoolkit.wt.gui.pres;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.gui.app.project.ProjectService;
+import org.sitoolkit.wt.gui.app.script.ScriptService;
 import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
-import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
 import org.sitoolkit.wt.gui.infra.fx.StageResizer;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
-import org.sitoolkit.wt.gui.infra.process.TextAreaConsole;
 import org.sitoolkit.wt.gui.infra.process.TextAreaStdoutListener;
 
 import javafx.beans.property.BooleanProperty;
@@ -72,8 +70,6 @@ public class AppController implements Initializable {
 
     private MessageView messageView = new MessageView();
 
-    private TextAreaConsole textAreaConsole;
-
     private ConversationProcess conversationProcess = new ConversationProcess();
 
     private ProjectState projectState = new ProjectState();
@@ -99,7 +95,6 @@ public class AppController implements Initializable {
         FxUtils.bindVisible(minimizeButton, windowMaximized);
 
         messageView.setTextArea(console);
-        textAreaConsole = new TextAreaConsole(console);
         StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
 
         File pomFile = projectService.openProject(new File(""), projectState);
@@ -161,18 +156,19 @@ public class AppController implements Initializable {
         FxContext.setTitie(projectDir.getAbsolutePath());
     }
 
+    ScriptService scriptService = new ScriptService();
+
     @FXML
     public void page2script() {
         messageView.startMsg("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
-        List<String> command = SitWtRuntimeUtils.buildPage2ScriptCommand(
-                testToolbarController.getDriverType(), testToolbarController.getBaseUrl());
-
-        conversationProcess.start(textAreaConsole, projectState.getBaseDir(), command);
 
         projectState.setState(State.BROWSING);
-        conversationProcess.onExit(exitCode -> {
-            projectState.reset();
-        });
+
+        conversationProcess = scriptService.page2script(testToolbarController.getDriverType(),
+                testToolbarController.getBaseUrl(), exitCode -> {
+                    projectState.reset();
+                });
+
     }
 
     @FXML
@@ -184,10 +180,9 @@ public class AppController implements Initializable {
     public void ope2script() {
         messageView.startMsg("ブラウザ操作の記録はFirefoxとSelenium IDE Pluginを使用します。");
         messageView.addMsg("Selenium IDEで記録したテストスクリプトをhtml形式でtestscriptディレクトリに保存してください。");
-        List<String> command = SitWtRuntimeUtils
-                .buildOpe2ScriptCommand(testToolbarController.getBaseUrl());
 
-        conversationProcess.start(textAreaConsole, projectState.getBaseDir(), command);
+        scriptService.ope2script(testToolbarController.getBaseUrl());
+
     }
 
     @FXML

@@ -71,7 +71,7 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
-    static void addVmArgs(List<String> command, String browser, String baseUrl) {
+    public static void addVmArgs(List<String> command, String browser, String baseUrl) {
         command.add("-Ddriver.type=" + browser);
         command.add("-Dsitwt.cli=false");
 
