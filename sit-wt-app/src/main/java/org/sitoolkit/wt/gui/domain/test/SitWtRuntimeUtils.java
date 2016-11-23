@@ -69,6 +69,7 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
+    @Deprecated
     private static String loadClasspath(File pomFile) {
 
         List<String> command = new ArrayList<>();
@@ -221,4 +222,7 @@ public class SitWtRuntimeUtils {
         return sitwtClasspath;
     }
 
+    public static void setSitWtClasspath(String sitwtClasspath) {
+        SitWtRuntimeUtils.sitwtClasspath = sitwtClasspath;
+    }
 }

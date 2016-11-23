@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sitoolkit.wt.gui.app.test.SitWtRuntimeService;
+import org.sitoolkit.wt.gui.domain.project.ProjectState;
+import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
@@ -16,30 +19,33 @@ import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 public class ProjectService {
 
-	private static final Logger LOG = LogUtils.get(ProjectService.class); 
-	
+    private static final Logger LOG = LogUtils.get(ProjectService.class);
+
+    SitWtRuntimeService runtimeService = new SitWtRuntimeService();
+
     public ProjectService() {
     }
 
-    public File createProject(File projectDir) {
+    public File createProject(File projectDir, ProjectState projectState) {
         File pomFile = new File(projectDir, "pom.xml");
 
         if (pomFile.exists()) {
             return null;
         }
 
-        createPom(pomFile);
+        createPom(pomFile, projectState);
         unpackResources(projectDir);
 
         return pomFile;
     }
 
-    public File openProject(File projectDir) {
-    	LOG.log(Level.INFO, "opening project in {0}", projectDir.getAbsolutePath());
+    public File openProject(File projectDir, ProjectState projectState) {
+        LOG.log(Level.INFO, "opening project in {0}", projectDir.getAbsolutePath());
         File pomFile = new File(projectDir.getAbsolutePath(), "pom.xml");
 
         if (pomFile.exists()) {
-            loadProject(pomFile);
+
+            loadProject(pomFile, projectState);
             return pomFile;
 
         } else {
@@ -47,7 +53,7 @@ public class ProjectService {
         }
     }
 
-    private void createPom(File pomFile) {
+    private void createPom(File pomFile, ProjectState projectState) {
 
         try {
             URL pomUrl = getClass().getResource("/distribution-pom.xml");
@@ -58,14 +64,23 @@ public class ProjectService {
 
         if (pomFile.exists()) {
 
-            loadProject(pomFile);
+            loadProject(pomFile, projectState);
+
         }
     }
 
-    private void loadProject(File pomFile) {
-    	LOG.log(Level.INFO, "loading project with {0}", pomFile.getAbsolutePath());
+    private void loadProject(File pomFile, ProjectState projectState) {
+        LOG.log(Level.INFO, "loading project with {0}", pomFile.getAbsolutePath());
         PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
-        SitWtRuntimeUtils.loadSitWtClasspath(pomFile);
+
+        runtimeService.loadClasspath(pomFile, exitCode -> {
+            if (exitCode == 0) {
+                // TODO プロジェクトの初期化判定は"pom.xml内にSIT-WTの設定があること"としたい
+                projectState.init(pomFile);
+            } else {
+                projectState.setState(State.NOT_LOADED);
+            }
+        });
     }
 
     private void unpackResources(File projectDir) {

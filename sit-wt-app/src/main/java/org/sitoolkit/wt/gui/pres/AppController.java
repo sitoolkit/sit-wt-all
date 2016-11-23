@@ -17,7 +17,9 @@ import org.sitoolkit.wt.gui.infra.fx.FxUtils;
 import org.sitoolkit.wt.gui.infra.fx.StageResizer;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
 import org.sitoolkit.wt.gui.infra.process.TextAreaConsole;
+import org.sitoolkit.wt.gui.infra.process.TextAreaStdoutListener;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -97,15 +99,13 @@ public class AppController implements Initializable {
 
         messageView.setTextArea(console);
         textAreaConsole = new TextAreaConsole(console);
+        StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
 
-        // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
-        File pomFile = projectService.openProject(new File(""));
+        File pomFile = projectService.openProject(new File(""), projectState);
         if (pomFile == null) {
-            projectState.setState(State.NOT_LOADED);
             openProject();
         } else {
             loadProject(pomFile);
-            projectState.init(pomFile);
         }
 
         testToolbarController.initialize(console, messageView, fileTreeController, projectState);
@@ -126,30 +126,30 @@ public class AppController implements Initializable {
 
     }
 
-    @FXML
-    public void createProject() {
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("プロジェクトを作成するフォルダを選択してください。");
-        dirChooser.setInitialDirectory(new File("."));
-
-        File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
-
-        if (projectDir == null) {
-            return;
-        }
-
-        File pomFile = projectService.createProject(projectDir);
-
-        if (pomFile == null) {
-            messageView.addMsg("プロジェクトは既に存在します。");
-            return;
-        }
-
-        loadProject(pomFile);
-        projectState.init(pomFile);
-        messageView.addMsg("プロジェクトを作成しました。");
-        messageView.addMsg("[プロジェクト]メニュー＞[サンプルWebサイトを起動]からサンプルを取得・起動することができます。");
-    }
+    // @FXML
+    // public void createProject() {
+    // DirectoryChooser dirChooser = new DirectoryChooser();
+    // dirChooser.setTitle("プロジェクトを作成するフォルダを選択してください。");
+    // dirChooser.setInitialDirectory(new File("."));
+    //
+    // File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
+    //
+    // if (projectDir == null) {
+    // return;
+    // }
+    //
+    // File pomFile = projectService.createProject(projectDir);
+    //
+    // if (pomFile == null) {
+    // messageView.addMsg("プロジェクトは既に存在します。");
+    // return;
+    // }
+    //
+    // loadProject(pomFile);
+    // projectState.init(pomFile);
+    // messageView.addMsg("プロジェクトを作成しました。");
+    // messageView.addMsg("[プロジェクト]メニュー＞[サンプルWebサイトを起動]からサンプルを取得・起動することができます。");
+    // }
 
     @FXML
     public void openProject() {
@@ -163,7 +163,7 @@ public class AppController implements Initializable {
             return;
         }
 
-        File pomFile = projectService.openProject(projectDir);
+        File pomFile = projectService.openProject(projectDir, projectState);
 
         if (pomFile == null) {
 
@@ -172,7 +172,7 @@ public class AppController implements Initializable {
 
             Optional<ButtonType> answer = alert.showAndWait();
             if (answer.get() == ButtonType.OK) {
-                pomFile = projectService.createProject(projectDir);
+                pomFile = projectService.createProject(projectDir, projectState);
                 loadProject(pomFile);
             }
 
@@ -186,10 +186,9 @@ public class AppController implements Initializable {
 
     private void loadProject(File pomFile) {
         File projectDir = pomFile.getAbsoluteFile().getParentFile();
+        messageView.addMsg("プロジェクトを開きます。" + projectDir.getAbsolutePath());
         fileTreeController.setFileTreeRoot(projectDir);
-        projectState.init(pomFile);
         FxContext.setTitie(projectDir.getAbsolutePath());
-        messageView.addMsg("プロジェクトを開きました。");
     }
 
     @FXML
