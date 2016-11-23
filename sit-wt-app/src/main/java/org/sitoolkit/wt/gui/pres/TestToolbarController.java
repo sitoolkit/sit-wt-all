@@ -12,8 +12,7 @@ import org.sitoolkit.wt.gui.domain.test.TestRunParams;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess.OnExitCallback;
-import org.sitoolkit.wt.gui.infra.process.TextAreaConsole;
+import org.sitoolkit.wt.gui.infra.process.ProcessExitCallback;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
@@ -25,7 +24,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 
@@ -55,8 +53,6 @@ public class TestToolbarController implements Initializable {
     @FXML
     private TextField stepNoText;
 
-    private TextArea console;
-
     private FileTreeController fileTreeController;
 
     private MessageView messageView;
@@ -77,10 +73,9 @@ public class TestToolbarController implements Initializable {
         FxUtils.bindVisible(restartButton, debugConsoleListener.getPausingProperty());
     }
 
-    public void initialize(TextArea console, MessageView messageView,
-            FileTreeController fileTreeController, ProjectState projectState) {
+    public void initialize(MessageView messageView, FileTreeController fileTreeController,
+            ProjectState projectState) {
         this.projectState = projectState;
-        this.console = console;
         this.fileTreeController = fileTreeController;
         this.messageView = messageView;
 
@@ -136,13 +131,12 @@ public class TestToolbarController implements Initializable {
 
         addBaseUrl(params.getBaseUrl());
 
-        OnExitCallback callback = exitCode -> {
+        ProcessExitCallback callback = exitCode -> {
             projectState.reset();
             Platform.runLater(() -> messageView.addMsg("テストを終了します。"));
         };
 
-        ConversationProcess testProcess = testService.runTest(params,
-                new TextAreaConsole(console, debugConsoleListener), callback);
+        ConversationProcess testProcess = testService.runTest(params, callback);
 
         if (testProcess == null) {
             Alert alert = new Alert(AlertType.INFORMATION);

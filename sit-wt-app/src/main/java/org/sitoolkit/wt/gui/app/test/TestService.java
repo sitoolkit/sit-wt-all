@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
-import org.sitoolkit.wt.gui.infra.process.Console;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess.OnExitCallback;
-import org.sitoolkit.wt.gui.infra.process.LogConsole;
+import org.sitoolkit.wt.gui.infra.process.ProcessExitCallback;
+import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.LogUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
@@ -21,12 +21,9 @@ public class TestService {
 
     private static final String SCRIPT_TEMPLATE = "TestScriptTemplate.xlsx";
 
-    public TestService() {
-        // TODO Auto-generated constructor stub
-    }
+    SitWtRuntimeProcessClient client = new SitWtRuntimeProcessClient();
 
-    public ConversationProcess runTest(TestRunParams params, Console console,
-            OnExitCallback callback) {
+    public ConversationProcess runTest(TestRunParams params, ProcessExitCallback callback) {
 
         List<File> testScripts = SitWtRuntimeUtils.filterTestScripts(params.getScripts());
 
@@ -34,15 +31,12 @@ public class TestService {
             return null;
         }
 
-        List<String> command = SitWtRuntimeUtils.buildSingleTestCommand(testScripts,
-                params.isDebug(), params.isParallel(), params.getDriverType(), params.getBaseUrl());
+        ProcessParams processParams = new ProcessParams();
 
-        ConversationProcess process = new ConversationProcess();
-        process.start(console, params.getBaseDir(), command);
+        processParams.getExitClallbacks().add(callback);
 
-        process.onExit(callback);
+        return client.runTest(params, processParams);
 
-        return process;
     }
 
     public void createNewScript(File baseDir, File destFile) {
@@ -61,18 +55,35 @@ public class TestService {
 
         } else {
 
-            ConversationProcess process = new ConversationProcess();
-            process.start(new LogConsole(), baseDir,
-                    SitWtRuntimeUtils.buildUnpackTestscriptCommand());
+            ProcessParams params = new ProcessParams();
+            params.setDirectory(baseDir);
 
-            process.onExit(exitCode -> {
+            params.getExitClallbacks().add(exitCode -> {
+
                 File testscript = new File(baseDir, "target/" + SCRIPT_TEMPLATE);
                 LOG.log(Level.INFO, "{0} rename to {1}",
                         new Object[] { testscript.getAbsolutePath(), template.getAbsolutePath() });
                 testscript.renameTo(template);
 
                 FileIOUtils.copy(template, destFile);
+
             });
+
+            client.unpackTestScript(params);
+
+            // ConversationProcess process = new ConversationProcess();
+            // process.start(new LogConsole(), baseDir,
+            // SitWtRuntimeUtils.buildUnpackTestscriptCommand());
+            //
+            // process.onExit(exitCode -> {
+            // File testscript = new File(baseDir, "target/" + SCRIPT_TEMPLATE);
+            // LOG.log(Level.INFO, "{0} rename to {1}",
+            // new Object[] { testscript.getAbsolutePath(),
+            // template.getAbsolutePath() });
+            // testscript.renameTo(template);
+            //
+            // FileIOUtils.copy(template, destFile);
+            // });
         }
 
     }

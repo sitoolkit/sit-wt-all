@@ -27,12 +27,11 @@ public class ProjectServiceTest {
         File pomFile = service.createProject(projectDir, projectState);
 
         ThreadUtils.waitFor("pom.xml is not exist", () -> pomFile.exists());
+        ThreadUtils.waitFor("project state is not loaded", () -> projectState.isLoaded().get());
         ThreadUtils.waitFor("capabilities.properties does not exist",
                 () -> new File(projectDir, "src/main/resources/capabilities.properties").exists());
-        ThreadUtils.waitFor("sit-wt-default.properties does not exist",
-                () -> new File(projectDir, "src/main/resources/sit-wt-default.properties")
-                        .exists());
-        ThreadUtils.waitFor("project state is not loaded", () -> projectState.isLoaded().get());
+        ThreadUtils.waitFor("sit-wt.properties does not exist",
+                () -> new File(projectDir, "src/main/resources/sit-wt.properties").exists());
     }
 
 }

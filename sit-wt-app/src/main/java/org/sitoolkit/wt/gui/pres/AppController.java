@@ -109,7 +109,7 @@ public class AppController implements Initializable {
             loadProject(pomFile);
         }
 
-        testToolbarController.initialize(console, messageView, fileTreeController, projectState);
+        testToolbarController.initialize(messageView, fileTreeController, projectState);
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
     }
 

@@ -23,8 +23,6 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
 
 public class FileTreeController implements Initializable {
 
-    private static final String TESTSCRIPT_URL = "https://github.com/sitoolkit/sit-wt-all/blob/master/sit-wt-runtime/src/main/resources/TestScriptTemplate.xlsx?raw=true";
-
     @FXML
     private TreeView<FileWrapper> fileTree;
 

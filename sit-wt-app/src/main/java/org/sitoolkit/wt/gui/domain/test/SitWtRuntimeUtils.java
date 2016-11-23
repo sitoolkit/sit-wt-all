@@ -1,21 +1,15 @@
 package org.sitoolkit.wt.gui.domain.test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
-import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
 public class SitWtRuntimeUtils {
@@ -35,66 +29,6 @@ public class SitWtRuntimeUtils {
                 .collect(Collectors.toList());
     }
 
-    public static List<String> buildCommand(String testedClasses, boolean isDebug,
-            boolean isParallel, String browser, String baseUrl) {
-        List<String> command = new ArrayList<>();
-
-        command.add(MavenUtils.getCommand());
-        command.add("verify");
-
-        command.add("-T");
-        command.add("1C");
-
-        if (StrUtils.isNotEmpty(testedClasses)) {
-            command.add("-Dit.test=" + testedClasses);
-        }
-
-        List<String> profiles = new ArrayList<>();
-        if (isDebug) {
-            profiles.add("debug");
-        }
-        if (isParallel) {
-            profiles.add("parallel");
-        }
-        if (!profiles.isEmpty()) {
-            command.add("-P" + String.join(",", profiles));
-        }
-
-        command.add("-Ddriver.type=" + browser);
-
-        if (StrUtils.isNotEmpty(baseUrl)) {
-            command.add("-DbaseUrl=" + baseUrl);
-        }
-
-        return command;
-    }
-
-    @Deprecated
-    private static String loadClasspath(File pomFile) {
-
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
-
-        command.add("dependency:build-classpath");
-        command.add("-f");
-        command.add(pomFile.getAbsolutePath());
-
-        ProcessBuilder builder = new ProcessBuilder(command);
-        putJavaHome(builder.environment());
-
-        try {
-            Process process = builder.start();
-            LOG.log(Level.INFO, "process {0} starts {1}",
-                    new Object[] { process, builder.command() });
-
-            process.waitFor(5, TimeUnit.SECONDS);
-            return FileIOUtils.read(process.getInputStream());
-
-        } catch (IOException | InterruptedException e) {
-            throw new UnExpectedException(e);
-        }
-    }
-
     public static void putJavaHome(Map<String, String> map) {
 
         if (javaHome == null) {
@@ -103,49 +37,6 @@ public class SitWtRuntimeUtils {
         }
         map.put("JAVA_HOME", javaHome);
 
-    }
-
-    public static synchronized void loadSitWtClasspath(File pomFile) {
-
-        if (sitwtClasspath == null) {
-            ExecutorContainer.get().submit(() -> {
-                String out = loadClasspath(pomFile);
-                sitwtClasspath = filter(out, "[INFO] Dependencies classpath:", "[INFO]");
-            });
-        }
-
-    }
-
-    private static String filter(String text, String startLine, String stopLine) {
-        int start = text.indexOf(startLine) + startLine.length();
-        int stop = text.indexOf(stopLine, start);
-
-        return text.substring(start, stop).trim();
-    }
-
-    public static List<String> buildSingleTestCommand(List<File> scriptFiles, boolean isDebug,
-            boolean isParallel, String browser, String baseUrl) {
-        List<String> command = buildJavaCommand();
-        addVmArgs(command, browser, baseUrl);
-
-        command.add("-cp");
-        command.add("src/main/resources" + File.pathSeparator + getSitWtClasspath());
-
-        if (isDebug) {
-            command.add("-Dsitwt.debug=true");
-        }
-
-        if (isParallel) {
-            command.add("-Dsitwt.parallel=true");
-        }
-
-        command.add("-Dsitwt.open-evidence=true");
-
-        command.add("org.sitoolkit.wt.app.test.TestRunner");
-
-        command.add(StrUtils.join(scriptFiles));
-
-        return command;
     }
 
     public static List<String> buildPage2ScriptCommand(String browser, String baseUrl) {
@@ -170,24 +61,6 @@ public class SitWtRuntimeUtils {
 
     }
 
-    public static List<String> buildUnpackCommand() {
-        List<String> command = new ArrayList<>();
-
-        command.add(MavenUtils.getCommand());
-        command.add("-Punpack-property-resources");
-
-        return command;
-    }
-
-    public static List<String> buildUnpackTestscriptCommand() {
-        List<String> command = new ArrayList<>();
-
-        command.add(MavenUtils.getCommand());
-        command.add("-Punpack-testscript");
-
-        return command;
-    }
-
     public static List<String> buildJavaCommand() {
         List<String> command = new ArrayList<>();
         command.add("java");
@@ -198,7 +71,7 @@ public class SitWtRuntimeUtils {
         return command;
     }
 
-    private static void addVmArgs(List<String> command, String browser, String baseUrl) {
+    static void addVmArgs(List<String> command, String browser, String baseUrl) {
         command.add("-Ddriver.type=" + browser);
         command.add("-Dsitwt.cli=false");
 
@@ -208,7 +81,7 @@ public class SitWtRuntimeUtils {
 
     }
 
-    private static String getSitWtClasspath() {
+    static String getSitWtClasspath() {
         if (sitwtClasspath == null) {
             throw new UnInitializedException();
         }
