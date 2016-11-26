@@ -13,14 +13,11 @@ import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
-import org.sitoolkit.wt.gui.infra.fx.StageResizer;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
 import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
 import org.sitoolkit.wt.gui.infra.process.TextAreaStdoutListener;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -32,7 +29,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 
 public class AppController implements Initializable {
 
@@ -81,6 +77,19 @@ public class AppController implements Initializable {
 
     ProjectService projectService = new ProjectService();
 
+    // private double stageHeight;
+    //
+    // private double stageWidth;
+    //
+    // @FXML
+    // private Label maximizeButton;
+    //
+    // @FXML
+    // private Label minimizeButton;
+    //
+    // private BooleanProperty windowMaximized = new
+    // SimpleBooleanProperty(true);
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -92,8 +101,8 @@ public class AppController implements Initializable {
         FxUtils.bindVisible(genScriptGroup, projectState.isLoaded());
         FxUtils.bindVisible(browsingGroup, projectState.isBrowsing());
 
-        FxUtils.bindVisible(maximizeButton, windowMaximized.not());
-        FxUtils.bindVisible(minimizeButton, windowMaximized);
+        // FxUtils.bindVisible(maximizeButton, windowMaximized.not());
+        // FxUtils.bindVisible(minimizeButton, windowMaximized);
 
         messageView.setTextArea(console);
         StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
@@ -202,34 +211,22 @@ public class AppController implements Initializable {
         projectState.reset();
     }
 
-    private double stageHeight;
-
-    private double stageWidth;
-
-    @FXML
-    private Label maximizeButton;
-
-    @FXML
-    private Label minimizeButton;
-
-    private BooleanProperty windowMaximized = new SimpleBooleanProperty(true);
-
-    @FXML
-    public void minimizeWindow() {
-        Stage primaryStage = FxContext.getPrimaryStage();
-        stageHeight = primaryStage.getHeight();
-        stageWidth = primaryStage.getWidth();
-        // TODO コンソールのサイズ設定
-        StageResizer.resize(primaryStage, 600, 90);
-        windowMaximized.set(false);
-    }
-
-    @FXML
-    public void maximizeWindow() {
-        Stage primaryStage = FxContext.getPrimaryStage();
-        StageResizer.resize(primaryStage, stageWidth, stageHeight);
-        windowMaximized.set(true);
-    }
+    // @FXML
+    // public void minimizeWindow() {
+    // Stage primaryStage = FxContext.getPrimaryStage();
+    // stageHeight = primaryStage.getHeight();
+    // stageWidth = primaryStage.getWidth();
+    // // TODO コンソールのサイズ設定
+    // StageResizer.resize(primaryStage, 600, 90);
+    // windowMaximized.set(false);
+    // }
+    //
+    // @FXML
+    // public void maximizeWindow() {
+    // Stage primaryStage = FxContext.getPrimaryStage();
+    // StageResizer.resize(primaryStage, stageWidth, stageHeight);
+    // windowMaximized.set(true);
+    // }
 
     @FXML
     public void settings() {

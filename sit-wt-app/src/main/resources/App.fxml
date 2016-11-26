@@ -68,16 +68,16 @@
       <ToolBar>
         <items>
           <Separator orientation="VERTICAL" />
-          <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn">
-            <tooltip>
-              <Tooltip text="ウィンドウを縮小します" />
-            </tooltip>
-          </Label>
-          <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn">
-            <tooltip>
-              <Tooltip text="ウィンドウを拡大します" />
-            </tooltip>
-          </Label>
+<!--           <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn"> -->
+<!--             <tooltip> -->
+<!--               <Tooltip text="ウィンドウを縮小します" /> -->
+<!--             </tooltip> -->
+<!--           </Label> -->
+<!--           <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn"> -->
+<!--             <tooltip> -->
+<!--               <Tooltip text="ウィンドウを拡大します" /> -->
+<!--             </tooltip> -->
+<!--           </Label> -->
           <Label onMouseClicked="#settings" styleClass="image-btn,settings-btn">
             <tooltip>
               <Tooltip text="設定ファイルのフォルダを開きます" />
