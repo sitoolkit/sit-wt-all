@@ -17,9 +17,16 @@ public class ConversationProcess {
 
     private static final Logger LOG = Logger.getLogger(ConversationProcess.class.getName());
 
+    private static final LogStdoutListener LOG_STDOUT_LISTENER = new LogStdoutListener(LOG,
+            Level.INFO, "stdout");
+    private static final LogStdoutListener LOG_STDERR_LISTENER = new LogStdoutListener(LOG,
+            Level.SEVERE, "stderr");
+
     private Process process;
 
     private PrintWriter processWriter;
+
+    private StringBuilderStdoutListener defaultStderrListener = new StringBuilderStdoutListener();
 
     ConversationProcess() {
     }
@@ -41,13 +48,17 @@ public class ConversationProcess {
             process = pb.start();
             LOG.log(Level.INFO, "process {0} starts {1}", new Object[] { process, command });
 
-            List<StdoutListener> listeners = new ArrayList<>();
-            listeners.addAll(params.getStdoutListeners());
-            listeners.addAll(StdoutListenerContainer.get().getListeners());
+            List<StdoutListener> stdoutListeners = new ArrayList<>();
+            stdoutListeners.add(LOG_STDOUT_LISTENER);
+            stdoutListeners.addAll(params.getStdoutListeners());
+            stdoutListeners.addAll(StdoutListenerContainer.get().getListeners());
 
-            if (!listeners.isEmpty()) {
-                ExecutorContainer.get().execute(() -> scan(process.getInputStream(), listeners));
-            }
+            ExecutorContainer.get().execute(() -> scan(process.getInputStream(), stdoutListeners));
+
+            List<StdoutListener> stderrListeners = new ArrayList<>();
+            stderrListeners.add(LOG_STDERR_LISTENER);
+
+            ExecutorContainer.get().execute(() -> scan(process.getErrorStream(), stderrListeners));
 
             processWriter = new PrintWriter(process.getOutputStream());
 
@@ -76,16 +87,28 @@ public class ConversationProcess {
 
     private void wait(List<ProcessExitCallback> callbacks) {
         int exitCode = 0;
+
         try {
+
             exitCode = process.waitFor();
             LOG.log(Level.INFO, "process {0} exits with code : {1}",
                     new Object[] { process, exitCode });
+
         } catch (InterruptedException e) {
+
             LOG.log(Level.WARNING, "", e);
+
         } finally {
+
+            if (exitCode != 0) {
+                LOG.log(Level.SEVERE, "{0} {1}",
+                        new Object[] { System.lineSeparator(), defaultStderrListener });
+            }
+
             for (ProcessExitCallback callback : callbacks) {
                 callback.callback(exitCode);
             }
+
         }
     }
 

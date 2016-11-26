@@ -9,8 +9,6 @@ import java.net.URISyntaxException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.infra.process.LogStdoutListener;
-import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
 
 public class UpdateServiceTest {
 
@@ -21,7 +19,6 @@ public class UpdateServiceTest {
     @BeforeClass
     public static void setup() {
         MavenUtils.findAndInstall();
-        StdoutListenerContainer.get().getListeners().add(new LogStdoutListener());
     }
 
     @Test

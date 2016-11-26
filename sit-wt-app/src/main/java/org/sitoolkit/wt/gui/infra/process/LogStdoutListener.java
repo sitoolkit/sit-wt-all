@@ -1,19 +1,26 @@
 package org.sitoolkit.wt.gui.infra.process;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 public class LogStdoutListener implements StdoutListener {
 
-    private static final Logger LOG = LogUtils.get(LogStdoutListener.class);
+    private Logger log;
 
-    public LogStdoutListener() {
+    private Level level;
+
+    private String name;
+
+    public LogStdoutListener(Logger log, Level level, String name) {
+        super();
+        this.log = log;
+        this.level = level;
+        this.name = name;
     }
 
     @Override
     public void nextLine(String line) {
-        LOG.info(line);
+        log.log(level, "[{0}] {1}", new Object[] { name, line });
     }
 
 }
