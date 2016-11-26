@@ -1,7 +1,6 @@
 package org.sitoolkit.wt.gui.domain.update;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
@@ -16,8 +15,7 @@ public class UpdateProcessClient {
 
     public void checkVersion(File pomFile, VersionCheckMode mode, ProcessParams params) {
 
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
+        List<String> command = MavenUtils.getCommand(params);
         command.add(mode.getPluginGoal());
         command.add("-f");
         command.add(pomFile.getAbsolutePath());
@@ -30,8 +28,7 @@ public class UpdateProcessClient {
 
     public void dependencyCopy(File destDir, String artifact, ProcessParams params) {
 
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
+        List<String> command = MavenUtils.getCommand(params);
         command.add("dependency:copy");
         command.add("-Dartifact=" + artifact);
         command.add("-DoutputDirectory=" + destDir.getAbsolutePath());

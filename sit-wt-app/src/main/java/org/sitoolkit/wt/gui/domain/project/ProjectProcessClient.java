@@ -1,7 +1,6 @@
 package org.sitoolkit.wt.gui.domain.project;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
@@ -25,9 +24,8 @@ public class ProjectProcessClient {
      */
     public void unpack(File pomFile, ProcessParams params) {
 
-        List<String> command = new ArrayList<>();
+        List<String> command = MavenUtils.getCommand(params);
 
-        command.add(MavenUtils.getCommand());
         command.add("-Punpack-property-resources");
         command.add("-f");
         command.add(pomFile.getAbsolutePath());

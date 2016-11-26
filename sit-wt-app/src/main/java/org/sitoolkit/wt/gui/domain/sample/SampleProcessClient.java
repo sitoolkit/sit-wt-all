@@ -1,7 +1,6 @@
 package org.sitoolkit.wt.gui.domain.sample;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
@@ -52,8 +51,7 @@ public class SampleProcessClient {
      */
     public ConversationProcess start(ProcessParams params) {
 
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
+        List<String> command = MavenUtils.getCommand(params);
 
         params.setCommand(command);
 
@@ -75,8 +73,7 @@ public class SampleProcessClient {
      */
     public void stop(ProcessParams params) {
 
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
+        List<String> command = MavenUtils.getCommand(params);
         command.add("jetty:stop");
 
         params.setCommand(command);

@@ -1,7 +1,6 @@
 package org.sitoolkit.wt.gui.domain.test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
@@ -25,8 +24,7 @@ public class SitWtRuntimeProcessClient {
      *            プロセス実行パラメーター
      */
     public void buildClasspath(File pomFile, ProcessParams params) {
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
+        List<String> command = MavenUtils.getCommand(params);
 
         command.add("dependency:build-classpath");
         command.add("-f");
@@ -72,8 +70,7 @@ public class SitWtRuntimeProcessClient {
 
     public void unpackTestScript(ProcessParams params) {
 
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
+        List<String> command = MavenUtils.getCommand(params);
         command.add("-Punpack-testscript");
         params.setCommand(command);
 

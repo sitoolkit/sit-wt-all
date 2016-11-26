@@ -2,10 +2,15 @@ package org.sitoolkit.wt.gui.infra.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
+import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
@@ -16,7 +21,20 @@ public class MavenUtils {
 
     private static String mvnCommand = "";
 
-    public static String getCommand() {
+    public static List<String> getCommand(ProcessParams params) {
+        List<String> mvnCommand = new ArrayList<String>();
+        mvnCommand.add(getCommand());
+
+        params.setCommand(mvnCommand);
+
+        Map<String, String> enviroment = new HashMap<>();
+        enviroment.put("JAVA_HOME", System.getProperty("java.home"));
+        params.setEnviroment(enviroment);
+
+        return mvnCommand;
+    }
+
+    private static String getCommand() {
         while (mvnCommand == null || mvnCommand.isEmpty()) {
             LOG.info("wait for installing Maven...");
 
