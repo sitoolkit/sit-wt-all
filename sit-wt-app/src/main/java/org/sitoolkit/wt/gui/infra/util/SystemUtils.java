@@ -36,7 +36,7 @@ public class SystemUtils {
         }
 
         if (isOsX()) {
-            browsers.add("safari");
+            // browsers.add("safari");
             browsers.add("ios");
         }
 
