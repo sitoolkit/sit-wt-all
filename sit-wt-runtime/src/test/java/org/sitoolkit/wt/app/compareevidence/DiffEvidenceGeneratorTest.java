@@ -1,7 +1,7 @@
 package org.sitoolkit.wt.app.compareevidence;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +37,8 @@ public class DiffEvidenceGeneratorTest {
         FileUtils.copyDirectoryToDirectory(new File("compareevidence/target/css"),
                 targetDir.getDir());
         FileUtils.copyDirectoryToDirectory(new File("compareevidence/target/img"),
+                targetDir.getDir());
+        FileUtils.copyFileToDirectory(new File("compareevidence/target/sit-wt.properties"),
                 targetDir.getDir());
         System.setProperty("evidence.base", "compareevidence/base");
     }
