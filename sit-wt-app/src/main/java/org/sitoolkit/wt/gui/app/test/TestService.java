@@ -74,19 +74,6 @@ public class TestService {
 
             client.unpackTestScript(params);
 
-            // ConversationProcess process = new ConversationProcess();
-            // process.start(new LogConsole(), baseDir,
-            // SitWtRuntimeUtils.buildUnpackTestscriptCommand());
-            //
-            // process.onExit(exitCode -> {
-            // File testscript = new File(baseDir, "target/" + SCRIPT_TEMPLATE);
-            // LOG.log(Level.INFO, "{0} rename to {1}",
-            // new Object[] { testscript.getAbsolutePath(),
-            // template.getAbsolutePath() });
-            // testscript.renameTo(template);
-            //
-            // FileIOUtils.copy(template, destFile);
-            // });
         }
 
     }

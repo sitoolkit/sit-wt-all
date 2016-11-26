@@ -15,6 +15,19 @@ public class SitWtRuntimeService {
     public SitWtRuntimeService() {
     }
 
+    /**
+     * {@code pomFile}のclasspathを{@link SitWtRuntimeUtils}に設定します。
+     * 
+     * <h3>処理順</h3>
+     * <ol>
+     * <li>mvn dependency:build-classpath -f ${pomFile}
+     * </ol>
+     * 
+     * @param pomFile
+     *            プロジェクトのpom.xml
+     * @param exitCallback
+     *            クラスパス取得後のCallback
+     */
     public void loadClasspath(File pomFile, ProcessExitCallback exitCallback) {
 
         ProcessParams params = new ProcessParams();

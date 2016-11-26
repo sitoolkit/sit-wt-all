@@ -12,6 +12,18 @@ import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
 public class SitWtRuntimeProcessClient {
 
+    /**
+     * 次のコマンドを実行します。
+     * 
+     * <pre>
+     *  mvn dependency:build-classpath -f ${pomFile}
+     * </pre>
+     * 
+     * @param pomFile
+     *            pom.xls
+     * @param params
+     *            プロセス実行パラメーター
+     */
     public void buildClasspath(File pomFile, ProcessParams params) {
         List<String> command = new ArrayList<>();
         command.add(MavenUtils.getCommand());

@@ -15,9 +15,24 @@ public class SampleService {
 
     SampleProcessClient client = new SampleProcessClient();
 
-    public SampleService() {
-    }
-
+    /**
+     * サンプルWebサイトを{@code destDir}以下に展開します。
+     * 
+     * <pre>
+     * ${destDir}
+     *   sample
+     *    input.html
+     *    :
+     *    pom.xml
+     *   testscript
+     *     SampleTestScript.xlsx
+     * </pre>
+     * 
+     * @param destDir
+     *            サンプルを展開するディレクトリ
+     * @param callback
+     *            サンプル展開後に実行されるCallback
+     */
     public void create(File destDir, SampleCreatedCallback callback) {
         ProcessParams params = new ProcessParams();
 
@@ -36,12 +51,14 @@ public class SampleService {
 
         ProcessParams params = new ProcessParams();
 
+        params.setDirectory(baseDir);
+
         JettyMavenPluginStdoutListener listener = new JettyMavenPluginStdoutListener();
         params.getStdoutListeners().add(listener);
 
         ExecutorContainer.get().execute(() -> callback.onStarted(listener.isSuccess()));
 
-        return client.start(getSampleDir(baseDir), params);
+        return client.start(params);
     }
 
     public void stop(File baseDir) {

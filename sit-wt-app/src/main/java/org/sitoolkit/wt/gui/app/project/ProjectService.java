@@ -24,6 +24,27 @@ public class ProjectService {
 
     ProjectProcessClient client = new ProjectProcessClient();
 
+    /**
+     * {@code projectDir}にpom.xmlを生成し、{@code projectSate}を初期状態に設定します。
+     * 
+     * <h3>処理順</h3>
+     * 
+     * <ol>
+     * <li>copy classpath:/distribution-pom.xml ${projectDir}/pom.xml
+     * <li>mvn dependency:build-classpath -f ${pomFile} (
+     * {@link SitWtRuntimeService#loadClasspath(File, org.sitoolkit.wt.gui.infra.process.ProcessExitCallback)}
+     * )
+     * <li>mvn -f ${pomFile} -P unpack-property-resources (
+     * {@link ProjectProcessClient#unpack(File, ProcessParams)})
+     * <li>mvn dependency:build-classpath -f ${pomFile}
+     * </ol>
+     * 
+     * @param projectDir
+     *            プロジェクトとするディレクトリ
+     * @param projectState
+     *            (inout) プロジェクトの状態
+     * @return 生成したpom.xml {@code projectDir}に既にpom.xmlが存在する場合はnull
+     */
     public File createProject(File projectDir, ProjectState projectState) {
         File pomFile = new File(projectDir, "pom.xml");
 
@@ -37,6 +58,27 @@ public class ProjectService {
         return pomFile;
     }
 
+    /**
+     * {@code projectDir}直下のpom.xmlにもとづきプロジェクトを初期化します。{@code projectSate}
+     * を初期状態に設定します。
+     * 
+     * <h3>処理順</h3>
+     * 
+     * <ol>
+     * <li>mvn dependency:build-classpath -f ${pomFile} (
+     * {@link SitWtRuntimeService#loadClasspath(File, org.sitoolkit.wt.gui.infra.process.ProcessExitCallback)}
+     * )
+     * <li>mvn -f ${pomFile} -P unpack-property-resources (
+     * {@link ProjectProcessClient#unpack(File, ProcessParams)})
+     * <li>mvn dependency:build-classpath -f ${pomFile}
+     * </ol>
+     * 
+     * @param projectDir
+     *            プロジェクトとするディレクトリ
+     * @param projectState
+     *            (inout) プロジェクトの状態
+     * @return プロジェクトのpom.xml {@code projectDir}に既にpom.xmlが存在する場合はnull
+     */
     public File openProject(File projectDir, ProjectState projectState) {
         LOG.log(Level.INFO, "opening project in {0}", projectDir.getAbsolutePath());
         File pomFile = new File(projectDir.getAbsolutePath(), "pom.xml");

@@ -11,6 +11,18 @@ import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 
 public class ProjectProcessClient {
 
+    /**
+     * 次のコマンドを実行します。
+     * 
+     * <pre>
+     * mvn -f ${pomFile} -P unpack-property-resources
+     * </pre>
+     * 
+     * @param pomFile
+     *            pom.xml
+     * @param params
+     *            プロセス実行パラメーター
+     */
     public void unpack(File pomFile, ProcessParams params) {
 
         List<String> command = new ArrayList<>();

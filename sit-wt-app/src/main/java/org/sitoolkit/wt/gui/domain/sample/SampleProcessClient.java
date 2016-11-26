@@ -15,6 +15,19 @@ public class SampleProcessClient {
     public SampleProcessClient() {
     }
 
+    /**
+     * 次のコマンドを実行します。
+     * 
+     * <pre>
+     * cd $[destDir}
+     * java -cp ${sitWtClasspath} org.sitoolkit.wt.app.sample.SampleManager
+     * </pre>
+     * 
+     * @param destDir
+     *            サンプル展開先のディレクトリ
+     * @param params
+     *            プロセス実行パラメーター
+     */
     public void create(File destDir, ProcessParams params) {
         params.setDirectory(destDir);
 
@@ -26,13 +39,23 @@ public class SampleProcessClient {
         process.start(params);
     }
 
-    public ConversationProcess start(File sampleDir, ProcessParams params) {
+    /**
+     * 次のコマンドを実行します。
+     * 
+     * <pre>
+     * mvn
+     * </pre>
+     * 
+     * @param params
+     *            プロセス実行パラメーター
+     * @return 対話プロセス
+     */
+    public ConversationProcess start(ProcessParams params) {
 
         List<String> command = new ArrayList<>();
         command.add(MavenUtils.getCommand());
 
         params.setCommand(command);
-        params.setDirectory(sampleDir);
 
         ConversationProcess process = ConversationProcessContainer.create();
         process.start(params);
@@ -40,6 +63,16 @@ public class SampleProcessClient {
         return process;
     }
 
+    /**
+     * 次のコマンドを実行します。
+     * 
+     * <pre>
+     * mvn jetty:stop
+     * </pre>
+     * 
+     * @param params
+     *            プロセス実行パラメーター
+     */
     public void stop(ProcessParams params) {
 
         List<String> command = new ArrayList<>();
