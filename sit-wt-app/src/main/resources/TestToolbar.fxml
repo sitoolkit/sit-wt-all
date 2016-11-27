@@ -52,6 +52,12 @@
       <Label fx:id="restartButton" onMouseClicked="#restart" styleClass="image-btn,run-btn" />
       <Label onMouseClicked="#back" styleClass="image-btn,back-btn" />
       <Label onMouseClicked="#forward" styleClass="image-btn,forward-btn" />
+      <TextField fx:id="locatorText" prefWidth="90.0" promptText="ロケーター" >
+        <tooltip>
+          <Tooltip text="[0] [1]と入力するとロケーター書式[0]、値[1]に該当する要素を検出します。"/>
+        </tooltip>
+      </TextField>
+      <Label onMouseClicked="#checkLocator" styleClass="image-btn,locator-check-btn" />
       <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
       <Label onMouseClicked="#quit" styleClass="image-btn,quit-btn" />
     </items>

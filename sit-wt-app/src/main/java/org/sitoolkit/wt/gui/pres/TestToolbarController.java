@@ -53,6 +53,9 @@ public class TestToolbarController implements Initializable {
     @FXML
     private TextField stepNoText;
 
+    @FXML
+    private TextField locatorText;
+
     private FileTreeController fileTreeController;
 
     private MessageView messageView;
@@ -195,6 +198,11 @@ public class TestToolbarController implements Initializable {
     @FXML
     public void export() {
         testProcess.input("e");
+    }
+
+    @FXML
+    public void checkLocator() {
+        testProcess.input("l " + locatorText.getText());
     }
 
     @FXML

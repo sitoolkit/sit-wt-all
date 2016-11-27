@@ -55,6 +55,10 @@
     -fx-background-image:url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
 }
 
+.locator-check-btn {
+    -fx-background-image:url('/icon/ic_search_black_18dp_1x.png');
+}
+
 .export-btn {
     -fx-background-image:url('/icon/ic_file_download_black_18dp_1x.png');
 }
