@@ -106,6 +106,17 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${project.basedir}/evidence</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -136,11 +147,11 @@
         <threadCountMethods>1</threadCountMethods>
       </properties>
     </profile>
-    
+
     <profile>
       <id>unpack-property-resources</id>
       <build>
-      <defaultGoal>dependency:unpack</defaultGoal>
+        <defaultGoal>dependency:unpack</defaultGoal>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -165,7 +176,7 @@
     <profile>
       <id>unpack-testscript</id>
       <build>
-      <defaultGoal>dependency:unpack</defaultGoal>
+        <defaultGoal>dependency:unpack</defaultGoal>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

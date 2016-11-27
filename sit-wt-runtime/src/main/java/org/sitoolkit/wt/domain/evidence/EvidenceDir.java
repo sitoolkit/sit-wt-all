@@ -39,9 +39,9 @@ public class EvidenceDir {
 
     private static final String IMG_BASE_DIR = "base";
 
-    private File dir;
+    private static final String EVIDENCE_ROOT_DIR = "evidence";
 
-    private static String buildDir = "target";
+    private File dir;
 
     private static String evidenceDirRegex = "^evidence_.*";
 
@@ -62,13 +62,17 @@ public class EvidenceDir {
         return getInstance(new File(BASE_EVIDENCE_ROOT, browser));
     }
 
+    public static String getRoot() {
+        return EVIDENCE_ROOT_DIR;
+    }
+
     public static EvidenceDir getLatest() {
         return getInstance(getLatestEvidenceDir());
     }
 
     public static File getLatestEvidenceDir() {
 
-        File outputDir = new File(buildDir);
+        File outputDir = new File(EVIDENCE_ROOT_DIR);
         List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
                 FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
         evidenceDirs.remove(outputDir);

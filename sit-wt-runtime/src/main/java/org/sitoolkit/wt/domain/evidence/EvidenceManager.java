@@ -68,7 +68,7 @@ public class EvidenceManager implements ApplicationContextAware {
 
     @PostConstruct
     public void init() {
-        evidenceDir = new File("target",
+        evidenceDir = new File(EvidenceDir.getRoot(),
                 "evidence_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
         evidenceDir.mkdirs();
         if (evidenceDir.exists()) {

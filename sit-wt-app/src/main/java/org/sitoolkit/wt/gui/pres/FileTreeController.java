@@ -56,18 +56,21 @@ public class FileTreeController implements Initializable {
         TreeItem<FileWrapper> root = new TreeItem<>();
         root.setValue(new FileWrapper(baseDir));
 
-        // TODO pagescriptディレクトリの選択を不可にする
         FileTreeItem pagescriptItem = new FileTreeItem(newDir(baseDir, "pagescript"));
         pagescriptItem.buildChildren();
         root.getChildren().add(pagescriptItem);
         FileTreeItem testscriptItem = new FileTreeItem(newDir(baseDir, "testscript"));
         testscriptItem.buildChildren();
         root.getChildren().add(testscriptItem);
+        FileTreeItem evidenceItem = new FileTreeItem(newDir(baseDir, "evidence"));
+        evidenceItem.buildChildren();
+        root.getChildren().add(evidenceItem);
 
         fileTree.setRoot(root);
 
         fileSystemWatchService.register(pagescriptItem);
         fileSystemWatchService.register(testscriptItem);
+        fileSystemWatchService.register(evidenceItem);
     }
 
     private File newDir(File baseDir, String dir) {
