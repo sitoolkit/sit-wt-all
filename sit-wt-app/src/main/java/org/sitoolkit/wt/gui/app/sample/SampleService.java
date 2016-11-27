@@ -17,7 +17,7 @@ public class SampleService {
 
     /**
      * サンプルWebサイトを{@code destDir}以下に展開します。
-     * 
+     *
      * <pre>
      * ${destDir}
      *   sample
@@ -27,7 +27,7 @@ public class SampleService {
      *   testscript
      *     SampleTestScript.xlsx
      * </pre>
-     * 
+     *
      * @param destDir
      *            サンプルを展開するディレクトリ
      * @param callback
@@ -51,7 +51,7 @@ public class SampleService {
 
         ProcessParams params = new ProcessParams();
 
-        params.setDirectory(baseDir);
+        params.setDirectory(getSampleDir(baseDir));
 
         JettyMavenPluginStdoutListener listener = new JettyMavenPluginStdoutListener();
         params.getStdoutListeners().add(listener);
