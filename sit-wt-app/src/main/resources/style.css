@@ -74,3 +74,7 @@
 .settings-btn {
     -fx-background-image:url('/icon/ic_settings_black_18dp_1x.png');
 }
+
+.help-btn {
+    -fx-background-image:url('/icon/ic_help_outline_black_18dp_1x.png');
+}

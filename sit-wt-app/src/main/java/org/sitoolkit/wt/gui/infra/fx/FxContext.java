@@ -3,13 +3,18 @@ package org.sitoolkit.wt.gui.infra.fx;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 import javafx.application.HostServices;
 import javafx.stage.Stage;
 
 public class FxContext {
+
+    private static final Logger LOG = LogUtils.get(FxContext.class);
 
     private static Stage primaryStage;
 
@@ -41,16 +46,19 @@ public class FxContext {
             try {
                 Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.log(Level.SEVERE, "", e);
             }
         }
 
         try {
             hostServices.showDocument(file.toURI().toURL().toExternalForm());
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "", e);
         }
     }
+
+    public static void showDocument(String uri) {
+        hostServices.showDocument(uri);
+    }
+
 }

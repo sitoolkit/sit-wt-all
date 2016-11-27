@@ -83,6 +83,8 @@
               <Tooltip text="設定ファイルのフォルダを開きます" />
             </tooltip>
           </Label>
+          <Label onMouseClicked="#help" styleClass="image-btn,help-btn">
+          </Label>
         </items>
       </ToolBar>
     </HBox>

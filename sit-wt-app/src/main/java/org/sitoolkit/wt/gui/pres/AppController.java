@@ -232,4 +232,9 @@ public class AppController implements Initializable {
     public void settings() {
         FxContext.openFile(new File(projectState.getBaseDir(), "src/main/resources"));
     }
+
+    @FXML
+    public void help() {
+        FxContext.showDocument("https://github.com/sitoolkit/sit-wt-all/wiki");
+    }
 }
