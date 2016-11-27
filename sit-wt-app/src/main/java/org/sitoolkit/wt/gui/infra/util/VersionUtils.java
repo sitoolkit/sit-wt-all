@@ -7,6 +7,8 @@ import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
+
 public class VersionUtils {
 
     private static final Logger LOG = LogUtils.get(VersionUtils.class);

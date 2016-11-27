@@ -3,8 +3,8 @@ package org.sitoolkit.wt.gui.domain.sample;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.process.StdoutListener;
-import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 public class JettyMavenPluginStdoutListener implements StdoutListener {
 

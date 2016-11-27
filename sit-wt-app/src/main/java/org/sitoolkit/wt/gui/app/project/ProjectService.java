@@ -13,8 +13,8 @@ import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
-import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 public class ProjectService {
 

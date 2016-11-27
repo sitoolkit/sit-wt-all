@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.infra.util.LogUtils;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -41,7 +41,6 @@ public class App extends Application {
         FxContext.setPrimaryStage(primaryStage);
         FxContext.setHostServices(getHostServices());
 
-        LogUtils.init();
         Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
 
         primaryStage.setTitle("SI-Toolkit for Web Testing");

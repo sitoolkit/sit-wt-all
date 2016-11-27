@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.app.update.UpdateService;
-import org.sitoolkit.wt.gui.infra.util.LogUtils;
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;

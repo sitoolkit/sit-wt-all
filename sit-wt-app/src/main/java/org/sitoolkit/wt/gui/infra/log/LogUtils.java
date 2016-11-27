@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.infra.util;
+package org.sitoolkit.wt.gui.infra.log;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,11 @@ public class LogUtils {
 
     private static final Logger LOG = Logger.getLogger(LogUtils.class.getName());
 
-    public static void init() throws IOException {
+    static {
+        init();
+    }
+
+    public static void init() {
         File logDir = new File("log");
         if (!logDir.exists()) {
             logDir.mkdirs();
@@ -20,6 +24,8 @@ public class LogUtils {
         try (InputStream is = configFile.openStream()) {
             LogManager.getLogManager().readConfiguration(is);
             LOG.info("log configured with " + configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
