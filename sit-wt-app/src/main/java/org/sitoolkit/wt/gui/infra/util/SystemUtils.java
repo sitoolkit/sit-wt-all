@@ -32,7 +32,7 @@ public class SystemUtils {
 
         if (isWindows()) {
             browsers.add("ie");
-            browsers.add("egde");
+            browsers.add("edge");
         }
 
         if (isOsX()) {
