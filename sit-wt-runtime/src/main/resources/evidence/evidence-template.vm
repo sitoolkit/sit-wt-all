@@ -33,7 +33,7 @@
           <th>$rec.no</th>
 #if ($rec.screenshot)
                     <td class="screenshot">[$rec.timestamp] $rec.screenshot.fileName
-            <img src="$rec.screenshot.filePath" class="img-responsive"/>
+            <img src="$rec.screenshot.filePath" class="img-responsive" data-original-width="$rec.screenshot.width"/>
 #foreach ($pos in $rec.screenshot.positions)
             <input type="hidden" value='{"no":"$pos.no","x":$pos.x,"y":$pos.y,"w":$pos.w,"h":$pos.h}'/>
 #end ## foreach
