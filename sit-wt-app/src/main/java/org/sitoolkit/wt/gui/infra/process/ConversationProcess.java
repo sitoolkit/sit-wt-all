@@ -44,7 +44,11 @@ public class ConversationProcess {
         pb.environment().putAll(params.getEnviroment());
 
         try {
-            pb.directory(directory);
+        	if (directory != null) {
+        		pb.directory(directory);
+			} else {
+				pb.directory(ProcessParams.getDefaultCurrentDir());
+			}
             process = pb.start();
             LOG.log(Level.INFO, "process {0} starts {1}", new Object[] { process, command });
 

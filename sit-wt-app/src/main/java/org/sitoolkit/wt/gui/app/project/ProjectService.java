@@ -111,7 +111,10 @@ public class ProjectService {
 
     private void loadProject(File pomFile, ProjectState projectState) {
         LOG.log(Level.INFO, "loading project with {0}", pomFile.getAbsolutePath());
-        PropertyManager.get().load(pomFile.getAbsoluteFile().getParentFile());
+        
+        File baseDir = pomFile.getAbsoluteFile().getParentFile();
+        PropertyManager.get().load(baseDir);
+        ProcessParams.setDefaultCurrentDir(baseDir);
 
         runtimeService.loadClasspath(pomFile, exitCode -> {
             if (exitCode == 0) {
