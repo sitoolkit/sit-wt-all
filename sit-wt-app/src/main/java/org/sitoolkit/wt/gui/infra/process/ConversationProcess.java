@@ -34,6 +34,9 @@ public class ConversationProcess {
     public void start(ProcessParams params) {
 
         File directory = params.getDirectory();
+        if (directory == null) {
+			directory = ProcessParams.getDefaultCurrentDir();
+		}
         List<String> command = params.getCommand();
 
         if (process != null && process.isAlive()) {
@@ -44,7 +47,7 @@ public class ConversationProcess {
         pb.environment().putAll(params.getEnviroment());
 
         try {
-            pb.directory(directory);
+        	pb.directory(directory);
             process = pb.start();
             LOG.log(Level.INFO, "process {0} starts {1}", new Object[] { process, command });
 
