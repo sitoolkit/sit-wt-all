@@ -39,8 +39,15 @@ public class TestRunner {
         boolean isEvidenceOpen = Boolean.getBoolean("sitwt.open-evidence");
 
         TestRunner runner = new TestRunner();
-        runner.runScript(args[0], "TestScript", caseNo, isParallel, isEvidenceOpen);
+        List<TestResult> results = runner.runScript(args[0], "TestScript", caseNo, isParallel,
+                isEvidenceOpen);
 
+        for (TestResult resuls : results) {
+            if (!resuls.isSuccess()) {
+                System.exit(2);
+            }
+        }
+        System.exit(0);
     }
 
     /**
