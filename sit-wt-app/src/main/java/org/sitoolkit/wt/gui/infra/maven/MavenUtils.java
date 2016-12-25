@@ -192,18 +192,24 @@ public class MavenUtils {
     public static void downloadRepository() {
 
         File mavenLocalRepo = getLocalRepository();
-        File sitWtRepo = new File(mavenLocalRepo, "org/sitoolkit/wt");
 
-        if (sitWtRepo.exists()) {
-            LOG.log(Level.INFO, "sit-wt exists in maven local repository {0}", sitWtRepo.getAbsolutePath());
+        if (mavenLocalRepo.exists()) {
+            LOG.log(Level.INFO, "maven local repository exists in {0}", mavenLocalRepo.getAbsolutePath());
             repositoryAvairable = true;
             return;
         }
+        // TODO sit-wt未使用の場合の差分リポジトリを用意するか？
+//        File sitWtRepo = new File(mavenLocalRepo, "org/sitoolkit/wt");
+//
+//        if (sitWtRepo.exists()) {
+//            LOG.log(Level.INFO, "sit-wt exists in maven local repository {0}", sitWtRepo.getAbsolutePath());
+//            repositoryAvairable = true;
+//            return;
+//        }
         try {
             File repositoryZip = new File(SystemUtils.getSitRepository(), "sit-wt-app/repository/maven-repository-sit-wt.zip");
 
             if (!repositoryZip.exists()) {
-                // TODO リリース資材配置
                 FileIOUtils.download("https://github.com/sitoolkit/sit-wt-all/releases/download/v2.0/maven-repository-sit-wt.zip", repositoryZip);
             }
 
