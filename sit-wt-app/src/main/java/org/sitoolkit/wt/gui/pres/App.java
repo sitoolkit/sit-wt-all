@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class App extends Application {
 
@@ -45,6 +46,10 @@ public class App extends Application {
         Executors.newSingleThreadExecutor().submit(() -> MavenUtils.downloadRepository());
 
         primaryStage.setTitle("SI-Toolkit for Web Testing");
+
+        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+            controller.postInit();
+        });
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
         Parent root = loader.load();

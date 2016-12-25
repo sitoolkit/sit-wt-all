@@ -107,15 +107,18 @@ public class AppController implements Initializable {
         messageView.setTextArea(console);
         StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
 
+        testToolbarController.initialize(messageView, fileTreeController, projectState);
+        sampleToolbarController.initialize(messageView, testToolbarController, projectState);
+
+    }
+
+    public void postInit() {
         File pomFile = projectService.openProject(new File(""), projectState);
         if (pomFile == null) {
             openProject();
         } else {
             loadProject(pomFile);
         }
-
-        testToolbarController.initialize(messageView, fileTreeController, projectState);
-        sampleToolbarController.initialize(messageView, testToolbarController, projectState);
     }
 
     public void destroy() {
