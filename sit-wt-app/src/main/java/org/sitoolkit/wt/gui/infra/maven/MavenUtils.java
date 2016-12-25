@@ -157,7 +157,7 @@ public class MavenUtils {
         // return children.length == 0 ? "" : children[0].getAbsolutePath();
     }
 
-    private static File getLocalRepository() {
+    public static File getLocalRepository() {
         File mavenUserHomeDir = new File(System.getProperty("user.home"), ".m2");
         File settingsXml = new File(mavenUserHomeDir, "settings.xml");
         File defaultLocalRepository = new File(mavenUserHomeDir, "repository");
