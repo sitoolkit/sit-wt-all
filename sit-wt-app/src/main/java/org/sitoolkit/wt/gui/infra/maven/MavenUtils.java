@@ -9,17 +9,24 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathFactory;
+
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
+import org.w3c.dom.Document;
 
 public class MavenUtils {
 
     private static final Logger LOG = Logger.getLogger(MavenUtils.class.getName());
 
     private static String mvnCommand = "";
+
+    private static boolean repositoryAvairable = false;
 
     public static List<String> getCommand(ProcessParams params) {
         List<String> mvnCommand = new ArrayList<String>();
@@ -35,7 +42,7 @@ public class MavenUtils {
     }
 
     private static String getCommand() {
-        while (mvnCommand == null || mvnCommand.isEmpty()) {
+        while (mvnCommand == null || mvnCommand.isEmpty() || !repositoryAvairable) {
             LOG.info("wait for installing Maven...");
 
             try {
@@ -148,6 +155,64 @@ public class MavenUtils {
 
         // File[] children = destDir.listFiles();
         // return children.length == 0 ? "" : children[0].getAbsolutePath();
+    }
+
+    private static File getLocalRepository() {
+        File mavenUserHomeDir = new File(System.getProperty("user.home"), ".m2");
+        File settingsXml = new File(mavenUserHomeDir, "settings.xml");
+        File defaultLocalRepository = new File(mavenUserHomeDir, "repository");
+
+        if (!settingsXml.exists()) {
+            return defaultLocalRepository;
+        }
+
+        try {
+
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.parse(settingsXml);
+
+
+            String localRepository = XPathFactory.newInstance().newXPath().compile("/settings/localRepository").evaluate(document);
+
+            if (StrUtils.isEmpty(localRepository)) {
+                return defaultLocalRepository;
+            }
+
+            return new File(localRepository);
+
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "fail to get maven local repository path ", e);
+            return defaultLocalRepository;
+        }
+    }
+
+    /**
+     *
+     */
+    public static void downloadRepository() {
+
+        File mavenLocalRepo = getLocalRepository();
+        File sitWtRepo = new File(mavenLocalRepo, "org/sitoolkit/wt");
+
+        if (sitWtRepo.exists()) {
+            LOG.log(Level.INFO, "sit-wt exists in maven local repository {0}", sitWtRepo.getAbsolutePath());
+            repositoryAvairable = true;
+            return;
+        }
+        try {
+            File repositoryZip = new File(SystemUtils.getSitRepository(), "sit-wt-app/repository/maven-repository-sit-wt.zip");
+
+            if (!repositoryZip.exists()) {
+                // TODO リリース資材配置
+                FileIOUtils.download("https://github.com/sitoolkit/sit-wt-all/releases/download/v2.0/maven-repository-sit-wt.zip", repositoryZip);
+            }
+
+            FileIOUtils.unarchive(repositoryZip, mavenLocalRepo);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "fail to download maven repository", e);
+        } finally {
+            repositoryAvairable = true;
+        }
     }
 
 }

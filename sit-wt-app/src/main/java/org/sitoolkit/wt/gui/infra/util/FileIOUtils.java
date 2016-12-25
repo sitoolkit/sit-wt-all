@@ -22,7 +22,10 @@ public class FileIOUtils {
     private static final Logger LOG = Logger.getLogger(FileIOUtils.class.getName());
 
     public static void download(String url, File destFile) {
-        LOG.info("downloading url : " + url + ", destFile : " + destFile.getAbsolutePath());
+        Stopwatch.start();
+
+        LOG.log(Level.INFO, "downloading url : {0}, destFile : {1}", new Object[]{url, destFile.getAbsolutePath()});
+
         File destDir = destFile.getParentFile();
         if (!destDir.exists()) {
             destDir.mkdirs();
@@ -34,11 +37,15 @@ public class FileIOUtils {
             throw new UnExpectedException(e);
         }
 
+        LOG.log(Level.INFO, "downloaded in {0}", Stopwatch.end());
     }
 
     public static void unarchive(File srcFile, File destDir) {
-        LOG.info("unarchive src : " + srcFile.getAbsolutePath() + ", dest : "
-                + destDir.getAbsolutePath());
+        Stopwatch.start();
+
+        LOG.log(Level.INFO, "unarchive src : {0}, dest : {1}",
+                new Object[]{srcFile.getAbsolutePath(), destDir.getAbsolutePath()});
+
         try (ZipFile zipFile = new ZipFile(srcFile)) {
             Enumeration<? extends ZipEntry> enu = zipFile.entries();
 
@@ -77,6 +84,8 @@ public class FileIOUtils {
         } catch (IOException e) {
             throw new UnExpectedException(e);
         }
+
+        LOG.log(Level.INFO, "unarchived in {0}", Stopwatch.end());
     }
 
     public static String read(InputStream input) throws IOException {

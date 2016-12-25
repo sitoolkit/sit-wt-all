@@ -42,6 +42,7 @@ public class App extends Application {
         FxContext.setHostServices(getHostServices());
 
         Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
+        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.downloadRepository());
 
         primaryStage.setTitle("SI-Toolkit for Web Testing");
 
@@ -50,7 +51,10 @@ public class App extends Application {
         controller = loader.getController();
 
         Scene scene = new Scene(root);
+
+        // TODO フォントファイルを直接ダウンロードすれば有効か要検証
         // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Material+Icons");
+
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
