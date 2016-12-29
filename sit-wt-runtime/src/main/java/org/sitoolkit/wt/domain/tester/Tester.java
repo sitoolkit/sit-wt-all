@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.Evidence;
@@ -91,11 +92,9 @@ public class Tester {
     }
 
     public void prepare(String scriptPath, String sheetName, String caseNo) {
-        log.info("テストスクリプトをロードします。{}, {}", scriptPath, sheetName);
         testScript = catalog.get(scriptPath, sheetName);
         current.setTestScript(testScript);
         current.setScriptName(testScript.getName());
-        current.setCaseNo(caseNo);
         current.reset();
         log.debug("prepare test context {}", current);
     }
@@ -112,7 +111,7 @@ public class Tester {
             testScript = catalog.get(testScriptPath, sheetName);
             current.setTestScript(testScript);
 
-            if (debug.isDebug()) {
+            if (pm.isDebug()) {
                 log.info("最後のステップにブレークポイントを設定します。");
                 TestStep lastStep = testScript.getLastStep();
                 lastStep.setBreakPoint("y");
@@ -126,19 +125,23 @@ public class Tester {
     }
 
     /**
-     * ケース番号のテストスクリプトに従い、テストを実施します。
+     * ケース番号のテストスクリプトを実行します。
      *
      * @param caseNo
      *            ケース番号
-     * @return Verify操作がNGとなった数
+     * @return テスト結果
      */
     public TestResult operate(String caseNo) {
 
-        if (!testScript.containsCaseNo(caseNo)) {
+        if (StringUtils.isEmpty(caseNo)) {
+            caseNo = testScript.getCaseNoMap().keySet().iterator().next();
+        } else if (!testScript.containsCaseNo(caseNo)) {
             String msg = "指定されたケース番号[" + caseNo + "]は不正です。指定可能なケース番号："
                     + testScript.getCaseNoMap().keySet();
             throw new TestException(msg);
         }
+
+        current.setCaseNo(caseNo);
 
         dialog.checkReserve(testScript.getTestStepList(), caseNo);
         log.info("ケース{}を実行します", caseNo);
@@ -166,13 +169,13 @@ public class Tester {
                             "期待と異なる結果になりました {}", e.getLocalizedMessage()));
                     addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
 
-                    if (debug.isDebug()) {
+                    if (pm.isDebug()) {
                         debug.pause();
                     }
 
                 } catch (Exception e) {
 
-                    if (debug.isDebug()) {
+                    if (pm.isDebug()) {
                         ngList.add(e);
                         evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                                 "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
@@ -249,6 +252,10 @@ public class Tester {
 
     public boolean isScriptLoaded() {
         return scriptLoaded;
+    }
+
+    public TestScript getTestScript() {
+        return testScript;
     }
 
 }

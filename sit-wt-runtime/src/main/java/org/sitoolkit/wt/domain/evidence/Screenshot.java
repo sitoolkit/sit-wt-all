@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -17,6 +18,8 @@ public class Screenshot {
 
     private static final Logger LOG = LoggerFactory.getLogger(Screenshot.class);
 
+    private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+
     private File file;
 
     private String filePath;
@@ -24,6 +27,8 @@ public class Screenshot {
     private int screenshotPaddingWidth;
 
     private int screenshotPaddingHeight;
+
+    private int width;
 
     private boolean resize;
 
@@ -54,7 +59,13 @@ public class Screenshot {
         }
 
         if (!resize) {
-            return null;
+            return EXECUTOR.submit(() -> {
+                try {
+                    width = ImageIO.read(file).getWidth();
+                } catch (IOException e) {
+                    LOG.warn("", e);
+                }
+            });
         }
 
         int minX = Integer.MAX_VALUE;
@@ -73,7 +84,7 @@ public class Screenshot {
                 new Object[] { positions.size(), maxX, minY, maxX, maxY });
 
         resizing = true;
-        return Executors.newSingleThreadExecutor().submit(new Resizer(minX, minY, maxX, maxY));
+        return EXECUTOR.submit(new Resizer(minX, minY, maxX, maxY));
     }
 
     private class Resizer implements Runnable {
@@ -108,6 +119,7 @@ public class Screenshot {
                 }
 
                 BufferedImage subImg = orgImg.getSubimage(subX, subY, subW, subH);
+                width = subImg.getWidth();
                 ImageIO.write(subImg, "png", file);
 
                 LOG.debug("origonal image w:{}, h:{} sub image x:{}, y:{}, w:{}, h{} file:{}",
@@ -187,6 +199,10 @@ public class Screenshot {
 
     public void setErrorMesage(String errorMesage) {
         this.errorMesage = errorMesage;
+    }
+
+    public int getWidth() {
+        return width;
     }
 
 }

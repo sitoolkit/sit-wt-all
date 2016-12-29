@@ -4,10 +4,11 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.ExecutorContainer;
-import org.sitoolkit.wt.gui.infra.FxContext;
-import org.sitoolkit.wt.gui.infra.LogUtils;
-import org.sitoolkit.wt.gui.infra.MavenUtils;
+import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.gui.infra.config.PropertyManager;
+import org.sitoolkit.wt.gui.infra.fx.FxContext;
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,11 +16,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class App extends Application {
 
     private static final Logger LOG = LogUtils.get(App.class);
+
+    private AppController controller;
 
     public static void main(String[] args) {
         launch(args);
@@ -36,22 +41,38 @@ public class App extends Application {
         });
 
         FxContext.setPrimaryStage(primaryStage);
-        LogUtils.init();
+        FxContext.setHostServices(getHostServices());
+
         Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
 
         primaryStage.setTitle("SI-Toolkit for Web Testing");
 
-        Parent root = FXMLLoader.load(getClass().getResource("/App.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
+        Parent root = loader.load();
+        controller = loader.getController();
+
+        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+            controller.postInit();
+        });
+
+        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.downloadRepository());
 
         Scene scene = new Scene(root);
+
+        // TODO フォントファイルを直接ダウンロードすれば有効か要検証
+        // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Material+Icons");
+
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         primaryStage.setScene(scene);
+        primaryStage.getIcons().add(new Image("/icon/sitoolkit.png"));
         primaryStage.show();
 
-        primaryStage.setMinHeight(primaryStage.getHeight());
     }
 
     @Override
     public void stop() throws Exception {
+        controller.destroy();
+        PropertyManager.get().save();
         ExecutorContainer.get().shutdown();
     }
 }

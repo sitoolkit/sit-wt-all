@@ -28,7 +28,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -37,6 +36,7 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.firefox.FirefoxManager;
 import org.sitoolkit.wt.infra.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 import org.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
@@ -72,10 +72,11 @@ public class WebDriverConfig {
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
     public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer,
-            WebDriverInstaller webDriverInstaller) throws MalformedURLException {
+            WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
+            throws MalformedURLException {
         RemoteWebDriver webDriver = null;
 
-        String driverType = pm.getDriverType();
+        String driverType = StringUtils.defaultString(pm.getDriverType());
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         Map<String, String> map = pm.getCapabilities();
@@ -84,65 +85,61 @@ public class WebDriverConfig {
             capabilities.setCapability(entry.getKey(), entry.getValue());
         }
 
-        if (driverType == null) {
+        LOG.info("WebDriverを起動します driverType:{}, capabilities:{}", driverType, capabilities);
 
-            webDriver = new FirefoxDriver(capabilities);
+        switch (driverType) {
 
-        } else {
+            case "chrome":
+                webDriverInstaller.installChromeDriver();
+                webDriver = new ChromeDriver(capabilities);
+                break;
 
-            switch (driverType) {
+            case "ie":
+            case "internet explorer":
+                webDriverInstaller.installIeDriver();
+                webDriver = new InternetExplorerDriver(capabilities);
+                break;
 
-                case "firefox":
-                    webDriver = new FirefoxDriver(capabilities);
-                    break;
+            case "edge":
+                webDriverInstaller.installEdgeDriver();
+                webDriver = new EdgeDriver(capabilities);
+                break;
 
-                case "chrome":
-                    webDriverInstaller.installChromeDriver();
-                    webDriver = new ChromeDriver(capabilities);
-                    break;
-
-                case "ie":
-                case "internet explorer":
-                    webDriverInstaller.installIeDriver();
-                    capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION,
-                            true);
-                    webDriver = new InternetExplorerDriver(capabilities);
-                    break;
-
-                case "edge":
-                    webDriverInstaller.installEdgeDriver();
-                    webDriver = new EdgeDriver(capabilities);
-                    break;
-
-                case "safari":
-                    try {
+            case "safari":
+                try {
+                    webDriver = new SafariDriver(capabilities);
+                } catch (UnreachableBrowserException e) {
+                    if (StringUtils.startsWith(e.getMessage(),
+                            "Failed to connect to SafariDriver")) {
+                        webDriverInstaller.installSafariDriver();
                         webDriver = new SafariDriver(capabilities);
-                    } catch (UnreachableBrowserException e) {
-                        if (StringUtils.startsWith(e.getMessage(),
-                                "Failed to connect to SafariDriver")) {
-                            webDriverInstaller.installSafariDriver();
-                            webDriver = new SafariDriver(capabilities);
-                        }
                     }
-                    break;
+                }
+                break;
 
-                case "remote":
-                    webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
+            case "remote":
+                LOG.info("RemoteWebDriverの接続先:{}", pm.getHubUrl());
+                webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
 
-                    break;
+                break;
 
-                case "android":
-                    webDriver = new AndroidDriver<>(pm.getAppiumAddress(), capabilities);
-                    break;
+            case "android":
+                LOG.info("AndroidDriverの接続先:{}", pm.getAppiumAddress());
+                webDriver = new AndroidDriver<>(pm.getAppiumAddress(), capabilities);
+                break;
 
-                case "ios":
-                    webDriver = new IOSDriver<>(pm.getAppiumAddress(), capabilities);
-                    break;
+            case "ios":
+                LOG.info("IOSDriverの接続先:{}", pm.getAppiumAddress());
+                webDriver = new IOSDriver<>(pm.getAppiumAddress(), capabilities);
+                break;
 
-                default:
-                    webDriver = new FirefoxDriver(capabilities);
-            }
+            default: // include firefox
+                // geckodriver is not stable yet as of 2016/10
+                // so we doesn't support neigther selenium 3 nor firefox 48.x
+                // higher
+                // webDriverInstaller.installGeckoDriver();
 
+                webDriver = firefoxManager.startWebDriver(capabilities);
         }
 
         webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
@@ -200,6 +197,11 @@ public class WebDriverConfig {
     @Bean
     public TestEventListener testEventListener() {
         return new TestEventListenerWebDriverImpl();
+    }
+
+    @Bean
+    public FirefoxManager firefoxManager() {
+        return new FirefoxManager();
     }
 
 }

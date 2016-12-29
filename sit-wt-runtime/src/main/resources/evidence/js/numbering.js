@@ -4,9 +4,9 @@
  * @param {type} pos 実行時ページでの項目の位置
  * @returns {String} 表示する枠のスタイル
  */
-function buildPosStyle(basePos, pos) {
-	return "left:" + (basePos.left + pos.x - 10) + "px;"
-		+ "top:" + (basePos.top + pos.y - 10) + "px;"
+function buildPosStyle(basePos, pos, scale) {
+	return "left:" + (basePos.left + pos.x * scale - 10) + "px;"
+		+ "top:" + (basePos.top + pos.y * scale - 10) + "px;"
 		+ "width:" + (pos.w + 20) + "px;"
 		+ "height:" + (pos.h + 20) + "px;";
 }
@@ -30,24 +30,26 @@ function buildBox() {
 	};
 
 	$("td.screenshot").each(function() {
-		var td = $(this);
-		var basePos = td.find("img").offset();
+		var $td = $(this);
+		var $img = $td.find("img");
+		var scale = $img.width() / $img.data("original-width");
+		var basePos = $img.offset();
 
 
-		td.find("input:hidden").each(function() {
+		$td.find("input:hidden").each(function() {
 			var val = $(this).val();
 			var pos = $.parseJSON(val);
 
-			var id = checkPos(pos, td);
+			var id = checkPos(pos, $td);
 			if (!id) {
 				return;
 			}
-			var style = buildPosStyle(basePos, pos);
+			var style = buildPosStyle(basePos, pos, scale);
 
-			td.prepend("<div id='" + id + "' class='box' style=" + style + ">" + pos.no + "</div>");
+			$td.prepend("<div id='" + id + "' class='box' style=" + style + ">" + pos.no + "</div>");
 		});
 	});
-	
+
 	$("div.box").click(function() {
 		$(this).toggleClass("box-hidden");
 	});

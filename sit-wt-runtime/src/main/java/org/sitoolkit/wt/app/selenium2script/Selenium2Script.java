@@ -57,11 +57,9 @@ public class Selenium2Script implements ApplicationContextAware {
 
     private SeleniumStepConverter seleniumStepConverter;
 
-    private String seleniumScriptDirs = "seleniumscript,.";
-
     private String outputDir = "testscript";
 
-    private String backupDir = "seleniumscript-bk";
+    private String seleniumScriptDirs = outputDir + ",.";
 
     private String caseNo = "001";
 
@@ -91,7 +89,6 @@ public class Selenium2Script implements ApplicationContextAware {
     public int execute() {
 
         int ret = 0;
-        File bkdir = new File(backupDir);
 
         for (String seleniumScriptDir : seleniumScriptDirs.split(",")) {
             File scriptDir = new File(seleniumScriptDir);
@@ -104,14 +101,7 @@ public class Selenium2Script implements ApplicationContextAware {
                     recursive)) {
                 File sitScript = convert(seleniumScript);
 
-                try {
-                    log.info("Seleniumスクリプトを退避します {} -> {}", seleniumScript.getAbsolutePath(),
-                            bkdir.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(seleniumScript, bkdir, true);
-                } catch (IOException e) {
-                    log.warn("Seleniumスクリプトの退避に失敗しました", e);
-                    ret = 1;
-                }
+                backup(seleniumScript);
 
                 if (isOpenScript()) {
                     try {
@@ -142,6 +132,14 @@ public class Selenium2Script implements ApplicationContextAware {
         dao.write(sitScriptFile, testStepList, overwriteScript);
 
         return sitScriptFile;
+    }
+
+    public void backup(File seleniumScript) {
+        File bkFile = new File(seleniumScript.getParentFile(), seleniumScript.getName() + ".bk");
+
+        log.info("Seleniumスクリプトを退避します {} -> {}", seleniumScript.getAbsolutePath(), bkFile);
+
+        seleniumScript.renameTo(bkFile);
     }
 
     /**

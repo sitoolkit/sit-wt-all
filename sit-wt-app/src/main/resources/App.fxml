@@ -1,89 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Tooltip?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity" prefHeight="61.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.AppController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity"
+  prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <center>
-    <TextArea fx:id="console" editable="false" minHeight="0.0" prefHeight="0.0" BorderPane.alignment="CENTER" />
+    <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
+      <items>
+        <fx:include fx:id="fileTree" source="FileTree.fxml" />
+        <TextArea fx:id="console" editable="false" />
+      </items>
+    </SplitPane>
   </center>
-   <top>
-      <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar" BorderPane.alignment="CENTER">
-         <children>
-          <ToolBar fx:id="projectGroup">
-            <items>
-                  <MenuButton mnemonicParsing="false" text="プロジェクト">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#createProject" text="新規作成" />
-                      <MenuItem mnemonicParsing="false" onAction="#openProject" text="開く" />
-                        <MenuItem mnemonicParsing="false" onAction="#getSample" text="サンプル取得" />
-                    </items>
-                  </MenuButton>
-            </items>
-          </ToolBar>
-            <ToolBar fx:id="startGroup">
-              <items>
-                  <Separator orientation="VERTICAL" />
-              <Button fx:id="runButton" mnemonicParsing="false" onAction="#run" text="実行" />
-                  <CheckBox fx:id="debugCheck" mnemonicParsing="false" text="デバッグ" />
-                  <CheckBox fx:id="parallelCheck" mnemonicParsing="false" text="並列" />
-                  <ChoiceBox fx:id="browserChoice" value="firefox" prefWidth="150.0" >
-                      <items>
-                          <FXCollections fx:factory="observableArrayList">
-                              <String fx:value="firefox" />
-                              <String fx:value="chrome" />
-                              <String fx:value="ie" />
-                              <String fx:value="edge" />
-                          </FXCollections>
-                      </items>
-                  </ChoiceBox>
-              </items>
-            </ToolBar>
-            <ToolBar fx:id="runningGroup">
-               <items>
-                  <Separator orientation="VERTICAL" />
-              <Button fx:id="quitButton" mnemonicParsing="false" onAction="#quit" text="停止" />
-               </items>
-            </ToolBar>
-            <ToolBar fx:id="debugGroup">
-               <items>
-                  <Separator orientation="VERTICAL" />
-              <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" text="一時停止" />
-              <Button fx:id="backButton" mnemonicParsing="false" onAction="#back" text="戻る" />
-              <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forward" text="進む" />
-                  <Button accessibleHelp="現在実行中のスクリプトを開きます。" mnemonicParsing="false" onAction="#openScript" text="スクリプトを開く" />
-              <Button fx:id="exportButton" mnemonicParsing="false" onAction="#export" text="スクリプトを生成" />
-               </items>
-            </ToolBar>
-        <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#toggleConsole" text="ログ" />
-         </children>
+  <top>
+    <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
+      <HBox fx:id="projectGroup" style="-fx-padding: 0 0 0 10px;" styleClass="tool-bar">
+        <children>
+          <Label onMouseClicked="#openProject" styleClass="image-btn,project-btn">
+            <tooltip>
+              <Tooltip text="プロジェクトを作成/開きます" />
+            </tooltip>
+          </Label>
+        </children>
       </HBox>
-   </top>
-   <bottom>
-      <HBox BorderPane.alignment="CENTER">
-         <children>
-            <Label fx:id="statusLabel">
-               <HBox.margin>
-                  <Insets right="10.0" />
-               </HBox.margin>
-            </Label>
-         </children>
-         <padding>
-            <Insets left="5.0" right="5.0" top="5.0" />
-         </padding>
-      </HBox>
-   </bottom>
+      <fx:include fx:id="testToolbar" source="TestToolbar.fxml" />
+      <ToolBar fx:id="genScriptGroup">
+        <items>
+          <Separator orientation="VERTICAL" />
+          <Label onMouseClicked="#ope2script" styleClass="image-btn,record-btn">
+            <tooltip>
+              <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します" />
+            </tooltip>
+          </Label>
+          <Label onMouseClicked="#page2script" styleClass="image-btn,export-btn">
+            <tooltip>
+              <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します" />
+            </tooltip>
+          </Label>
+        </items>
+      </ToolBar>
+      <ToolBar fx:id="browsingGroup">
+        <items>
+          <Separator orientation="VERTICAL" />
+          <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
+          <Label onMouseClicked="#quitBrowsing" styleClass="image-btn,quit-btn" />
+        </items>
+      </ToolBar>
+      <fx:include fx:id="sampleToolbar" source="SampleToolbar.fxml" />
+      <ToolBar>
+        <items>
+          <Separator orientation="VERTICAL" />
+<!--           <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn"> -->
+<!--             <tooltip> -->
+<!--               <Tooltip text="ウィンドウを縮小します" /> -->
+<!--             </tooltip> -->
+<!--           </Label> -->
+<!--           <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn"> -->
+<!--             <tooltip> -->
+<!--               <Tooltip text="ウィンドウを拡大します" /> -->
+<!--             </tooltip> -->
+<!--           </Label> -->
+          <Label onMouseClicked="#settings" styleClass="image-btn,settings-btn">
+            <tooltip>
+              <Tooltip text="設定ファイルのフォルダを開きます" />
+            </tooltip>
+          </Label>
+          <Label onMouseClicked="#help" styleClass="image-btn,help-btn">
+          </Label>
+        </items>
+      </ToolBar>
+    </HBox>
+  </top>
 </BorderPane>

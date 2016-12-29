@@ -1,161 +1,138 @@
 package org.sitoolkit.wt.gui.pres;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
-import org.sitoolkit.wt.gui.domain.MavenConsoleListener;
-import org.sitoolkit.wt.gui.domain.ProjectState;
-import org.sitoolkit.wt.gui.infra.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.FxContext;
-import org.sitoolkit.wt.gui.infra.MavenUtils;
-import org.sitoolkit.wt.gui.infra.TextAreaConsole;
-import org.sitoolkit.wt.gui.infra.UnExpectedException;
+import org.sitoolkit.wt.gui.app.project.ProjectService;
+import org.sitoolkit.wt.gui.app.script.ScriptService;
+import org.sitoolkit.wt.gui.app.test.TestService;
+import org.sitoolkit.wt.gui.domain.project.ProjectState;
+import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
+import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.gui.infra.fx.FxContext;
+import org.sitoolkit.wt.gui.infra.fx.FxUtils;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
+import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
+import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
+import org.sitoolkit.wt.gui.infra.process.TextAreaStdoutListener;
 
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 
 public class AppController implements Initializable {
 
     @FXML
-    private ToolBar projectGroup;
+    private HBox projectGroup;
 
     @FXML
-    private ToolBar startGroup;
+    private ToolBar genScriptGroup;
 
     @FXML
-    private ToolBar runningGroup;
-
-    @FXML
-    private ToolBar debugGroup;
+    private ToolBar browsingGroup;
 
     @FXML
     private TextArea console;
 
     @FXML
-    private Button runButton;
+    private Label exportButton;
 
     @FXML
-    private CheckBox debugCheck;
+    private Label toggleButton;
 
     @FXML
-    private CheckBox parallelCheck;
+    private SampleToolbarController sampleToolbarController;
 
     @FXML
-    private ChoiceBox<String> browserChoice;
+    private FileTreeController fileTreeController;
 
     @FXML
-    private Button pauseButton;
+    private TestToolbarController testToolbarController;
 
     @FXML
-    private Button quitButton;
+    private MenuItem sampleRunMenu;
 
     @FXML
-    private Button backButton;
+    private MenuItem sampleStopMenu;
 
-    @FXML
-    private Button forwardButton;
+    private MessageView messageView = new MessageView();
 
-    @FXML
-    private Button exportButton;
-
-    @FXML
-    private ToggleButton logButton;
-
-    @FXML
-    private Label statusLabel;
-
-    private ConversationProcess mvnProcess = new ConversationProcess();
+    private ConversationProcess conversationProcess;
 
     private ProjectState projectState = new ProjectState();
 
-    private File pomFile = new File("pom.xml");
+    UpdateController updateController = new UpdateController();
 
-    private MavenConsoleListener mavenConsoleListener = new MavenConsoleListener();
+    TestService testService = new TestService();
+
+    ProjectService projectService = new ProjectService();
+
+    // private double stageHeight;
+    //
+    // private double stageWidth;
+    //
+    // @FXML
+    // private Label maximizeButton;
+    //
+    // @FXML
+    // private Label minimizeButton;
+    //
+    // private BooleanProperty windowMaximized = new
+    // SimpleBooleanProperty(true);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        setVisible(projectGroup, Bindings.not(projectState.getRunning()));
-        setVisible(startGroup, Bindings.and(projectState.getInitialized(),
-                Bindings.not(projectState.getRunning())));
-        setVisible(runningGroup, projectState.getRunning());
-        setVisible(debugGroup,
-                Bindings.and(projectState.getRunning(), debugCheck.selectedProperty()));
+        if (!Boolean.getBoolean("skipUpdate")) {
+            ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
+        }
 
-        parallelCheck.disableProperty().bind(debugCheck.selectedProperty());
+        FxUtils.bindVisible(projectGroup, projectState.isLocking().not());
+        FxUtils.bindVisible(genScriptGroup, projectState.isLoaded());
+        FxUtils.bindVisible(browsingGroup, projectState.isBrowsing());
 
-        // TODO プロジェクトの初期化判定はpom.xml内にSIT-WTの設定があること
-        projectState.getInitialized().setValue(pomFile.exists());
-        if (pomFile.exists()) {
-            FxContext.setTitie(pomFile.getAbsoluteFile().getParentFile().getAbsolutePath());
-            statusLabel.setText("");
+        // FxUtils.bindVisible(maximizeButton, windowMaximized.not());
+        // FxUtils.bindVisible(minimizeButton, windowMaximized);
+
+        messageView.setTextArea(console);
+        StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
+
+        testToolbarController.initialize(messageView, fileTreeController, projectState);
+        sampleToolbarController.initialize(messageView, testToolbarController, projectState);
+
+    }
+
+    public void postInit() {
+        File pomFile = projectService.openProject(new File(""), projectState);
+        if (pomFile == null) {
+            openProject();
         } else {
-            statusLabel.setText("[プロジェクト]>[新規作成]からプロジェクトを作成するフォルダを選択してください。");
+            loadProject(pomFile);
         }
-
     }
 
-    private void setVisible(Node node, ObservableBooleanValue visible) {
-        node.visibleProperty().bind(visible);
-        node.managedProperty().bind(visible);
-    }
+    public void destroy() {
+        ConversationProcessContainer.destroy();
+        testToolbarController.destroy();
+        fileTreeController.destroy();
+        sampleToolbarController.destroy();
 
-    @FXML
-    public void createProject() {
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("プロジェクトを作成するフォルダを選択してください。");
-        dirChooser.setInitialDirectory(new File("."));
-
-        File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
-
-        if (projectDir == null) {
-            return;
-        }
-
-        pomFile = new File(projectDir, "pom.xml");
-        if (pomFile.exists()) {
-            statusLabel.setText("プロジェクトは既に存在します。");
-            return;
-        }
-
-        // TODO 外部化
-        String pomUrl = "https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml";
-        try (InputStream pom = new URL(pomUrl).openStream()) {
-            Files.copy(pom, pomFile.toPath());
-        } catch (IOException e) {
-            throw new UnExpectedException(e);
-        }
-
-        projectState.getInitialized().set(pomFile.exists());
-        if (pomFile.exists()) {
-            FxContext.setTitie(pomFile.getParentFile().getAbsolutePath());
-            statusLabel.setText("プロジェクトを作成しました。");
-        }
     }
 
     @FXML
     public void openProject() {
         DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("プロジェクトのpom.xmlがあるフォルダを選択してください。");
+        dirChooser.setTitle("プロジェクトフォルダを選択してください。");
         dirChooser.setInitialDirectory(new File("."));
 
         File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
@@ -164,106 +141,103 @@ public class AppController implements Initializable {
             return;
         }
 
-        pomFile = new File(projectDir, "pom.xml");
+        File pomFile = projectService.openProject(projectDir, projectState);
 
-        if (pomFile != null && pomFile.exists()) {
-            projectState.getInitialized().set(true);
-            statusLabel.setText("プロジェクトを作成しました。");
+        if (pomFile == null) {
+
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setContentText(projectDir.getAbsolutePath() + "にプロジェクトを作成しますか？");
+
+            Optional<ButtonType> answer = alert.showAndWait();
+            if (answer.get() == ButtonType.OK) {
+                pomFile = projectService.createProject(projectDir, projectState);
+                loadProject(pomFile);
+            }
+
         } else {
-            statusLabel.setText("pom.xmlの無いフォルダは無効です。");
+
+            loadProject(pomFile);
+
         }
+
+    }
+
+    private void loadProject(File pomFile) {
+        File projectDir = pomFile.getAbsoluteFile().getParentFile();
+        messageView.addMsg("プロジェクトを開きます。" + projectDir.getAbsolutePath());
+        fileTreeController.setFileTreeRoot(projectDir);
+        FxContext.setTitie(projectDir.getAbsolutePath());
+    }
+
+    ScriptService scriptService = new ScriptService();
+
+    @FXML
+    public void page2script() {
+        messageView.startMsg("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
+
+        projectState.setState(State.BROWSING);
+
+        conversationProcess = scriptService.page2script(testToolbarController.getDriverType(),
+                testToolbarController.getBaseUrl(), exitCode -> {
+                    projectState.reset();
+                });
+
     }
 
     @FXML
-    public void getSample() {
-        statusLabel.setText("サンプルを取得します。");
-
-        mvnProcess.start(new TextAreaConsole(console), pomFile.getAbsoluteFile().getParentFile(),
-                MavenUtils.getCommand(), "sit-wt:sample");
-
-        mvnProcess.waitFor(() -> Platform.runLater(() -> statusLabel.setText("サンプルを取得しました。")));
+    public void quitBrowsing() {
+        conversationProcess.input("q");
     }
 
     @FXML
-    public void run() {
-        statusLabel.setText("テストを実行します。");
+    public void ope2script() {
+        messageView.startMsg("ブラウザ操作の記録はFirefoxとSelenium IDE Pluginを使用します。");
+        messageView.addMsg("Selenium IDEで記録したテストスクリプトをhtml形式でtestscriptディレクトリに保存してください。");
 
-        List<String> command = new ArrayList<>();
-        command.add(MavenUtils.getCommand());
-        command.add("clean");
-        command.add("verify");
+        scriptService.ope2script(testToolbarController.getBaseUrl());
 
-        List<String> profiles = new ArrayList<>();
-        if (debugCheck.isSelected()) {
-            profiles.add("debug");
-        }
-        if (!parallelCheck.isDisabled() && parallelCheck.isSelected()) {
-            profiles.add("parallel");
-        }
-        if (!profiles.isEmpty()) {
-            command.add("-P" + String.join(",", profiles));
-        }
-
-        command.add("-Ddriver.type=" + browserChoice.getSelectionModel().getSelectedItem());
-
-
-        mvnProcess.start(new TextAreaConsole(console, mavenConsoleListener),
-                pomFile.getAbsoluteFile().getParentFile(), command);
-
-        projectState.getRunning().setValue(true);
-        mvnProcess.waitFor(() -> {
-            projectState.getRunning().set(false);
-            Platform.runLater(() -> statusLabel.setText("テストを終了します。"));
-        });
-    }
-
-    @FXML
-    public void pause() {
-        if (mavenConsoleListener.isPausing()) {
-            pauseButton.setText("一時停止");
-            mvnProcess.input("s");
-        } else {
-            pauseButton.setText("再開");
-            mvnProcess.input("");
-        }
-    }
-
-    @FXML
-    public void back() {
-        mvnProcess.input("b");
-    }
-
-    @FXML
-    public void forward() {
-        mvnProcess.input("f");
     }
 
     @FXML
     public void export() {
-        mvnProcess.input("e");
+        conversationProcess.input("e");
     }
 
     @FXML
     public void openScript() {
-        mvnProcess.input("o");
+        conversationProcess.input("o");
     }
 
     @FXML
     public void quit() {
-        mvnProcess.destroy();
-        projectState.getRunning().set(false);
+        conversationProcess.destroy();
+        projectState.reset();
+    }
+
+    // @FXML
+    // public void minimizeWindow() {
+    // Stage primaryStage = FxContext.getPrimaryStage();
+    // stageHeight = primaryStage.getHeight();
+    // stageWidth = primaryStage.getWidth();
+    // // TODO コンソールのサイズ設定
+    // StageResizer.resize(primaryStage, 600, 90);
+    // windowMaximized.set(false);
+    // }
+    //
+    // @FXML
+    // public void maximizeWindow() {
+    // Stage primaryStage = FxContext.getPrimaryStage();
+    // StageResizer.resize(primaryStage, stageWidth, stageHeight);
+    // windowMaximized.set(true);
+    // }
+
+    @FXML
+    public void settings() {
+        FxContext.openFile(new File(projectState.getBaseDir(), "src/main/resources"));
     }
 
     @FXML
-    public void toggleConsole() {
-        Stage primaryStage = FxContext.getPrimaryStage();
-        if (logButton.isSelected()) {
-            // TODO コンソールのサイズ設定
-            primaryStage.setHeight(400);
-        } else {
-            console.setPrefHeight(0);
-            primaryStage.setHeight(primaryStage.getMinHeight());
-        }
+    public void help() {
+        FxContext.showDocument("https://github.com/sitoolkit/sit-wt-all/wiki");
     }
-
 }

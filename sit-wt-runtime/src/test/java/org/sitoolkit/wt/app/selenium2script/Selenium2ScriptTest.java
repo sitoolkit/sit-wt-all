@@ -15,18 +15,15 @@
  */
 package org.sitoolkit.wt.app.selenium2script;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import org.sitoolkit.wt.infra.TestException;
 
 /**
  *
@@ -36,7 +33,9 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
 
     private String testScriptPath;
 
-    private String backupedScriptPath = "seleniumscript-bk/SeleniumIDETestScript.html";
+    private static String TARGET_SCRIPT = "testscript/SeleniumIDETestScript.html";
+
+    private static String BACKUPED_SCRIPT = TARGET_SCRIPT + ".bk";
 
     @Before
     @Override
@@ -51,7 +50,7 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
         int ret = converter.execute();
 
         assertThat("実行結果コード", ret, is(0));
-        assertThat("バックアップされたSeleniumScriptファイル", new File(backupedScriptPath).exists(), is(true));
+        assertThat("バックアップされたSeleniumScriptファイル", new File(BACKUPED_SCRIPT).exists(), is(true));
 
         testScriptPath = testScript.getAbsolutePath();
 
@@ -70,12 +69,8 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
     public void tearDown() {
         super.tearDown();
 
-        File seleniumScript = new File("seleniumscript-bk/SeleniumIDETestScript.html");
-        try {
-            FileUtils.moveFileToDirectory(seleniumScript, new File("seleniumscript"), false);
-        } catch (IOException e) {
-            throw new TestException(e);
-        }
+        File seleniumScript = new File(BACKUPED_SCRIPT);
+        seleniumScript.renameTo(new File(TARGET_SCRIPT));
     }
 
     @Override

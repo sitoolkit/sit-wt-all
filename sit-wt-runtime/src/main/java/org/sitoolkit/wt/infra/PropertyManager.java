@@ -1,13 +1,17 @@
 package org.sitoolkit.wt.infra;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +22,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @PropertySource(ignoreResourceNotFound = true, value = { "classpath:sit-wt-default.properties",
         "classpath:sit-wt.properties" })
 public class PropertyManager {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PropertyManager.class);
 
     @Value("${window.width}")
     private int windowWidth;
@@ -49,8 +55,8 @@ public class PropertyManager {
     @Value("${window.resize}")
     private boolean resizeWindow;
 
-    @Value("${pageobj.dir}")
-    private String pageObjectDir;
+    @Value("${pagescript.dir}")
+    private String pageScriptDir;
 
     @Value("${driver.type}")
     private String driverType;
@@ -73,13 +79,19 @@ public class PropertyManager {
     @Value("${selenium.screenshot.pattern}")
     private String seleniumScreenshotPattern;
 
-    @Value("${baseUrl}")
+    @Value("${baseUrl:}")
     private String baseUrl;
 
     @Value("${hubUrl}")
     private String hubUrl;
 
-    private Map<String, String> capabilities;
+    @Value("${sitwt.debug:false}")
+    private boolean isDebug;
+
+    @Value("${sitwt.cli:true}")
+    private boolean isCli;
+
+    private Map<String, String> capabilities = new HashMap<>();
 
     private boolean isFirefoxDriver;
 
@@ -103,6 +115,11 @@ public class PropertyManager {
         capabilities = PropertyUtils.loadAsMap("/capabilities", true);
 
         setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
+
+    }
+
+    public void save(File dir) {
+        PropertyUtils.save(this, new File(dir, "sit-wt.properties"));
     }
 
     void setDriverFlags(String driverType, String browserName) {
@@ -143,8 +160,8 @@ public class PropertyManager {
         return resizeWindow;
     }
 
-    public String getPageObjectDir() {
-        return pageObjectDir;
+    public String getPageScriptDir() {
+        return pageScriptDir;
     }
 
     public String getDriverType() {
@@ -181,7 +198,7 @@ public class PropertyManager {
 
     public URL getAppiumAddress() {
         try {
-            return new URL(appiumAddress);
+            return appiumAddress == null ? null : new URL(appiumAddress);
         } catch (MalformedURLException e) {
             throw new ConfigurationException("appium.address", e);
         }
@@ -201,7 +218,8 @@ public class PropertyManager {
 
     public Pattern getSeleniumScreenshotPattern() {
         try {
-            return Pattern.compile(seleniumScreenshotPattern);
+            return seleniumScreenshotPattern == null ? null
+                    : Pattern.compile(seleniumScreenshotPattern);
         } catch (PatternSyntaxException e) {
             throw new ConfigurationException("selenium.screenshot.pattern", e);
         }
@@ -245,6 +263,14 @@ public class PropertyManager {
 
     public Map<String, String> getCapabilities() {
         return capabilities;
+    }
+
+    public boolean isDebug() {
+        return isDebug;
+    }
+
+    public boolean isCli() {
+        return isCli;
     }
 
 }

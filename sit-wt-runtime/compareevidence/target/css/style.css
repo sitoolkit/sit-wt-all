@@ -1,0 +1,49 @@
+
+table tr td img {
+	box-shadow: 3px 3px 10px #777777;
+	display: block;
+	margin-top: 5px;
+}
+div.box {
+	position:absolute;
+	border: dotted 2px red;
+	text-align:right;
+	color : red;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+div.box-hidden {
+	border: none;
+}
+
+#toolBox {
+	position: fixed;
+	opacity: 0.8;
+	width: 1000px;
+}
+
+#initialFusenPos {
+	position: fixed;
+}
+
+div.fusen {
+	width: 150px;
+    height: 60px;
+	background: yellow;
+	opacity: 0.8;
+	z-index: 1;
+}
+
+#trashBox {
+	width: 200px;
+    height: 200px;
+	background: gray;
+}
+
+.tooltip {
+	color: blue;
+	font-weight: bold;
+	vertical-align: super;
+  	font-size: 0.8em;
+}

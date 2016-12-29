@@ -1,0 +1,80 @@
+.image-btn {
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 18px;
+    -fx-background-color: transparent;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 30px;
+}
+
+.image-btn:hover {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+}
+
+.project-btn {
+    -fx-background-image:url('/icon/ic_folder_open_black_18dp_1x.png');
+}
+
+.run-sample-btn {
+    -fx-background-image:url('/icon/ic_play_circle_outline_black_18dp_1x.png');
+}
+
+.stop-sample-btn {
+    -fx-background-image:url('/icon/ic_pause_circle_outline_black_18dp_1x.png');
+}
+
+.run-btn {
+    -fx-background-image:url('/icon/ic_play_arrow_black_18dp_1x.png');
+}
+
+.debug-btn {
+    -fx-background-image:url('/icon/ic_bug_report_black_18dp_1x.png');
+}
+
+.parallel-btn {
+    -fx-background-image:url('/icon/ic_fast_forward_black_18dp_1x.png');
+}
+
+.pause-btn {
+    -fx-background-image:url('/icon/ic_pause_black_18dp_1x.png');
+}
+
+.back-btn {
+    -fx-background-image:url('/icon/ic_skip_previous_black_18dp_1x.png');
+}
+
+.forward-btn {
+    -fx-background-image:url('/icon/ic_skip_next_black_18dp_1x.png');
+}
+
+.quit-btn {
+    -fx-background-image:url('/icon/ic_stop_black_18dp_1x.png');
+}
+
+.record-btn {
+    -fx-background-image:url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
+}
+
+.locator-check-btn {
+    -fx-background-image:url('/icon/ic_search_black_18dp_1x.png');
+}
+
+.export-btn {
+    -fx-background-image:url('/icon/ic_file_download_black_18dp_1x.png');
+}
+
+.maximize-btn {
+    -fx-background-image:url('/icon/ic_fullscreen_black_18dp_1x.png');
+}
+
+.minimize-btn {
+    -fx-background-image:url('/icon/ic_fullscreen_exit_black_18dp_1x.png');
+}
+
+.settings-btn {
+    -fx-background-image:url('/icon/ic_settings_black_18dp_1x.png');
+}
+
+.help-btn {
+    -fx-background-image:url('/icon/ic_help_outline_black_18dp_1x.png');
+}

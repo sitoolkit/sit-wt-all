@@ -3,4 +3,6 @@
 /testscript/入力TestScript*.xlsx
 ~$*
 .DS_Store
-/seleniumscript-bk/
+/sample/
+/base-evidence/
+/evidence/
