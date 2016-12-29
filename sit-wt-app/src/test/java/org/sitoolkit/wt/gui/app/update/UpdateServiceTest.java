@@ -1,7 +1,7 @@
 package org.sitoolkit.wt.gui.app.update;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -19,6 +19,7 @@ public class UpdateServiceTest {
     @BeforeClass
     public static void setup() {
         MavenUtils.findAndInstall();
+        MavenUtils.downloadRepository();
     }
 
     @Test
