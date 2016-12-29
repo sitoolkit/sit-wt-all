@@ -93,24 +93,24 @@
     <fixcrlf file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" destdir="${testdir}/testscript"
       encoding="UTF-8" outputencoding="MS932" if:true="${os.windows}" />
 	-->
-    
-    
+
+
     <echo message="mvn sit-wt:sample"/>
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-e" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
     </exec>
-    
+
     <parallel>
-  
+
       <echo message="mvn -f sample   (jetty:run)"/>
       <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
         <env key="JAVA_HOME" value="${java.home}" />
         <arg value="-f" />
         <arg value="sample" />
       </exec>
-      
+
 
       <sequential>
           <echo message="mvn verify -P parallel"/>
@@ -139,13 +139,13 @@
           <arg value="sample" />
           <arg value="jetty:stop" />
         </exec>
-        
+
         <fail>
           <condition>
             <not><equals arg1="${result}" arg2="0"/></not>
           </condition>
         </fail>
-        
+
       </sequential>
 
     </parallel>
@@ -156,22 +156,22 @@
   <target name="trial">
 
     <parallel>
-      
+
       <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
         <env key="JAVA_HOME" value="${java.home}" />
         <arg value="-f" />
         <arg value="sample" />
       </exec>
-      
+
       <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
         <env key="JAVA_HOME" value="${java.home}" />
         <arg value="-f" />
         <arg value="sample" />
         <arg value="jetty:stop" />
       </exec>
-      
+
     </parallel>
-    
+
   </target>
 
   <target name="04_deploy-stage">
@@ -190,7 +190,7 @@
 
   <target name="set-version">
 
-    <property name="version" value="2.0-SNAPSHOT" />
+    <property name="version" value="2.0" />
 
     <replaceregexp file="${distribution.pom}"
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
