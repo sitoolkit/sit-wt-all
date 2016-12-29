@@ -43,17 +43,18 @@ public class App extends Application {
         FxContext.setHostServices(getHostServices());
 
         Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
-        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.downloadRepository());
 
         primaryStage.setTitle("SI-Toolkit for Web Testing");
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
+        Parent root = loader.load();
+        controller = loader.getController();
 
         primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
             controller.postInit();
         });
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
-        Parent root = loader.load();
-        controller = loader.getController();
+        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.downloadRepository());
 
         Scene scene = new Scene(root);
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.logging.Level;
@@ -16,6 +17,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
+import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.gui.infra.process.StdoutListener;
+import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
 
 public class FileIOUtils {
 
@@ -31,13 +35,57 @@ public class FileIOUtils {
             destDir.mkdirs();
         }
 
-        try (InputStream stream = new URL(url).openStream()) {
+        URLConnection conn = null;
+        try {
+            conn = new URL(url).openConnection();
+        } catch (IOException e) {
+            throw new UnExpectedException(e);
+        }
+
+        DownloadWatcher watcher = new DownloadWatcher(conn.getContentLength(), destFile);
+        ExecutorContainer.get().execute(watcher);
+
+        try (InputStream stream = conn.getInputStream()) {
             Files.copy(stream, destFile.toPath());
+            watcher.downloaded = true;
         } catch (IOException e) {
             throw new UnExpectedException(e);
         }
 
         LOG.log(Level.INFO, "downloaded in {0}", Stopwatch.end());
+    }
+
+    static class DownloadWatcher implements Runnable {
+
+        boolean downloaded = false;
+        int contentLength;
+        File destFile;
+
+        DownloadWatcher(int contentLength, File destFile) {
+            super();
+            this.contentLength = contentLength;
+            this.destFile = destFile;
+        }
+
+        @Override
+        public void run() {
+            for (StdoutListener listener : StdoutListenerContainer.get().getListeners()) {
+                listener.nextLine("downloading " + destFile.getAbsolutePath());
+            }
+            while (!downloaded) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    LOG.log(Level.WARNING, "", e);
+                }
+                String log = "downloaded " + destFile.length() / 1024 + " / " + contentLength / 1024 + " KB";
+                for (StdoutListener listener : StdoutListenerContainer.get().getListeners()) {
+                    listener.nextLine(log);
+                }
+                LOG.log(Level.INFO, log);
+            }
+        }
+
     }
 
     public static void unarchive(File srcFile, File destDir) {
@@ -123,5 +171,9 @@ public class FileIOUtils {
         } catch (IOException e) {
             throw new UnExpectedException(e);
         }
+    }
+
+    public static void main(String[] args) {
+        download("https://github.com/sitoolkit/sit-wt-all/releases/download/v2.0/maven-repository-sit-wt.zip", new File("./temp.zip"));
     }
 }

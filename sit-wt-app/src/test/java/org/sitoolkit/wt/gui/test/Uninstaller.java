@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 
 public class Uninstaller {
@@ -15,8 +14,8 @@ public class Uninstaller {
     public static void main(String[] args) {
         uninstall(new File(SystemUtils.getSitRepository(), "maven/runtime/apache-maven-3.3.9"),
                 new File(SystemUtils.getSitRepository(), "maven/download"),
-                new File(SystemUtils.getSitRepository(), "sit-wt-app/repository"),
-                new File(MavenUtils.getLocalRepository(), "org/sitoolkit/wt"));
+                new File(SystemUtils.getSitRepository(), "sit-wt-app/repository"));
+
     }
 
     static void uninstall(File... files) {
