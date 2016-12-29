@@ -9,12 +9,13 @@ import java.net.URISyntaxException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
+import org.sitoolkit.wt.gui.test.ThreadUtils;
 
 public class UpdateServiceTest {
 
     UpdateService service = new UpdateService();
 
-    private volatile boolean testing = true;
+    private volatile boolean tested = false;
 
     @BeforeClass
     public static void setup() {
@@ -28,12 +29,12 @@ public class UpdateServiceTest {
         File pomFile = new File(getClass().getResource("pom.xml").toURI());
 
         service.checkSitWtAppUpdate(pomFile, newVersion -> {
-            assertThat("newVersion", newVersion, is("1.2"));
-            testing = false;
+            // TODO newVersionの値をpomから取得
+            assertThat("newVersion", newVersion, is("2.0"));
+            tested = true;
         });
 
-        while (testing) {
-        }
+        ThreadUtils.waitFor(() -> tested);
     }
 
     @Test
@@ -42,11 +43,10 @@ public class UpdateServiceTest {
         service.downloadSitWtApp(new File("target"), "1.2", downloadedFile -> {
             downloadedFile.deleteOnExit();
             assertThat("file downloaded", downloadedFile.exists(), is(true));
-            testing = false;
+            tested = true;
         });
 
-        while (testing) {
-        }
+        ThreadUtils.waitFor(() -> tested);
     }
 
 }
