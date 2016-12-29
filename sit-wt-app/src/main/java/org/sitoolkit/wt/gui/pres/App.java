@@ -16,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -63,6 +64,7 @@ public class App extends Application {
 
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         primaryStage.setScene(scene);
+        primaryStage.getIcons().add(new Image("/icon/sitoolkit.png"));
         primaryStage.show();
 
     }
