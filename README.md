@@ -10,7 +10,7 @@ SIToolkit for Web Testing (SIT-WT) はWebアプリケーションの自動テス
 
 詳しい使い方などはこちらを参照してください。
 
-* サンプルを動かしてみる => [クイックスタート](../../wiki/クイックスタート)
+* サンプルを動かしてみる => [クイックスタート](http://www.sitoolkit.org/sit-wt.html)
 * 使い方 => [Wiki](../../wiki)
 
 
