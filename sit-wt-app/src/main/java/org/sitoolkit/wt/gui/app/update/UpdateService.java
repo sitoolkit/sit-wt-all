@@ -12,6 +12,7 @@ import org.sitoolkit.wt.gui.domain.update.VersionCheckedCallback;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
 import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
+import org.sitoolkit.wt.gui.infra.util.VersionUtils;
 
 public class UpdateService {
 
@@ -35,7 +36,11 @@ public class UpdateService {
 
         params.getExitClallbacks().add(exitCode -> {
             if (exitCode == 0) {
-                callback.onCallback(listener.getNewVersion());
+                if (VersionUtils.isNewer(listener.getCurrentVersion(), listener.getNewVersion())) {
+                    callback.onChecked(listener.getNewVersion());
+                } else {
+                    LOG.log(Level.INFO, "sit-wt-app {0} is latest", listener.getCurrentVersion());
+                }
             } else {
                 LOG.log(Level.WARNING, "fail to check update of following pom.xml \n {0}", FileIOUtils.file2str(pomFile));
             }

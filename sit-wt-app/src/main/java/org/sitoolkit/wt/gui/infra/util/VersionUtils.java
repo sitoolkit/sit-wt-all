@@ -37,4 +37,11 @@ public class VersionUtils {
         }
         return "";
     }
+
+    public static boolean isNewer(String currentVer, String newVer) {
+        if (StrUtils.isEmpty(currentVer) || StrUtils.isEmpty(newVer)) {
+            return false;
+        }
+        return currentVer.compareTo(newVer) < 0;
+    }
 }
