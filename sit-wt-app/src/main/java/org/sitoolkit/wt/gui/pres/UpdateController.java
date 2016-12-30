@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.app.update.UpdateService;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -48,6 +49,11 @@ public class UpdateController {
     }
 
     private void confirmAndInstall(String newVersion) {
+        if (StrUtils.isEmpty(newVersion)) {
+            LOG.info("sit-wt-app is latest version");
+            return ;
+        }
+
         Platform.runLater(() -> {
             Alert conf = new Alert(AlertType.CONFIRMATION);
             conf.setContentText("SIT-WTの新しいバージョンがあります。ダウンロードしますか？");

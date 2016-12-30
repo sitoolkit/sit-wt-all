@@ -1,15 +1,21 @@
 package org.sitoolkit.wt.gui.app.update;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.domain.update.DownloadCallback;
 import org.sitoolkit.wt.gui.domain.update.MavenVersionsPluginStdoutListener;
 import org.sitoolkit.wt.gui.domain.update.UpdateProcessClient;
 import org.sitoolkit.wt.gui.domain.update.VersionCheckMode;
 import org.sitoolkit.wt.gui.domain.update.VersionCheckedCallback;
+import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 
 public class UpdateService {
+
+    private static final Logger LOG = LogUtils.get(UpdateService.class);
 
     UpdateProcessClient client = new UpdateProcessClient();
 
@@ -28,7 +34,11 @@ public class UpdateService {
         params.getStdoutListeners().add(listener);
 
         params.getExitClallbacks().add(exitCode -> {
-            callback.onCallback(listener.getNewVersion());
+            if (exitCode == 0) {
+                callback.onCallback(listener.getNewVersion());
+            } else {
+                LOG.log(Level.WARNING, "fail to check update of following pom.xml \n {0}", FileIOUtils.file2str(pomFile));
+            }
         });
 
         client.checkVersion(pomFile, mode, params);
