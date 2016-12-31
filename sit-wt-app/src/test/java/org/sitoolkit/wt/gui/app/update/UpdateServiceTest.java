@@ -30,7 +30,7 @@ public class UpdateServiceTest {
 
         service.checkSitWtAppUpdate(pomFile, newVersion -> {
             // TODO newVersionの値をpomから取得
-            assertThat("newVersion", newVersion, is("2.0"));
+            assertThat("newVersion", newVersion, is("2.0.1"));
             tested = true;
         });
 
@@ -40,7 +40,7 @@ public class UpdateServiceTest {
     @Test
     public void testDownload() {
 
-        service.downloadSitWtApp(new File("target"), "1.2", downloadedFile -> {
+        service.downloadSitWtApp(new File("target"), "2.0", downloadedFile -> {
             downloadedFile.deleteOnExit();
             assertThat("file downloaded", downloadedFile.exists(), is(true));
             tested = true;
