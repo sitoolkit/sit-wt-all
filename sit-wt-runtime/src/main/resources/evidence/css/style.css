@@ -40,9 +40,6 @@ div.fusen {
     height: 96px;
 }
 
-.help {
-	color: blue;
-	font-weight: bold;
-	vertical-align: super;
-  	font-size: 0.8em;
+.ui-tooltip {
+	max-width: 400px;
 }

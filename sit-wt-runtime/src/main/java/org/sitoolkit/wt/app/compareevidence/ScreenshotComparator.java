@@ -54,7 +54,7 @@ public class ScreenshotComparator {
 
         if (!baseDir.exists()) {
             LOG.info("基準エビデンスディレクトリが存在しません {}", baseDir.getDir().getPath());
-            return true;
+            return false;
         }
 
         Map<String, File> baseSsMap = baseDir.getScreenshotFilesAsMap(evidenceFile.getName());
@@ -72,6 +72,7 @@ public class ScreenshotComparator {
 
             if (baseSs == null) {
                 LOG.warn("基準エビデンスディレクトリに存在しないスクリーンショットです {}", targetEntry.getKey());
+                match = false;
                 continue;
             }
 

@@ -12,6 +12,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
 
 
 <HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.TestToolbarController"
@@ -36,6 +37,11 @@
       </Label>
       <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
       <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
+      <ToggleButton fx:id="compareToggle" styleClass="image-toggle-btn, compare-toggle-btn" >
+        <tooltip>
+          <Tooltip text="スクリーンショット比較機能のON/OFFを切り替えます" />
+        </tooltip>
+      </ToggleButton>
     </items>
   </ToolBar>
   <ToolBar fx:id="runningGroup">

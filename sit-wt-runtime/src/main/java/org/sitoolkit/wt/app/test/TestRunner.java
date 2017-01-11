@@ -8,8 +8,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
+import org.sitoolkit.wt.app.compareevidence.DiffEvidenceGeneratorConfig;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.app.selenium2script.Selenium2Script;
+import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.sitoolkit.wt.domain.evidence.EvidenceOpener;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.TestResult;
@@ -19,6 +22,7 @@ import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -37,6 +41,7 @@ public class TestRunner {
         String caseNo = args.length > 2 ? args[1] : "";
         boolean isParallel = Boolean.getBoolean("sitwt.parallel");
         boolean isEvidenceOpen = Boolean.getBoolean("sitwt.open-evidence");
+        boolean isCompareScreenshot = Boolean.getBoolean("sitwt.compare-screenshot");
 
         TestRunner runner = new TestRunner();
         List<TestResult> results = runner.runScript(args[0], "TestScript", caseNo, isParallel,
@@ -47,6 +52,26 @@ public class TestRunner {
                 System.exit(2);
             }
         }
+
+        if (isCompareScreenshot) {
+
+            ApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                    DiffEvidenceGeneratorConfig.class);
+            DiffEvidenceGenerator generator = appCtx.getBean(DiffEvidenceGenerator.class);
+
+            EvidenceDir targetDir = EvidenceDir.getLatest();
+            EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(null, targetDir.getBrowser());
+
+            boolean compareSsSuccess = generator.generate(baseDir, targetDir, isCompareScreenshot);
+            LOG.info("基準エビデンスとのスクリーンショット比較が{}しました。", compareSsSuccess ? "成功" : "失敗");
+
+            if (!compareSsSuccess) {
+                EvidenceOpener opener = new EvidenceOpener();
+                opener.openCompareNgEvidence(targetDir);
+            }
+
+        }
+
         System.exit(0);
     }
 

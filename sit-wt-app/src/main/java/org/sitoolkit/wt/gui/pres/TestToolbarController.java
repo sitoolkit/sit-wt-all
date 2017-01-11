@@ -26,6 +26,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.ToggleButton;
 
 public class TestToolbarController implements Initializable {
 
@@ -43,6 +44,9 @@ public class TestToolbarController implements Initializable {
 
     @FXML
     private ComboBox<String> baseUrlCombo;
+
+    @FXML
+    private ToggleButton compareToggle;
 
     @FXML
     private Label pauseButton;
@@ -106,22 +110,22 @@ public class TestToolbarController implements Initializable {
     @FXML
     public void run() {
         messageView.startMsg("テストを実行します。");
-        runTest(false, false);
+        runTest(false, false, compareToggle.isSelected());
     }
 
     @FXML
     public void debug() {
         messageView.startMsg("テストをデバッグします。");
-        runTest(true, false);
+        runTest(true, false, compareToggle.isSelected());
     }
 
     @FXML
     public void runParallel() {
         messageView.startMsg("テストを並列実行します。");
-        runTest(false, true);
+        runTest(false, true, compareToggle.isSelected());
     }
 
-    private void runTest(boolean isDebug, boolean isParallel) {
+    private void runTest(boolean isDebug, boolean isParallel, boolean compareScreenshot) {
         projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
 
         TestRunParams params = new TestRunParams();
@@ -129,6 +133,7 @@ public class TestToolbarController implements Initializable {
         params.setBaseDir(projectState.getBaseDir());
         params.setDebug(isDebug);
         params.setParallel(isParallel);
+        params.setCompareScreenshot(compareScreenshot);
         params.setDriverType(getDriverType());
         params.setBaseUrl(getBaseUrl());
 
@@ -146,7 +151,7 @@ public class TestToolbarController implements Initializable {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("");
             alert.setContentText("");
-            alert.setHeaderText("実行するテストスクリプトを選択してください。テストスクリプトの拡張子はxlsx、xlsx、csv、htmlです。");
+            alert.setHeaderText("実行するテストスクリプトを1つ選択してください。テストスクリプトの拡張子はxlsx、xlsx、csv、htmlです。");
             alert.show();
             projectState.reset();
         } else {

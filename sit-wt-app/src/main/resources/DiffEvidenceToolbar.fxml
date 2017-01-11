@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+
+
+<HBox fx:id="diffEvidenceToolbar" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65"
+  fx:controller="org.sitoolkit.wt.gui.pres.DiffEvidenceToolbarController" style="-fx-padding: 0 0 0 0;"
+  styleClass="tool-bar">
+  <ToolBar fx:id="genDiffEvidenceGroup">
+    <items>
+      <Separator orientation="VERTICAL" />
+      <Label onMouseClicked="#maskEvidence" styleClass="image-btn,mask-btn">
+        <tooltip>
+          <Tooltip text="スクリーンショットにマスク処理を施します"/>
+        </tooltip>
+      </Label>
+      <Label onMouseClicked="#setBaseEvidence" styleClass="image-btn,base-btn">
+        <tooltip>
+          <Tooltip text="基準エビデンスを確定します"/>
+        </tooltip>
+      </Label>
+      <Label onMouseClicked="#genDiffEvidence" styleClass="image-btn,diff-btn">
+        <tooltip>
+          <Tooltip text="比較エビデンスを生成します"/>
+        </tooltip>
+      </Label>
+    </items>
+  </ToolBar>
+</HBox>

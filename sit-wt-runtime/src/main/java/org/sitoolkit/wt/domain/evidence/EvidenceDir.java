@@ -145,8 +145,10 @@ public class EvidenceDir {
         for (File imgFile : FileUtils.listFiles(dir, new String[] { "png" }, true)) {
 
             String imgName = imgFile.getName();
-            if (isScreenshot(imgName, evidenceName) || isMaskScreenshot(imgName)
-                    || isUnmatchScreenshot(imgName) || isUnmatchMaskScreenshot(imgName)) {
+            if (isEvidenceScreenshot(imgName, evidenceName)
+                    || isMaskEvidenceScreenshot(imgName, evidenceName)
+                    || isUnmatchEvidenceScreenshot(imgName, evidenceName)
+                    || isUnmatchMaskEvidenceScreenshot(imgName, evidenceName)) {
                 screenshotFiles.put(imgFile.getName(), imgFile);
             }
         }
@@ -254,12 +256,20 @@ public class EvidenceDir {
         return startsWith(name, MASK_PREFIX);
     }
 
-    public static boolean isScreenshot(String name, String evidenceName) {
-        return startsWith(name, evidenceName);
+    public static boolean isEvidenceScreenshot(String ssName, String evidenceName) {
+        return startsWith(ssName, evidenceName);
     }
 
-    public static boolean isCompareScreenshot(String name) {
-        return startsWith(name, COMPARE_PREFIX);
+    public static boolean isMaskEvidenceScreenshot(String name, String evidenceName) {
+        return startsWith(name, MASK_PREFIX + evidenceName);
+    }
+
+    public static boolean isUnmatchEvidenceScreenshot(String ssName, String evidenceName) {
+        return startsWith(ssName, UNMATCH_PREFIX + evidenceName);
+    }
+
+    public static boolean isUnmatchMaskEvidenceScreenshot(String ssName, String evidenceName) {
+        return startsWith(ssName, UNMATCH_PREFIX + MASK_PREFIX + evidenceName);
     }
 
     public static boolean isMaskScreenshot(String name) {

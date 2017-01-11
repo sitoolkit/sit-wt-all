@@ -19,24 +19,44 @@ public class EvidenceOpener {
     private static final Logger LOG = LoggerFactory.getLogger(EvidenceOpener.class);
     private int openFileCount = 1;
     private String evidenceFileRegex = ".*\\.html$";
+    private String maskFileRegex = "^mask_.*html$";
+    private String compareFileRegex = "^comp_(?!mask_|ng_).*html$";
+    private String compareNgFileRegex = "^comp_ng_.*html$";
 
     public void open() {
+        openFiles(null, evidenceFileRegex, "");
+    }
 
-        File evidenceDir = EvidenceDir.getLatestEvidenceDir();
+    public void openCompareEvidence(EvidenceDir targetDir) {
+        openFiles(targetDir, compareFileRegex, "比較");
+    }
+
+    public void openCompareNgEvidence(EvidenceDir targetDir) {
+        openFiles(targetDir, compareNgFileRegex, "比較NG");
+    }
+
+    public void openMaskEvidence(EvidenceDir targetDir) {
+        openFiles(targetDir, maskFileRegex, "マスク");
+    }
+
+    public void openFiles(EvidenceDir targetDir, String targetFileRegex, String evidenceType) {
+
+        File evidenceDir = targetDir == null ? EvidenceDir.getLatestEvidenceDir()
+                : targetDir.getDir();
 
         if (evidenceDir == null) {
             return;
         }
 
-        List<File> opelogFiles = new ArrayList<File>(FileUtils.listFiles(evidenceDir,
-                new RegexFileFilter(evidenceFileRegex), TrueFileFilter.INSTANCE));
-        LOG.info("{}に{}のエビデンスがあります ", evidenceDir.getName(), opelogFiles.size());
+        List<File> targetFiles = new ArrayList<File>(FileUtils.listFiles(evidenceDir,
+                new RegexFileFilter(targetFileRegex), TrueFileFilter.INSTANCE));
+        LOG.info("{}に{}の{}エビデンスがあります ", evidenceDir.getName(), targetFiles.size(), evidenceType);
 
-        Collections.sort(opelogFiles, new FileLastModifiedComarator(true));
+        Collections.sort(targetFiles, new FileLastModifiedComarator(true));
 
         try {
             int openFiles = 0;
-            for (File file : opelogFiles) {
+            for (File file : targetFiles) {
                 Desktop.getDesktop().open(file);
 
                 if (++openFiles >= openFileCount) {

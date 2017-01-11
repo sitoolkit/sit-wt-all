@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
+import org.sitoolkit.wt.domain.evidence.EvidenceOpener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,21 @@ import org.slf4j.LoggerFactory;
 public class MaskEvidenceGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MaskEvidenceGenerator.class);
+
+    public static void main(String[] args) {
+
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(args[0]);
+
+        MaskScreenshotGenerator mask = new MaskScreenshotGenerator();
+        mask.generate(targetDir);
+
+        MaskEvidenceGenerator evidence = new MaskEvidenceGenerator();
+        evidence.generate(targetDir);
+
+        EvidenceOpener opener = new EvidenceOpener();
+        opener.openMaskEvidence(targetDir);
+
+    }
 
     public void generate(EvidenceDir targetDir) {
 

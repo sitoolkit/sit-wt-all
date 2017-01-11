@@ -38,7 +38,7 @@ public class FileTreeController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         fileTree.setEditable(true);
-        fileTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        fileTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         if (mode == Mode.CHECKBOX) {
             fileTree.setCellFactory(CheckBoxTreeCell.forTreeView());
         }
@@ -62,6 +62,9 @@ public class FileTreeController implements Initializable {
         FileTreeItem testscriptItem = new FileTreeItem(newDir(baseDir, "testscript"));
         testscriptItem.buildChildren();
         root.getChildren().add(testscriptItem);
+        FileTreeItem baseEvidenceItem = new FileTreeItem(newDir(baseDir, "base-evidence"));
+        baseEvidenceItem.buildChildren();
+        root.getChildren().add(baseEvidenceItem);
         FileTreeItem evidenceItem = new FileTreeItem(newDir(baseDir, "evidence"));
         evidenceItem.buildChildren();
         root.getChildren().add(evidenceItem);
@@ -70,6 +73,7 @@ public class FileTreeController implements Initializable {
 
         fileSystemWatchService.register(pagescriptItem);
         fileSystemWatchService.register(testscriptItem);
+        fileSystemWatchService.register(baseEvidenceItem);
         fileSystemWatchService.register(evidenceItem);
     }
 

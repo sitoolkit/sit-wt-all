@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import org.sitoolkit.wt.gui.app.diffevidence.DiffEvidenceService;
 import org.sitoolkit.wt.gui.app.project.ProjectService;
 import org.sitoolkit.wt.gui.app.script.ScriptService;
 import org.sitoolkit.wt.gui.app.test.TestService;
@@ -60,6 +61,9 @@ public class AppController implements Initializable {
     private TestToolbarController testToolbarController;
 
     @FXML
+    private DiffEvidenceToolbarController diffEvidenceToolbarController;
+
+    @FXML
     private MenuItem sampleRunMenu;
 
     @FXML
@@ -72,6 +76,8 @@ public class AppController implements Initializable {
     private ProjectState projectState = new ProjectState();
 
     UpdateController updateController = new UpdateController();
+
+    DiffEvidenceService diffEvidenceService = new DiffEvidenceService();
 
     TestService testService = new TestService();
 
@@ -109,6 +115,7 @@ public class AppController implements Initializable {
 
         testToolbarController.initialize(messageView, fileTreeController, projectState);
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
+        diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
 
     }
 

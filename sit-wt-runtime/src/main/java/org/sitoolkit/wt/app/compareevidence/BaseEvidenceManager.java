@@ -13,6 +13,12 @@ public class BaseEvidenceManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseEvidenceManager.class);
 
+    public static void main(String[] args) {
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(args[0]);
+        BaseEvidenceManager baseEvidenceManager = new BaseEvidenceManager();
+        baseEvidenceManager.setBaseEvidence(targetDir);
+    }
+
     /**
      * 指定されたエビデンスを基準エビデンスとして確定します。
      *

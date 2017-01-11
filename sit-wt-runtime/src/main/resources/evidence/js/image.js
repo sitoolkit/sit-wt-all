@@ -1,32 +1,29 @@
 
 function init(){
 
-	var modeHelp = "スクリーンショット比較時における除外箇所を指定するモードです。";
-	modeHelp += "スクリーンショット上に配置した付箋の形にマスク処理がされます。"
-	modeHelp += "左記アイコンのクリックで付箋モードのON/OFFを切り替えることができます。"
-	var fusenHelp = "マスクをかけたい箇所にドラッグします。";
+	var modeHelp = "付箋モードのON/OFFを切り替ます。";
 	var trashBoxHelp = "削除したい付箋はここにドロップします。";
-	var loadHelp = "指定したJSONファイルを読み込み、付箋の配置を復元します。";
-	var saveHelp = "スクリーンショット上に配置した付箋の情報をJSON形式で保存します。";
-	var deleteHelp = "配置済みの付箋をすべて削除します。";
+	var loadHelp = "JSONを読み込み付箋の配置を復元します。";
+	var saveHelp = "付箋の配置情報をJSONで保存します。";
+	var deleteHelp = "配置済みの全付箋を削除します。";
 
 	$("body").prepend("<div id='modeSelect'></div>");
-	$("#modeSelect").append("<img class='icon' id='switch' src='img/icon/ic_swap_horiz_black_36dp.png'/> 付箋モード<span class='help' title='" + modeHelp + "'><img src='img/icon/ic_help_outline_black_18dp.png'/></span>：<span id='mode'>OFF</span></p>");
+	$("#modeSelect").append("<span class='help' title='" + modeHelp + "'><img class='icon' id='switch' src='img/icon/ic_swap_horiz_black_36dp.png'/></span> 付箋モード：<span id='mode'>OFF</span></p>");
 	$("#modeSelect").append("<hr/>");
 
 	$("#modeSelect").after("<div id='toolBox'></div>");
-	$("#toolBox").append("付箋<span class='help' title='" + fusenHelp + "'><img src='img/icon/ic_help_outline_black_18dp.png'/></span><br/>");
+	$("#toolBox").append("付箋<br/>");
 	$("#toolBox").append("<div id='initialFusenPos'></div>");
 	$("#toolBox").append("<br/>");
 	$("#toolBox").append("<br/>");
 	$("#toolBox").append("<br/>");
 	$("#toolBox").append("<br/>");
-	$("#toolBox").append("ゴミ箱<span class='help' title='" + trashBoxHelp + "'><img src='img/icon/ic_help_outline_black_18dp.png'/></span><br/>");
-	$("#toolBox").append("<div id='trashBox'><img id='traxhBox' src='img/icon/ic_delete_black_48dp.png'/></div>");
+	$("#toolBox").append("ゴミ箱<br/>");
+	$("#toolBox").append("<div id='trashBox'><span class='help' title='" + trashBoxHelp + "'><img id='traxhBox' src='img/icon/ic_delete_black_48dp.png'/></span></div>");
 	$("#toolBox").append("<br/>");
-	$("#toolBox").append("<img class='icon' id='load' src='img/icon/ic_file_upload_black_36dp.png'/><span class='help' title='" + loadHelp + "'><img src='img/icon/ic_help_outline_black_18dp.png'/></span>");
-	$("#toolBox").append("<img class='icon' id='save' src='img/icon/ic_file_download_black_36dp.png'/><span class='help' title='" + saveHelp + "'><img src='img/icon/ic_help_outline_black_18dp.png'/></span> ");
-	$("#toolBox").append("<img class='icon' id='delete' src='img/icon/ic_clear_black_36dp.png'/><span class='help' title='" + deleteHelp + "'><img src='img/icon/ic_help_outline_black_18dp.png'/></span>");
+	$("#toolBox").append("<span class='help' title='" + loadHelp + "'><img class='icon' id='load' src='img/icon/ic_file_upload_black_36dp.png'/> </span>");
+	$("#toolBox").append("<span class='help' title='" + saveHelp + "'><img class='icon' id='save' src='img/icon/ic_file_download_black_36dp.png'/> </span> ");
+	$("#toolBox").append("<span class='help' title='" + deleteHelp + "'><img class='icon' id='delete' src='img/icon/ic_clear_black_36dp.png'/> </span>");
 	$("#toolBox").after("<div id='movedFusen'></div>");
 
 	$(".help").tooltip();

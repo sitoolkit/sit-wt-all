@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.DiffEvidence;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
+import org.sitoolkit.wt.domain.evidence.EvidenceOpener;
 import org.sitoolkit.wt.domain.evidence.ReportOpener;
 import org.sitoolkit.wt.infra.TestException;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
@@ -48,8 +49,35 @@ public class DiffEvidenceGenerator {
 
     private ScreenshotComparator screenshotComparator = new ScreenshotComparator();
 
+    public static void main(String[] args) {
+
+        ApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                DiffEvidenceGeneratorConfig.class);
+        DiffEvidenceGenerator generator = appCtx.getBean(DiffEvidenceGenerator.class);
+
+        String targetPath = null;
+        String basePath = null;
+        int argCount = args.length;
+
+        if (argCount == 2) {
+            basePath = args[0];
+            targetPath = args[1];
+        } else if (argCount == 1) {
+            targetPath = args[0];
+        }
+
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(targetPath);
+        EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(basePath, targetDir.getBrowser());
+
+        generator.generate(baseDir, targetDir, false);
+
+        EvidenceOpener opener = new EvidenceOpener();
+        opener.openCompareEvidence(targetDir);
+
+    }
+
     public static void staticExecute(EvidenceDir baseDir, EvidenceDir targetDir,
-            boolean compareScreenshot, String evidenceOpen) {
+            boolean compareScreenshot, boolean evidenceOpen) {
 
         if (!(baseDir.exists())) {
             LOG.error("基準エビデンスがありません");
@@ -65,7 +93,7 @@ public class DiffEvidenceGenerator {
                 EvidenceReportEditor editor = appCtx.getBean(EvidenceReportEditor.class);
                 editor.edit(targetDir);
 
-                if (Boolean.parseBoolean(evidenceOpen)) {
+                if (evidenceOpen) {
                     ReportOpener opener = appCtx.getBean(ReportOpener.class);
                     opener.open(targetDir);
                 }
@@ -107,13 +135,23 @@ public class DiffEvidenceGenerator {
 
             if (compareScreenshot) {
                 if (!screenshotComparator.compare(baseDir, targetDir, evidenceFile)) {
-                    generateDiffEvidence(baseDir, evidenceFile, true);
                     allSsMatches = false;
+                    try {
+                        generateDiffEvidence(baseDir, evidenceFile, true);
+                    } catch (IOException e) {
+                        LOG.error("比較エビデンス生成処理で例外が発生しました", e);
+                        return allSsMatches;
+                    }
                 }
             }
 
-            generateDiffEvidence(baseDir, evidenceFile, false);
-            copyBaseScreenshots(baseDir, targetDir, evidenceFile);
+            try {
+                generateDiffEvidence(baseDir, evidenceFile, false);
+                copyBaseScreenshots(baseDir, targetDir, evidenceFile);
+            } catch (IOException e) {
+                LOG.error("比較エビデンス生成処理で例外が発生しました", e);
+                return allSsMatches;
+            }
 
         }
 
@@ -138,8 +176,11 @@ public class DiffEvidenceGenerator {
      *            比較エビデンスの生成対象のエビデンス
      * @param withUnmatch
      *            不一致スクリーンショットに対する比較エビデンスを生成する場合にtrue
+     * @throws IOException
+     *             入出力エラーが発生した場合または基準エビデンスが存在しない場合
      */
-    void generateDiffEvidence(EvidenceDir baseEvidenceDir, File evidenceFile, boolean withUnmatch) {
+    void generateDiffEvidence(EvidenceDir baseEvidenceDir, File evidenceFile, boolean withUnmatch)
+            throws IOException {
 
         File baseEvidence = new File(baseEvidenceDir.getDir(), evidenceFile.getName());
 
@@ -166,7 +207,7 @@ public class DiffEvidenceGenerator {
     }
 
     void load(DiffEvidence diffEvidence, EvidenceDir baseEvidenceDir, File baseEvidenceFile,
-            File evidenceFile, boolean withUnmatch) {
+            File evidenceFile, boolean withUnmatch) throws IOException {
 
         diffEvidence.setEvidenceName(StringUtils.removeEnd(evidenceFile.getName(), ".html"));
 
@@ -180,25 +221,20 @@ public class DiffEvidenceGenerator {
         diffEvidence.setRightFileName(
                 FilenameUtils.concat(evidenceFile.getParent(), evidenceFile.getName()));
 
-        try {
-            String leftHtmlTable = EvidenceDir.extractTable(baseEvidenceFile);
-            leftHtmlTable = EvidenceDir.removeInputLine(leftHtmlTable);
-            leftHtmlTable = EvidenceDir.replaceImgPath(leftHtmlTable);
+        String leftHtmlTable = EvidenceDir.extractTable(baseEvidenceFile);
+        leftHtmlTable = EvidenceDir.removeInputLine(leftHtmlTable);
+        leftHtmlTable = EvidenceDir.replaceImgPath(leftHtmlTable);
 
-            String rightHtmlTable = EvidenceDir.extractTable(evidenceFile);
-            rightHtmlTable = EvidenceDir.removeInputLine(rightHtmlTable);
+        String rightHtmlTable = EvidenceDir.extractTable(evidenceFile);
+        rightHtmlTable = EvidenceDir.removeInputLine(rightHtmlTable);
 
-            if (withUnmatch) {
-                leftHtmlTable = replaceImgName(leftHtmlTable, baseEvidenceFile);
-                rightHtmlTable = replaceImgName(rightHtmlTable, evidenceFile);
-            }
-
-            diffEvidence.setLeftFile(leftHtmlTable);
-            diffEvidence.setRightFile(rightHtmlTable);
-
-        } catch (IOException e) {
-            throw new TestException("比較エビデンス生成処理で例外が発生しました", e);
+        if (withUnmatch) {
+            leftHtmlTable = replaceImgName(leftHtmlTable, baseEvidenceFile);
+            rightHtmlTable = replaceImgName(rightHtmlTable, evidenceFile);
         }
+
+        diffEvidence.setLeftFile(leftHtmlTable);
+        diffEvidence.setRightFile(rightHtmlTable);
 
     }
 

@@ -27,9 +27,10 @@ public class TestService {
     public ConversationProcess runTest(TestRunParams params, SitWtDebugStdoutListener listener,
             ProcessExitCallback callback) {
 
-        List<File> testScripts = SitWtRuntimeUtils.filterTestScripts(params.getScripts());
+        List<File> selectedFiles = params.getScripts();
+        List<File> testScripts = SitWtRuntimeUtils.filterTestScripts(selectedFiles);
 
-        if (testScripts.isEmpty()) {
+        if (selectedFiles.size() != 1 || testScripts.isEmpty()) {
             return null;
         }
 

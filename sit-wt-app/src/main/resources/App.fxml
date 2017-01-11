@@ -20,7 +20,7 @@
 <?import javafx.scene.control.Tooltip?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity"
-  prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
+  prefHeight="400.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="org.sitoolkit.wt.gui.pres.AppController">
   <center>
     <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
@@ -42,6 +42,7 @@
         </children>
       </HBox>
       <fx:include fx:id="testToolbar" source="TestToolbar.fxml" />
+      <fx:include fx:id="diffEvidenceToolbar" source="DiffEvidenceToolbar.fxml" />
       <ToolBar fx:id="genScriptGroup">
         <items>
           <Separator orientation="VERTICAL" />
