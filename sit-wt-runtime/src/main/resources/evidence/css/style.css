@@ -1,3 +1,20 @@
+h1 {
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    letter-spacing: 0.3rem;
+}
+table {
+	border-collapse: collapse;
+}
+table tr th, table tr td {
+	border-bottom: solid 1px gray;
+	padding: 0.7rem;
+	vertical-align: top;
+}
+table > thead > tr > th {
+	border-bottom: double 3px gray;
+	letter-spacing: 0.5rem;
+}
 
 table tr td img {
 	box-shadow: 3px 3px 10px #777777;
@@ -15,6 +32,18 @@ div.box {
 
 div.box-hidden {
 	border: none;
+}
+
+.verified {
+	font-weight: bold;
+	font-style: italic;
+	color: green;
+}
+
+.mismatched {
+	font-weight: bold;
+	font-style: italic;
+	color: red;
 }
 
 #toolBox {

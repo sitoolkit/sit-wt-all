@@ -1,0 +1,1 @@
+SELECT id, col1, col2 FROM tab1 WHERE ID = :id

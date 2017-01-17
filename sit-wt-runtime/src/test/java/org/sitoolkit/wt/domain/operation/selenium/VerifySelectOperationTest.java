@@ -19,7 +19,7 @@ public class VerifySelectOperationTest extends SitTesterTestBase {
         System.err.println(System.getProperties());
         TestResult result = tester.operate(getCurrentCaseNo());
 
-        assertThat(result.buileReason(), result.getFailCount(), is(8));
+        assertThat(result.buildReason(), result.getFailCount(), is(8));
     }
 
     @Override

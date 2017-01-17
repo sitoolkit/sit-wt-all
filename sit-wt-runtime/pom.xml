@@ -117,6 +117,27 @@
       <artifactId>javax.json</artifactId>
       <version>1.0.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.8.9</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.13.1.1</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <parent>
     <groupId>org.sitoolkit.wt</groupId>
@@ -156,6 +177,14 @@
         </includes>
         <targetPath>${project.build.outputDirectory}/sample</targetPath>
       </resource>
+      <resource>
+        <directory>${project.basedir}/db</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>connection.properties</include>
+        </includes>
+        <targetPath>${project.build.outputDirectory}/db</targetPath>
+      </resource>
     </resources>
     <testResources>
       <testResource>
@@ -163,6 +192,14 @@
         <excludes>
           <exclude>**/~$*.xlsx</exclude>
         </excludes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/db</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>connection.properties</include>
+        </includes>
+        <targetPath>${project.build.testOutputDirectory}/db</targetPath>
       </testResource>
     </testResources>
     <pluginManagement>
@@ -187,6 +224,14 @@
             <stopKey>x</stopKey>
             <stopPort>9999</stopPort>
             <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.carlspring.maven</groupId>
+          <artifactId>derby-maven-plugin</artifactId>
+          <version>1.10</version>
+          <configuration>
+            <derbyHome>${basedir}/derby</derbyHome>
           </configuration>
         </plugin>
       </plugins>

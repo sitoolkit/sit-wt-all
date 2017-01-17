@@ -1,0 +1,12 @@
+						<table>
+							<tr>
+#foreach ($col in $table.columns)
+								<th>$col</th>
+#end
+							</tr>
+							<tr>
+#foreach ($val in $table.values)
+								<td class="$val.style">$val.val</td>
+#end
+							<tr>
+						</table>

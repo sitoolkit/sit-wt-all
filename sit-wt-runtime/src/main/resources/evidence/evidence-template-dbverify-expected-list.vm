@@ -1,0 +1,8 @@
+
+						下記カラムの値が期待値と一致することを確認します
+						<ul>
+#foreach ($vpl in $expected.verifyColList)
+							<li>カラム[$vpl.verifyCol] / 期待値[$vpl.expected]</li>
+#end
+						</ul>
+						[$expected.verifySql] [$expected.verifyParams]

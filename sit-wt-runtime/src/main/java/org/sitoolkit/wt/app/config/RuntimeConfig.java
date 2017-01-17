@@ -13,8 +13,12 @@ import org.sitoolkit.wt.domain.evidence.appium.HybridScreenshotTaker;
 import org.sitoolkit.wt.domain.evidence.selenium.ElementPositionSupport2;
 import org.sitoolkit.wt.domain.evidence.selenium.SeleniumDialogScreenshotSupport;
 import org.sitoolkit.wt.domain.evidence.selenium.SeleniumScreenshotTaker;
+import org.sitoolkit.wt.domain.operation.DbVerifyLog;
+import org.sitoolkit.wt.domain.operation.HtmlTable;
+import org.sitoolkit.wt.domain.tester.OperationSupport;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.tester.Tester;
+import org.sitoolkit.wt.domain.tester.selenium.DbVerifyOperationSupport;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
@@ -22,6 +26,8 @@ import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.ELSupport;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.template.TemplateEngine;
+import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +36,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
 @Configuration
-@Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptConfig.class })
+@Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptConfig.class, DbConfig.class })
 @ComponentScan("org.sitoolkit.wt.domain.operation")
 public class RuntimeConfig {
 
@@ -129,6 +135,26 @@ public class RuntimeConfig {
     @Scope("prototype")
     public Evidence evidence() {
         return new Evidence();
+    }
+
+    @Bean
+    public TemplateEngine templateEngine() {
+        return new TemplateEngineVelocityImpl();
+    }
+
+    @Bean
+    public HtmlTable htmlTable() {
+        return new HtmlTable();
+    }
+
+    @Bean
+    public DbVerifyLog dbVerifyObject() {
+        return new DbVerifyLog();
+    }
+
+    @Bean
+    public OperationSupport operationSupport() {
+        return new DbVerifyOperationSupport();
     }
 
     @Bean

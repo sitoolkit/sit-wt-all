@@ -73,6 +73,9 @@ public class Tester {
     @Resource
     PropertyManager pm;
 
+    @Resource
+    OperationSupport operationSupport;
+
     // /**
     // * スクリーンショット操作
     // */
@@ -167,7 +170,9 @@ public class Tester {
                     result.add(e);
                     evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                             "期待と異なる結果になりました {}", e.getLocalizedMessage()));
-                    addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
+                    if (!operationSupport.isDbVerify(testStep.getOperation())) {
+                        addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
+                    }
 
                     if (pm.isDebug()) {
                         debug.pause();
@@ -180,7 +185,9 @@ public class Tester {
                         evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                                 "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
                         log.debug("例外詳細", e);
-                        addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
+                        if (!operationSupport.isDbVerify(testStep.getOperation())) {
+                            addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
+                        }
                         debug.pause();
                     } else {
                         throw e;
@@ -193,8 +200,10 @@ public class Tester {
         } catch (Exception e) {
             evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                     "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
+            if (!operationSupport.isDbVerify(testStep.getOperation())) {
+                addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
+            }
             log.debug("例外詳細", e);
-            addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
             result.setErrorCause(e);
         } finally {
             em.flushEvidence(evidence);
