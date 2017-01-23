@@ -1,7 +1,6 @@
 package org.sitoolkit.wt.gui.domain.test;
 
 import java.io.File;
-import java.util.List;
 
 public class TestRunParams {
 
@@ -9,13 +8,13 @@ public class TestRunParams {
 
     private String baseUrl;
 
-    private List<File> scripts;
-
     private boolean debug;
 
     private boolean parallel;
 
     private String driverType;
+
+    private String targetScripts;
 
     public TestRunParams() {
     }
@@ -26,14 +25,6 @@ public class TestRunParams {
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
-    }
-
-    public List<File> getScripts() {
-        return scripts;
-    }
-
-    public void setScripts(List<File> scripts) {
-        this.scripts = scripts;
     }
 
     public boolean isDebug() {
@@ -66,6 +57,14 @@ public class TestRunParams {
 
     public void setBaseDir(File baseDir) {
         this.baseDir = baseDir;
+    }
+
+    public String getTargetScripts() {
+        return targetScripts;
+    }
+
+    public void setTargetScriptsStr(String targetScripts) {
+        this.targetScripts = targetScripts;
     }
 
 }

@@ -1,5 +1,6 @@
 package org.sitoolkit.wt.gui.pres;
 
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -8,6 +9,7 @@ import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
+import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
@@ -27,7 +29,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 
-public class TestToolbarController implements Initializable {
+public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     private ToolBar startGroup;
@@ -121,11 +123,23 @@ public class TestToolbarController implements Initializable {
         runTest(false, true);
     }
 
+    @Override
+    public void runTest(boolean isDebug, boolean isParallel, File testScript,
+            List<String> caseNos) {
+        messageView.startMsg("テストを実行します。");
+        runTest(false, false, SitWtRuntimeUtils.buildScriptStr(testScript, caseNos));
+    }
+
     private void runTest(boolean isDebug, boolean isParallel) {
+        runTest(isDebug, isParallel,
+                SitWtRuntimeUtils.buildScriptStr(fileTreeController.getSelectedFiles()));
+    }
+
+    private void runTest(boolean isDebug, boolean isParallel, String targetScriptStr) {
         projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
 
         TestRunParams params = new TestRunParams();
-        params.setScripts(fileTreeController.getSelectedFiles());
+        params.setTargetScriptsStr(targetScriptStr);
         params.setBaseDir(projectState.getBaseDir());
         params.setDebug(isDebug);
         params.setParallel(isParallel);
@@ -146,7 +160,7 @@ public class TestToolbarController implements Initializable {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("");
             alert.setContentText("");
-            alert.setHeaderText("実行するテストスクリプトを選択してください。テストスクリプトの拡張子はxlsx、xlsx、csv、htmlです。");
+            alert.setHeaderText("実行するテストスクリプトを選択してください。テストスクリプトの拡張子はxlsx、csv、htmlです。");
             alert.show();
             projectState.reset();
         } else {

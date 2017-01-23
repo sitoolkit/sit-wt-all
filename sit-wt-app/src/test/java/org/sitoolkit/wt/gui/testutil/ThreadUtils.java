@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.test;
+package org.sitoolkit.wt.gui.testutil;
 
 public class ThreadUtils {
 

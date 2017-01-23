@@ -23,6 +23,26 @@ public class SitWtRuntimeUtils {
     private static final Pattern SCRIPT_FILE_PATTERN = Pattern
             .compile(".*\\.xlsx$|.*\\.xls$|.*\\.csv$|.*\\.html$");
 
+    public static String buildScriptStr(List<File> selectedFiles) {
+        return StrUtils.join(filterTestScripts(selectedFiles));
+    }
+
+    public static String buildScriptStr(File testScript, List<String> caseNos) {
+        StringBuilder sb = new StringBuilder();
+        String testScriptPath = testScript.getAbsolutePath();
+
+        for (String caseNo : caseNos) {
+
+            if (sb.length() == 0)
+                sb.append(",");
+            sb.append(testScriptPath);
+            sb.append("#");
+            sb.append(caseNo);
+        }
+
+        return sb.toString();
+    }
+
     public static List<File> filterTestScripts(List<File> selectedFiles) {
         return selectedFiles.stream()
                 .filter(file -> SCRIPT_FILE_PATTERN.matcher(file.getName()).matches())

@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.test.ThreadUtils;
+import org.sitoolkit.wt.gui.testutil.ThreadUtils;
 
 public class ProjectServiceTest {
 

@@ -1,4 +1,4 @@
-package org.sitoolkit.wt.gui.test;
+package org.sitoolkit.wt.gui.testutil;
 
 import java.io.File;
 import java.util.logging.Level;

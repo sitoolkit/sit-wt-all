@@ -110,6 +110,7 @@ public class AppController implements Initializable {
         testToolbarController.initialize(messageView, fileTreeController, projectState);
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
 
+        fileTreeController.setTestRunnable(testToolbarController);
     }
 
     public void postInit() {

@@ -1,20 +1,29 @@
 package org.sitoolkit.wt.gui.pres;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import org.sitoolkit.wt.gui.app.script.ScriptService;
 import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import org.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import org.sitoolkit.wt.gui.infra.fx.FileWrapper;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
+import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
@@ -26,11 +35,26 @@ public class FileTreeController implements Initializable {
     @FXML
     private TreeView<FileWrapper> fileTree;
 
+    @FXML
+    private ContextMenu contextMenu;
+
+    @FXML
+    private MenuItem executeMenuItem;
+
+    @FXML
+    private MenuItem executeCaseMenuItem;
+
     private Mode mode = Mode.NORMAL;
 
     TestService testService = new TestService();
 
     FileSystemWatchService fileSystemWatchService = new FileSystemWatchService();
+
+    TestRunnable testRunnable;
+
+    ScriptService scriptService = new ScriptService();
+
+    TestCaseDialogController testCaseDialogController;
 
     public FileTreeController() {
     }
@@ -44,7 +68,27 @@ public class FileTreeController implements Initializable {
         }
         fileTree.setShowRoot(false);
 
+        contextMenu.setOnShowing(value -> {
+            operateSelectedItem(selectedItem -> {
+
+                String selectedFileName = selectedItem.getValue().getFile().getName();
+
+                executeMenuItem.setVisible(
+                        StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls", ".csv"));
+                executeCaseMenuItem
+                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
+            });
+        });
+
         fileSystemWatchService.init();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/TestCaseDialog.fxml"));
+        try {
+            loader.load();
+            testCaseDialogController = loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void destroy() {
@@ -86,10 +130,7 @@ public class FileTreeController implements Initializable {
         List<File> selectedFiles = new ArrayList<>();
 
         if (mode == Mode.NORMAL) {
-            // TODO recursive
-            fileTree.getSelectionModel().getSelectedItems()
-                    .forEach(item -> selectedFiles.add(item.getValue().getFile()));
-            return selectedFiles;
+            return getFilesRecursively(fileTree.getSelectionModel().getSelectedItems());
         }
 
         for (TreeItem<?> item : fileTree.getRoot().getChildren()) {
@@ -102,6 +143,25 @@ public class FileTreeController implements Initializable {
         }
 
         return selectedFiles;
+    }
+
+    public List<File> getFilesRecursively(List<?> fileTree) {
+        List<File> allFiles = new ArrayList<>();
+
+        for (Object item : fileTree) {
+            if (item instanceof FileTreeItem) {
+                FileTreeItem casted = (FileTreeItem) item;
+                File target = casted.getValue().getFile();
+
+                if (target.isDirectory()) {
+                    allFiles.addAll(getFilesRecursively(casted.getChildren()));
+                } else {
+                    allFiles.add(target);
+                }
+            }
+        }
+
+        return allFiles;
     }
 
     @FXML
@@ -189,6 +249,24 @@ public class FileTreeController implements Initializable {
         selectedItem.getParent().getChildren().remove(selectedItem);
     }
 
+    @FXML
+    public void execute() {
+        testRunnable.run();
+    }
+
+    @FXML
+    public void executeCase() {
+        operateSelectedItem(selectedItem -> {
+            File selectedFile = selectedItem.getValue().getFile();
+
+            scriptService.readCaseNo(selectedFile, caseNos -> {
+                Platform.runLater(
+                        () -> testCaseDialogController.showSelectDialog(selectedFile, caseNos));
+            });
+
+        });
+    }
+
     private void operateSelectedItem(Operation operation) {
         TreeItem<FileWrapper> selectedItem = fileTree.getSelectionModel().getSelectedItem();
 
@@ -208,6 +286,19 @@ public class FileTreeController implements Initializable {
             }
             operation.operate(selectedItem);
         });
+    }
+
+    public void setTestRunnable(TestRunnable testRunnable) {
+        this.testRunnable = testRunnable;
+        this.testCaseDialogController.setTestRunnable(testRunnable);
+    }
+
+    public void showAlert(String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("");
+        alert.setContentText("");
+        alert.setHeaderText(message);
+        alert.show();
     }
 
     @FunctionalInterface
