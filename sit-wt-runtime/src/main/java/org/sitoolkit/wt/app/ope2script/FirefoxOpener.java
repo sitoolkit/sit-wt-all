@@ -1,10 +1,10 @@
 package org.sitoolkit.wt.app.ope2script;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.sitoolkit.wt.domain.guidance.GuidanceUtils;
 import org.sitoolkit.wt.infra.MultiThreadUtils;
 import org.sitoolkit.wt.infra.firefox.FirefoxManager;
 import org.slf4j.Logger;
@@ -15,6 +15,11 @@ public class FirefoxOpener {
     private static final Logger LOG = LoggerFactory.getLogger(FirefoxOpener.class);
 
     private FirefoxManager ffManager = new FirefoxManager();
+
+    private String guidanceFile = "guidance/guidance-ope2script.html";
+
+    private String[] guidanceResources = new String[] { guidanceFile,
+            "guidance/css/bootstrap.min.css", "guidance/css/style.css", "guidance/js/open.js" };
 
     public FirefoxOpener() {
     }
@@ -32,6 +37,9 @@ public class FirefoxOpener {
      */
     public int open() {
         try {
+
+            GuidanceUtils.retrieve(guidanceResources);
+
             FirefoxProfile profile = new FirefoxProfile();
             profile.addExtension(ffManager.getSeleniumIdeUnarchivedDir());
 
@@ -41,10 +49,9 @@ public class FirefoxOpener {
 
             WebDriver driver = MultiThreadUtils
                     .submitWithProgress(() -> new FirefoxDriver(ffBinary, profile));
-            String url = System.getProperty("url");
-            if (StringUtils.isNotEmpty(url)) {
-                driver.get(url);
-            }
+
+            String baseUrl = System.getProperty("baseUrl");
+            driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));
 
             // wait for Firefox window is closed
             ffBinary.waitFor();
