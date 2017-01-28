@@ -136,7 +136,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     private void runTest(boolean isDebug, boolean isParallel) {
         runTest(isDebug, isParallel,
-                SitWtRuntimeUtils.buildScriptStr(fileTreeController.getSelectedFiles()));
+                SitWtRuntimeUtils.buildScriptStr(fileTreeController.getSelectedItems(true)));
     }
 
     private void runTest(boolean isDebug, boolean isParallel, String targetScriptStr) {

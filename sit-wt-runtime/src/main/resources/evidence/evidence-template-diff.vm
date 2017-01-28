@@ -11,32 +11,23 @@
 	</head>
 	<body>
 		<div class="container">
-		<a href="./">エビデンスフォルダへ</a>
-		<div class="page-header">
-			<h1>テストエビデンスdiff $diff.evidenceName</h1>
-		</div>
-		<table class="table">
-			<thead>
-				<tr>
-					<th>$diff.leftFileName</th>
-					<th>$diff.rightFileName</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>
-						<div id="left_evidence">
-$diff.leftFile
-						</div>
-					</td>
-					<td>
-						<div id="right_evidence">
-$diff.rightFile
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+    		<a href="./">エビデンスフォルダへ</a>
+    		<div class="page-header">
+    			<h1>テストエビデンスdiff $diff.evidenceName</h1>
+    		</div>
+    		
+    		<div class="row">
+              <div class="col-md-6">$diff.leftFileName</div>
+              <div class="col-md-6">$diff.rightFileName</div>
+    		</div>
+    		<div class="row">
+    		  <div id="left_evidence" class="col-md-6">
+    		    $diff.leftFile
+    		  </div>
+    		  <div id="right_evidence" class="col-md-6">
+    		    $diff.rightFile
+    		  </div>
+    		</div>
 		</div>
 	</body>
 </html>

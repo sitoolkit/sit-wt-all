@@ -17,13 +17,13 @@ public class DiffEvidenceService {
 
     DiffEvidenceProcessClient client = new DiffEvidenceProcessClient();
 
-    public boolean genMaskEvidence(List<File> selectedFiles, ProcessExitCallback callback) {
+    public boolean genMaskEvidence(File selectedItem, ProcessExitCallback callback) {
 
-        if (selectedFiles.size() != 1) {
+        if (selectedItem == null) {
             return false;
         }
 
-        Matcher m = evidenceDirPattern.matcher(selectedFiles.get(0).getName());
+        Matcher m = evidenceDirPattern.matcher(selectedItem.getName());
         if (!m.matches()) {
             return false;
         }
@@ -31,18 +31,18 @@ public class DiffEvidenceService {
         ProcessParams params = new ProcessParams();
         params.getExitClallbacks().add(callback);
 
-        client.genMaskEvidence(selectedFiles.get(0), params);
+        client.genMaskEvidence(selectedItem, params);
 
         return true;
     }
 
-    public boolean setBaseEvidence(List<File> selectedFiles, ProcessExitCallback callback) {
+    public boolean setBaseEvidence(File selectedItem, ProcessExitCallback callback) {
 
-        if (selectedFiles.size() != 1) {
+        if (selectedItem == null) {
             return false;
         }
 
-        Matcher m = evidenceDirPattern.matcher(selectedFiles.get(0).getName());
+        Matcher m = evidenceDirPattern.matcher(selectedItem.getName());
         if (!m.matches()) {
             return false;
         }
@@ -50,12 +50,13 @@ public class DiffEvidenceService {
         ProcessParams params = new ProcessParams();
         params.getExitClallbacks().add(callback);
 
-        client.setBaseEvidence(selectedFiles.get(0), params);
+        client.setBaseEvidence(selectedItem, params);
 
         return true;
     }
 
-    public boolean genDiffEvidence(List<File> selectedFiles, ProcessExitCallback callback) {
+    public boolean genDiffEvidence(File projectDir, List<File> selectedFiles,
+            ProcessExitCallback callback) {
 
         int selectedCount = selectedFiles.size();
 
@@ -81,6 +82,8 @@ public class DiffEvidenceService {
         } else if (selectedCount == 1) {
             targetDir = selectedFiles.get(0);
         }
+
+        targetDir = projectDir.toPath().relativize(targetDir.toPath()).toFile();
 
         client.genDiffEvidence(baseDir, targetDir, params);
 

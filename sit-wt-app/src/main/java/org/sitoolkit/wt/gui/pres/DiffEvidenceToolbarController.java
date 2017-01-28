@@ -10,14 +10,14 @@ import org.sitoolkit.wt.gui.infra.fx.FxUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
-import javafx.scene.layout.HBox;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.HBox;
 
 public class DiffEvidenceToolbarController implements Initializable {
 
     @FXML
     private HBox diffEvidenceToolbar;
-    
+
     private FileTreeController fileTreeController;
 
     private MessageView messageView;
@@ -31,7 +31,8 @@ public class DiffEvidenceToolbarController implements Initializable {
 
     }
 
-    public void initialize(MessageView messageView, FileTreeController fileTreeController, ProjectState projectState) {
+    public void initialize(MessageView messageView, FileTreeController fileTreeController,
+            ProjectState projectState) {
         this.projectState = projectState;
         this.fileTreeController = fileTreeController;
         this.messageView = messageView;
@@ -44,7 +45,7 @@ public class DiffEvidenceToolbarController implements Initializable {
 
         messageView.startMsg("スクリーンショットにマスク処理を施したエビデンスを生成します。");
 
-        boolean success = diffEvidenceService.genMaskEvidence(fileTreeController.getSelectedFiles(), 
+        boolean success = diffEvidenceService.genMaskEvidence(fileTreeController.getSelectedItem(),
                 exitCode -> {
                     projectState.reset();
                 });
@@ -63,7 +64,7 @@ public class DiffEvidenceToolbarController implements Initializable {
 
         messageView.startMsg("基準エビデンス確定処理を実行します。");
 
-        boolean success = diffEvidenceService.setBaseEvidence(fileTreeController.getSelectedFiles(), 
+        boolean success = diffEvidenceService.setBaseEvidence(fileTreeController.getSelectedItem(),
                 exitCode -> {
                     projectState.reset();
                 });
@@ -82,8 +83,8 @@ public class DiffEvidenceToolbarController implements Initializable {
 
         messageView.startMsg("比較エビデンスを生成します。");
 
-        boolean success = diffEvidenceService.genDiffEvidence(fileTreeController.getSelectedFiles(), 
-                exitCode -> {
+        boolean success = diffEvidenceService.genDiffEvidence(fileTreeController.getRoot(),
+                fileTreeController.getSelectedItems(false), exitCode -> {
                     projectState.reset();
                 });
 
@@ -91,7 +92,8 @@ public class DiffEvidenceToolbarController implements Initializable {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("");
             alert.setContentText("");
-            alert.setHeaderText("比較対象のエビデンスディレクトリを1つ、または2つ選択してください。1つだけ選択した場合は、選択したディレクトリと基準エビデンスを比較します。");
+            alert.setHeaderText(
+                    "比較対象のエビデンスディレクトリを1つ、または2つ選択してください。1つだけ選択した場合は、選択したディレクトリと基準エビデンスを比較します。");
             alert.show();
         }
     }

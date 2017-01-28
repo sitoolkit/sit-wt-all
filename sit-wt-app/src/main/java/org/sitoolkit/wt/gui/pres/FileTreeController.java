@@ -95,6 +95,10 @@ public class FileTreeController implements Initializable {
         fileSystemWatchService.destroy();
     }
 
+    public File getRoot() {
+        return fileTree.getRoot().getValue().getFile();
+    }
+
     public void setFileTreeRoot(File baseDir) {
 
         TreeItem<FileWrapper> root = new TreeItem<>();
@@ -130,26 +134,16 @@ public class FileTreeController implements Initializable {
         return newDir;
     }
 
-    public List<File> getSelectedFiles() {
-        List<File> selectedFiles = new ArrayList<>();
-
-        if (mode == Mode.NORMAL) {
-            return getFilesRecursively(fileTree.getSelectionModel().getSelectedItems());
-        }
-
-        for (TreeItem<?> item : fileTree.getRoot().getChildren()) {
-            if (item instanceof FileTreeItem) {
-                FileTreeItem casted = (FileTreeItem) item;
-                if (casted.isSelectable()) {
-                    selectedFiles.addAll(casted.getSelectedFiles());
-                }
-            }
-        }
-
-        return selectedFiles;
+    public List<File> getSelectedItems(boolean recursive) {
+        return tree2files(fileTree.getSelectionModel().getSelectedItems(), recursive);
     }
 
-    public List<File> getFilesRecursively(List<?> fileTree) {
+    public File getSelectedItem() {
+        TreeItem<FileWrapper> selectedItem = fileTree.getSelectionModel().getSelectedItem();
+        return selectedItem == null ? null : selectedItem.getValue().getFile();
+    }
+
+    private List<File> tree2files(List<?> fileTree, boolean recursive) {
         List<File> allFiles = new ArrayList<>();
 
         for (Object item : fileTree) {
@@ -157,8 +151,8 @@ public class FileTreeController implements Initializable {
                 FileTreeItem casted = (FileTreeItem) item;
                 File target = casted.getValue().getFile();
 
-                if (target.isDirectory()) {
-                    allFiles.addAll(getFilesRecursively(casted.getChildren()));
+                if (recursive && target.isDirectory()) {
+                    allFiles.addAll(tree2files(casted.getChildren(), recursive));
                 } else {
                     allFiles.add(target);
                 }
