@@ -1,0 +1,22 @@
+#if ($error.invalidCols.size() > 0)
+<br/>
+						下記カラムはテーブルに存在しない、またはロケーター指定のSQLで選択されていません
+						<ul>
+#foreach ($col in $error.invalidCols)
+							<li>カラム[$col]</li>
+#end
+						</ul>
+#end
+#if ($error.verifyErrs.size() > 0)
+<br/>
+						下記カラムの実測値が期待値と異なります
+						<ul>
+#foreach ($err in $error.verifyErrs)
+							<li>カラム[$err.verifyCol] / 実測値[$err.actual] / 期待値[$err.expected]</li>
+#end
+						</ul>
+#end
+#if ($error.invalidCols.size() > 0 || $error.verifyErrs.size() > 0)
+						[$error.verifySql] [$error.verifyParams]
+
+#end

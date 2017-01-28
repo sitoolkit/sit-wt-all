@@ -15,7 +15,7 @@
  */
 package org.sitoolkit.wt.domain.tester;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -65,7 +65,7 @@ public abstract class SitTesterTestBase {
         }
 
         if (!result.isSuccess()) {
-            fail(result.buileReason());
+            fail(result.buildReason());
         }
     }
 

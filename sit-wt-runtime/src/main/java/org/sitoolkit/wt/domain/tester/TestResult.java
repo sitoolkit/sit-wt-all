@@ -31,7 +31,7 @@ public class TestResult {
      *
      * @return テスト実行が失敗した理由のメッセージ文字列
      */
-    public String buileReason() {
+    public String buildReason() {
         StringBuilder sb = new StringBuilder();
 
         sb.append("テスト実行が失敗しました。");

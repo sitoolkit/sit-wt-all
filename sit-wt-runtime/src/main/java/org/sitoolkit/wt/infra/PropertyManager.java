@@ -79,6 +79,9 @@ public class PropertyManager {
     @Value("${selenium.screenshot.pattern}")
     private String seleniumScreenshotPattern;
 
+    @Value("${connection.properties}")
+    private String connectionProperties;
+
     @Value("${baseUrl:}")
     private String baseUrl;
 
@@ -227,6 +230,10 @@ public class PropertyManager {
 
     public String getScreenthotMode() {
         return screenshotMode;
+    }
+    
+    public String getConnectionProperties() {
+        return connectionProperties;
     }
 
     public String getBaseUrl() {
