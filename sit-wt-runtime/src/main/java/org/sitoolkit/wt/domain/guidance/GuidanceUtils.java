@@ -22,8 +22,6 @@ public class GuidanceUtils {
      * 
      * @param resources
      *            ガイダンスの表示に必要なファイル
-     * @param destDir
-     *            展開先のディレクトリ
      */
     public static void retrieve(String[] resources) {
         retrieve(resources, new File("."));
