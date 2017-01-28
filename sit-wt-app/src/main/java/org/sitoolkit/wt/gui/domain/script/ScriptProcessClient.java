@@ -1,5 +1,6 @@
 package org.sitoolkit.wt.gui.domain.script;
 
+import java.io.File;
 import java.util.List;
 
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
@@ -40,5 +41,18 @@ public class ScriptProcessClient {
         process.start(params);
 
         return process;
+    }
+
+    public void readCaseNo(File testScript, ProcessParams params) {
+        List<String> command = SitWtRuntimeUtils.buildJavaCommand();
+
+        command.add("org.sitoolkit.wt.app.test.TestCaseReader");
+        command.add(testScript.getAbsolutePath());
+
+        params.setCommand(command);
+
+        ConversationProcess process = ConversationProcessContainer.create();
+        process.start(params);
+
     }
 }

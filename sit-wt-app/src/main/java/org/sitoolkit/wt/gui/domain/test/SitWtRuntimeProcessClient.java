@@ -7,17 +7,16 @@ import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
 
 public class SitWtRuntimeProcessClient {
 
     /**
      * 次のコマンドを実行します。
-     * 
+     *
      * <pre>
      *  mvn dependency:build-classpath -f ${pomFile}
      * </pre>
-     * 
+     *
      * @param pomFile
      *            pom.xls
      * @param params
@@ -62,7 +61,7 @@ public class SitWtRuntimeProcessClient {
 
         command.add("org.sitoolkit.wt.app.test.TestRunner");
 
-        command.add(StrUtils.join(testRunParams.getScripts()));
+        command.add(testRunParams.getTargetScripts());
 
         params.setCommand(command);
 

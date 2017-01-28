@@ -69,6 +69,11 @@ public class EvidenceOpener {
 
     }
 
+    public void openTarget(File targetFile) {
+        evidenceFileRegex = targetFile.getName() + ".*\\.html$";
+        open();
+    }
+
     public class FileLastModifiedComarator implements Comparator<File> {
 
         private int signum = 1;

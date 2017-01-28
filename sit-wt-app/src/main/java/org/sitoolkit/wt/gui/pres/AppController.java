@@ -117,6 +117,7 @@ public class AppController implements Initializable {
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
         diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
 
+        fileTreeController.setTestRunnable(testToolbarController);
     }
 
     public void postInit() {

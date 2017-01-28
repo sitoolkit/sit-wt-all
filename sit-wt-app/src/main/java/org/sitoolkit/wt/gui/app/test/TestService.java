@@ -1,13 +1,11 @@
 package org.sitoolkit.wt.gui.app.test;
 
 import java.io.File;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
-import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
@@ -27,10 +25,7 @@ public class TestService {
     public ConversationProcess runTest(TestRunParams params, SitWtDebugStdoutListener listener,
             ProcessExitCallback callback) {
 
-        List<File> selectedFiles = params.getScripts();
-        List<File> testScripts = SitWtRuntimeUtils.filterTestScripts(selectedFiles);
-
-        if (selectedFiles.size() != 1 || testScripts.isEmpty()) {
+        if (params.getTargetScripts() == null) {
             return null;
         }
 

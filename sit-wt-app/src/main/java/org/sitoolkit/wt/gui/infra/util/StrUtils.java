@@ -35,4 +35,15 @@ public class StrUtils {
     public static boolean equals(String a, String b) {
         return a == null ? b == null : a.equals(b);
     }
+
+    public static boolean endsWithAny(String str, String... suffixes) {
+
+        for (String suffix : suffixes) {
+            if (str.endsWith(suffix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

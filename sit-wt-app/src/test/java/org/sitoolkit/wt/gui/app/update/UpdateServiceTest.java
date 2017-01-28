@@ -1,7 +1,7 @@
 package org.sitoolkit.wt.gui.app.update;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.test.ThreadUtils;
+import org.sitoolkit.wt.gui.testutil.ThreadUtils;
 
 public class UpdateServiceTest {
 
@@ -30,7 +30,7 @@ public class UpdateServiceTest {
 
         service.checkSitWtAppUpdate(pomFile, newVersion -> {
             // TODO newVersionの値をpomから取得
-            assertThat("newVersion", newVersion, is("2.0.1"));
+            assertThat("newVersion", newVersion, is("2.0.2"));
             tested = true;
         });
 
