@@ -4,12 +4,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
+import org.sitoolkit.wt.domain.guidance.GuidanceUtils;
 import org.sitoolkit.wt.domain.pageload.PageContext;
 import org.sitoolkit.wt.domain.pageload.PageListener;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.sitoolkit.wt.infra.SitPathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +21,12 @@ public class SeleniumPageLietener implements PageListener {
 
     @Resource
     PropertyManager pm;
+
+    private String guidanceFile = "guidance/guidance-page2script.html";
+
+    private String[] guidanceResources = new String[] { guidanceFile,
+            "guidance/css/bootstrap.min.css", "guidance/css/style.css", "guidance/js/open.js",
+            "guidance/img/ic_file_download_black_18dp_1x.png" };
 
     @Override
     public void setUpPage(PageContext ctx) {
@@ -37,14 +42,15 @@ public class SeleniumPageLietener implements PageListener {
 
     @Override
     public void setUp() {
+
+        GuidanceUtils.retrieve(guidanceResources);
+
         // touch WebDriver instance to start Browser
         String driverType = driver.toString();
         LOG.info("ブラウザを起動します {}", driverType);
 
-        String baseUrl = pm.getBaseUrl();
-        if (StringUtils.isNotEmpty(baseUrl)) {
-            driver.get(SitPathUtils.buildUrl(baseUrl, ""));
-        }
+        String baseUrl = System.getProperty("baseUrl");
+        driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));
     }
 
     @Override

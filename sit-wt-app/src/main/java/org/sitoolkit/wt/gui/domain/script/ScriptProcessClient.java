@@ -24,11 +24,11 @@ public class ScriptProcessClient {
         return process;
     }
 
-    public ConversationProcess ope2script(String url) {
+    public ConversationProcess ope2script(String baseUrl) {
         List<String> command = SitWtRuntimeUtils.buildJavaCommand();
 
-        if (StrUtils.isNotEmpty(url)) {
-            command.add("-Durl=" + url);
+        if (StrUtils.isNotEmpty(baseUrl)) {
+            command.add("-DbaseUrl=" + baseUrl);
         }
 
         command.add("org.sitoolkit.wt.app.ope2script.FirefoxOpener");

@@ -18,7 +18,7 @@ public class ScriptService {
         return client.page2script(driverType, baseUrl, params);
     }
 
-    public ConversationProcess ope2script(String url) {
-        return client.ope2script(url);
+    public ConversationProcess ope2script(String baseUrl) {
+        return client.ope2script(baseUrl);
     }
 }
