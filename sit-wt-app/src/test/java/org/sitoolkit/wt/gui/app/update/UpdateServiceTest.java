@@ -30,7 +30,7 @@ public class UpdateServiceTest {
 
         service.checkSitWtAppUpdate(pomFile, newVersion -> {
             // TODO newVersionの値をpomから取得
-            assertThat("newVersion", newVersion, is("2.0.2"));
+            assertThat("newVersion", newVersion, is("2.1"));
             tested = true;
         });
 

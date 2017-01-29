@@ -15,7 +15,9 @@ import org.sitoolkit.wt.gui.infra.UnExpectedException;
 import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.gui.infra.util.VersionUtils;
 
 public class ProjectService {
 
@@ -85,6 +87,8 @@ public class ProjectService {
         File pomFile = new File(projectDir.getAbsolutePath(), "pom.xml");
 
         if (pomFile.exists()) {
+
+            MavenUtils.setSitWtVersion(pomFile, VersionUtils.get());
 
             loadProject(pomFile, projectState);
             return pomFile;

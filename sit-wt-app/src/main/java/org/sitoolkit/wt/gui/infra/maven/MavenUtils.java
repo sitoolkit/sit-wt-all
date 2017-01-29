@@ -11,6 +11,11 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.sitoolkit.wt.gui.infra.UnExpectedException;
@@ -19,6 +24,7 @@ import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.StrUtils;
 import org.sitoolkit.wt.gui.infra.util.SystemUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class MavenUtils {
 
@@ -171,8 +177,8 @@ public class MavenUtils {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(settingsXml);
 
-
-            String localRepository = XPathFactory.newInstance().newXPath().compile("/settings/localRepository").evaluate(document);
+            String localRepository = XPathFactory.newInstance().newXPath()
+                    .compile("/settings/localRepository").evaluate(document);
 
             if (StrUtils.isEmpty(localRepository)) {
                 return defaultLocalRepository;
@@ -194,23 +200,28 @@ public class MavenUtils {
         File mavenLocalRepo = getLocalRepository();
 
         if (mavenLocalRepo.exists()) {
-            LOG.log(Level.INFO, "maven local repository exists in {0}", mavenLocalRepo.getAbsolutePath());
+            LOG.log(Level.INFO, "maven local repository exists in {0}",
+                    mavenLocalRepo.getAbsolutePath());
             repositoryAvairable = true;
             return;
         }
         // TODO sit-wt未使用の場合の差分リポジトリを用意するか？
-//        File sitWtRepo = new File(mavenLocalRepo, "org/sitoolkit/wt");
-//
-//        if (sitWtRepo.exists()) {
-//            LOG.log(Level.INFO, "sit-wt exists in maven local repository {0}", sitWtRepo.getAbsolutePath());
-//            repositoryAvairable = true;
-//            return;
-//        }
+        // File sitWtRepo = new File(mavenLocalRepo, "org/sitoolkit/wt");
+        //
+        // if (sitWtRepo.exists()) {
+        // LOG.log(Level.INFO, "sit-wt exists in maven local repository {0}",
+        // sitWtRepo.getAbsolutePath());
+        // repositoryAvairable = true;
+        // return;
+        // }
         try {
-            File repositoryZip = new File(SystemUtils.getSitRepository(), "sit-wt-app/repository/maven-repository-sit-wt.zip");
+            File repositoryZip = new File(SystemUtils.getSitRepository(),
+                    "sit-wt-app/repository/maven-repository-sit-wt.zip");
 
             if (!repositoryZip.exists()) {
-                FileIOUtils.download("https://github.com/sitoolkit/sit-wt-all/releases/download/v2.0/maven-repository-sit-wt.zip", repositoryZip);
+                FileIOUtils.download(
+                        "https://github.com/sitoolkit/sit-wt-all/releases/download/v2.0/maven-repository-sit-wt.zip",
+                        repositoryZip);
             }
 
             FileIOUtils.unarchive(repositoryZip, mavenLocalRepo);
@@ -221,4 +232,45 @@ public class MavenUtils {
         }
     }
 
+    public static void setSitWtVersion(File pomFile, String newVersion) {
+        setSitWtVersion(pomFile, newVersion, pomFile);
+    }
+
+    static int setSitWtVersion(File pomFile, String newVersion, File destPomFile) {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.parse(pomFile);
+
+            Node versionNode = (Node) XPathFactory.newInstance().newXPath()
+                    .compile("/project/properties/sitwt.version")
+                    .evaluate(document, XPathConstants.NODE);
+
+            String currentVersion = versionNode.getTextContent();
+
+            if (currentVersion.equals(newVersion)) {
+                LOG.log(Level.INFO, "sitwt.version in {0} is {1}",
+                        new Object[] { pomFile.getAbsolutePath(), currentVersion });
+                return 1;
+            }
+
+            LOG.log(Level.INFO, "set sitwt.version in {0} {1} -> {2}",
+                    new Object[] { pomFile.getAbsolutePath(), currentVersion, newVersion });
+            versionNode.setTextContent(newVersion);
+
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+            DOMSource domSource = new DOMSource(document);
+            StreamResult result = new StreamResult(destPomFile);
+            transformer.transform(domSource, result);
+
+            return 0;
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "fail to update sitwt.version", e);
+            return -1;
+        }
+    }
+
+    public static void main(String[] args) {
+        setSitWtVersion(new File("distribution-pom.xml"), "1.1");
+    }
 }
