@@ -190,7 +190,7 @@
 
   <target name="set-version">
 
-    <property name="version" value="2.1" />
+    <property name="version" value="2.1.1-SNAPSHOT" />
 
     <replaceregexp file="${distribution.pom}"
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
