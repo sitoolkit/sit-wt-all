@@ -19,14 +19,14 @@ public class CaseNoCache {
 
     public List<String> getCaseNosIfNotModified(File testScript) {
         String key = toCacheKey(testScript);
-        TestScript cachedTestScript = cache.get(testScript);
+        TestScript cachedTestScript = cache.get(key);
 
         if (cachedTestScript == null) {
             return null;
         }
 
-        if (key == toCacheKey(cachedTestScript.getFile())) {
-            return cachedTestScript.getCaseNos();
+        if (key.equals(toCacheKey(cachedTestScript))) {
+            return cachedTestScript.caseNos;
         }
         return null;
     }
@@ -35,36 +35,23 @@ public class CaseNoCache {
         return file.getAbsolutePath() + ";" + file.lastModified();
     }
 
+    private String toCacheKey(TestScript script) {
+        return script.path + ";" + script.lastModified;
+    }
+
     class TestScript {
 
-        private File file;
+        String path;
 
-        private List<String> caseNos;
+        long lastModified;
 
-        public TestScript() {
-        }
+        List<String> caseNos;
 
         public TestScript(File file, List<String> caseNos) {
             super();
-            this.file = file;
+            this.path = file.getAbsolutePath();
+            this.lastModified = file.lastModified();
             this.caseNos = caseNos;
         }
-
-        public File getFile() {
-            return file;
-        }
-
-        public void setFile(File file) {
-            this.file = file;
-        }
-
-        public List<String> getCaseNos() {
-            return caseNos;
-        }
-
-        public void setCaseNos(List<String> caseNos) {
-            this.caseNos = caseNos;
-        }
-
     }
 }
