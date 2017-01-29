@@ -26,7 +26,8 @@ public class SeleniumPageLietener implements PageListener {
 
     private String[] guidanceResources = new String[] { guidanceFile,
             "guidance/css/bootstrap.min.css", "guidance/css/style.css", "guidance/js/open.js",
-            "guidance/img/ic_file_download_black_18dp_1x.png" };
+            "guidance/img/ic_file_download_black_18dp_1x.png",
+            "guidance/img/ic_stop_black_18dp_1x.png" };
 
     @Override
     public void setUpPage(PageContext ctx) {
