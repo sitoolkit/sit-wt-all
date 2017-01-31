@@ -49,7 +49,7 @@ div.box-hidden {
 #toolBox {
 	position: fixed;
 	opacity: 0.8;
-	width: 1000px;
+	width: 200px;
 }
 
 #initialFusenPos {
@@ -71,4 +71,5 @@ div.fusen {
 
 .ui-tooltip {
 	max-width: 400px;
+	white-space: pre-wrap;
 }

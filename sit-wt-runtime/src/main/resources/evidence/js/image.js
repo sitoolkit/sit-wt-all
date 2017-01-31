@@ -1,7 +1,7 @@
 
 function init(){
 
-	var modeHelp = "付箋モードのON/OFFを切り替ます。";
+	var modeHelp = "付箋モードのON/OFFを切り替ます。&#10;（キーボードショートカット：F）";
 	var trashBoxHelp = "削除したい付箋はここにドロップします。";
 	var loadHelp = "JSONを読み込み付箋の配置を復元します。";
 	var saveHelp = "付箋の配置情報をJSONで保存します。";
@@ -27,6 +27,7 @@ function init(){
 	$("#toolBox").after("<div id='movedFusen'></div>");
 
 	$(".help").tooltip();
+	$(".icon").css("cursor", "pointer");
 
 }
 
@@ -43,7 +44,8 @@ $(function() {
 		initialFusenPos.append("<div class='fusen'></div>");
 		var fusen = initialFusenPos.find("div:last");
 
-		fusen.resizable().draggable()
+		fusen.css("cursor", "move")
+		.resizable().draggable()
 		.on("drag", function(event, ui) {
 
 			if (isOut(fusen, initialFusenPos)) {
