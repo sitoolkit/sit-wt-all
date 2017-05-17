@@ -94,6 +94,12 @@ public class PropertyManager {
     @Value("${sitwt.cli:true}")
     private boolean isCli;
 
+    @Value("${wait.timeout}")
+    private int timeout;
+
+    @Value("${wait.waitSpan}")
+    private int waitSpan;
+
     private Map<String, String> capabilities = new HashMap<>();
 
     private boolean isFirefoxDriver;
@@ -231,7 +237,7 @@ public class PropertyManager {
     public String getScreenthotMode() {
         return screenshotMode;
     }
-    
+
     public String getConnectionProperties() {
         return connectionProperties;
     }
@@ -280,4 +286,11 @@ public class PropertyManager {
         return isCli;
     }
 
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public int getWaitSpan() {
+        return waitSpan;
+    }
 }
