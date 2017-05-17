@@ -17,6 +17,7 @@ package org.sitoolkit.wt.app.config;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -91,6 +93,14 @@ public class WebDriverConfig {
 
             case "chrome":
                 webDriverInstaller.installChromeDriver();
+
+                Map<String, Object> prefs = new HashMap<>();
+                prefs.put("credentials_enable_service", false);
+                prefs.put("password_manager_enabled", false);
+                Map<String, Object> options = new HashMap<>();
+                options.put("prefs", prefs);
+                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
                 webDriver = new ChromeDriver(capabilities);
                 break;
 
