@@ -174,6 +174,7 @@ public class AppController implements Initializable {
         File projectDir = pomFile.getAbsoluteFile().getParentFile();
         messageView.addMsg("プロジェクトを開きます。" + projectDir.getAbsolutePath());
         fileTreeController.setFileTreeRoot(projectDir);
+        testToolbarController.loadProject();
         FxContext.setTitie(projectDir.getAbsolutePath());
     }
 
