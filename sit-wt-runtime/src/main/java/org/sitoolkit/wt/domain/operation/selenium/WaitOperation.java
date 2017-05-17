@@ -15,7 +15,10 @@
  */
 package org.sitoolkit.wt.domain.operation.selenium;
 
+import javax.annotation.Resource;
+
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.RegexHelper;
 import org.springframework.stereotype.Component;
 
@@ -26,14 +29,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class WaitOperation extends SeleniumOperation {
 
-    private int timeout = 1;
-    private int waitSpan = 100;
+    @Resource
+    PropertyManager pm;
 
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
+        int timeout = pm.getTimeout();
+        int waitSpan = pm.getWaitSpan();
+
         ctx.info("{}({})に{}が表示されるまで{}秒間待機します。", testStep.getItemName(), testStep.getLocator(),
-                testStep.getValue(), getTimeout());
-        int count = (getTimeout() * 1000) / getWaitSpan();
+                testStep.getValue(), timeout / 1000);
+        int count = timeout / waitSpan;
 
         for (int i = 0; i < count; i++) {
 
@@ -42,26 +48,10 @@ public class WaitOperation extends SeleniumOperation {
                 break;
             }
             try {
-                Thread.sleep(getWaitSpan());
+                Thread.sleep(waitSpan);
             } catch (InterruptedException e) {
                 log.warn("スレッドの待機に失敗しました。", e);
             }
         }
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    public int getWaitSpan() {
-        return waitSpan;
-    }
-
-    public void setWaitSpan(int waitSpan) {
-        this.waitSpan = waitSpan;
     }
 }
