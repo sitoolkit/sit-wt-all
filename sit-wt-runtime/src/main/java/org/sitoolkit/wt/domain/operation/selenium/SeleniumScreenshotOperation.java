@@ -93,6 +93,8 @@ public class SeleniumScreenshotOperation implements ScreenshotOperation {
                     return file;
                 } catch (IOException ioe) {
                     throw new ConfigurationException(ioe);
+                } catch (Exception exp) {
+                    throw new ConfigurationException(exp);
                 }
             }
         } else {

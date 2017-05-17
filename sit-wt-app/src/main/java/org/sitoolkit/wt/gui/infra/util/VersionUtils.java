@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class VersionUtils {
 

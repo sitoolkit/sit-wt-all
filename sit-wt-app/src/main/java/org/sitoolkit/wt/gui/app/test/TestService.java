@@ -8,11 +8,11 @@ import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ProcessExitCallback;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
-import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
-import org.sitoolkit.wt.gui.infra.util.SystemUtils;
+import org.sitoolkit.wt.util.infra.process.ConversationProcess;
+import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.util.FileIOUtils;
+import org.sitoolkit.wt.util.infra.util.SystemUtils;
 
 public class TestService {
 

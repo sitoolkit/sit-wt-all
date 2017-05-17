@@ -41,6 +41,9 @@ public class EvidenceReportEditor {
             } catch (IOException e) {
                 LOG.error("リソースのコピーに失敗しました", e);
                 return;
+            } catch (Exception exp) {
+                LOG.error("プロキシの取得で例外が発生しました", exp);
+                return;
             }
 
             addTags(evidenceDir);

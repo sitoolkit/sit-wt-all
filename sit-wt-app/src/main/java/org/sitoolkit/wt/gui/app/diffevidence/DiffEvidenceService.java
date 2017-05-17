@@ -6,8 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.sitoolkit.wt.gui.domain.diffevidence.DiffEvidenceProcessClient;
-import org.sitoolkit.wt.gui.infra.process.ProcessExitCallback;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class DiffEvidenceService {
 

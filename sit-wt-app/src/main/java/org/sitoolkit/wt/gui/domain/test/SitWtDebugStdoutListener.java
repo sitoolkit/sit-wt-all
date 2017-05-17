@@ -1,6 +1,6 @@
 package org.sitoolkit.wt.gui.domain.test;
 
-import org.sitoolkit.wt.gui.infra.process.StdoutListener;
+import org.sitoolkit.wt.util.infra.process.StdoutListener;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

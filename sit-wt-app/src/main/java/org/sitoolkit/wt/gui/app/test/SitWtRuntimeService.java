@@ -5,8 +5,8 @@ import java.io.File;
 import org.sitoolkit.wt.gui.domain.test.MavenClasspahListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
-import org.sitoolkit.wt.gui.infra.process.ProcessExitCallback;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class SitWtRuntimeService {
 
@@ -17,12 +17,12 @@ public class SitWtRuntimeService {
 
     /**
      * {@code pomFile}のclasspathを{@link SitWtRuntimeUtils}に設定します。
-     * 
+     *
      * <h3>処理順</h3>
      * <ol>
      * <li>mvn dependency:build-classpath -f ${pomFile}
      * </ol>
-     * 
+     *
      * @param pomFile
      *            プロジェクトのpom.xml
      * @param exitCallback

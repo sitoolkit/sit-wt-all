@@ -4,7 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
-import org.sitoolkit.wt.gui.infra.process.StdoutListener;
+import org.sitoolkit.wt.util.infra.process.StdoutListener;
 
 public class JettyMavenPluginStdoutListener implements StdoutListener {
 

@@ -7,9 +7,9 @@ import org.sitoolkit.wt.gui.domain.sample.SampleCreatedCallback;
 import org.sitoolkit.wt.gui.domain.sample.SampleProcessClient;
 import org.sitoolkit.wt.gui.domain.sample.SampleStartedCallback;
 import org.sitoolkit.wt.gui.domain.sample.SampleStoppedCallback;
-import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.util.infra.process.ConversationProcess;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class SampleService {
 

@@ -7,9 +7,9 @@ import org.sitoolkit.wt.gui.domain.script.CaseNoCache;
 import org.sitoolkit.wt.gui.domain.script.CaseNoReadCallback;
 import org.sitoolkit.wt.gui.domain.script.CaseNoStdoutListener;
 import org.sitoolkit.wt.gui.domain.script.ScriptProcessClient;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ProcessExitCallback;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.process.ConversationProcess;
+import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class ScriptService {
 

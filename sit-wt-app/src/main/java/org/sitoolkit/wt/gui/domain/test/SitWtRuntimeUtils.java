@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class SitWtRuntimeUtils {
 
@@ -33,7 +33,7 @@ public class SitWtRuntimeUtils {
 
         for (String caseNo : caseNos) {
 
-            if (sb.length() == 0)
+            if (sb.length() != 0)
                 sb.append(",");
             sb.append(testScriptPath);
             sb.append("#");

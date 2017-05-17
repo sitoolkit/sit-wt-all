@@ -13,10 +13,10 @@ import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ProcessExitCallback;
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
-import org.sitoolkit.wt.gui.infra.util.SystemUtils;
+import org.sitoolkit.wt.util.infra.process.ConversationProcess;
+import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
+import org.sitoolkit.wt.util.infra.util.SystemUtils;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;

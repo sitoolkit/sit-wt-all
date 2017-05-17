@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.List;
 
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.maven.MavenUtils;
+import org.sitoolkit.wt.util.infra.process.ConversationProcess;
+import org.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class SampleProcessClient {
 
@@ -16,12 +16,12 @@ public class SampleProcessClient {
 
     /**
      * 次のコマンドを実行します。
-     * 
+     *
      * <pre>
      * cd $[destDir}
      * java -cp ${sitWtClasspath} org.sitoolkit.wt.app.sample.SampleManager
      * </pre>
-     * 
+     *
      * @param destDir
      *            サンプル展開先のディレクトリ
      * @param params
@@ -40,11 +40,11 @@ public class SampleProcessClient {
 
     /**
      * 次のコマンドを実行します。
-     * 
+     *
      * <pre>
      * mvn
      * </pre>
-     * 
+     *
      * @param params
      *            プロセス実行パラメーター
      * @return 対話プロセス
@@ -63,11 +63,11 @@ public class SampleProcessClient {
 
     /**
      * 次のコマンドを実行します。
-     * 
+     *
      * <pre>
      * mvn jetty:stop
      * </pre>
-     * 
+     *
      * @param params
      *            プロセス実行パラメーター
      */

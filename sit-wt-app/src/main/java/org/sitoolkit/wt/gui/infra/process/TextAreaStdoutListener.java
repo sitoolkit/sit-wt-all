@@ -1,5 +1,7 @@
 package org.sitoolkit.wt.gui.infra.process;
 
+import org.sitoolkit.wt.util.infra.process.StdoutListener;
+
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 

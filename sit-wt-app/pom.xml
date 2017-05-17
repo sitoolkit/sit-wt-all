@@ -17,6 +17,11 @@
       <version>2.5</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sitoolkit.wt</groupId>
+      <artifactId>sit-wt-util</artifactId>
+      <version>2.2-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <parent>
     <groupId>org.sitoolkit.wt</groupId>
@@ -45,6 +50,31 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
           </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <id>sit-wt-util</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>org.sitoolkit.wt.gui.pres.App</mainClass>
+            </manifest>
+          </archive>
+          <finalName>sit-wt-app-${project.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
       </plugin>
     </plugins>

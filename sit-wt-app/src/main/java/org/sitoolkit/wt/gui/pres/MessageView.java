@@ -1,6 +1,6 @@
 package org.sitoolkit.wt.gui.pres;
 
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 import javafx.scene.control.TextArea;
 

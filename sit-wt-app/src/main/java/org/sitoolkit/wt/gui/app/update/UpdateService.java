@@ -10,9 +10,9 @@ import org.sitoolkit.wt.gui.domain.update.UpdateProcessClient;
 import org.sitoolkit.wt.gui.domain.update.VersionCheckMode;
 import org.sitoolkit.wt.gui.domain.update.VersionCheckedCallback;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
-import org.sitoolkit.wt.gui.infra.util.FileIOUtils;
 import org.sitoolkit.wt.gui.infra.util.VersionUtils;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.util.FileIOUtils;
 
 public class UpdateService {
 

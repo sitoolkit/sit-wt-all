@@ -19,7 +19,7 @@ public class GuidanceUtils {
 
     /**
      * ガイダンスファイルをカレントディレクトリに展開します。
-     * 
+     *
      * @param resources
      *            ガイダンスの表示に必要なファイル
      */
@@ -29,7 +29,7 @@ public class GuidanceUtils {
 
     /**
      * ガイダンスファイルを指定のディレクトリに展開します。
-     * 
+     *
      * @param resources
      *            ガイダンスの表示に必要なファイル
      * @param destDir
@@ -48,6 +48,8 @@ public class GuidanceUtils {
                 FileUtils.copyURLToFile(resUrl, destFile);
             } catch (IOException e) {
                 LOG.warn("ガイダンスファイルの展開で例外が発生しました", e);
+            } catch (Exception exp) {
+                LOG.warn("プロキシの取得で例外が発生しました", exp);
             }
         }
 

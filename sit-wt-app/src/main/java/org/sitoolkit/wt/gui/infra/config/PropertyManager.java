@@ -11,7 +11,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class PropertyManager {
 

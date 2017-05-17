@@ -14,7 +14,7 @@ import org.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import org.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import org.sitoolkit.wt.gui.infra.fx.FileWrapper;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;

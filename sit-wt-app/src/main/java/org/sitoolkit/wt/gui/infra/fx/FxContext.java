@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
-import org.sitoolkit.wt.gui.infra.util.SystemUtils;
+import org.sitoolkit.wt.util.infra.util.SystemUtils;
 
 import javafx.application.HostServices;
 import javafx.stage.Stage;

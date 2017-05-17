@@ -161,6 +161,8 @@ public class DiffEvidenceGenerator {
             FileUtils.copyURLToFile(url, dstFile);
         } catch (IOException e) {
             LOG.error("リソースファイルのコピー処理で例外が発生しました", e);
+        } catch (Exception exp) {
+            LOG.error("プロキシの取得で例外が発生しました", exp);
         }
 
         return allSsMatches;

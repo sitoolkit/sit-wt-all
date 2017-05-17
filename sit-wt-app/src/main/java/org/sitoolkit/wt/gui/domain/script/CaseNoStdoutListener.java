@@ -3,7 +3,7 @@ package org.sitoolkit.wt.gui.domain.script;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sitoolkit.wt.gui.infra.process.StdoutListener;
+import org.sitoolkit.wt.util.infra.process.StdoutListener;
 
 public class CaseNoStdoutListener implements StdoutListener {
 

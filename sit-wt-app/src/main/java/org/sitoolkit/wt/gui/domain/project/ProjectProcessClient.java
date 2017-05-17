@@ -3,20 +3,20 @@ package org.sitoolkit.wt.gui.domain.project;
 import java.io.File;
 import java.util.List;
 
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
-import org.sitoolkit.wt.gui.infra.process.ProcessParams;
+import org.sitoolkit.wt.util.infra.maven.MavenUtils;
+import org.sitoolkit.wt.util.infra.process.ConversationProcess;
+import org.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
+import org.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class ProjectProcessClient {
 
     /**
      * 次のコマンドを実行します。
-     * 
+     *
      * <pre>
      * mvn -f ${pomFile} -P unpack-property-resources
      * </pre>
-     * 
+     *
      * @param pomFile
      *            pom.xml
      * @param params

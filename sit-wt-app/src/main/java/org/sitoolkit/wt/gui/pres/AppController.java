@@ -11,13 +11,13 @@ import org.sitoolkit.wt.gui.app.script.ScriptService;
 import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
-import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcess;
-import org.sitoolkit.wt.gui.infra.process.ConversationProcessContainer;
-import org.sitoolkit.wt.gui.infra.process.StdoutListenerContainer;
 import org.sitoolkit.wt.gui.infra.process.TextAreaStdoutListener;
+import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.util.infra.process.ConversationProcess;
+import org.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
+import org.sitoolkit.wt.util.infra.process.StdoutListenerContainer;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

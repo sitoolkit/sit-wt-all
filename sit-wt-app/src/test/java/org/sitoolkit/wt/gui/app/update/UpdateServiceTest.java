@@ -8,8 +8,8 @@ import java.net.URISyntaxException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sitoolkit.wt.gui.infra.maven.MavenUtils;
 import org.sitoolkit.wt.gui.testutil.ThreadUtils;
+import org.sitoolkit.wt.util.infra.maven.MavenUtils;
 
 public class UpdateServiceTest {
 

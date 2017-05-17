@@ -15,8 +15,8 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 
 import javafx.scene.control.TreeItem;
 

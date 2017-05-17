@@ -21,6 +21,7 @@
     <version>7</version>
   </parent>
   <modules>
+    <module>sit-wt-util</module>
     <module>sit-wt-app</module>
     <module>sit-wt-maven-plugin</module>
     <module>sit-wt-runtime</module>

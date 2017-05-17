@@ -1,7 +1,7 @@
 package org.sitoolkit.wt.gui.domain.update;
 
-import org.sitoolkit.wt.gui.infra.process.StdoutListener;
-import org.sitoolkit.wt.gui.infra.util.StrUtils;
+import org.sitoolkit.wt.util.infra.process.StdoutListener;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class MavenVersionsPluginStdoutListener implements StdoutListener {
 

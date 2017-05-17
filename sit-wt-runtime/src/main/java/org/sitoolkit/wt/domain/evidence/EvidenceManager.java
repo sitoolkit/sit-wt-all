@@ -95,6 +95,8 @@ public class EvidenceManager implements ApplicationContextAware {
             copyEvidenceResources("css/images/*", evidenceDir.getPath());
         } catch (IOException e) {
             throw new TestException(e);
+        } catch (Exception exp) {
+            throw new TestException(exp);
         }
     }
 

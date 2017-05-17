@@ -1,6 +1,6 @@
 package org.sitoolkit.wt.gui.domain.test;
 
-import org.sitoolkit.wt.gui.infra.process.StdoutListener;
+import org.sitoolkit.wt.util.infra.process.StdoutListener;
 
 public class MavenClasspahListener implements StdoutListener {
 
