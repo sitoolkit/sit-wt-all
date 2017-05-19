@@ -224,6 +224,10 @@ public class TestStep {
         return StringUtils.isBlank(getValue());
     }
 
+    public boolean isCaseStrExists() {
+        return StringUtils.isNotBlank(getTestData().get(getCurrentCaseNo()));
+    }
+
     public String getCurrentCaseNo() {
         return currentCaseNo;
     }

@@ -53,13 +53,13 @@ public class SeleniumDialogScreenshotSupport implements DialogScreenshotSupport 
         for (int i = testSteps.size() - 1; i >= 0; i--) {
             TestStep testStep = testSteps.get(i);
             testStep.setCurrentCaseNo(caseNo);
-            if (!testStep.isSkip() && testStep.getOperation() instanceof DialogOperation
+            if (testStep.isCaseStrExists() && testStep.getOperation() instanceof DialogOperation
                     && testStep.beforeScreenshot()) {
                 int reservedIdx = i;
                 while (reservedIdx > 0) {
                     TestStep reservedScript = testSteps.get(reservedIdx);
                     reservedScript.setCurrentCaseNo(caseNo);
-                    if (reservedScript.isSkip()) {
+                    if (!reservedScript.isCaseStrExists()) {
                         continue;
                     }
                     reservedIdx--;
