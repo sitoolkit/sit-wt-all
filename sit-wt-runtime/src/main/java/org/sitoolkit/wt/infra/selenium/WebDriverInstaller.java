@@ -124,8 +124,7 @@ public class WebDriverInstaller {
 
         try {
             if (!installFile.exists()) {
-                ProxySettingService proxyService = new ProxySettingService();
-                proxyService.loadProxy();
+                ProxySettingService.getInstance().loadProxy();
 
                 URL downloadUrl = new URL(safariBinaryInfo.downloadUrl);
                 LOG.info("Safari Driverをダウンロードします {} -> {}", downloadUrl,
@@ -187,8 +186,7 @@ public class WebDriverInstaller {
             if (downloadFile.exists()) {
                 LOG.info("{}はダウンロード済みです {}", binaryInfo.sysPropKey, downloadFile.getAbsolutePath());
             } else {
-                ProxySettingService proxyService = new ProxySettingService();
-                proxyService.loadProxy();
+                ProxySettingService.getInstance().loadProxy();
 
                 LOG.info("{}をダウンロードします {} -> {}", new Object[] { binaryInfo.sysPropKey, downloadUrl,
                         downloadFile.getAbsolutePath() });
