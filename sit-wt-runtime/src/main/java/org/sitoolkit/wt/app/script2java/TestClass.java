@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sitoolkit.wt.infra.template.TemplateModel;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class TestClass extends TemplateModel {
 
@@ -60,4 +61,11 @@ public class TestClass extends TemplateModel {
         this.pkg = pkg;
     }
 
+    public String sanitizeFunctionName(String caseNo) {
+        return StrUtils.sanitizeMetaCharacter(caseNo);
+    }
+
+    public String escape(String caseNo) {
+        return StrUtils.addEscape(caseNo);
+    }
 }

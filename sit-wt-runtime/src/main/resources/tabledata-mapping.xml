@@ -29,7 +29,7 @@ limitations under the License.
         <column property="locator.value" name="ロケーター"/>
         <column property="dataType" name="データ形式"/>
         <column property="screenshotTiming" name="スクリーンショット"/>
-        <column property="testData" name="テストデータ" pattern="ケース_([0-9]*)$"/>
+        <column property="testData" name="テストデータ" pattern="ケース_(.*)$"/>
         <column property="breakPoint" name="ブレークポイント"/>
     </table>
 

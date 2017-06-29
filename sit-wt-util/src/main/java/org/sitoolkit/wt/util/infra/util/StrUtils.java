@@ -46,4 +46,13 @@ public class StrUtils {
 
         return false;
     }
+
+    public static String sanitizeMetaCharacter(String str) {
+        String regex = "[ !\"#$%&'()=~|\\-^\\\\@\\[\\]:;`\\{\\}*+<>?,./]";
+        return str.replaceAll(regex, "_");
+    }
+
+    public static String addEscape(String str) {
+        return str.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"");
+    }
 }

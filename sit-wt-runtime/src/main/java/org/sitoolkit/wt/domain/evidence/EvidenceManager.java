@@ -26,6 +26,7 @@ import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.SitPathUtils;
 import org.sitoolkit.wt.infra.TestException;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -158,8 +159,10 @@ public class EvidenceManager implements ApplicationContextAware {
     private String buildScreenshotFileName(String scriptName, String caseNo, String testStepNo,
             String itemName, String timing) {
 
-        return StringUtils.join(new String[] { scriptName, caseNo, testStepNo, itemName, timing },
-                "_") + ".png";
+        return StrUtils
+                .sanitizeMetaCharacter(StringUtils.join(
+                        new String[] { scriptName, caseNo, testStepNo, itemName, timing }, "_"))
+                + ".png";
     }
 
     /**
@@ -195,7 +198,8 @@ public class EvidenceManager implements ApplicationContextAware {
             resultHtml = "_NG.html";
         }
 
-        return StringUtils.join(new String[] { scriptName, caseNo }, "_") + resultHtml;
+        return StrUtils.sanitizeMetaCharacter(
+                StringUtils.join(new String[] { scriptName, caseNo }, "_")) + resultHtml;
 
     }
 
@@ -255,8 +259,9 @@ public class EvidenceManager implements ApplicationContextAware {
             }
         }
 
-        String fileName = StringUtils
-                .join(new String[] { scriptName, caseNo, testStepNo, itemName, baseFilename }, "_");
+        String fileName = StrUtils.sanitizeMetaCharacter(
+                StringUtils.join(new String[] { scriptName, caseNo, testStepNo, itemName, }, "_"))
+                + "_" + baseFilename;
 
         return new File(downloadDir, fileName);
     }
