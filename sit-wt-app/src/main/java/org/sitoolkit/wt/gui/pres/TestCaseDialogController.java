@@ -39,34 +39,11 @@ public class TestCaseDialogController implements Initializable {
     }
 
     public void showSelectDialog(File currentFile, List<String> caseIdList) {
+    	showDialog(currentFile,caseIdList,false);
+    }
 
-        caseNoFlowPane.getChildren().clear();
-
-        Dialog<List<String>> dialog = new Dialog<>();
-        dialog.setTitle("ケースを指定して実行");
-        dialog.setHeaderText("実行するテストケースを選択してください。");
-
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        testScriptLabel.setText(currentFile.getName());
-
-        CheckBoxResultConverter resultConverter = new CheckBoxResultConverter();
-        dialog.setResultConverter(resultConverter);
-
-        for (String caseId : caseIdList) {
-            CheckBox checkBox = new CheckBox(caseId);
-            resultConverter.add(checkBox);
-            caseNoFlowPane.getChildren().add(checkBox);
-        }
-
-        dialog.getDialogPane().setContent(content);
-
-        Optional<List<String>> result = dialog.showAndWait();
-        result.ifPresent(selectedCaseNos -> {
-            if (!selectedCaseNos.isEmpty()) {
-                testRunnable.runTest(false, false, currentFile, selectedCaseNos);
-            }
-        });
+    public void showSelectDebugDialog(File currentFile, List<String> caseIdList) {
+    	showDialog(currentFile,caseIdList,true);
     }
 
     public void setTestRunnable(TestRunnable testRunnable) {
@@ -94,5 +71,35 @@ public class TestCaseDialogController implements Initializable {
             return selected;
         }
 
+    }
+
+    private void showDialog(File currentFile, List<String> caseIdList,boolean isDebug){
+        caseNoFlowPane.getChildren().clear();
+
+        Dialog<List<String>> dialog = new Dialog<>();
+        dialog.setTitle("ケースを指定して実行");
+        dialog.setHeaderText("実行するテストケースを選択してください。");
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        testScriptLabel.setText(currentFile.getName());
+
+        CheckBoxResultConverter resultConverter = new CheckBoxResultConverter();
+        dialog.setResultConverter(resultConverter);
+
+        for (String caseId : caseIdList) {
+            CheckBox checkBox = new CheckBox(caseId);
+            resultConverter.add(checkBox);
+            caseNoFlowPane.getChildren().add(checkBox);
+        }
+
+        dialog.getDialogPane().setContent(content);
+
+        Optional<List<String>> result = dialog.showAndWait();
+        result.ifPresent(selectedCaseNos -> {
+            if (!selectedCaseNos.isEmpty()) {
+                testRunnable.runTest(isDebug, false, currentFile, selectedCaseNos);
+            }
+        });
     }
 }

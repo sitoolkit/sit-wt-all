@@ -131,7 +131,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
     public void runTest(boolean isDebug, boolean isParallel, File testScript,
             List<String> caseNos) {
         messageView.startMsg("テストを実行します。");
-        runTest(false, false, SitWtRuntimeUtils.buildScriptStr(testScript, caseNos));
+        runTest(isDebug, false, SitWtRuntimeUtils.buildScriptStr(testScript, caseNos));
     }
 
     private void runTest(boolean isDebug, boolean isParallel) {

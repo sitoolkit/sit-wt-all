@@ -44,6 +44,9 @@ public class FileTreeController implements Initializable {
     @FXML
     private MenuItem executeCaseMenuItem;
 
+    @FXML
+    private MenuItem executeDebugCaseMenuItem;
+
     private Mode mode = Mode.NORMAL;
 
     TestService testService = new TestService();
@@ -77,6 +80,8 @@ public class FileTreeController implements Initializable {
                         StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls", ".csv"));
                 executeCaseMenuItem
                         .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
+                executeDebugCaseMenuItem
+                .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
             });
         });
 
@@ -260,6 +265,19 @@ public class FileTreeController implements Initializable {
             scriptService.readCaseNo(selectedFile, caseNos -> {
                 Platform.runLater(
                         () -> testCaseDialogController.showSelectDialog(selectedFile, caseNos));
+            });
+
+        });
+    }
+
+    @FXML
+    public void executeDebugCase() {
+        operateSelectedItem(selectedItem -> {
+            File selectedFile = selectedItem.getValue().getFile();
+
+            scriptService.readCaseNo(selectedFile, caseNos -> {
+                Platform.runLater(
+                        () -> testCaseDialogController.showSelectDebugDialog(selectedFile, caseNos));
             });
 
         });

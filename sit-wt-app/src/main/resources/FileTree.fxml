@@ -16,6 +16,7 @@
           <MenuItem mnemonicParsing="false" onAction="#open" text="開く" />
           <MenuItem fx:id="executeMenuItem" mnemonicParsing="false" onAction="#execute" text="実行"/>
           <MenuItem fx:id="executeCaseMenuItem" mnemonicParsing="false" onAction="#executeCase" text="ケースを選択して実行"/>
+          <MenuItem fx:id="executeDebugCaseMenuItem" mnemonicParsing="false" onAction="#executeDebugCase" text="ケースを選択してデバッグ"/>
           <Menu text="新規">
             <MenuItem mnemonicParsing="false" text="スクリプト" onAction="#newScript" />
             <MenuItem mnemonicParsing="false" text="フォルダー" onAction="#newFolder" />
