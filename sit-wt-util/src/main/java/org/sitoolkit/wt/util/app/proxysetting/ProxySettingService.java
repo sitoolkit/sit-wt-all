@@ -10,7 +10,21 @@ import org.sitoolkit.wt.util.infra.proxysetting.ProxySetting;
 public class ProxySettingService {
     private static final Logger LOG = Logger.getLogger(ProxySettingService.class.getName());
 
+    private static ProxySettingService proxySettingService = new ProxySettingService();
+
+    private boolean loaded;
+
+    private ProxySettingService() {
+        loaded = false;
+    }
+
+    public static ProxySettingService getInstance() {
+        return proxySettingService;
+    }
+
     public void loadProxy() {
+
+        if (loaded) return;
 
         try {
             ProxySetting proxySetting = MavenUtils.readProxySetting();
@@ -29,6 +43,8 @@ public class ProxySettingService {
             setProperties(proxySetting);
         } catch (Exception exp) {
             LOG.log(Level.WARNING, "set proxy failed", exp);
+        } finally {
+            loaded = true;
         }
     }
 

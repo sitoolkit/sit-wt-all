@@ -58,8 +58,7 @@ public class FirefoxManager {
         } else {
 
             try {
-                ProxySettingService proxyService = new ProxySettingService();
-                proxyService.loadProxy();
+                ProxySettingService.getInstance().loadProxy();
 
                 // TODO 外部化
                 URL xpiUrl = new URL(
@@ -114,8 +113,7 @@ public class FirefoxManager {
             LOG.info("Firefoxはダウンロード済みです {}", ffInstaller.getAbsolutePath());
         } else {
             try {
-                ProxySettingService proxyService = new ProxySettingService();
-                proxyService.loadProxy();
+                ProxySettingService.getInstance().loadProxy();
 
                 // TODO 外部化
                 URL url = new URL(
@@ -163,8 +161,7 @@ public class FirefoxManager {
             LOG.info("Firefoxはダウンロード済みです {}", ffInstaller.getAbsolutePath());
         } else {
             try {
-                ProxySettingService proxyService = new ProxySettingService();
-                proxyService.loadProxy();
+                ProxySettingService.getInstance().loadProxy();
 
                 // TODO 外部化
                 URL url = new URL(

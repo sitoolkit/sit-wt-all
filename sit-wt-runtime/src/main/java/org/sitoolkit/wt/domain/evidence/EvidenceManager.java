@@ -26,6 +26,7 @@ import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.SitPathUtils;
 import org.sitoolkit.wt.infra.TestException;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -62,6 +63,7 @@ public class EvidenceManager implements ApplicationContextAware {
     private String logFilePath = "target/sit-wt.log";
     private Template tmpl;
     private ApplicationContext appCtx;
+    private File downloadDir;
 
     @Resource
     PropertyManager pm;
@@ -82,6 +84,9 @@ public class EvidenceManager implements ApplicationContextAware {
         if (!imgDir.exists()) {
             throw new TestException("スクリーンショット出力ディレクトリの作成に失敗しました" + imgDir.getAbsoluteFile());
         }
+
+        downloadDir = new File(evidenceDir, "download");
+
         try {
             Properties prop = PropertyUtils.load("/velocity.properties", false);
             Velocity.init(prop);
@@ -154,8 +159,10 @@ public class EvidenceManager implements ApplicationContextAware {
     private String buildScreenshotFileName(String scriptName, String caseNo, String testStepNo,
             String itemName, String timing) {
 
-        return StringUtils.join(new String[] { scriptName, caseNo, testStepNo, itemName, timing },
-                "_") + ".png";
+        return StrUtils
+                .sanitizeMetaCharacter(StringUtils.join(
+                        new String[] { scriptName, caseNo, testStepNo, itemName, timing }, "_"))
+                + ".png";
     }
 
     /**
@@ -191,7 +198,8 @@ public class EvidenceManager implements ApplicationContextAware {
             resultHtml = "_NG.html";
         }
 
-        return StringUtils.join(new String[] { scriptName, caseNo }, "_") + resultHtml;
+        return StrUtils.sanitizeMetaCharacter(
+                StringUtils.join(new String[] { scriptName, caseNo }, "_")) + resultHtml;
 
     }
 
@@ -238,6 +246,24 @@ public class EvidenceManager implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext arg0) throws BeansException {
         appCtx = arg0;
+    }
+
+    public File buildDownloadFile(String scriptName, String caseNo, String testStepNo,
+            String itemName, String baseFilename) {
+
+        if (!downloadDir.exists()) {
+            downloadDir.mkdirs();
+            if (!downloadDir.exists()) {
+                throw new TestException(
+                        "ダウンロードファイル出力ディレクトリの作成に失敗しました" + downloadDir.getAbsoluteFile());
+            }
+        }
+
+        String fileName = StrUtils.sanitizeMetaCharacter(
+                StringUtils.join(new String[] { scriptName, caseNo, testStepNo, itemName, }, "_"))
+                + "_" + baseFilename;
+
+        return new File(downloadDir, fileName);
     }
 
 }

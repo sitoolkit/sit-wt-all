@@ -28,6 +28,7 @@ import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.infra.SitPathUtils;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
+import org.sitoolkit.wt.util.infra.util.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -200,7 +201,8 @@ public class Script2Java implements ApplicationContextAware {
 
         // テストクラスの物理名の設定
         String baseName = FilenameUtils.getBaseName(testClass.getScriptPath());
-        testClass.setFileBase(StringUtils.capitalize(baseName) + "IT");
+        testClass.setFileBase(
+                StrUtils.sanitizeMetaCharacter("IT" + StringUtils.capitalize(baseName)));
 
         // パッケージパス
         String scriptPathFromPkg = SitPathUtils.relatvePath(testScriptDir,
