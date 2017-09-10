@@ -13,12 +13,12 @@ import java.util.TreeMap;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class PropertyUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PropertyUtils.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(PropertyUtils.class);
 
     private static final Map<String, Properties> CACHE = new HashMap<>();
 
@@ -44,7 +44,7 @@ public class PropertyUtils {
             }
         }
 
-        LOG.info("プロパティを読み込みます。{}", url);
+        LOG.info("property.load", url);
 
         try {
             if (url.getFile().endsWith("properties")) {

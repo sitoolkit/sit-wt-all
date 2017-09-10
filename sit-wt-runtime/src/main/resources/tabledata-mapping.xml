@@ -18,19 +18,36 @@ limitations under the License.
 
 <mapping
     xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-    xmlns='http://www.sitoolkit.org/schema/tabledata-mapping'
-    xsi:schemaLocation='http://www.sitoolkit.org/schema/tabledata-mapping https://raw.githubusercontent.com/sitoolkit/sit-util-td/master/src/main/xsd/tabledata-mapping-1.0.xsd'>
+    xmlns='http://www.sitoolkit.org/schema/tabledata-mapping/1.1'
+    xsi:schemaLocation='http://www.sitoolkit.org/schema/tabledata-mapping/1.1 https://raw.githubusercontent.com/sitoolkit/sit-util-td/master/src/main/xsd/tabledata-mapping-1.1.xsd'>
 
     <table beanId="testStep" name="テストステップ">
         <column property="no" name="No."/>
-        <column property="itemName" name="項目名"/>
-        <column property="operation" name="操作"/>
-        <column property="locator.type" name="ロケーター形式"/>
-        <column property="locator.value" name="ロケーター"/>
-        <column property="dataType" name="データ形式"/>
-        <column property="screenshotTiming" name="スクリーンショット"/>
-        <column property="testData" name="テストデータ" pattern="ケース_(.*)$"/>
-        <column property="breakPoint" name="ブレークポイント"/>
+        <column property="itemName" name="ItemName">
+          <localizedName locale="ja_JP">項目名</localizedName>
+        </column>
+        <column property="operation" name="Operation">
+          <localizedName locale="ja_JP">操作</localizedName>
+        </column>
+        <column property="locator.type" name="LocatorStyle">
+          <localizedName locale="ja_JP">ロケーター形式</localizedName>
+        </column>
+        <column property="locator.value" name="Locator">
+          <localizedName locale="ja_JP">ロケーター</localizedName>
+        </column>
+        <column property="dataType" name="DataStyle">
+          <localizedName locale="ja_JP">データ形式</localizedName>
+        </column>
+        <column property="screenshotTiming" name="Screenshot">
+          <localizedName locale="ja_JP">スクリーンショット</localizedName>
+        </column>
+        <column property="testData" name="TestData" pattern="Case_(.*)$">
+          <localizedName locale="ja_JP">テストデータ</localizedName>
+          <localizedPattern locale="ja_JP">ケース_(.*)$</localizedPattern>
+        </column>
+        <column property="breakPoint" name="BreakPoint">
+          <localizedName locale="ja_JP">ブレークポイント</localizedName>
+        </column>
     </table>
 
     <table beanId="pageItemSpec" name="画面定義書ファイル">
