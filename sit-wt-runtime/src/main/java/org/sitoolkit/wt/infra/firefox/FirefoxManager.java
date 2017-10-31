@@ -12,15 +12,15 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.sitoolkit.wt.infra.MultiThreadUtils;
 import org.sitoolkit.wt.infra.SitRepository;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.infra.process.ProcessUtils;
 import org.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeroturnaround.zip.ZipUtil;
 
 public class FirefoxManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FirefoxManager.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(FirefoxManager.class);
 
     public FirefoxDriver startWebDriver(DesiredCapabilities capabilities) {
         return MultiThreadUtils.submitWithProgress(
@@ -32,11 +32,11 @@ public class FirefoxManager {
 
         if (ffBinaryFile.exists()) {
 
-            LOG.info("Firefoxはインストール済みです {}", ffBinaryFile.getAbsolutePath());
+            LOG.info("firefox.exist", ffBinaryFile.getAbsolutePath());
 
         } else {
 
-            LOG.info("SIT-WT用のFirefoxがインストールされていません");
+            LOG.info("firefox.sit.install");
             installFirefox();
 
         }
@@ -54,7 +54,7 @@ public class FirefoxManager {
         File xpi = new File(repo, "selenium_ide-2.9.1-fx.xpi");
 
         if (xpi.exists()) {
-            LOG.info("Selenium IDEはダウンロード済みです {}", xpi.getAbsolutePath());
+            LOG.info("selenium.exist", xpi.getAbsolutePath());
         } else {
 
             try {
@@ -64,7 +64,7 @@ public class FirefoxManager {
                 URL xpiUrl = new URL(
                         "https://addons.mozilla.org/firefox/downloads/latest/selenium-ide/addon-2079-latest.xpi?src=dp-btn-primary");
 
-                LOG.info("Selenium IDEをダウンロードします {} -> {}", xpiUrl, xpi.getAbsolutePath());
+                LOG.info("selenium.download", xpiUrl, xpi.getAbsolutePath());
 
                 FileUtils.copyURLToFile(xpiUrl, xpi);
                 ZipUtil.unpack(xpi, repo);
@@ -110,7 +110,7 @@ public class FirefoxManager {
         File ffInstaller = new File(repo, "Firefox Setup 47.0.1.exe");
 
         if (ffInstaller.exists()) {
-            LOG.info("Firefoxはダウンロード済みです {}", ffInstaller.getAbsolutePath());
+            LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
         } else {
             try {
                 ProxySettingService.getInstance().loadProxy();
@@ -119,7 +119,7 @@ public class FirefoxManager {
                 URL url = new URL(
                         "https://ftp.mozilla.org/pub/firefox/releases/47.0.1/win64/ja/Firefox%20Setup%2047.0.1.exe");
 
-                LOG.info("Firefoxをダウンロードします {} -> {}", url, ffInstaller.getAbsolutePath());
+                LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
 
                 MultiThreadUtils.submitWithProgress(() -> {
                     FileUtils.copyURLToFile(url, ffInstaller);
@@ -133,7 +133,7 @@ public class FirefoxManager {
             }
         }
 
-        LOG.info("Firefoxをインストールします");
+        LOG.info("firefox.install");
 
         try {
             File iniFile = File.createTempFile("ff-inst", ".ini");
@@ -158,7 +158,7 @@ public class FirefoxManager {
         File ffInstaller = new File(repo, "Firefox 47.0.1.dmg");
 
         if (ffInstaller.exists()) {
-            LOG.info("Firefoxはダウンロード済みです {}", ffInstaller.getAbsolutePath());
+            LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
         } else {
             try {
                 ProxySettingService.getInstance().loadProxy();
@@ -167,7 +167,7 @@ public class FirefoxManager {
                 URL url = new URL(
                         "https://ftp.mozilla.org/pub/firefox/releases/47.0.1/mac/ja-JP-mac/Firefox%2047.0.1.dmg");
 
-                LOG.info("Firefoxをダウンロードします {} -> {}", url, ffInstaller.getAbsolutePath());
+                LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
 
                 FileUtils.copyURLToFile(url, ffInstaller);
 
@@ -179,13 +179,13 @@ public class FirefoxManager {
             }
         }
 
-        LOG.info("Firefoxのインストーラーをマウントします");
+        LOG.info("firefox.mount");
         ProcessUtils.execute("hdiutil", "attach", ffInstaller.getAbsolutePath());
 
         File mountedFf = new File("/Volumes/Firefox/Firefox.app");
         File ffRuntime = new File(repo, "runtime");
 
-        LOG.info("Firefoxをインストールします {}", ffRuntime.getAbsolutePath());
+        LOG.info("firefox.install2", ffRuntime.getAbsolutePath());
         // たまにcp -Rコマンドが失敗してFirefox.appがコピーされないので3回リトライ
         for (int i = 0; i < 3; i++) {
 
@@ -200,7 +200,7 @@ public class FirefoxManager {
             }
         }
 
-        LOG.info("Firefoxのインストーラーをアンマウントします");
+        LOG.info("firefox.unmount");
         ProcessUtils.execute("hdiutil", "detach", "/Volumes/Firefox");
 
     }

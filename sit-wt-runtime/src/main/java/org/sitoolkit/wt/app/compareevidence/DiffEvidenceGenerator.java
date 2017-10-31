@@ -16,9 +16,9 @@ import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.sitoolkit.wt.domain.evidence.EvidenceOpener;
 import org.sitoolkit.wt.domain.evidence.ReportOpener;
 import org.sitoolkit.wt.infra.TestException;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.util.ResourceUtils;
@@ -36,7 +36,7 @@ public class DiffEvidenceGenerator {
     @Resource
     ApplicationContext appCtx;
 
-    private static final Logger LOG = LoggerFactory.getLogger(DiffEvidenceGenerator.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(DiffEvidenceGenerator.class);
 
     /**
      * エビデンスの表示に関連する資源
@@ -80,7 +80,7 @@ public class DiffEvidenceGenerator {
             boolean compareScreenshot, boolean evidenceOpen) {
 
         if (!(baseDir.exists())) {
-            LOG.error("基準エビデンスがありません");
+            LOG.error("base.evidence.error");
         } else {
 
             ApplicationContext appCtx = new AnnotationConfigApplicationContext(
@@ -120,7 +120,7 @@ public class DiffEvidenceGenerator {
      */
     public boolean generate(EvidenceDir baseDir, EvidenceDir targetDir, boolean compareScreenshot) {
 
-        LOG.info("比較エビデンスを生成します {} <-> {}", baseDir.getDir(), targetDir.getDir());
+        LOG.info("compare.screenshot", baseDir.getDir(), targetDir.getDir());
 
         if (compareScreenshot) {
             MaskScreenshotGenerator mask = appCtx.getBean(MaskScreenshotGenerator.class);
@@ -139,7 +139,7 @@ public class DiffEvidenceGenerator {
                     try {
                         generateDiffEvidence(baseDir, evidenceFile, true);
                     } catch (IOException e) {
-                        LOG.error("比較エビデンス生成処理で例外が発生しました", e);
+                        LOG.error("compare.screenshot.error", e);
                         return allSsMatches;
                     }
                 }
@@ -149,7 +149,7 @@ public class DiffEvidenceGenerator {
                 generateDiffEvidence(baseDir, evidenceFile, false);
                 copyBaseScreenshots(baseDir, targetDir, evidenceFile);
             } catch (IOException e) {
-                LOG.error("比較エビデンス生成処理で例外が発生しました", e);
+                LOG.error("compare.screenshot.error", e);
                 return allSsMatches;
             }
 
@@ -160,9 +160,9 @@ public class DiffEvidenceGenerator {
             File dstFile = new File(targetDir.getDir(), compareEvidenceResource);
             FileUtils.copyURLToFile(url, dstFile);
         } catch (IOException e) {
-            LOG.error("リソースファイルのコピー処理で例外が発生しました", e);
+            LOG.error("resource.copy.error", e);
         } catch (Exception exp) {
-            LOG.error("プロキシの取得で例外が発生しました", exp);
+            LOG.error("proxy.error", exp);
         }
 
         return allSsMatches;
@@ -309,7 +309,7 @@ public class DiffEvidenceGenerator {
     private void copyBaseScreenshots(EvidenceDir baseDir, EvidenceDir targetDir,
             File evidenceFile) {
 
-        LOG.info("基準のスクリーンショットをエビデンスディレクトリにコピーします");
+        LOG.info("copy.base.screenshots");
 
         try {
 
@@ -320,7 +320,7 @@ public class DiffEvidenceGenerator {
             }
 
         } catch (IOException e) {
-            LOG.error("スクリーンショットのコピー処理で例外が発生しました", e);
+            LOG.error("copy.screenshot.error", e);
         }
 
     }

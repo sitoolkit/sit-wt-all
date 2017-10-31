@@ -8,12 +8,12 @@ import javax.annotation.Resource;
 
 import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class WebDriverCloser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WebDriverCloser.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(WebDriverCloser.class);
 
     private List<WebDriver> driverList = new ArrayList<>();
 
@@ -34,11 +34,11 @@ public class WebDriverCloser {
         }
 
         driverList.parallelStream().forEach(driver -> {
-            LOG.debug("WebDriverを停止します {}", driver);
+            LOG.debug("webdriver.stop", driver);
             try {
                 driver.quit();
             } catch (Exception e) {
-                LOG.trace(e.getMessage());
+                LOG.trace("trace", e.getMessage());
             }
         });
     }

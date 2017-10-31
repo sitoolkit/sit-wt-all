@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 /**
  *
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TestScript {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
     /**
      * テストスクリプトの中から ケース番号のカラムを識別するためのプレフィックス
      */
@@ -100,7 +100,7 @@ public class TestScript {
 
     /**
      * 当該テストスクリプト内のテストステップ数を取得します。
-     * 
+     *
      * @return 当該テストスクリプト内のテストステップ数
      */
     public int getTestStepCount() {

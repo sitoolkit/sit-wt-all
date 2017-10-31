@@ -14,8 +14,8 @@ import org.sitoolkit.wt.domain.pageload.PageContext;
 import org.sitoolkit.wt.domain.pageload.PageListener;
 import org.sitoolkit.wt.domain.pageload.PageLoader;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 public class Page2Script implements TestScriptGenerateTool, ApplicationContextAware {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Page2Script.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(Page2Script.class);
 
     private static final String MSG = "テストスクリプトに出力するページでEnterキーをタイプしてください。\n"
             + "終了する場合はqを入力しEnterキーをタイプしてください。";
@@ -64,23 +64,23 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
             Scanner scan = new Scanner(System.in);
 
-            LOG.info("ブラウザが起動したらブラウザを操作してください。");
+            LOG.info("browser.start.operation");
             if (isCli) {
-                LOG.info(MSG);
+                LOG.info("msg", MSG);
             }
 
             while (!"q".equalsIgnoreCase(scan.nextLine())) {
                 generateFromPage();
 
                 if (isCli) {
-                    LOG.info(MSG);
+                    LOG.info("msg", MSG);
                 }
             }
 
             scan.close();
 
         } catch (Exception e) {
-            LOG.error("予期しないエラーが発生しました。", e);
+            LOG.error("unexpected.error", e);
             return -1;
 
         } finally {
@@ -97,10 +97,10 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
             listener.setUpPage(pageCtx);
         }
 
-        LOG.info("ページの読み込みを開始します。{} {}", pageCtx.getTitle(), pageCtx.getUrl());
+        LOG.info("page.load.start", pageCtx.getTitle(), pageCtx.getUrl());
 
         for (PageLoader loader : loaders) {
-            LOG.info("{}を実行します。", loader.getClass().getName());
+            LOG.info("page.load.execute", loader.getClass().getName());
             loader.load(pageCtx);
         }
 

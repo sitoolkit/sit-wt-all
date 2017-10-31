@@ -20,8 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 /**
  * WebElementの再実行機能を追加する{@code MethodInterceptor}です。
@@ -34,7 +34,8 @@ import org.slf4j.LoggerFactory;
  */
 public class WebElementMethodInterceptor implements MethodInterceptor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WebElementMethodInterceptor.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(WebElementMethodInterceptor.class);
 
     /**
      * WebDriver#findElementのMethodInvocationインスタンス
@@ -68,7 +69,7 @@ public class WebElementMethodInterceptor implements MethodInterceptor {
         String className = invocation.getThis().getClass().getName();
         String methodName = invocation.getMethod().getName();
 
-        LOG.trace("invoke method {} {}", className, methodName);
+        LOG.trace("invoke.method", className, methodName);
 
         try {
             if (webElement == null) {
@@ -78,11 +79,10 @@ public class WebElementMethodInterceptor implements MethodInterceptor {
             }
         } catch (Throwable t) {
             Throwable thr = t instanceof InvocationTargetException ? t.getCause() : t;
-            LOG.trace("invoke method {} {} throws exception {}",
-                    new Object[] { className, methodName, thr.getClass() });
+            LOG.trace("invoke.error", new Object[] { className, methodName, thr.getClass() });
 
             if (checker.isRetriable(thr)) {
-                LOG.trace("re-invoke method {} {}", className, methodName);
+                LOG.trace("reinvoke.method", className, methodName);
 
                 webElement = webDriverFindElementInvocation.proceed();
                 return invoke(invocation, webElement);

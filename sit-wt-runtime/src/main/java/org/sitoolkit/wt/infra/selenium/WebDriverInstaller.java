@@ -24,14 +24,14 @@ import org.apache.commons.lang3.SystemUtils;
 import org.sitoolkit.wt.infra.ConfigurationException;
 import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.SitRepository;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.infra.process.ProcessUtils;
 import org.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WebDriverInstaller {
 
-    private static Logger LOG = LoggerFactory.getLogger(WebDriverInstaller.class);
+    private static SitLogger LOG = SitLoggerFactory.getLogger(WebDriverInstaller.class);
 
     private WebDriverBinaryInfo winGeckoBinaryInfo = new WebDriverBinaryInfo("win", "gecko");
     private WebDriverBinaryInfo macGeckoBinaryInfo = new WebDriverBinaryInfo("mac", "gecko");
@@ -127,12 +127,11 @@ public class WebDriverInstaller {
                 ProxySettingService.getInstance().loadProxy();
 
                 URL downloadUrl = new URL(safariBinaryInfo.downloadUrl);
-                LOG.info("Safari Driverをダウンロードします {} -> {}", downloadUrl,
-                        installFile.getAbsolutePath());
+                LOG.info("safari.dawnload", downloadUrl, installFile.getAbsolutePath());
                 FileUtils.copyURLToFile(downloadUrl, installFile);
             }
 
-            LOG.info("Safari Driverをインストールします {}", installFile.getAbsolutePath());
+            LOG.info("safari.install", installFile.getAbsolutePath());
 
             String script = IOUtils
                     .toString(ClassLoader.getSystemResource("install-safaridriver.scpt"), "UTF-8");
@@ -173,39 +172,39 @@ public class WebDriverInstaller {
         System.setProperty(binaryInfo.sysPropKey, installFile.getAbsolutePath());
 
         if (installFile.exists()) {
-            LOG.info("{}はインストール済みです {}", binaryInfo.sysPropKey, installFile.getAbsolutePath());
+            LOG.info("install.exists", binaryInfo.sysPropKey, installFile.getAbsolutePath());
             return installFile.getAbsolutePath();
         }
 
-        LOG.info("{}をインストールします", binaryInfo.sysPropKey);
+        LOG.info("install", binaryInfo.sysPropKey);
 
         try {
             URL downloadUrl = new URL(binaryInfo.downloadUrl);
             File downloadFile = new File(binaryInfo.downloadDir, downloadUrl.getFile());
 
             if (downloadFile.exists()) {
-                LOG.info("{}はダウンロード済みです {}", binaryInfo.sysPropKey, downloadFile.getAbsolutePath());
+                LOG.info("download.exists", binaryInfo.sysPropKey, downloadFile.getAbsolutePath());
             } else {
                 ProxySettingService.getInstance().loadProxy();
 
-                LOG.info("{}をダウンロードします {} -> {}", new Object[] { binaryInfo.sysPropKey, downloadUrl,
+                LOG.info("download", new Object[] { binaryInfo.sysPropKey, downloadUrl,
                         downloadFile.getAbsolutePath() });
                 FileUtils.copyURLToFile(downloadUrl, downloadFile);
             }
 
             // Windowsインストーラ―の場合は無人モードで実行
             if (downloadFile.getName().endsWith(".msi")) {
-                LOG.info("{}をインストーラを実行します {}",
+                LOG.info("installer.execute",
                         new Object[] { binaryInfo.sysPropKey, downloadFile.getAbsolutePath() });
                 ProcessUtils.exec("msiexec", "/i", downloadFile.getAbsolutePath(), "/passive");
 
             } else if (StringUtils.isEmpty(binaryInfo.zipEntry)) {
-                LOG.info("{}を配置します {} -> {} ", new Object[] { binaryInfo.sysPropKey,
+                LOG.info("put", new Object[] { binaryInfo.sysPropKey,
                         downloadFile.getAbsolutePath(), installFile.getAbsolutePath() });
                 FileUtils.copyFile(downloadFile, installFile);
 
             } else {
-                LOG.info("{}を展開します {} -> {} ", new Object[] { binaryInfo.sysPropKey,
+                LOG.info("open", new Object[] { binaryInfo.sysPropKey,
                         downloadFile.getAbsolutePath(), installFile.getAbsolutePath() });
                 extractOne(downloadFile, binaryInfo.zipEntry, installFile);
             }

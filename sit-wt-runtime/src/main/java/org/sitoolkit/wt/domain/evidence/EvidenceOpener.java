@@ -11,12 +11,12 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class EvidenceOpener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EvidenceOpener.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceOpener.class);
     private int openFileCount = 1;
     private String evidenceFileRegex = ".*\\.html$";
     private String maskFileRegex = "^mask_.*html$";
@@ -50,7 +50,7 @@ public class EvidenceOpener {
 
         List<File> targetFiles = new ArrayList<File>(FileUtils.listFiles(evidenceDir,
                 new RegexFileFilter(targetFileRegex), TrueFileFilter.INSTANCE));
-        LOG.info("{}に{}の{}エビデンスがあります ", evidenceDir.getName(), targetFiles.size(), evidenceType);
+        LOG.info("evidence.info ", evidenceDir.getName(), targetFiles.size(), evidenceType);
 
         Collections.sort(targetFiles, new FileLastModifiedComarator(true));
 

@@ -6,13 +6,13 @@ import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.util.ResourceUtils;
 
 public class GuidanceUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GuidanceUtils.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(GuidanceUtils.class);
 
     private GuidanceUtils() {
     }
@@ -44,12 +44,12 @@ public class GuidanceUtils {
                 if (destFile.exists()) {
                     return;
                 }
-                LOG.info("ガイダンスファイルを展開します {}", destFile.getAbsolutePath());
+                LOG.info("guidance.file.open", destFile.getAbsolutePath());
                 FileUtils.copyURLToFile(resUrl, destFile);
             } catch (IOException e) {
-                LOG.warn("ガイダンスファイルの展開で例外が発生しました", e);
+                LOG.warn("guidance.file.open.error", e);
             } catch (Exception exp) {
-                LOG.warn("プロキシの取得で例外が発生しました", exp);
+                LOG.warn("proxy.error", exp);
             }
         }
 

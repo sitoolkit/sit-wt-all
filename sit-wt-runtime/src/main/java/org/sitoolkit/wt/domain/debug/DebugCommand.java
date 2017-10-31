@@ -10,12 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 class DebugCommand {
-    private static Logger LOG = LoggerFactory.getLogger(DebugCommand.class);
+    private static SitLogger LOG = SitLoggerFactory.getLogger(DebugCommand.class);
 
     CommandKey key;
     String body;
@@ -88,7 +88,7 @@ class DebugCommand {
                 Locator locator = Locator.build(body);
 
                 if (locator.isNa()) {
-                    LOG.info("書式が不正です。");
+                    LOG.info("format.valid");
                 } else {
                     check.check(locator);
                 }
@@ -107,7 +107,7 @@ class DebugCommand {
                     TestScriptGenerateTool exporter = appCtx.getBean(TestScriptGenerateTool.class);
                     exporter.generateFromPage();
                 } catch (Exception e) {
-                    LOG.error("エクスポートの実行中に予期しないエラーが発生しました。", e);
+                    LOG.error("export.error", e);
                 }
                 break;
 
@@ -115,7 +115,7 @@ class DebugCommand {
                 try {
                     Desktop.getDesktop().open(testScript.getScriptFile());
                 } catch (IOException e) {
-                    LOG.error("予期しないエラーが発生しました。", e);
+                    LOG.error("unexpected.error", e);
                 }
                 break;
 
@@ -133,7 +133,7 @@ class DebugCommand {
         TestContext testCtx = appCtx.getBean(TestContext.class);
 
         if (StringUtils.isBlank(body)) {
-            LOG.info("書式が不正です。");
+            LOG.info("format.valid");
             return;
         }
 
@@ -142,14 +142,14 @@ class DebugCommand {
         String value = StringUtils.substringAfter(body, " ");
 
         testCtx.addParam(key, value);
-        LOG.info("パラメーターをストアしました。{}={}", key, value);
+        LOG.info("add.param", key, value);
     }
 
     protected void showParam(ApplicationContext appCtx) {
         TestContext testCtx = appCtx.getBean(TestContext.class);
 
         if (testCtx.getParams().isEmpty()) {
-            LOG.info("ストアされているパラメーターはありません。");
+            LOG.info("param.empty");
             return;
         }
 
@@ -161,7 +161,7 @@ class DebugCommand {
             sb.append(entry.getValue());
 
         }
-        LOG.info("ストアされているパラメーターを表示します。{}", sb);
+        LOG.info("show.param", sb);
     }
 
 }

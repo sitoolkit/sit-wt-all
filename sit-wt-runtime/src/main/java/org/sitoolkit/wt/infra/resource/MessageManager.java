@@ -3,12 +3,12 @@ package org.sitoolkit.wt.infra.resource;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class MessageManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MessageManager.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(MessageManager.class);
 
     private static ResourceBundle resource;
 
@@ -25,7 +25,7 @@ public class MessageManager {
         try {
             return getResource().getString(key);
         } catch (MissingResourceException e) {
-            LOG.warn("{}", e.getMessage());
+            LOG.warn("warn2", e.getMessage());
         }
         return "!! messing resource !!";
 

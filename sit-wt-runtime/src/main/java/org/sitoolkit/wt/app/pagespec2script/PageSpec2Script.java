@@ -33,8 +33,8 @@ import org.sitoolkit.wt.app.config.ExtConfig;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -60,7 +60,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public class PageSpec2Script implements ApplicationContextAware {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     private ApplicationContext appCtx;
 
@@ -97,11 +97,11 @@ public class PageSpec2Script implements ApplicationContextAware {
         File pagespecDirF = new File(pagespecDir);
 
         if (!pagespecDirF.exists()) {
-            log.info("画面仕様書ディレクトリを作成します。{}", pagespecDirF.getAbsolutePath());
+            log.info("page.dir.generate", pagespecDirF.getAbsolutePath());
             pagespecDirF.mkdirs();
         }
 
-        log.info("画面仕様書ディレクトリ以下のスクリプトを処理します。{}", pagespecDirF.getAbsolutePath());
+        log.info("page.script", pagespecDirF.getAbsolutePath());
         for (File scriptFile : FileUtils.listFiles(pagespecDirF, fileFilter,
                 DirectoryFileFilter.DIRECTORY)) {
             convert(scriptFile);

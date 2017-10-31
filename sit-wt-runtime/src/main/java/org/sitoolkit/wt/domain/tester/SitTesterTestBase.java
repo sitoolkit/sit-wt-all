@@ -15,7 +15,7 @@
  */
 package org.sitoolkit.wt.domain.tester;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -25,8 +25,8 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,7 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = RuntimeConfig.class)
 public abstract class SitTesterTestBase {
 
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    protected SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     @Rule
     public TestName testName = new TestName();
@@ -79,7 +79,7 @@ public abstract class SitTesterTestBase {
         // https://jira.spring.io/browse/SPR-12421
         tester = ApplicationContextHelper.getBean(Tester.class);
 
-        log.trace("setUp {} {} {}", new Object[] { this, testName.getMethodName(), tester });
+        log.trace("setup", new Object[] { this, testName.getMethodName(), tester });
         tester.prepare(getTestScriptPath(), getSheetName(), getCurrentCaseNo());
 
         TestEventListener listener = ApplicationContextHelper.getBean(TestEventListener.class);

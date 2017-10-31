@@ -20,22 +20,21 @@ import org.sitoolkit.wt.domain.tester.Tester;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class TestRunner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestRunner.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestRunner.class);
 
     public static void main(String[] args) {
 
         if (args.length < 1) {
-            LOG.info("テストスクリプトを指定してください。");
-            LOG.info(">java {} [path/to/TestScript.xlsx!TestSheet#CaseNo]",
-                    TestRunner.class.getName());
+            LOG.info("test.script.appoint");
+            LOG.info("test.case", TestRunner.class.getName());
             System.exit(1);
         }
 
@@ -62,7 +61,7 @@ public class TestRunner {
             EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(null, targetDir.getBrowser());
 
             boolean compareSsSuccess = generator.generate(baseDir, targetDir, isCompareScreenshot);
-            LOG.info("基準エビデンスとのスクリーンショット比較が{}しました。", compareSsSuccess ? "成功" : "失敗");
+            LOG.info("base.evidence.compare", compareSsSuccess ? "成功" : "失敗");
 
             if (!compareSsSuccess) {
                 EvidenceOpener opener = new EvidenceOpener();
@@ -103,8 +102,7 @@ public class TestRunner {
      * テストスクリプトを実行します。
      *
      * @param appCtx
-     *            {@link RuntimeConfig}で構成された
-     *            {@code ConfigurableApplicationContext}
+     *            {@link RuntimeConfig}で構成された {@code ConfigurableApplicationContext}
      * @param testCaseStr
      *            実行するテストケース(scriptPath1,scriptPath2#case_1,scriptPath3!TestScript#case_1)
      * @param isParallel
@@ -200,7 +198,7 @@ public class TestRunner {
                 List<String> caseNoList = new ArrayList<>(script.getCaseNoMap().keySet());
 
                 if (caseNoList.isEmpty()) {
-                    LOG.warn("テストスクリプトにケースがありません　{} {}", scriptPath, sheetName);
+                    LOG.warn("case.empty", scriptPath, sheetName);
                     continue;
                 }
 
@@ -234,14 +232,14 @@ public class TestRunner {
         try {
             executor.awaitTermination(5, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
-            LOG.warn("スレッドの待機で例外が発生しました", e);
+            LOG.warn("thread.sleep.exception", e);
         }
 
         return results;
     }
 
     private TestResult runCase(String scriptPath, String sheetName, String caseNo) {
-        LOG.info("テストスクリプトを実行します。{} {} {}", scriptPath, sheetName, caseNo);
+        LOG.info("run.case", scriptPath, sheetName, caseNo);
 
         Tester tester = ApplicationContextHelper.getBean(Tester.class);
         TestEventListener listener = ApplicationContextHelper.getBean(TestEventListener.class);
@@ -258,7 +256,7 @@ public class TestRunner {
             tester.tearDown();
 
             if (result != null) {
-                LOG.info("ケース{}が{}しました", caseNo, result.isSuccess() ? "成功" : "失敗");
+                LOG.info("test.result", caseNo, result.isSuccess() ? "成功" : "失敗");
             }
         }
 

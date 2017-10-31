@@ -16,8 +16,8 @@
 package org.sitoolkit.wt.infra;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -32,7 +32,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  */
 public class ELSupport {
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final SitLogger LOG = SitLoggerFactory.getLogger(getClass());
 
     protected ExpressionParser parser = new SpelExpressionParser();
 

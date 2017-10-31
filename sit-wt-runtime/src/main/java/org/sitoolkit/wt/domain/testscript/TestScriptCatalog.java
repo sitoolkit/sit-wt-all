@@ -6,12 +6,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class TestScriptCatalog {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestScriptCatalog.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestScriptCatalog.class);
 
     private Map<String, TestScript> catalog = Collections.synchronizedMap(new HashMap<>());
 
@@ -25,7 +25,7 @@ public class TestScriptCatalog {
     public TestScript get(String scriptPath, String sheetName) {
         TestScript script = catalog.get(scriptPath);
         if (script == null) {
-            LOG.info("テストスクリプトをロードします。{}, {}", scriptPath, sheetName);
+            LOG.info("script.load2", scriptPath, sheetName);
             script = dao.load(scriptPath, sheetName, false);
             catalog.put(scriptPath, script);
         }

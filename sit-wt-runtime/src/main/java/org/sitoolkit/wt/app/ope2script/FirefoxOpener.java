@@ -7,12 +7,12 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.sitoolkit.wt.domain.guidance.GuidanceUtils;
 import org.sitoolkit.wt.infra.MultiThreadUtils;
 import org.sitoolkit.wt.infra.firefox.FirefoxManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class FirefoxOpener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FirefoxOpener.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(FirefoxOpener.class);
 
     private FirefoxManager ffManager = new FirefoxManager();
 
@@ -45,7 +45,7 @@ public class FirefoxOpener {
 
             FirefoxBinary ffBinary = ffManager.getFirefoxBinary();
 
-            LOG.info("Firefoxを起動します {}", ffBinary);
+            LOG.info("firefox.start", ffBinary);
 
             WebDriver driver = MultiThreadUtils
                     .submitWithProgress(() -> new FirefoxDriver(ffBinary, profile));
@@ -58,7 +58,7 @@ public class FirefoxOpener {
 
             return 0;
         } catch (Exception e) {
-            LOG.error("予期しない例外が発生しました", e);
+            LOG.error("unexpected.exception", e);
             return 1;
         }
     }

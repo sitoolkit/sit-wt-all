@@ -6,4 +6,10 @@ public interface SitLogger {
 
     public void debug(String key, Object... arguments);
 
+    public void warn(String key, Object... arguments);
+
+    public void error(String key, Object... arguments);
+
+    public void trace(String key, Object... arguments);
+
 }

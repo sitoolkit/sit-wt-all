@@ -11,12 +11,12 @@ import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class Screenshot {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Screenshot.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(Screenshot.class);
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
@@ -80,8 +80,7 @@ public class Screenshot {
             maxY = Math.max(maxY, pos.getY() + pos.getH());
         }
 
-        LOG.debug("elements:{} rectanble maxX:{}, minY:{}, maxX:{}, maxY:{}",
-                new Object[] { positions.size(), maxX, minY, maxX, maxY });
+        LOG.debug("element.info", new Object[] { positions.size(), maxX, minY, maxX, maxY });
 
         resizing = true;
         return EXECUTOR.submit(new Resizer(minX, minY, maxX, maxY));
@@ -122,9 +121,8 @@ public class Screenshot {
                 width = subImg.getWidth();
                 ImageIO.write(subImg, "png", file);
 
-                LOG.debug("origonal image w:{}, h:{} sub image x:{}, y:{}, w:{}, h{} file:{}",
-                        new Object[] { orgImg.getWidth(), orgImg.getHeight(), subX, subY, subW,
-                                subH, file.getAbsolutePath() });
+                LOG.debug("origonal.image.info", new Object[] { orgImg.getWidth(),
+                        orgImg.getHeight(), subX, subY, subW, subH, file.getAbsolutePath() });
 
             } catch (IOException e) {
                 LOG.error("スクリーンショットファイル{}のサイズ変更で例外が発生", file.getName(), e);

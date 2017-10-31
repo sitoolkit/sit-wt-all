@@ -1,7 +1,7 @@
 package org.sitoolkit.wt.app.compareevidence;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,14 +11,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class DiffEvidenceGeneratorTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DiffEvidenceGeneratorTest.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(DiffEvidenceGeneratorTest.class);
 
     DiffEvidenceGenerator generator;
 

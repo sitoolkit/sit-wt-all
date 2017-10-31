@@ -19,8 +19,8 @@ import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
 
 /**
@@ -36,7 +36,8 @@ import org.springframework.aop.framework.ProxyFactory;
  */
 public class WebDriverMethodInterceptor implements MethodInterceptor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WebDriverMethodInterceptor.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(WebDriverMethodInterceptor.class);
 
     private WebElementExceptionChecker checker;
 
@@ -57,8 +58,7 @@ public class WebDriverMethodInterceptor implements MethodInterceptor {
         Object ret = mi.proceed();
 
         if (ret == null) {
-            LOG.debug("{} {}でnullが返りました 再実行します", mi.getThis().getClass().getName(),
-                    method.getName());
+            LOG.debug("restart", mi.getThis().getClass().getName(), method.getName());
             ret = mi.proceed();
         }
 

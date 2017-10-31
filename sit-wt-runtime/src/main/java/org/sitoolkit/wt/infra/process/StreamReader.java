@@ -4,12 +4,12 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class StreamReader implements Runnable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamReader.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(StreamReader.class);
 
     private String name = "default";
 
@@ -34,7 +34,7 @@ public class StreamReader implements Runnable {
             sb.append(line);
             sb.append(System.lineSeparator());
 
-            LOG.info("[{}] {}", name, line);
+            LOG.info("scanner", name, line);
         }
 
         text = sb.toString();

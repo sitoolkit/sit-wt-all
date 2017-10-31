@@ -9,15 +9,15 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 public class SeleniumStepConverter implements ApplicationContextAware {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     protected ApplicationContext appCtx;
 
@@ -93,8 +93,7 @@ public class SeleniumStepConverter implements ApplicationContextAware {
             if (appCtx.containsBeanDefinition(seleniumStep.getCommand() + "Operation")) {
                 operationName = seleniumStep.getCommand();
             } else {
-                log.info("Seleniumコマンド：{}は非対応です。テストスクリプトの操作は空白で出力します。",
-                        seleniumStep.getCommand());
+                log.info("selenium.command.unmatched", seleniumStep.getCommand());
             }
         }
 

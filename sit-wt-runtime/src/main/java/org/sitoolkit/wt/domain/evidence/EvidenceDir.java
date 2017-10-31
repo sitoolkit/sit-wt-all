@@ -16,12 +16,12 @@ import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.infra.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class EvidenceDir {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EvidenceDir.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceDir.class);
 
     private static final String BASE_EVIDENCE_ROOT = "base-evidence";
 
@@ -79,7 +79,7 @@ public class EvidenceDir {
         Collections.sort(evidenceDirs, new FileNameComarator(false));
 
         if (evidenceDirs.isEmpty()) {
-            LOG.info("エビデンスフォルダがありません {}", outputDir.getAbsolutePath());
+            LOG.info("evidence.dirs.empty", outputDir.getAbsolutePath());
             return null;
         }
 

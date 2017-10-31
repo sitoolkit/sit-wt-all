@@ -22,4 +22,19 @@ public class DefaultLoggerImpl implements SitLogger {
         logger.debug(MessageManager.getMessage(key), arguments);
     }
 
+    @Override
+    public void warn(String key, Object... arguments) {
+        logger.warn(MessageManager.getMessage(key), arguments);
+    }
+
+    @Override
+    public void error(String key, Object... arguments) {
+        logger.error(MessageManager.getMessage(key), arguments);
+    }
+
+    @Override
+    public void trace(String key, Object... arguments) {
+        logger.trace(MessageManager.getMessage(key), arguments);
+    }
+
 }

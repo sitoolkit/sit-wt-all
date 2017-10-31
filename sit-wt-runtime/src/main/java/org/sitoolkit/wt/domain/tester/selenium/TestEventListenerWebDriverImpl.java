@@ -5,13 +5,14 @@ import javax.annotation.Resource;
 import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.support.SimpleThreadScope;
 
 public class TestEventListenerWebDriverImpl implements TestEventListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestEventListenerWebDriverImpl.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(TestEventListenerWebDriverImpl.class);
 
     @Resource
     WebDriver driver;
@@ -33,16 +34,16 @@ public class TestEventListenerWebDriverImpl implements TestEventListener {
         // EdgeDriver#deleteAllCookies doesn't work.
         // https://developer.microsoft.com/microsoft-edge/platform/issues/5751773/
         if (pm.isEdgeDriver()) {
-            LOG.debug("WebDriverを再作成します {}", driver);
+            LOG.debug("webdriver.reconstruction", driver);
             threadScope.remove("scopedTarget.innerWebDriver");
 
         } else if (pm.isRemoteDriver()) {
-            LOG.debug("RemoteWebDriverのセッションを終了します {}", driver);
+            LOG.debug("webdriver.remote.end", driver);
             driver.quit();
             threadScope.remove("scopedTarget.innerWebDriver");
 
         } else {
-            LOG.debug("Coolkieを削除します {}", driver);
+            LOG.debug("cookie.delete", driver);
             driver.manage().deleteAllCookies();
         }
 

@@ -4,12 +4,12 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class ReportOpener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ReportOpener.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(ReportOpener.class);
 
     public void open(EvidenceDir targetDir) {
         File failsafeReport = targetDir.getFailsafeReport();
@@ -17,7 +17,7 @@ public class ReportOpener {
         try {
             Desktop.getDesktop().open(failsafeReport);
         } catch (IOException e) {
-            LOG.error("レポートファイルのオープンに失敗しました", e);
+            LOG.error("report.open.error", e);
         }
 
     }

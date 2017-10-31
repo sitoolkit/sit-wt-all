@@ -14,12 +14,13 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.sitoolkit.wt.infra.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class TemplateEngineVelocityImpl implements TemplateEngine {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TemplateEngineVelocityImpl.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(TemplateEngineVelocityImpl.class);
 
     private Map<String, Template> templateCache = new HashMap<>();
 
@@ -44,7 +45,7 @@ public class TemplateEngineVelocityImpl implements TemplateEngine {
         File file = new File(outdir, model.getFileBase() + "." + model.getFileExt());
         try {
             FileUtils.writeStringToFile(file, str, "UTF-8");
-            LOG.info("ファイルに書き込みました {}", file.getAbsolutePath());
+            LOG.info("write", file.getAbsolutePath());
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

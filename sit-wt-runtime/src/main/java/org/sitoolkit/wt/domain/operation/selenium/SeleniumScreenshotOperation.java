@@ -36,8 +36,8 @@ import org.sitoolkit.wt.domain.operation.ScreenshotOperation;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.infra.ConfigurationException;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
@@ -48,7 +48,8 @@ import org.springframework.util.ResourceUtils;
 @Component
 public class SeleniumScreenshotOperation implements ScreenshotOperation {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SeleniumScreenshotOperation.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(SeleniumScreenshotOperation.class);
 
     protected Robot robot;
 
@@ -70,7 +71,7 @@ public class SeleniumScreenshotOperation implements ScreenshotOperation {
         try {
             robot = new Robot();
         } catch (AWTException e) {
-            LOG.warn("", e);
+            LOG.warn("warn", e);
         }
     }
 
@@ -80,7 +81,7 @@ public class SeleniumScreenshotOperation implements ScreenshotOperation {
             if (pm.isResizeWindow()) {
                 Dimension bodySize = seleniumDriver.findElement(By.tagName("body")).getSize();
                 seleniumDriver.manage().window().setSize(bodySize);
-                LOG.debug("bodySize {}", bodySize);
+                LOG.debug("body.size", bodySize);
             }
 
             try {
@@ -98,7 +99,7 @@ public class SeleniumScreenshotOperation implements ScreenshotOperation {
                 }
             }
         } else {
-            LOG.warn("ドライバ{}はスクリーンショットを取得できません。", seleniumDriver.getClass().getName());
+            LOG.warn("driver.screenshot.error", seleniumDriver.getClass().getName());
             return null;
             // try {
             // File file = File.createTempFile("sit-wt", "html");
@@ -126,14 +127,14 @@ public class SeleniumScreenshotOperation implements ScreenshotOperation {
                 // TODO 待機＋タイムアウト
                 Thread.sleep(getDialogWaitSpan());
             } catch (InterruptedException e) {
-                LOG.warn("スレッドの待機に失敗");
+                LOG.warn("thread.sleep.error");
             }
             BufferedImage img = robot.createScreenCapture(windowRect);
             ImageIO.write(img, "png", file);
             current.setWindowRect(null);
             return file;
         } catch (IOException e) {
-            LOG.warn("スクリーンショットの取得に失敗しました", e);
+            LOG.warn("screenshot.get.error", e);
             // TODO スクリーンショット失敗用の画像を返す
             return null;
         }
