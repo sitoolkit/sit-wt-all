@@ -50,7 +50,7 @@ public class WaitOperation extends SeleniumOperation {
             try {
                 Thread.sleep(waitSpan);
             } catch (InterruptedException e) {
-                log.warn("スレッドの待機に失敗しました。", e);
+                sitLog.warn("thread.sleep.error", e);
             }
         }
     }

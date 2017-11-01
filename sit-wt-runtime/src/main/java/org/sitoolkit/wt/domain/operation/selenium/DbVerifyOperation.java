@@ -170,7 +170,7 @@ public class DbVerifyOperation extends SeleniumOperation {
     private String writeSqlToString(String sqlPath) {
         try {
             File sqlFile = new File(sqlPath).getAbsoluteFile();
-            log.info("SQLファイルを読み込みます。[{}]", sqlFile);
+            sitLog.info("sql.load", sqlFile);
             return FileUtils.readFileToString(sqlFile, "UTF-8");
         } catch (IOException e) {
             throw new TestException(e);
@@ -191,7 +191,7 @@ public class DbVerifyOperation extends SeleniumOperation {
 
         Map<String, Object> tmpResult = new HashMap<>();
         try {
-            log.info("検証SQLを実行します。[{}] [{}]", sql, paramMap);
+            sitLog.info("sql.execute", sql, paramMap);
             tmpResult = jdbcTemplate.queryForMap(sql, paramMap);
         } catch (DataAccessException e) {
             throw new TestException(e);

@@ -46,7 +46,7 @@ public class DialogOperation extends SeleniumOperation {
                 alert.dismiss();
             }
         } catch (UnsupportedOperationException e) {
-            log.warn("ドライバ{}はダイアログを操作できません。", this.getClass());
+            sitLog.warn("unsupported.operation.error", this.getClass());
         }
     }
 }

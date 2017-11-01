@@ -32,7 +32,7 @@ public class SetWindowSizeOperation extends SeleniumOperation {
         String[] size = value.split(",");
 
         if (size.length != 2) {
-            log.warn("setWindowSizen操作のデータが不正です。例　900,600");
+            sitLog.warn("set.window.sizen");
             return;
         }
 
@@ -45,7 +45,7 @@ public class SetWindowSizeOperation extends SeleniumOperation {
             Dimension targetSize = new Dimension(width, height);
             seleniumDriver.manage().window().setSize(targetSize);
         } catch (NumberFormatException e) {
-            log.warn("setWindowSizen操作のデータが不正です。例　900,600", e);
+            sitLog.warn("set.window.sizen", e);
         }
     }
 }
