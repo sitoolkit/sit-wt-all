@@ -34,8 +34,6 @@ import org.sitoolkit.wt.infra.ElementNotFoundException;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -46,8 +44,7 @@ public abstract class SeleniumOperation implements Operation {
     @Resource
     PropertyManager pm;
 
-    protected Logger log = LoggerFactory.getLogger(getClass());
-    protected final SitLogger sitLog = SitLoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     @Resource
     protected WebDriver seleniumDriver;
@@ -116,7 +113,7 @@ public abstract class SeleniumOperation implements Operation {
      */
     protected boolean setChecked(WebElement checkElement, WebElement clickElement,
             boolean checked) {
-        sitLog.debug("check.element", checkElement, clickElement, checked);
+        log.debug("check.element", checkElement, clickElement, checked);
         if (checkElement.isSelected() != checked) {
             click(clickElement);
             return true;

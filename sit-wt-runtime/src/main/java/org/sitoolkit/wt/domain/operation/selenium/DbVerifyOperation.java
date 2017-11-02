@@ -86,7 +86,7 @@ public class DbVerifyOperation extends SeleniumOperation {
         setUpLogInfo(verifyMap, result, verifySql, paramMap);
 
         String startLog = buildLog();
-        ctx.info(startLog, "");
+        ctx.info("msg", startLog);
 
         verify();
 
@@ -170,7 +170,7 @@ public class DbVerifyOperation extends SeleniumOperation {
     private String writeSqlToString(String sqlPath) {
         try {
             File sqlFile = new File(sqlPath).getAbsoluteFile();
-            sitLog.info("sql.load", sqlFile);
+            log.info("sql.load", sqlFile);
             return FileUtils.readFileToString(sqlFile, "UTF-8");
         } catch (IOException e) {
             throw new TestException(e);
@@ -191,7 +191,7 @@ public class DbVerifyOperation extends SeleniumOperation {
 
         Map<String, Object> tmpResult = new HashMap<>();
         try {
-            sitLog.info("sql.execute", sql, paramMap);
+            log.info("sql.execute", sql, paramMap);
             tmpResult = jdbcTemplate.queryForMap(sql, paramMap);
         } catch (DataAccessException e) {
             throw new TestException(e);

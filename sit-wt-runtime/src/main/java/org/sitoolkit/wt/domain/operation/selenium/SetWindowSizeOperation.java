@@ -32,7 +32,7 @@ public class SetWindowSizeOperation extends SeleniumOperation {
         String[] size = value.split(",");
 
         if (size.length != 2) {
-            sitLog.warn("set.window.sizen");
+            log.warn("window.sizen.set.error");
             return;
         }
 
@@ -40,12 +40,12 @@ public class SetWindowSizeOperation extends SeleniumOperation {
             int width = Integer.parseInt(size[0]);
             int height = Integer.parseInt(size[1]);
 
-            ctx.info("ウィンドウサイズを({}, {})に設定します", width, height);
+            ctx.info("window.size.set", width, height);
 
             Dimension targetSize = new Dimension(width, height);
             seleniumDriver.manage().window().setSize(targetSize);
         } catch (NumberFormatException e) {
-            sitLog.warn("set.window.sizen", e);
+            log.warn("window.sizen.set.error", e);
         }
     }
 }

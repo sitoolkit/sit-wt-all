@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 public class MessageManager {
 
@@ -24,6 +25,16 @@ public class MessageManager {
     public static String getMessage(String key) {
         try {
             return getResource().getString(key);
+        } catch (MissingResourceException e) {
+            LOG.warn("warn2", e.getMessage());
+        }
+        return "!! messing resource !!";
+
+    }
+
+    public static String getMessage(String key, Object... params) {
+        try {
+            return MessageFormatter.arrayFormat(getResource().getString(key), params).getMessage();
         } catch (MissingResourceException e) {
             LOG.warn("warn2", e.getMessage());
         }

@@ -15,6 +15,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 
 public class PropertyUtils {
 
@@ -40,7 +41,8 @@ public class PropertyUtils {
             if (ignoreResourceNotFound) {
                 return prop;
             } else {
-                throw new ConfigurationException("プロパティファイルが見つかりません。" + resourceName);
+                throw new ConfigurationException(
+                        MessageManager.getMessage("property.not.found") + resourceName);
             }
         }
 
@@ -88,7 +90,8 @@ public class PropertyUtils {
             prop.store(writer, "");
 
         } catch (Exception e) {
-            throw new ConfigurationException("プロパティの保存で例外が発生しました", e);
+            throw new ConfigurationException(MessageManager.getMessage("property.save.exception"),
+                    e);
         }
 
     }

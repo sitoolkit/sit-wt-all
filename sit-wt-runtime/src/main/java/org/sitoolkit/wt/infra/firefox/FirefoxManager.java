@@ -15,6 +15,7 @@ import org.sitoolkit.wt.infra.SitRepository;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.infra.process.ProcessUtils;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -86,7 +87,7 @@ public class FirefoxManager {
             return new File(SitRepository.getRepositoryPath(),
                     "firefox/runtime/Firefox.app/Contents/MacOS/firefox-bin");
         } else {
-            throw new UnsupportedOperationException("サポートされていないOSです");
+            throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
         }
     }
 
@@ -102,7 +103,7 @@ public class FirefoxManager {
         } else if (SystemUtils.IS_OS_MAC) {
             installFirefoxMacOs(repo);
         } else {
-            throw new UnsupportedOperationException("サポートされていないOSです");
+            throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
         }
     }
 
@@ -127,9 +128,11 @@ public class FirefoxManager {
                 });
 
             } catch (IOException e) {
-                throw new RuntimeException("Firefoxのダウンロードで例外が発生しました", e);
+                throw new RuntimeException(MessageManager.getMessage("firefox.download.exception"),
+                        e);
             } catch (Exception exp) {
-                throw new RuntimeException("Firefoxのダウンロードで例外が発生しました", exp);
+                throw new RuntimeException(MessageManager.getMessage("firefox.download.exception"),
+                        exp);
             }
         }
 
@@ -148,7 +151,7 @@ public class FirefoxManager {
                 return 0;
             });
         } catch (IOException e) {
-            throw new RuntimeException("Firefoxのインストールで例外が発生しました", e);
+            throw new RuntimeException("firefox.install.exception", e);
         }
 
     }

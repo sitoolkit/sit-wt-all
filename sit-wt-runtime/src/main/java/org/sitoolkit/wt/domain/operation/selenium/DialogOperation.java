@@ -20,6 +20,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,14 +40,14 @@ public class DialogOperation extends SeleniumOperation {
             testStep.getLocator().setValue(alertText);
 
             if (testStep.getDialogValue()) {
-                ctx.info(MessagePattern.項目をXXします, "許諾");
+                ctx.info(MessagePattern.項目をXXします, MessageManager.getMessage("accept"));
                 alert.accept();
             } else {
-                ctx.info(MessagePattern.項目をXXします, "拒否");
+                ctx.info(MessagePattern.項目をXXします, MessageManager.getMessage("dismiss"));
                 alert.dismiss();
             }
         } catch (UnsupportedOperationException e) {
-            sitLog.warn("unsupported.operation.error", this.getClass());
+            log.warn("unsupported.operation.error", this.getClass());
         }
     }
 }

@@ -37,7 +37,7 @@ public class StoreOperation extends SeleniumOperation {
         String name = testStep.getLocator().getValue();
         String value = testStep.getValue();
 
-        sitLog.info("var.define", name, value);
+        log.info("var.define", name, value);
 
         context.addParam(name, value);
     }

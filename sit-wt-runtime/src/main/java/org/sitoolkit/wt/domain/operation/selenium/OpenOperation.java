@@ -34,8 +34,8 @@ public class OpenOperation extends SeleniumOperation {
     PropertyManager pm;
 
     /**
-     * テストステップで指定されたURLを開きます。 URLはロケーターの値とシステムプロパティ<code>baseUrl</code>
-     * を連結した文字列です。 ロケーターの値がhttp(s)で始まる場合は<code>baseUrl</code>は無視されます。 ロケーターの値、
+     * テストステップで指定されたURLを開きます。 URLはロケーターの値とシステムプロパティ<code>baseUrl</code> を連結した文字列です。
+     * ロケーターの値がhttp(s)で始まる場合は<code>baseUrl</code>は無視されます。 ロケーターの値、
      * <code>baseUrl</code>何れもhttp(s)で始まらない場合は、 ファイルプロトコルのURLとして解釈します。
      *
      *
@@ -44,7 +44,7 @@ public class OpenOperation extends SeleniumOperation {
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         String url = SitPathUtils.buildUrl(pm.getBaseUrl(), testStep.getLocator().getValue());
-        ctx.info("URLをオープンします {}", url);
+        ctx.info("url.open", url);
         seleniumDriver.get(url);
     }
 

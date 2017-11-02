@@ -29,7 +29,7 @@ public class SwitchFrameOperation extends SeleniumOperation {
 
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
-        ctx.info("フレームを{}に切り替えます", testStep.getItemName());
+        ctx.info("frame.switch", testStep.getItemName());
         Locator locator = testStep.getLocator();
         if (locator.isNa()) {
             seleniumDriver.switchTo().defaultContent();

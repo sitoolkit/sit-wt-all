@@ -48,7 +48,7 @@ public class StoreElementIndexOperation extends SeleniumOperation {
             idx++;
         }
 
-        ctx.info(element, "{}({})のインデックスは{}です", testStep.getItemName(), testStep.getLocator(), idx);
+        ctx.info(element, "element.index", testStep.getItemName(), testStep.getLocator(), idx);
 
         context.addParam(testStep.getDataType(), idx);
     }

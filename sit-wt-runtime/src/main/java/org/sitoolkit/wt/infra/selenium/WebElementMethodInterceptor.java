@@ -22,6 +22,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 
 /**
  * WebElementの再実行機能を追加する{@code MethodInterceptor}です。
@@ -100,13 +101,14 @@ public class WebElementMethodInterceptor implements MethodInterceptor {
 
         if (!(invocation.getThis() instanceof WebDriver)) {
             throw new IllegalArgumentException(
-                    invocation + "の対象オブジェクトはWebDriver型またはそのサブクラス型である必要があります");
+                    MessageManager.getMessage("object.model.error", invocation));
         }
 
         String methodName = invocation.getMethod().getName();
 
         if (!"findElement".equals(methodName)) {
-            throw new IllegalArgumentException(invocation + "はfindElementである必要があります。");
+            throw new IllegalArgumentException(
+                    MessageManager.getMessage("method.name.error", invocation));
         }
 
     }

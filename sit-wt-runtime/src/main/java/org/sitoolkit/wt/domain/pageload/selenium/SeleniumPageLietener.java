@@ -48,7 +48,7 @@ public class SeleniumPageLietener implements PageListener {
 
         // touch WebDriver instance to start Browser
         String driverType = driver.toString();
-        LOG.info("ブラウザを起動します {}", driverType);
+        LOG.info("browser.start", driverType);
 
         String baseUrl = System.getProperty("baseUrl");
         driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));

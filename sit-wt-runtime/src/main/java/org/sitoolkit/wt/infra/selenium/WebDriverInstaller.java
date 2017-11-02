@@ -187,7 +187,7 @@ public class WebDriverInstaller {
             } else {
                 ProxySettingService.getInstance().loadProxy();
 
-                LOG.info("download", new Object[] { binaryInfo.sysPropKey, downloadUrl,
+                LOG.info("download2", new Object[] { binaryInfo.sysPropKey, downloadUrl,
                         downloadFile.getAbsolutePath() });
                 FileUtils.copyURLToFile(downloadUrl, downloadFile);
             }

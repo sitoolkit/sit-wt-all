@@ -22,8 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.LogRecord;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.TestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExecOperation implements Operation {
 
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    protected SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     private static final String CMD_SEPARATOR = "[\\s]+";
 
@@ -50,7 +51,7 @@ public class ExecOperation implements Operation {
             command = "cmd /c " + command;
         }
 
-        result.addRecord(LogRecord.info(log, testStep, "コマンド[{}]を実行します", command));
+        result.addRecord(LogRecord.info(log, testStep, "cmd.execute", command));
 
         ProcessBuilder pb = new ProcessBuilder(command.split(CMD_SEPARATOR));
         pb.redirectErrorStream(true);
@@ -75,11 +76,11 @@ public class ExecOperation implements Operation {
         }
 
         if (!StringUtils.isEmpty(cmdlog)) {
-            result.addRecord(LogRecord.info(log, testStep, "コマンド実行結果 {}", cmdlog));
+            result.addRecord(LogRecord.info(log, testStep, "cmd.result", cmdlog));
         }
 
         if (exitValue != 0) {
-            throw new TestException("コマンドが異常終了しました。 " + command);
+            throw new TestException(MessageManager.getMessage("cmd.exception") + command);
         }
 
         return result;

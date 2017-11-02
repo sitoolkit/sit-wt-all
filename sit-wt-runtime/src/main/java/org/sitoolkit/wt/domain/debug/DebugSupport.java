@@ -161,7 +161,7 @@ public class DebugSupport {
             final int cmdRet = cmd.execute(ret, current.getTestScript(), appCtx);
 
             if (cmdRet < 0) {
-                LOG.info("comand.error");
+                LOG.info("cmd.error");
             } else {
                 ret = cmdRet;
 
