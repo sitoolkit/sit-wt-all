@@ -40,7 +40,7 @@ public class SeleniumLocatorChecker extends SeleniumOperation implements Locator
                     TimeUnit.MILLISECONDS);
 
             if (elements.isEmpty()) {
-                log.info("ロケーター({})に該当する要素は見つかりませんでした。", locator);
+                log.info("element.not.found", locator);
                 return;
             }
             StringBuilder sb = new StringBuilder();
@@ -61,9 +61,9 @@ public class SeleniumLocatorChecker extends SeleniumOperation implements Locator
                 sb.append("...");
             }
 
-            log.info("ロケーター({})に該当する要素が見つかりました。{}", locator, sb);
+            log.info("element.found", locator, sb);
         } catch (InvalidSelectorException e) {
-            log.info("ロケーター({})が不正です。{}", locator, e.getLocalizedMessage());
+            log.info("locator.error", locator, e.getLocalizedMessage());
         }
     }
 

@@ -22,6 +22,7 @@ import org.sitoolkit.wt.domain.testscript.TestScriptCatalog;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -61,7 +62,9 @@ public class TestRunner {
             EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(null, targetDir.getBrowser());
 
             boolean compareSsSuccess = generator.generate(baseDir, targetDir, isCompareScreenshot);
-            LOG.info("base.evidence.compare", compareSsSuccess ? "成功" : "失敗");
+            LOG.info("base.evidence.compare",
+                    compareSsSuccess ? MessageManager.getMessage("success")
+                            : MessageManager.getMessage("failure"));
 
             if (!compareSsSuccess) {
                 EvidenceOpener opener = new EvidenceOpener();
@@ -256,7 +259,9 @@ public class TestRunner {
             tester.tearDown();
 
             if (result != null) {
-                LOG.info("test.result", caseNo, result.isSuccess() ? "成功" : "失敗");
+                LOG.info("test.result", caseNo,
+                        result.isSuccess() ? MessageManager.getMessage("success")
+                                : MessageManager.getMessage("failure"));
             }
         }
 

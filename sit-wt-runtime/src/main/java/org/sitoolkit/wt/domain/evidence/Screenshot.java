@@ -63,7 +63,7 @@ public class Screenshot {
                 try {
                     width = ImageIO.read(file).getWidth();
                 } catch (IOException e) {
-                    LOG.warn("", e);
+                    LOG.warn("warn", e);
                 }
             });
         }
@@ -125,7 +125,7 @@ public class Screenshot {
                         orgImg.getHeight(), subX, subY, subW, subH, file.getAbsolutePath() });
 
             } catch (IOException e) {
-                LOG.error("スクリーンショットファイル{}のサイズ変更で例外が発生", file.getName(), e);
+                LOG.error("screenshot.resize.error", file.getName(), e);
             } finally {
                 resizing = false;
             }
