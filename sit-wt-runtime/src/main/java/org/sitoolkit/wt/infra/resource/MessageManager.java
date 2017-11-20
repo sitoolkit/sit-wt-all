@@ -1,5 +1,6 @@
 package org.sitoolkit.wt.infra.resource;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -17,7 +18,7 @@ public class MessageManager {
         if (resource == null) {
             String baseName = MessageManager.class.getPackage().getName().replace(".", "/")
                     + "/message";
-            resource = ResourceBundle.getBundle(baseName);
+            resource = ResourceBundle.getBundle(baseName, Locale.getDefault());
         }
         return resource;
     }

@@ -24,29 +24,38 @@ limitations under the License.
     <table beanId="testStep" name="テストステップ">
         <column property="no" name="No."/>
         <column property="itemName" name="ItemName">
-          <localizedName locale="ja_JP">項目名</localizedName>
+          <localizedName locale="ja">項目名</localizedName>
+          <localizedName locale="en">項目名</localizedName>
         </column>
         <column property="operation" name="Operation">
-          <localizedName locale="ja_JP">操作</localizedName>
+          <localizedName locale="ja">操作</localizedName>
+          <localizedName locale="en">操作</localizedName>
         </column>
         <column property="locator.type" name="LocatorStyle">
-          <localizedName locale="ja_JP">ロケーター形式</localizedName>
+          <localizedName locale="ja">ロケーター形式</localizedName>
+          <localizedName locale="en">ロケーター形式</localizedName>
         </column>
         <column property="locator.value" name="Locator">
-          <localizedName locale="ja_JP">ロケーター</localizedName>
+          <localizedName locale="ja">ロケーター</localizedName>
+          <localizedName locale="en">ロケーター</localizedName>
         </column>
         <column property="dataType" name="DataStyle">
-          <localizedName locale="ja_JP">データ形式</localizedName>
+          <localizedName locale="ja">データ形式</localizedName>
+          <localizedName locale="en">データ形式</localizedName>
         </column>
         <column property="screenshotTiming" name="Screenshot">
-          <localizedName locale="ja_JP">スクリーンショット</localizedName>
+          <localizedName locale="ja">スクリーンショット</localizedName>
+          <localizedName locale="en">スクリーンショット</localizedName>
         </column>
         <column property="testData" name="TestData" pattern="Case_(.*)$">
-          <localizedName locale="ja_JP">テストデータ</localizedName>
-          <localizedPattern locale="ja_JP">ケース_(.*)$</localizedPattern>
+          <localizedName locale="ja">テストデータ</localizedName>
+          <localizedPattern locale="ja">ケース_(.*)$</localizedPattern>
+          <localizedName locale="en">テストデータ</localizedName>
+          <localizedPattern locale="en">ケース_(.*)$</localizedPattern>
         </column>
         <column property="breakPoint" name="BreakPoint">
-          <localizedName locale="ja_JP">ブレークポイント</localizedName>
+          <localizedName locale="ja">ブレークポイント</localizedName>
+          <localizedName locale="en">ブレークポイント</localizedName>
         </column>
     </table>
 
