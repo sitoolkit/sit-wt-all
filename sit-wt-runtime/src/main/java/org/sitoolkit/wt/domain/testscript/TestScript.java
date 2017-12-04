@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.sitoolkit.wt.infra.log.SitLogger;
@@ -35,7 +36,7 @@ public class TestScript {
     /**
      * テストスクリプトの中から ケース番号のカラムを識別するためのプレフィックス
      */
-    private String caseNoPrefix = "ケース_";
+    private String caseNoPrefix = "";
     /**
      * テストスクリプト内で ケースのテストデータが記載された列番号
      */
@@ -71,11 +72,22 @@ public class TestScript {
     private String sheetName;
 
     public String getCaseNoPrefix() {
+        if (caseNoPrefix == "") {
+            setCaseNoPrefix();
+        }
         return caseNoPrefix;
     }
 
     public void setCaseNoPrefix(String caseNoPrefix) {
         this.caseNoPrefix = caseNoPrefix;
+    }
+
+    private void setCaseNoPrefix() {
+        if (Locale.getDefault().getLanguage() == "ja") {
+            this.caseNoPrefix = "ケース_";
+        } else {
+            this.caseNoPrefix = "Case_";
+        }
     }
 
     public List<TestStep> getTestStepList() {

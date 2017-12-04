@@ -16,11 +16,17 @@
 package org.sitoolkit.wt.domain.testscript;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.sitoolkit.util.tabledata.RowData;
 import org.sitoolkit.util.tabledata.TableData;
 import org.sitoolkit.util.tabledata.TableDataCatalog;
+import org.sitoolkit.wt.infra.PropertyUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(xlsx)に変換するクラスです。
@@ -28,7 +34,11 @@ import org.sitoolkit.util.tabledata.TableDataCatalog;
  * @author yuichi.kuwahara
  * @author kaori.ogawa
  */
-public class TestScriptConvertUtils {
+public class TestScriptConvertUtils implements ApplicationContextAware {
+
+    protected ApplicationContext appCtx;
+
+    private static Map<String, String> cellNameMap;
 
     /**
      * テストスクリプトが定義されたシート名
@@ -40,11 +50,14 @@ public class TestScriptConvertUtils {
 
     /**
      * TestScriptオブジェクトをRowDataオブジェクトに変換して TableDataCatalogに格納します。
-     * 
+     *
      * @param testStepList
      * @return
      */
     public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList) {
+        if (cellNameMap == null) {
+            initCellNameMap();
+        }
         TableDataCatalog tableDataCatalog = new TableDataCatalog();
         TableData tableData = new TableData();
 
@@ -52,17 +65,17 @@ public class TestScriptConvertUtils {
             RowData row = new RowData();
 
             row.setCellValue("No.", testStep.getNo());
-            row.setCellValue("項目名", testStep.getItemName());
-            row.setCellValue("操作", testStep.getOperationName());
+            row.setCellValue(cellNameMap.get("ItemName"), testStep.getItemName());
+            row.setCellValue(cellNameMap.get("Operation"), testStep.getOperationName());
             if (!Locator.Type.na.equals(testStep.getLocator().getType())) {
-                row.setCellValue("ロケーター形式", testStep.getLocator().getType());
+                row.setCellValue(cellNameMap.get("LocatorStyle"), testStep.getLocator().getType());
             }
-            row.setCellValue("ロケーター", testStep.getLocator().getValue());
-            row.setCellValue("データ形式", testStep.getDataType());
-            row.setCellValue("スクリーンショット", testStep.getScreenshotTiming());
+            row.setCellValue(cellNameMap.get("Locator"), testStep.getLocator().getValue());
+            row.setCellValue(cellNameMap.get("DataStyle"), testStep.getDataType());
+            row.setCellValue(cellNameMap.get("Screenshot"), testStep.getScreenshotTiming());
 
             for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
-                row.setCellValue("ケース_" + entry.getKey(), entry.getValue());
+                row.setCellValue(cellNameMap.get("Case") + entry.getKey(), entry.getValue());
             }
             tableData.add(row);
         }
@@ -71,5 +84,16 @@ public class TestScriptConvertUtils {
         tableDataCatalog.add(tableData);
 
         return tableDataCatalog;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.appCtx = applicationContext;
+    }
+
+    private static void initCellNameMap() {
+        String path = "/" + TestScriptConvertUtils.class.getPackage().getName().replace(".", "/")
+                + "/testscript_" + Locale.getDefault().getLanguage();
+        cellNameMap = PropertyUtils.loadAsMap(path, false);
     }
 }

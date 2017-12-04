@@ -2,6 +2,7 @@ package org.sitoolkit.wt.domain.testscript;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -23,7 +24,8 @@ public class TestScriptDao {
 
     protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
-    private static final String TEMPLATE_PATH = "classpath:TestScriptTemplate.xlsx";
+    private static final String TEMPLATE_PATH = "classpath:TestScriptTemplate_"
+            + Locale.getDefault().getLanguage() + ".xlsx";
 
     @Resource
     ApplicationContext appCtx;
