@@ -242,6 +242,13 @@ public class MavenUtils {
     }
 
     static int setSitWtVersion(File pomFile, String newVersion, File destPomFile) {
+    	
+    	if (StrUtils.isEmpty(newVersion)) {
+            LOG.log(Level.WARNING, "new sitwt.version must not be empty",
+                    new Object[] { });
+    		return 2;
+    	}
+    	
         try {
             Document document = parseSettingFile(pomFile);
 
