@@ -15,15 +15,15 @@
  */
 package org.sitoolkit.wt.domain.testscript;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.sitoolkit.util.tabledata.RowData;
 import org.sitoolkit.util.tabledata.TableData;
 import org.sitoolkit.util.tabledata.TableDataCatalog;
-import org.sitoolkit.wt.infra.PropertyUtils;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -45,6 +45,20 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
      */
     private static String sheetName = "TestScript";
 
+    private static String itemName = "ItemName";
+
+    private static String operation = "Operation";
+
+    private static String locatorStyle = "LocatorStyle";
+
+    private static String locator = "Locator";
+
+    private static String dataStyle = "DataStyle";
+
+    private static String screenshot = "Screenshot";
+
+    private static String case_ = "Case";
+
     public TestScriptConvertUtils() {
     }
 
@@ -65,17 +79,17 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
             RowData row = new RowData();
 
             row.setCellValue("No.", testStep.getNo());
-            row.setCellValue(cellNameMap.get("ItemName"), testStep.getItemName());
-            row.setCellValue(cellNameMap.get("Operation"), testStep.getOperationName());
+            row.setCellValue(cellNameMap.get(itemName), testStep.getItemName());
+            row.setCellValue(cellNameMap.get(operation), testStep.getOperationName());
             if (!Locator.Type.na.equals(testStep.getLocator().getType())) {
-                row.setCellValue(cellNameMap.get("LocatorStyle"), testStep.getLocator().getType());
+                row.setCellValue(cellNameMap.get(locatorStyle), testStep.getLocator().getType());
             }
-            row.setCellValue(cellNameMap.get("Locator"), testStep.getLocator().getValue());
-            row.setCellValue(cellNameMap.get("DataStyle"), testStep.getDataType());
-            row.setCellValue(cellNameMap.get("Screenshot"), testStep.getScreenshotTiming());
+            row.setCellValue(cellNameMap.get(locator), testStep.getLocator().getValue());
+            row.setCellValue(cellNameMap.get(dataStyle), testStep.getDataType());
+            row.setCellValue(cellNameMap.get(screenshot), testStep.getScreenshotTiming());
 
             for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
-                row.setCellValue(cellNameMap.get("Case") + entry.getKey(), entry.getValue());
+                row.setCellValue(cellNameMap.get(case_) + entry.getKey(), entry.getValue());
             }
             tableData.add(row);
         }
@@ -92,8 +106,14 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
     }
 
     private static void initCellNameMap() {
-        String path = "/" + TestScriptConvertUtils.class.getPackage().getName().replace(".", "/")
-                + "/testscript_" + Locale.getDefault().getLanguage();
-        cellNameMap = PropertyUtils.loadAsMap(path, false);
+        cellNameMap = new HashMap<String, String>();
+
+        cellNameMap.put(itemName, MessageManager.getMessage(itemName));
+        cellNameMap.put(operation, MessageManager.getMessage(operation));
+        cellNameMap.put(locatorStyle, MessageManager.getMessage(locatorStyle));
+        cellNameMap.put(locator, MessageManager.getMessage(locator));
+        cellNameMap.put(dataStyle, MessageManager.getMessage(dataStyle));
+        cellNameMap.put(screenshot, MessageManager.getMessage(screenshot));
+        cellNameMap.put(case_, MessageManager.getMessage(case_));
     }
 }
