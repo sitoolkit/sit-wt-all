@@ -17,9 +17,7 @@ package org.sitoolkit.wt.domain.tester;
 
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.sitoolkit.wt.domain.testscript.TestScript;
 
 /**
  *
@@ -33,13 +31,7 @@ public class LanguageEnTest extends SitTesterTestBase {
     public void test001() {
         if (language == "en") {
             test();
-            TestScript testscript = this.tester.getTestScript();
         }
-    }
-
-    @Override
-    protected String getCurrentCaseNo() {
-        return StringUtils.substringAfter(testName.getMethodName(), "test");
     }
 
     @Override
