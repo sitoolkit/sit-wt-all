@@ -60,6 +60,8 @@
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
       <arg value="localhost,ci" />
+      <arg value="-Duser.language=ja" />
+      <arg value="-Duser.country=JP" />
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="-Dmaven.test.skip=false" />
       <arg value="-Dmpir.skip=true" />
@@ -98,6 +100,8 @@
     <echo message="mvn sit-wt:sample"/>
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-Duser.language=ja" />
+      <arg value="-Duser.country=JP" />
       <arg value="-e" />
       <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
     </exec>
@@ -107,6 +111,8 @@
       <echo message="mvn -f sample   (jetty:run)"/>
       <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
         <env key="JAVA_HOME" value="${java.home}" />
+        <arg value="-Duser.language=ja" />
+        <arg value="-Duser.country=JP" />
         <arg value="-f" />
         <arg value="sample" />
       </exec>

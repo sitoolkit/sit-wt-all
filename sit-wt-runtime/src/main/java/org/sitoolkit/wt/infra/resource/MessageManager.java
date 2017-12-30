@@ -18,7 +18,8 @@ public class MessageManager {
         if (resource == null) {
             String baseName = MessageManager.class.getPackage().getName().replace(".", "/")
                     + "/message";
-            resource = ResourceBundle.getBundle(baseName, Locale.getDefault());
+            LOG.info("message resource is initialised with locale {}", Locale.getDefault());
+            resource = ResourceBundle.getBundle(baseName);
         }
         return resource;
     }
