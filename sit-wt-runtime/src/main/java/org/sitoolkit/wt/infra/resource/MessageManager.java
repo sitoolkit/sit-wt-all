@@ -4,13 +4,13 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.sitoolkit.wt.infra.log.SitLogger;
-import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 
 public class MessageManager {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(MessageManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessageManager.class);
 
     private static ResourceBundle resource;
 
