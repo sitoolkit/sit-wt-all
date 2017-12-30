@@ -14,7 +14,7 @@ public class MessageManager {
 
     private static ResourceBundle resource;
 
-    private static ResourceBundle getResource() {
+    private static synchronized ResourceBundle getResource() {
         if (resource == null) {
             String baseName = MessageManager.class.getPackage().getName().replace(".", "/")
                     + "/message";
@@ -27,7 +27,7 @@ public class MessageManager {
         try {
             return getResource().getString(key);
         } catch (MissingResourceException e) {
-            LOG.warn("warn2", e.getMessage());
+            LOG.warn("{}, locale {}", e.getMessage(), getResource().getLocale());
         }
         return "!! messing resource !!";
 
@@ -37,7 +37,7 @@ public class MessageManager {
         try {
             return MessageFormatter.arrayFormat(getResource().getString(key), params).getMessage();
         } catch (MissingResourceException e) {
-            LOG.warn("warn2", e.getMessage());
+            LOG.warn("{}, locale {}", e.getMessage(), getResource().getLocale());
         }
         return "!! messing resource !!";
 

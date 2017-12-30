@@ -201,10 +201,10 @@ public class Tester {
         } catch (Exception e) {
             evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
                     "unexpected.error2", e.getLocalizedMessage()));
+            log.debug("exception", e);
             if (!operationSupport.isDbVerify(testStep.getOperation())) {
                 addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
             }
-            log.debug("exception", e);
             result.setErrorCause(e);
         } finally {
             em.flushEvidence(evidence);
