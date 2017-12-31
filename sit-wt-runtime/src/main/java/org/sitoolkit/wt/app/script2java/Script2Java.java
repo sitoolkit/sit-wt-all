@@ -201,8 +201,9 @@ public class Script2Java implements ApplicationContextAware {
 
         // テストクラスの物理名の設定
         String baseName = FilenameUtils.getBaseName(testClass.getScriptPath());
-        testClass.setFileBase(
-                StrUtils.sanitizeMetaCharacter("IT" + StringUtils.capitalize(baseName)));
+        baseName = StringUtils.capitalize(baseName);
+        baseName = StrUtils.sanitizeMetaCharacter(baseName) + "IT";
+        testClass.setFileBase(baseName);
 
         // パッケージパス
         String scriptPathFromPkg = SitPathUtils.relatvePath(testScriptDir,
