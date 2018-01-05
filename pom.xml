@@ -14,8 +14,6 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <checkstyle.skip>true</checkstyle.skip>
-    <user.language>ja</user.language>
-    <user.country>JP</user.country>
   </properties>
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -51,8 +49,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.19.1</version>
           <configuration>
-            <argLine>-Dfile.encoding=${file.encoding} -XX:-UseSplitVerifier</argLine>
-            <argLine>-Duser.language=${user.language} -Duser.country=${user.country}</argLine>
+            <argLine>-Dfile.encoding=${file.encoding} -XX:-UseSplitVerifier -Duser.language=${user.language} -Duser.country=${user.country}</argLine>
           </configuration>
         </plugin>
         <plugin>
