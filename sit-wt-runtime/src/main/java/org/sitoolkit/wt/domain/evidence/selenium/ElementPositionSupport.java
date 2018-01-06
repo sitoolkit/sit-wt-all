@@ -23,12 +23,8 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.evidence.ElementPosition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import io.appium.java_client.AppiumDriver;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 /**
  *
@@ -36,11 +32,11 @@ import io.appium.java_client.AppiumDriver;
  */
 public class ElementPositionSupport {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     @Resource
     protected WebDriver driver;
-    
+
     private WebElement currentFrame;
 
     public WebElement getCurrentFrame() {
@@ -53,7 +49,7 @@ public class ElementPositionSupport {
 
     /**
      * 要素位置の基準となる座標を取得します。
-     * 
+     *
      * @return 要素位置の基準となる座標
      */
     protected Point getCurrentBasePosition() {
@@ -64,8 +60,7 @@ public class ElementPositionSupport {
             Point documentPos = driver.findElement(By.tagName("html")).getLocation();
             Point framePos = currentFrame.getLocation();
             driver.switchTo().frame(currentFrame);
-            return new Point(
-                    documentPos.getX() - framePos.getX(),
+            return new Point(documentPos.getX() - framePos.getX(),
                     documentPos.getY() - framePos.getY());
         }
     }
@@ -77,13 +72,10 @@ public class ElementPositionSupport {
             Point elementPos = element.getLocation();
             Point basePos = getCurrentBasePosition();
 
-            log.debug("要素:{}, 要素位置:{}, 基準位置:{}",
-                    new Object[]{element, elementPos, basePos});
+            log.debug("element.position", new Object[] { element, elementPos, basePos });
 
-            return new ElementPosition(
-                    elementPos.getX() - basePos.getX(),
-                    elementPos.getY() - basePos.getY(),
-                    element.getSize().getWidth(),
+            return new ElementPosition(elementPos.getX() - basePos.getX(),
+                    elementPos.getY() - basePos.getY(), element.getSize().getWidth(),
                     element.getSize().getHeight());
         } else {
             return ElementPosition.EMPTY;

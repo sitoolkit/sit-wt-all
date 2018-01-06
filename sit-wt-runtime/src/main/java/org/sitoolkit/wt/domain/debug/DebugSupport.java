@@ -29,8 +29,8 @@ import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -39,7 +39,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class DebugSupport {
 
-    private static Logger LOG = LoggerFactory.getLogger(DebugSupport.class);
+    private static SitLogger LOG = SitLoggerFactory.getLogger(DebugSupport.class);
 
     private static final String USAGE_DESC = CommandKey.buildUsage();
 
@@ -69,8 +69,7 @@ public class DebugSupport {
     private Boolean debug;
 
     /**
-     * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき
-     * {@code TestStep}
+     * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき {@code TestStep}
      * とテストステップインデックスを設定します。(テストステップインデックスはテストスクリプト内でのテストステップの順番です。)
      *
      * @return テスト実行を継続する場合にtrue
@@ -79,18 +78,17 @@ public class DebugSupport {
         final int currentIndex = current.getCurrentIndex();
         int nextIndex = currentIndex + 1;
         TestScript testScript = current.getTestScript();
-        LOG.debug("debugging test context : {}", current);
+        LOG.debug("debug.test", current);
         if (currentIndex < testScript.getTestStepCount()) {
 
             if (pm.isDebug()) {
 
-                LOG.debug("currentIndex:{}, testStepCount:{}", currentIndex,
-                        testScript.getTestStepCount());
+                LOG.debug("debug.index", currentIndex, testScript.getTestStepCount());
 
                 TestStep nexttStep = testScript.getTestStep(nextIndex);
 
                 if (nexttStep != null && StringUtils.isNotEmpty(nexttStep.getBreakPoint())) {
-                    LOG.info("ブレークポイントが設定されています。");
+                    LOG.info("debug.break.point");
                     pause();
                 }
                 nextIndex = getNextIndex(currentIndex);
@@ -145,12 +143,12 @@ public class DebugSupport {
             try {
                 Thread.sleep(getPauseSpan());
             } catch (InterruptedException e) {
-                LOG.warn("スレッドの待機に失敗しました", e);
+                LOG.warn("thread.sleep.error", e);
             }
 
             TestScript testScript = current.getTestScript();
             if (testScript.isScriptFileChanged()) {
-                LOG.info("テストスクリプトが変更されています。再読込します。");
+                LOG.info("script.file.changed");
                 current.setTestScript(
                         dao.load(testScript.getScriptFile(), testScript.getSheetName(), false));
             }
@@ -163,27 +161,27 @@ public class DebugSupport {
             final int cmdRet = cmd.execute(ret, current.getTestScript(), appCtx);
 
             if (cmdRet < 0) {
-                LOG.info("不正な操作です。");
+                LOG.info("cmd.error");
             } else {
                 ret = cmdRet;
 
                 if (current.getTestScript().getTestStep(ret) == null) {
-                    LOG.info("全てのテストステップが終了しました。");
+                    LOG.info("test.step.end");
                     break;
                 }
 
-                LOG.info("");
-                LOG.info("前後のテストステップ");
+                LOG.info("empty");
+                LOG.info("test.step.next.prev");
                 for (int i = ret - 1; i <= ret + 1; i++) {
                     TestStep nextStep = current.getTestScript().getTestStep(i);
                     if (nextStep == null) {
                         continue;
                     }
                     String nextMark = i == ret + 1 ? " <- 次に実行" : "";
-                    LOG.info("{} {}({}){}", new Object[] { nextStep.getNo(), nextStep.getItemName(),
-                            nextStep.getLocator(), nextMark });
+                    LOG.info("test.step.next", new Object[] { nextStep.getNo(),
+                            nextStep.getItemName(), nextStep.getLocator(), nextMark });
                 }
-                LOG.info("");
+                LOG.info("empty");
             }
 
             //
@@ -204,9 +202,9 @@ public class DebugSupport {
             return;
         }
 
-        LOG.info("デバッグモードでテストを実行します。");
+        LOG.info("debug.execute");
         if (pm.isCli()) {
-            LOG.info("実行を一時停止するにはEnterキーをタイプしてください。");
+            LOG.info("enter.pause.click");
         }
 
         executor = Executors.newSingleThreadExecutor();
@@ -218,7 +216,7 @@ public class DebugSupport {
                     while ((cmd = DebugCommand.readLine(scan.nextLine())) != null) {
 
                         if (cmd.key == CommandKey.START) {
-                            LOG.info("テスト実行を再開します。");
+                            LOG.info("test.restart");
                             setPaused(false);
 
                         } else if (cmd == DebugCommand.NA) {
@@ -237,16 +235,16 @@ public class DebugSupport {
     }
 
     public void pause() {
-        LOG.info("テストスクリプトの実行を一時停止します。ブラウザの操作は可能です。");
+        LOG.info("test.pause");
         if (pm.isCli()) {
-            LOG.info("操作方法を表示するにはEnterキーをタイプしてください。");
+            LOG.info("enter.click");
         }
         setPaused(true);
     }
 
     private void showUsage() {
         if (pm.isCli()) {
-            LOG.info(USAGE_DESC);
+            LOG.info("show.usage", USAGE_DESC);
         }
     }
 

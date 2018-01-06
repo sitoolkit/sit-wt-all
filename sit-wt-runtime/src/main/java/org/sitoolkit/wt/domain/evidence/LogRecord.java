@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.slf4j.Logger;
-import org.slf4j.helpers.MessageFormatter;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 
 /**
  * このクラスは、操作ログの構成単位となるエンティティです。 1回の操作、または1つのスクリーンショットを1インスタンスとして保持します。
@@ -84,8 +84,8 @@ public class LogRecord {
 
     /**
      * 次のメッセージを持つ操作ログオブジェクトを作成します。
-     * 
-     * 
+     *
+     *
      * @param logger
      *            ロガー
      * @param position
@@ -98,7 +98,7 @@ public class LogRecord {
      *            メッセージパラメーター
      * @return 操作ログ
      */
-    public static LogRecord create(Logger logger, ElementPosition position, TestStep testStep,
+    public static LogRecord create(SitLogger logger, ElementPosition position, TestStep testStep,
             MessagePattern pattern, Object... params) {
 
         Object[] newParams = new Object[] { testStep.getItemName(), testStep.getLocator() };
@@ -109,64 +109,64 @@ public class LogRecord {
 
     /**
      * 操作ログオブジェクトを作成します。
-     * 
+     *
      * @param logger
      *            ロガー
      * @param position
      *            要素位置
      * @param testStep
      *            テストステップ
-     * @param messagePattern
-     *            メッセージパターン
+     * @param messageKey
+     *            メッセージキー
      * @param params
      *            メッセージパラメーター
      * @return 操作ログ
      */
-    public static LogRecord create(Logger logger, ElementPosition position, TestStep testStep,
-            String messagePattern, Object... params) {
+    public static LogRecord create(SitLogger logger, ElementPosition position, TestStep testStep,
+            String messageKey, Object... params) {
 
-        String msg = log(messagePattern, params);
+        String msg = MessageManager.getMessage(messageKey, params);
 
-        logger.info(msg);
+        logger.infoMsg(msg);
 
         return new LogRecord(testStep.getNo(), msg, position);
     }
 
     /**
      * 操作ログオブジェクトを作成します。
-     * 
+     *
      * @param logger
      *            ロガー
      * @param logLevel
      *            ログレベル
      * @param testStep
      *            テストステップ
-     * @param messagePattern
-     *            メッセージパターン
+     * @param messageKey
+     *            メッセージキー
      * @param params
      *            メッセージパラメーター
      * @return 操作ログ
      */
-    public static LogRecord create(Logger logger, LogLevelVo logLevel, TestStep testStep,
-            String messagePattern, Object... params) {
+    public static LogRecord create(SitLogger logger, LogLevelVo logLevel, TestStep testStep,
+            String messageKey, Object... params) {
 
-        String msg = log(messagePattern, params);
+        String msg = MessageManager.getMessage(messageKey, params);
 
         switch (logLevel) {
             case INFO:
-                logger.info(msg);
+                logger.infoMsg(msg);
                 break;
             case DEBUG:
-                logger.debug(msg);
+                logger.debugMsg(msg);
                 break;
             case ERROR:
-                logger.error(msg);
+                logger.errorMsg(msg);
                 break;
             case WARN:
-                logger.warn(msg);
+                logger.warnMsg(msg);
                 break;
             default:
-                logger.info(msg);
+                logger.infoMsg(msg);
         }
 
         String testStepNo = testStep == null ? "xxx" : testStep.getNo();
@@ -176,7 +176,7 @@ public class LogRecord {
 
     /**
      * 操作ログオブジェクトを作成します。
-     * 
+     *
      * @param logger
      *            ロガー
      * @param testStep
@@ -187,7 +187,7 @@ public class LogRecord {
      *            メッセージパラメーター
      * @return 操作ログ
      */
-    public static LogRecord info(Logger logger, TestStep testStep, MessagePattern messagePattern,
+    public static LogRecord info(SitLogger logger, TestStep testStep, MessagePattern messagePattern,
             Object... params) {
 
         Object[] newParams = new Object[] { testStep.getItemName(), testStep.getLocator() };
@@ -198,25 +198,21 @@ public class LogRecord {
 
     /**
      * 操作ログオブジェクトを作成します。
-     * 
+     *
      * @param logger
      *            ロガー
      * @param testStep
      *            テストステップ
-     * @param messagePattern
-     *            メッセージパターン
+     * @param messageKey
+     *            メッセージキー
      * @param params
      *            メッセージパラメーター
      * @return 操作ログ
      */
-    public static LogRecord info(Logger logger, TestStep testStep, String messagePattern,
+    public static LogRecord info(SitLogger logger, TestStep testStep, String messageKey,
             Object... params) {
 
-        return create(logger, LogLevelVo.INFO, testStep, messagePattern, params);
-    }
-
-    private static String log(String messagePattern, Object... params) {
-        return MessageFormatter.arrayFormat(messagePattern, params).getMessage();
+        return create(logger, LogLevelVo.INFO, testStep, messageKey, params);
     }
 
     public String getTimestamp() {

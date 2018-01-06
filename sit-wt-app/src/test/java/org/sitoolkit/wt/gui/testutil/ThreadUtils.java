@@ -10,7 +10,7 @@ public class ThreadUtils {
 
         long start = System.currentTimeMillis();
 
-        while (System.currentTimeMillis() - start < 10000) {
+        while (System.currentTimeMillis() - start < 15000) {
 
             if (checker.check()) {
                 return;

@@ -10,11 +10,11 @@ import org.sitoolkit.wt.domain.evidence.LogRecord;
 import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.evidence.selenium.ElementPositionSupport2;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.slf4j.Logger;
+import org.sitoolkit.wt.infra.log.SitLogger;
 
 public class SeleniumOperationContext {
 
-    private Logger logger;
+    private SitLogger logger;
 
     private ElementPositionSupport2 elementPositionSupport;
 
@@ -64,11 +64,11 @@ public class SeleniumOperationContext {
 
     }
 
-    public Logger getLogger() {
+    public SitLogger getLogger() {
         return logger;
     }
 
-    public void setLogger(Logger logger) {
+    public void setLogger(SitLogger logger) {
         this.logger = logger;
     }
 

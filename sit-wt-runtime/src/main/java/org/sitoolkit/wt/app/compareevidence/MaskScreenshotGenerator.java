@@ -13,12 +13,12 @@ import javax.imageio.ImageIO;
 import org.sitoolkit.wt.domain.evidence.ElementPosition;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.sitoolkit.wt.domain.evidence.MaskInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class MaskScreenshotGenerator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MaskScreenshotGenerator.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(MaskScreenshotGenerator.class);
 
     /**
      * 指定されたエビデンスディレクトリ以下のスクリーンショットに対してマスク処理を行います。
@@ -38,12 +38,12 @@ public class MaskScreenshotGenerator {
      */
     public List<File> generate(EvidenceDir targetDir) {
 
-        LOG.info("スクリーンショットのマスク処理を行います ", targetDir.getDir());
+        LOG.info("screenshot.generate", targetDir.getDir());
 
         List<File> maskedFiles = new ArrayList<>();
 
         if (!(targetDir.exists())) {
-            LOG.error("エビデンスがありません");
+            LOG.error("evidence.error");
             return maskedFiles;
         }
 
@@ -98,10 +98,10 @@ public class MaskScreenshotGenerator {
 
             }
 
-            LOG.info("マスク済み画像ファイルを生成しました {}", maskedImg.getPath());
+            LOG.info("mask.generate", maskedImg.getPath());
 
         } catch (IOException e) {
-            LOG.error("画像ファイルのマスク処理で例外が発生しました", e);
+            LOG.error("mask.error", e);
         }
 
         return maskedImg;

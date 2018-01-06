@@ -24,6 +24,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,7 +39,8 @@ public class KeyOperation extends SeleniumOperation {
     @Override
     public void execute(TestStep testStep, SeleniumOperationContext ctx) {
         WebElement element = findElement(testStep.getLocator());
-        ctx.info(element, MessagePattern.項目にXXをYYします, Arrays.toString(testStep.getValues()), "打鍵");
+        ctx.info(element, MessagePattern.項目にXXをYYします, Arrays.toString(testStep.getValues()),
+                MessageManager.getMessage("key.strok"));
         CharSequence[] chars = split(testStep.getValues());
         Keys.chord(chars);
     }

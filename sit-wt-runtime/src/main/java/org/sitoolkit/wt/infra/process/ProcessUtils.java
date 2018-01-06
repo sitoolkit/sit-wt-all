@@ -5,12 +5,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class ProcessUtils {
 
-    static final Logger LOG = LoggerFactory.getLogger(ProcessUtils.class);
+    static final SitLogger LOG = SitLoggerFactory.getLogger(ProcessUtils.class);
 
     public static void exec(String... command) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(command);
@@ -18,7 +18,7 @@ public class ProcessUtils {
             Process process = pb.start();
             process.waitFor(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            LOG.warn("", e);
+            LOG.warn("warn", e);
         }
     }
 
@@ -31,7 +31,7 @@ public class ProcessUtils {
 
         try {
             String commandStr = toCommandString(command);
-            LOG.debug("execute : {}", commandStr);
+            LOG.debug("execute", commandStr);
 
             Process process = builder.start();
 

@@ -7,8 +7,8 @@ import javax.annotation.Resource;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.sitoolkit.wt.domain.operation.ScreenshotOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 import io.appium.java_client.AppiumDriver;
 
@@ -16,7 +16,8 @@ public class HybridScreenshotOperation implements ScreenshotOperation {
 
     private static final String CONTEXT_NATIVE_APP = "NATIVE_APP";
 
-    private static final Logger LOG = LoggerFactory.getLogger(HybridScreenshotOperation.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(HybridScreenshotOperation.class);
 
     @Resource
     AppiumDriver<?> driver;
@@ -42,7 +43,7 @@ public class HybridScreenshotOperation implements ScreenshotOperation {
 
             return file;
         } else {
-            LOG.warn("ドライバ{}はスクリーンショットを取得できません。", driver.getClass().getName());
+            LOG.warn("driver.screenshot.error", driver.getClass().getName());
             return null;
         }
     }

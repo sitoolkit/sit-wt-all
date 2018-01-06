@@ -70,7 +70,7 @@ public class StoreElementValueOperation extends SeleniumOperation {
         }
 
         if (value != null) {
-            ctx.info(element, "変数を定義します {}={}", name, value);
+            ctx.info(element, "var.define", name, value);
             context.addParam(name, value);
         }
     }

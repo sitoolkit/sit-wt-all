@@ -56,7 +56,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         try {
             robot = new Robot();
         } catch (AWTException e) {
-            log.warn("", e);
+            log.warn("warn", e);
         }
 
         waitTimeout = pm.getImplicitlyWait() / 1000;
@@ -124,7 +124,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             current.setWindowRect(null);
             return Base64.encodeBase64String(baos.toByteArray());
         } catch (IOException e) {
-            log.warn("スクリーンショットの取得に失敗しました", e);
+            log.warn("screenshot.get.error", e);
             return null;
         }
     }

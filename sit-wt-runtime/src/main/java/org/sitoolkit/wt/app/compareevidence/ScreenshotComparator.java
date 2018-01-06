@@ -14,14 +14,14 @@ import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class ScreenshotComparator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ScreenshotComparator.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(ScreenshotComparator.class);
 
     int openFileCount = 1;
 
@@ -49,11 +49,11 @@ public class ScreenshotComparator {
      */
     public boolean compare(EvidenceDir baseDir, EvidenceDir targetDir, File evidenceFile) {
 
-        LOG.info("スクリーンショットを比較します {} {} <-> {}",
+        LOG.info("screenshot.compare",
                 new Object[] { evidenceFile, baseDir.getDir(), targetDir.getDir() });
 
         if (!baseDir.exists()) {
-            LOG.info("基準エビデンスディレクトリが存在しません {}", baseDir.getDir().getPath());
+            LOG.info("base.dir.none", baseDir.getDir().getPath());
             return false;
         }
 
@@ -71,7 +71,7 @@ public class ScreenshotComparator {
             File targetSs = targetEntry.getValue();
 
             if (baseSs == null) {
-                LOG.warn("基準エビデンスディレクトリに存在しないスクリーンショットです {}", targetEntry.getKey());
+                LOG.warn("base.screenshot.none", targetEntry.getKey());
                 match = false;
                 continue;
             }
@@ -118,9 +118,9 @@ public class ScreenshotComparator {
         }
 
         if (match) {
-            LOG.info("スクリーンショットは基準と一致しました {}", targetImg.getName());
+            LOG.info("screenshot.match", targetImg.getName());
         } else {
-            LOG.error("スクリーンショットは基準と一致しませんでした {}", targetImg.getName());
+            LOG.error("screenshot.unmatch", targetImg.getName());
             writeDiffImg(targetImg, diffImg);
         }
 
@@ -160,7 +160,7 @@ public class ScreenshotComparator {
             }
 
         } catch (IOException e) {
-            LOG.error("スクリーンショットの分割処理で例外が発生しました", e);
+            LOG.error("split.image.error", e);
         }
         return splitImages;
     }
@@ -185,10 +185,10 @@ public class ScreenshotComparator {
             File maskedImg = new File(targetImg.getParent(),
                     EvidenceDir.toUnmatchSsName(targetImg.getName()));
             ImageIO.write(imgBase, "png", maskedImg);
-            LOG.info("差分スクリーンショットを生成しました {}", maskedImg);
+            LOG.info("write.diff.image", maskedImg);
 
         } catch (IOException e) {
-            LOG.error("差分スクリーンショット生成処理で例外が発生しました", e);
+            LOG.error("write.diff.image.error", e);
         }
 
     }
@@ -211,7 +211,7 @@ public class ScreenshotComparator {
             byteArray = baos.toByteArray();
             baos.close();
         } catch (IOException e) {
-            LOG.error("バイト配列変換処理で例外が発生しました", e);
+            LOG.error("byte.array.error", e);
         }
         return byteArray;
     }

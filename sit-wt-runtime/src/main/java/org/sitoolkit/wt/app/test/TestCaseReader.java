@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class TestCaseReader {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestCaseReader.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestCaseReader.class);
 
     public TestCaseReader() {
     }
@@ -23,8 +23,8 @@ public class TestCaseReader {
 
     public int execute(String[] args) {
         if (args.length < 1) {
-            LOG.info("テストスクリプトを指定してください。");
-            LOG.info(">java {} [scriptPath sheetName]", TestCaseReader.class.getName());
+            LOG.info("test.script.appoint");
+            LOG.info("script.path", TestCaseReader.class.getName());
             return 1;
         }
 

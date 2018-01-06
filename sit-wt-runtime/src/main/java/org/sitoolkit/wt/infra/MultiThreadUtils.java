@@ -6,12 +6,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class MultiThreadUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MultiThreadUtils.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(MultiThreadUtils.class);
 
     public static <T> T submitWithProgress(Callable<T> callable) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -24,7 +24,7 @@ public class MultiThreadUtils {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
-                LOG.warn("スレッドの待機で例外が発生しました", e);
+                LOG.warn("warn", e);
             }
 
             if (loop++ % 7 == 1) {

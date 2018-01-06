@@ -2,6 +2,7 @@ package org.sitoolkit.wt.domain.testscript;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -15,15 +16,16 @@ import org.sitoolkit.util.tabledata.TableDataDao;
 import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.util.tabledata.csv.TableDataDaoCsvImpl;
 import org.sitoolkit.util.tabledata.excel.TableDataDaoExcelImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 public class TestScriptDao {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
-    private static final String TEMPLATE_PATH = "classpath:TestScriptTemplate.xlsx";
+    private static final String TEMPLATE_PATH = "classpath:TestScriptTemplate_"
+            + Locale.getDefault().getLanguage() + ".xlsx";
 
     @Resource
     ApplicationContext appCtx;

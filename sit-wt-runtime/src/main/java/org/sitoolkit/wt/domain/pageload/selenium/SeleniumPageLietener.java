@@ -9,12 +9,12 @@ import org.sitoolkit.wt.domain.guidance.GuidanceUtils;
 import org.sitoolkit.wt.domain.pageload.PageContext;
 import org.sitoolkit.wt.domain.pageload.PageListener;
 import org.sitoolkit.wt.infra.PropertyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class SeleniumPageLietener implements PageListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SeleniumPageLietener.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(SeleniumPageLietener.class);
 
     @Resource
     WebDriver driver;
@@ -48,7 +48,7 @@ public class SeleniumPageLietener implements PageListener {
 
         // touch WebDriver instance to start Browser
         String driverType = driver.toString();
-        LOG.info("ブラウザを起動します {}", driverType);
+        LOG.info("browser.start", driverType);
 
         String baseUrl = System.getProperty("baseUrl");
         driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));

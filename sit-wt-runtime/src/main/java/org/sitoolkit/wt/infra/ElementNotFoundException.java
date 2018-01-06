@@ -1,6 +1,7 @@
 package org.sitoolkit.wt.infra;
 
 import org.sitoolkit.wt.domain.testscript.Locator;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 
 public class ElementNotFoundException extends RuntimeException {
 
@@ -31,7 +32,6 @@ public class ElementNotFoundException extends RuntimeException {
     }
 
     private static String buildMessage(Locator locator) {
-        return "ロケーター(" + locator + ")で指定される要素は画面上で見つかりませんでした。"
-                + "ロケーターが誤っているか、操作のタイミングが早い可能性があります。";
+        return MessageManager.getMessage("build.message", locator);
     }
 }

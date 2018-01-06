@@ -28,8 +28,8 @@ import org.sitoolkit.wt.domain.evidence.DialogScreenshotSupport;
 import org.sitoolkit.wt.domain.operation.selenium.DialogOperation;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 /**
  *
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SeleniumDialogScreenshotSupport implements DialogScreenshotSupport {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     private Set<String> windowSizeCheckNoSet = new HashSet<String>();
 
@@ -71,13 +71,13 @@ public class SeleniumDialogScreenshotSupport implements DialogScreenshotSupport 
                 }
             }
         }
-        log.debug("ウィンドウサイズの事前取得が必要なステップNo:{}", windowSizeCheckNoSet);
+        log.debug("window.size.check", windowSizeCheckNoSet);
     }
 
     @Override
     public void reserveWindowRect(String testStepNo) {
         if (windowSizeCheckNoSet.contains(testStepNo)) {
-            log.debug("ウィンドウ位置、サイズを取得します");
+            log.debug("window.get");
             Point winPos = seleniumDriver.manage().window().getPosition();
             Dimension winSize = seleniumDriver.manage().window().getSize();
             current.setWindowRect(winPos.getX(), winPos.getY(), winSize.getWidth(),
