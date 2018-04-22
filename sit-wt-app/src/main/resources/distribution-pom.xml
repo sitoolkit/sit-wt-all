@@ -96,6 +96,7 @@
         <version>2.19.1</version>
         <configuration>
           <systemPropertiesFile>${sitwt.test.properties}</systemPropertiesFile>
+          <argLine>-Duser.language=${user.language} -Duser.country=${user.country}</argLine>
         </configuration>
         <executions>
           <execution>
