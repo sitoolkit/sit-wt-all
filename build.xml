@@ -132,6 +132,8 @@
           <arg value="-DthreadCount=4" />
           <arg value="-DtrimStackTrace=false" />
           <arg value="-Ddriver.type=${driver.type}" />
+          <arg value="-Duser.language=ja" />
+          <arg value="-Duser.country=JP" />
           <arg value="verify" />
         </exec>
 
