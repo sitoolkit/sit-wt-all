@@ -20,13 +20,13 @@
     <dependency>
       <groupId>org.sitoolkit.wt</groupId>
       <artifactId>sit-wt-util</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>2.3</version>
     </dependency>
   </dependencies>
   <parent>
     <groupId>org.sitoolkit.wt</groupId>
     <artifactId>sit-wt-all</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.3</version>
   </parent>
   <properties>
     <parallel>classesAndMethods</parallel>
