@@ -21,8 +21,8 @@ import org.sitoolkit.wt.domain.evidence.LogRecord;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestStep;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GotoOperation implements Operation {
 
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    protected SitLogger log = SitLoggerFactory.getLogger(getClass());
     @Resource
     protected TestContext current;
     // @Resource
@@ -42,7 +42,7 @@ public class GotoOperation implements Operation {
     public OperationResult operate(TestStep testStep) {
         String value = testStep.getValue();
 
-        LogRecord record = LogRecord.info(log, testStep, "ステップNo[{}]を実行します。", value);
+        LogRecord record = LogRecord.info(log, testStep, "test.step.execute", value);
 
         TestScript testScript = current.getTestScript();
         int nextIndex = testScript.getIndexByScriptNo(value) - 1;

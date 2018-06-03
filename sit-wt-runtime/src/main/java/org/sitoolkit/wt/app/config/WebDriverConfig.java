@@ -39,13 +39,13 @@ import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.firefox.FirefoxManager;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.infra.selenium.WebDriverCloser;
 import org.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 import org.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionChecker;
 import org.sitoolkit.wt.infra.selenium.WebElementExceptionCheckerImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,7 +60,7 @@ import io.appium.java_client.ios.IOSDriver;
 @Configuration
 public class WebDriverConfig {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WebDriverConfig.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(WebDriverConfig.class);
 
     private int windowShiftLeft = 0;
 
@@ -87,7 +87,7 @@ public class WebDriverConfig {
             capabilities.setCapability(entry.getKey(), entry.getValue());
         }
 
-        LOG.info("WebDriverを起動します driverType:{}, capabilities:{}", driverType, capabilities);
+        LOG.info("webdriver.start", driverType, capabilities);
 
         switch (driverType) {
 
@@ -128,18 +128,18 @@ public class WebDriverConfig {
                 break;
 
             case "remote":
-                LOG.info("RemoteWebDriverの接続先:{}", pm.getHubUrl());
+                LOG.info("webdriver.remote", pm.getHubUrl());
                 webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
 
                 break;
 
             case "android":
-                LOG.info("AndroidDriverの接続先:{}", pm.getAppiumAddress());
+                LOG.info("webdriver.android", pm.getAppiumAddress());
                 webDriver = new AndroidDriver<>(pm.getAppiumAddress(), capabilities);
                 break;
 
             case "ios":
-                LOG.info("IOSDriverの接続先:{}", pm.getAppiumAddress());
+                LOG.info("webdriver.ios", pm.getAppiumAddress());
                 webDriver = new IOSDriver<>(pm.getAppiumAddress(), capabilities);
                 break;
 
@@ -166,7 +166,7 @@ public class WebDriverConfig {
 
         closer.register(webDriver);
 
-        LOG.debug("init webDriver:{}", webDriver);
+        LOG.debug("webdriver.init", webDriver);
 
         return webDriver;
     }
@@ -183,7 +183,7 @@ public class WebDriverConfig {
 
         Object proxy = proxyFactory.getProxy();
 
-        LOG.debug("proxy webDriver:{}", proxy);
+        LOG.debug("webdriver.proxy", proxy);
 
         return (RemoteWebDriver) proxy;
     }

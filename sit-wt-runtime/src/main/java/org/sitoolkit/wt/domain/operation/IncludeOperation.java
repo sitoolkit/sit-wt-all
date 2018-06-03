@@ -27,8 +27,9 @@ import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.TestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class IncludeOperation implements Operation, TestContextListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IncludeOperation.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(IncludeOperation.class);
 
     private String sheetName = "TestScript";
 
@@ -62,7 +63,7 @@ public class IncludeOperation implements Operation, TestContextListener {
     public OperationResult operate(TestStep testStep) {
         String testStepName = testStep.getLocator().getValue();
 
-        LogRecord log = LogRecord.info(LOG, testStep, "テストスクリプト[{}]を実行します。", testStepName);
+        LogRecord log = LogRecord.info(LOG, testStep, "script.execute", testStepName);
 
         current.backup();
 
@@ -76,7 +77,7 @@ public class IncludeOperation implements Operation, TestContextListener {
         if (testScript.containsCaseNo(caseNo)) {
             current.setCaseNo(caseNo);
         } else {
-            String msg = "指定されたケース番号[" + caseNo + "]は不正です。指定可能なケース番号："
+            String msg = MessageManager.getMessage("case.number.error", caseNo)
                     + testScript.getCaseNoMap().keySet();
             throw new TestException(msg);
         }

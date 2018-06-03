@@ -20,13 +20,13 @@
     <dependency>
       <groupId>org.sitoolkit.wt</groupId>
       <artifactId>sit-wt-util</artifactId>
-      <version>2.2.1</version>
+      <version>2.3</version>
     </dependency>
   </dependencies>
   <parent>
     <groupId>org.sitoolkit.wt</groupId>
     <artifactId>sit-wt-all</artifactId>
-    <version>2.2.1</version>
+    <version>2.3</version>
   </parent>
   <properties>
     <parallel>classesAndMethods</parallel>
@@ -37,6 +37,21 @@
   <!-- Build Settings -->
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
+        <configuration>
+          <archive>
+            <index>true</index>
+            <manifest>
+              <mainClass>org.sitoolkit.wt.gui.pres.App</mainClass>
+              <useUniqueVersions>true</useUniqueVersions>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2</version>

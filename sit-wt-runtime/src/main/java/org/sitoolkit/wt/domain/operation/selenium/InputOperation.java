@@ -22,6 +22,7 @@ import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.TestException;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,7 +43,8 @@ public class InputOperation extends SeleniumOperation {
             File file = new File(value);
 
             if (file.exists()) {
-                ctx.info(element, MessagePattern.項目にXXをYYします, file.getAbsolutePath(), "入力");
+                ctx.info(element, MessagePattern.項目にXXをYYします, file.getAbsolutePath(),
+                        MessageManager.getMessage("input"));
                 element.sendKeys(file.getAbsolutePath());
             } else {
                 throw new TestException("指定されたファイルが存在しません " + file.getAbsolutePath());
@@ -51,10 +53,12 @@ public class InputOperation extends SeleniumOperation {
         } else {
 
             if (value.startsWith(APPEND_PREFIX)) {
-                ctx.info(element, MessagePattern.項目にXXをYYします, value, "入力(追記)");
+                ctx.info(element, MessagePattern.項目にXXをYYします, value,
+                        MessageManager.getMessage("input.append"));
                 value = StringUtils.substringAfter(value, APPEND_PREFIX);
             } else {
-                ctx.info(element, MessagePattern.項目にXXをYYします, value, "入力(上書)");
+                ctx.info(element, MessagePattern.項目にXXをYYします, value,
+                        MessageManager.getMessage("input.overwite"));
                 element.clear();
             }
 

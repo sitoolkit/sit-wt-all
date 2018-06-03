@@ -1,7 +1,8 @@
 package org.sitoolkit.wt.app.script2java;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 
@@ -20,7 +21,7 @@ public class Script2JavaTest {
         TestClass actual = loadScript("testscript/a/b/c/ABCTestScript.xlsx", "testscript");
 
         assertThat("スクリプトパス", actual.getScriptPath(), is("testscript/a/b/c/ABCTestScript.xlsx"));
-        assertThat("テストクラス物理名", actual.getFileBase(), is("ITABCTestScript"));
+        assertThat("テストクラス物理名", actual.getFileBase(), is("ABCTestScriptIT"));
         assertThat("テストクラスファイル拡張子", actual.getFileExt(), is("java"));
         assertThat("テストクラス出力ディレクトリ", actual.getOutDir(),
                 is(FilenameUtils.separatorsToSystem("target/generated-test-sources/test/a/b/c/")));
@@ -34,7 +35,7 @@ public class Script2JavaTest {
 
         assertThat("スクリプトパス", actual.getScriptPath(),
                 is("src/test/resources/テスト-スクリプト(サンプル).xlsx"));
-        assertThat("テストクラス物理名", actual.getFileBase(), is("ITテスト_スクリプト_サンプル_"));
+        assertThat("テストクラス物理名", actual.getFileBase(), is("テスト_スクリプト_サンプル_IT"));
         assertThat("テストクラスファイル拡張子", actual.getFileExt(), is("java"));
         assertThat("テストクラス出力ディレクトリ", actual.getOutDir(),
                 is(FilenameUtils.separatorsToSystem("target/generated-test-sources/test/")));

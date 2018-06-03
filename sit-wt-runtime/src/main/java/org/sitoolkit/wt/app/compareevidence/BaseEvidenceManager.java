@@ -6,12 +6,12 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class BaseEvidenceManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseEvidenceManager.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(BaseEvidenceManager.class);
 
     public static void main(String[] args) {
         EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(args[0]);
@@ -28,10 +28,10 @@ public class BaseEvidenceManager {
     public void setBaseEvidence(EvidenceDir targetDir) {
 
         if (!(targetDir.exists())) {
-            LOG.error("エビデンスがありません");
+            LOG.error("evidence.error");
         } else {
             EvidenceDir baseDir = EvidenceDir.getBase(targetDir.getBrowser());
-            LOG.info("基準エビデンスとして確定します {}", targetDir.getDir());
+            LOG.info("base.evidence.set", targetDir.getDir());
             copy(targetDir.getDir(), baseDir.getDir());
 
         }
@@ -54,7 +54,7 @@ public class BaseEvidenceManager {
                 }
 
             } catch (IOException e) {
-                LOG.error("エビデンスのコピー処理で例外が発生しました", e);
+                LOG.error("base.evidence.copy", e);
             }
         }
 

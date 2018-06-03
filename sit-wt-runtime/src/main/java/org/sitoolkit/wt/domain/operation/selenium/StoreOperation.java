@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * テストスクリプト内で使用可能な変数を格納する操作です。
- * 
+ *
  * @author yuichi.kuwahara
  */
 @Component
@@ -37,7 +37,7 @@ public class StoreOperation extends SeleniumOperation {
         String name = testStep.getLocator().getValue();
         String value = testStep.getValue();
 
-        log.info("変数を定義します {}={}", name, value);
+        log.info("var.define", name, value);
 
         context.addParam(name, value);
     }

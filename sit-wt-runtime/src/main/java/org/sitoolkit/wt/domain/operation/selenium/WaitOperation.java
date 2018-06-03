@@ -37,8 +37,8 @@ public class WaitOperation extends SeleniumOperation {
         int timeout = pm.getTimeout();
         int waitSpan = pm.getWaitSpan();
 
-        ctx.info("{}({})に{}が表示されるまで{}秒間待機します。", testStep.getItemName(), testStep.getLocator(),
-                testStep.getValue(), timeout / 1000);
+        ctx.info("wait", testStep.getItemName(), testStep.getLocator(), testStep.getValue(),
+                timeout / 1000);
         int count = timeout / waitSpan;
 
         for (int i = 0; i < count; i++) {
@@ -50,7 +50,7 @@ public class WaitOperation extends SeleniumOperation {
             try {
                 Thread.sleep(waitSpan);
             } catch (InterruptedException e) {
-                log.warn("スレッドの待機に失敗しました。", e);
+                log.warn("thread.sleep.error", e);
             }
         }
     }

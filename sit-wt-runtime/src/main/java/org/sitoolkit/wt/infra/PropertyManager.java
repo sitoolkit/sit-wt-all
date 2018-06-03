@@ -10,8 +10,8 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "classpath:sit-wt.properties" })
 public class PropertyManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PropertyManager.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(PropertyManager.class);
 
     @Value("${window.width}")
     private int windowWidth;

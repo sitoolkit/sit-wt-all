@@ -21,11 +21,12 @@ import java.util.List;
 import org.openqa.selenium.NoSuchWindowException;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestStep;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.stereotype.Component;
 
 /**
  * このクラスは、ブラウザのウィンドウを切り替える操作を実行します。
- * 
+ *
  * @author yuichi.kuwahara
  */
 @Component
@@ -46,16 +47,16 @@ public class SwitchWindowOperation extends SeleniumOperation {
                 avairableTitle.add(windowTitle);
 
                 if (windowTitle.equals(windowLocator.getValue())) {
-                    ctx.info("ウィンドウを{}に切り替えます", windowLocator);
+                    ctx.info("window.switch", windowLocator);
                     return;
                 }
             }
 
-            throw new NoSuchWindowException("ロケーター:" + windowLocator + "に該当するウィンドウはありません。name:"
-                    + avairableName + "かtitle:" + avairableTitle + "が指定可能です。");
+            throw new NoSuchWindowException(MessageManager.getMessage("window.no.such.error",
+                    windowLocator, avairableName, avairableTitle));
 
         } else {
-            ctx.info("ウィンドウを{}に切り替えます", windowLocator);
+            ctx.info("window.switch", windowLocator);
             String windowName = windowLocator.getValue();
             if ("_parent".equalsIgnoreCase(windowName) || "null".equalsIgnoreCase(windowName)) {
                 windowName = "";

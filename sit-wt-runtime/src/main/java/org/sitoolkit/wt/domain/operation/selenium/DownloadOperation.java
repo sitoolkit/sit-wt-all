@@ -27,6 +27,7 @@ import org.sitoolkit.wt.domain.evidence.MessagePattern;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.TestException;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 import org.springframework.stereotype.Component;
 
@@ -53,8 +54,8 @@ public class DownloadOperation extends SeleniumOperation {
                 current.getTestStepNo(), current.getItemName(),
                 StringUtils.substringAfterLast(urlString, "/"));
 
-        ctx.info(MessagePattern.項目をXXします_URL_エビデンス, "ダウンロード", urlString,
-                downloadFile.getAbsolutePath());
+        ctx.info(MessagePattern.項目をXXします_URL_エビデンス, MessageManager.getMessage("download"),
+                urlString, downloadFile.getAbsolutePath());
 
         try {
             URL targetUrl = new URL(urlString);

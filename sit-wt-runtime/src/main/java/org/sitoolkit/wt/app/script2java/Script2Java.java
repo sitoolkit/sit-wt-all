@@ -27,10 +27,10 @@ import org.sitoolkit.wt.app.config.ExtConfig;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.infra.SitPathUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
 import org.sitoolkit.wt.util.infra.util.StrUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -58,7 +58,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public class Script2Java implements ApplicationContextAware {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     public static final String SYSPROP_TESTS_SCRIPT_PATH = "testsScriptPath";
 
@@ -126,7 +126,7 @@ public class Script2Java implements ApplicationContextAware {
                     continue;
                 }
 
-                log.info("テストスクリプトディレクトリ以下のスクリプトを処理します。{}", testScriptDirF.getAbsolutePath());
+                log.info("test.script", testScriptDirF.getAbsolutePath());
                 for (File scriptFile : FileUtils.listFiles(testScriptDirF,
                         new String[] { "csv", "xls", "xlsx" }, true)) {
                     generate(scriptFile, testScriptDir);
@@ -148,20 +148,20 @@ public class Script2Java implements ApplicationContextAware {
     public void generate(File scriptFile, String testScriptDir) {
 
         if (scriptFile.getName().startsWith("~$")) {
-            log.debug("システムファイルのため生成処理から除外します {}", scriptFile.getAbsolutePath());
+            log.debug("system.file.exclusion", scriptFile.getAbsolutePath());
             return;
         }
 
         String lastModified = Long.toString(scriptFile.lastModified());
         String storedLastModified = timestampLog.getProperty(scriptFile.getAbsolutePath());
         if (lastModified.equals(storedLastModified)) {
-            log.info("テストスクリプトのテストクラスは最新の状態です {}", scriptFile.getAbsolutePath());
+            log.info("script.last", scriptFile.getAbsolutePath());
             return;
         }
 
         timestampLog.put(scriptFile.getAbsolutePath(), lastModified);
 
-        log.info("テストスクリプトを読み込みます。{}", scriptFile.getAbsolutePath());
+        log.info("script.load", scriptFile.getAbsolutePath());
 
         TestClass testClass = appCtx.getBean(TestClass.class);
         load(testClass, scriptFile, testScriptDir);
@@ -201,8 +201,9 @@ public class Script2Java implements ApplicationContextAware {
 
         // テストクラスの物理名の設定
         String baseName = FilenameUtils.getBaseName(testClass.getScriptPath());
-        testClass.setFileBase(
-                StrUtils.sanitizeMetaCharacter("IT" + StringUtils.capitalize(baseName)));
+        baseName = StringUtils.capitalize(baseName);
+        baseName = StrUtils.sanitizeMetaCharacter(baseName) + "IT";
+        testClass.setFileBase(baseName);
 
         // パッケージパス
         String scriptPathFromPkg = SitPathUtils.relatvePath(testScriptDir,
@@ -231,7 +232,7 @@ public class Script2Java implements ApplicationContextAware {
             try {
                 timestampLog.loadFromXML(FileUtils.openInputStream(timestampFile));
             } catch (IOException e) {
-                log.warn("タイムスタンプファイルの読み込みに失敗しました。", e);
+                log.warn("timestamp.load.error", e);
             }
         }
     }
@@ -242,7 +243,7 @@ public class Script2Java implements ApplicationContextAware {
         try {
             timestampLog.storeToXML(FileUtils.openOutputStream(timestampFile, false), "");
         } catch (IOException e) {
-            log.warn("タイムスタンプファイルの書き込みに失敗しました。", e);
+            log.warn("timestamp.write.error", e);
         }
     }
 

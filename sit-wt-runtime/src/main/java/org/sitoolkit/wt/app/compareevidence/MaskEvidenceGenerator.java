@@ -9,8 +9,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
 import org.sitoolkit.wt.domain.evidence.EvidenceOpener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 /**
  * @author yu.takada
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MaskEvidenceGenerator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MaskEvidenceGenerator.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(MaskEvidenceGenerator.class);
 
     public static void main(String[] args) {
 
@@ -37,10 +37,10 @@ public class MaskEvidenceGenerator {
 
     public void generate(EvidenceDir targetDir) {
 
-        LOG.info("マスク済みエビデンスを生成します");
+        LOG.info("mask.evidence.generate");
 
         if (!(targetDir.exists())) {
-            LOG.error("エビデンスがありません");
+            LOG.error("evidence.error");
             return;
         }
 
@@ -75,10 +75,10 @@ public class MaskEvidenceGenerator {
             }
 
             FileUtils.writeStringToFile(maskEvidence, evidenceHtml, "UTF-8");
-            LOG.info("マスク済みエビデンスを生成しました {}", maskEvidence.getPath());
+            LOG.info("mask.evidence.generated", maskEvidence.getPath());
 
         } catch (IOException e) {
-            LOG.error("エビデンス生成処理で例外が発生しました", e);
+            LOG.error("evidence.generate.error", e);
         }
 
     }

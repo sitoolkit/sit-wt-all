@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.VerifyException;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -49,8 +50,8 @@ public class VerifySelectOperation extends SeleniumOperation {
         WebElement element = findElement(testStep.getLocator());
         Select select = new Select(element);
 
-        ctx.info(element, "{}({})で選択された値が期待値{}に一致することを確認します。", new Object[] {
-                testStep.getItemName(), testStep.getLocator(), Arrays.toString(expectedValues) });
+        ctx.info(element, "verify.select", new Object[] { testStep.getItemName(),
+                testStep.getLocator(), Arrays.toString(expectedValues) });
 
         OptionSupport support = map.get(testStep.getDataType());
 
@@ -72,8 +73,8 @@ public class VerifySelectOperation extends SeleniumOperation {
         }
 
         if (sb.length() > 0) {
-            throw new VerifyException("{0}({1})で選択された値は期待値と異なります。{2}", testStep.getItemName(),
-                    testStep.getLocator(), sb.toString());
+            throw new VerifyException(MessageManager.getMessage("verify.select.unmatch"),
+                    testStep.getItemName(), testStep.getLocator(), sb.toString());
         }
 
     }

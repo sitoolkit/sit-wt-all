@@ -16,12 +16,12 @@ import javax.json.JsonReader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class MaskInfo {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MaskInfo.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(MaskInfo.class);
 
     private static String USER_HOME = System.getProperty("user.home");
 
@@ -66,7 +66,7 @@ public class MaskInfo {
                 convertToMap(evdenceMaskInfo, jsonString);
 
             } catch (IOException e) {
-                LOG.info("マスクファイル読み込み時に予期せぬエラーが発生しました", e);
+                LOG.info("mask.load.error", e);
             }
 
         }

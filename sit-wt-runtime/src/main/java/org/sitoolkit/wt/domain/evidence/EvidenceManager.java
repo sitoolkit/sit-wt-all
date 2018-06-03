@@ -26,9 +26,9 @@ import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.SitPathUtils;
 import org.sitoolkit.wt.infra.TestException;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.util.StrUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -38,7 +38,7 @@ import org.springframework.util.ResourceUtils;
 
 public class EvidenceManager implements ApplicationContextAware {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EvidenceManager.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceManager.class);
 
     /**
      * エビデンスのVelocityテンプレート
@@ -74,7 +74,7 @@ public class EvidenceManager implements ApplicationContextAware {
                 "evidence_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
         evidenceDir.mkdirs();
         if (evidenceDir.exists()) {
-            LOG.info("エビデンス出力ディレクトリを作成しました。{}", evidenceDir.getAbsolutePath());
+            LOG.info("evidence.mkdirs", evidenceDir.getAbsolutePath());
         } else {
             throw new TestException("エビデンス出力ディレクトリの作成に失敗しました" + evidenceDir.getAbsoluteFile());
         }
@@ -148,10 +148,10 @@ public class EvidenceManager implements ApplicationContextAware {
             screenshot.setFile(dstFile);
             screenshot.setFilePath(SitPathUtils.relatvePath(evidenceDir, dstFile));
 
-            LOG.info("スクリーンショットを取得しました {}", dstFile.getAbsolutePath());
+            LOG.info("screenshot.set", dstFile.getAbsolutePath());
 
         } catch (IOException e) {
-            LOG.warn("スクリーンショットファイルの移動に失敗しました", e);
+            LOG.warn("screenshot.set.error", e);
         }
 
     }
@@ -182,7 +182,7 @@ public class EvidenceManager implements ApplicationContextAware {
                     System.currentTimeMillis() + "_" + htmlFile.getName());
         }
 
-        LOG.info("エビデンスを出力します {}", htmlFile.getAbsolutePath());
+        LOG.info("evidence.output", htmlFile.getAbsolutePath());
 
         try {
             FileUtils.write(htmlFile, html, "UTF-8");
@@ -222,7 +222,7 @@ public class EvidenceManager implements ApplicationContextAware {
             try {
                 screenshotRezeFuture.get(3, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                LOG.warn("スクリーンショットリサイズ処理の待機で例外発生", e);
+                LOG.warn("screenshot.resize.wait.error", e);
             }
         }
 

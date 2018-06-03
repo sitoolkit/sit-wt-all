@@ -29,8 +29,8 @@ import org.sitoolkit.wt.app.config.ExtConfig;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.TestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
  */
 public class Selenium2Script implements ApplicationContextAware {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     private ApplicationContext appCtx;
 
@@ -107,7 +107,7 @@ public class Selenium2Script implements ApplicationContextAware {
                     try {
                         Desktop.getDesktop().open(sitScript);
                     } catch (IOException e) {
-                        log.error("変換後のスクリプトを開けませんでした", e);
+                        log.error("open.script.error", e);
                         ret = 2;
                     }
                 }
@@ -118,7 +118,7 @@ public class Selenium2Script implements ApplicationContextAware {
     }
 
     public File convert(File seleniumScript) {
-        log.info("Seleniumスクリプトを変換します。{}", seleniumScript.getAbsolutePath());
+        log.info("selenium.script.convert", seleniumScript.getAbsolutePath());
 
         // htmlの読み込み
         SeleniumTestScript list = loadSeleniumScript(seleniumScript);
@@ -137,7 +137,7 @@ public class Selenium2Script implements ApplicationContextAware {
     public void backup(File seleniumScript) {
         File bkFile = new File(seleniumScript.getParentFile(), seleniumScript.getName() + ".bk");
 
-        log.info("Seleniumスクリプトを退避します {} -> {}", seleniumScript.getAbsolutePath(), bkFile);
+        log.info("selenium.script.backup", seleniumScript.getAbsolutePath(), bkFile);
 
         seleniumScript.renameTo(bkFile);
     }
@@ -175,8 +175,8 @@ public class Selenium2Script implements ApplicationContextAware {
                 case 2:
                     testStep.setValue(nodeValue);
                     list.add(testStep);
-                    log.debug("Seleniumテストスクリプトを1行読み込みました　command:{},target:{},value:{}",
-                            testStep.getCommand(), testStep.getTarget(), testStep.getValue());
+                    log.debug("test.step.load", testStep.getCommand(), testStep.getTarget(),
+                            testStep.getValue());
                     testStep = new SeleniumTestStep();
                     break;
                 default:

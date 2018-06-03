@@ -60,6 +60,8 @@
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
       <arg value="localhost,ci" />
+      <arg value="-Duser.language=ja" />
+      <arg value="-Duser.country=JP" />
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="-Dmaven.test.skip=false" />
       <arg value="-Dmpir.skip=true" />
@@ -116,7 +118,10 @@
           <echo message="mvn verify -P parallel"/>
           <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="false" resultproperty="result">
           <env key="JAVA_HOME" value="${java.home}" />
+          <env key="MAVEN_OPTS" value="-Duser.language=ja -Duser.country=JP"/>
           <arg value="-e" />
+          <arg value="-P" />
+          <arg value="parallel" />
           <!--
                 <arg value="-Dmaven.failsafe.debug=true" />
           -->
@@ -127,6 +132,8 @@
           <arg value="-DthreadCount=4" />
           <arg value="-DtrimStackTrace=false" />
           <arg value="-Ddriver.type=${driver.type}" />
+          <arg value="-Duser.language=ja" />
+          <arg value="-Duser.country=JP" />
           <arg value="verify" />
         </exec>
 
@@ -189,6 +196,7 @@
   <target name="set-version">
 
     <property name="version" value="2.2.1" />
+    <property name="version" value="2.3" />
 
     <replaceregexp file="${distribution.pom}"
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"

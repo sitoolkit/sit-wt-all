@@ -13,12 +13,13 @@ import java.util.TreeMap;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 
 public class PropertyUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PropertyUtils.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(PropertyUtils.class);
 
     private static final Map<String, Properties> CACHE = new HashMap<>();
 
@@ -40,11 +41,12 @@ public class PropertyUtils {
             if (ignoreResourceNotFound) {
                 return prop;
             } else {
-                throw new ConfigurationException("プロパティファイルが見つかりません。" + resourceName);
+                throw new ConfigurationException(
+                        MessageManager.getMessage("property.not.found") + resourceName);
             }
         }
 
-        LOG.info("プロパティを読み込みます。{}", url);
+        LOG.info("property.load", url);
 
         try {
             if (url.getFile().endsWith("properties")) {
@@ -88,7 +90,8 @@ public class PropertyUtils {
             prop.store(writer, "");
 
         } catch (Exception e) {
-            throw new ConfigurationException("プロパティの保存で例外が発生しました", e);
+            throw new ConfigurationException(MessageManager.getMessage("property.save.exception"),
+                    e);
         }
 
     }

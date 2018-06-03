@@ -38,8 +38,9 @@ import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.TestException;
 import org.sitoolkit.wt.infra.VerifyException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 
 /**
  * このクラスは、テストの実施者を表すエンティティです。
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Tester {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     @Resource
     TestContext current;
@@ -99,7 +100,7 @@ public class Tester {
         current.setTestScript(testScript);
         current.setScriptName(testScript.getName());
         current.reset();
-        log.debug("prepare test context {}", current);
+        log.debug("prepare.test", current);
     }
 
     /**
@@ -110,12 +111,12 @@ public class Tester {
      */
     public void setUpClass(String testScriptPath, String sheetName) {
         if (!isScriptLoaded()) {
-            log.info("テストスクリプトをロードします。{}, {}", testScriptPath, sheetName);
+            log.info("script.load2", testScriptPath, sheetName);
             testScript = catalog.get(testScriptPath, sheetName);
             current.setTestScript(testScript);
 
             if (pm.isDebug()) {
-                log.info("最後のステップにブレークポイントを設定します。");
+                log.info("test.step.last");
                 TestStep lastStep = testScript.getLastStep();
                 lastStep.setBreakPoint("y");
             }
@@ -139,7 +140,7 @@ public class Tester {
         if (StringUtils.isEmpty(caseNo)) {
             caseNo = testScript.getCaseNoMap().keySet().iterator().next();
         } else if (!testScript.containsCaseNo(caseNo)) {
-            String msg = "指定されたケース番号[" + caseNo + "]は不正です。指定可能なケース番号："
+            String msg = MessageManager.getMessage("case.number.error", caseNo)
                     + testScript.getCaseNoMap().keySet();
             throw new TestException(msg);
         }
@@ -147,7 +148,7 @@ public class Tester {
         current.setCaseNo(caseNo);
 
         dialog.checkReserve(testScript.getTestStepList(), caseNo);
-        log.info("ケース{}を実行します", caseNo);
+        log.info("case.execute", caseNo);
 
         List<Exception> ngList = new ArrayList<Exception>();
         TestResult result = new TestResult();
@@ -169,7 +170,7 @@ public class Tester {
                     ngList.add(e);
                     result.add(e);
                     evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
-                            "期待と異なる結果になりました {}", e.getLocalizedMessage()));
+                            "unexpected.result", e.getLocalizedMessage()));
                     if (!operationSupport.isDbVerify(testStep.getOperation())) {
                         addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
                     }
@@ -183,8 +184,8 @@ public class Tester {
                     if (pm.isDebug()) {
                         ngList.add(e);
                         evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
-                                "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
-                        log.debug("例外詳細", e);
+                                "unexpected.error2", e.getLocalizedMessage()));
+                        log.debug("exception", e);
                         if (!operationSupport.isDbVerify(testStep.getOperation())) {
                             addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
                         }
@@ -199,11 +200,11 @@ public class Tester {
 
         } catch (Exception e) {
             evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
-                    "予期しないエラーが発生しました {}", e.getLocalizedMessage()));
+                    "unexpected.error2", e.getLocalizedMessage()));
+            log.debug("exception", e);
             if (!operationSupport.isDbVerify(testStep.getOperation())) {
                 addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
             }
-            log.debug("例外詳細", e);
             result.setErrorCause(e);
         } finally {
             em.flushEvidence(evidence);
@@ -227,7 +228,7 @@ public class Tester {
         testStep.setCurrentCaseNo(caseNo);
 
         if (testStep.isSkip()) {
-            log.info("ケース[{}][{} {}]の操作をスキップします", caseNo, testStep.getNo(), testStep.getItemName());
+            log.info("case.skip", caseNo, testStep.getNo(), testStep.getItemName());
             return;
         }
 
@@ -249,7 +250,7 @@ public class Tester {
         try {
             Thread.sleep(pm.getOperationWait());
         } catch (InterruptedException e) {
-            log.warn("スレッドの待機に失敗しました", e);
+            log.warn("thread.sleep.error", e);
         }
     }
 

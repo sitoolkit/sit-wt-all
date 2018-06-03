@@ -8,12 +8,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.evidence.ElementPosition;
 import org.sitoolkit.wt.domain.evidence.ElementPositionStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class ElementPositionSupport2 {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
     private boolean frameChanged = false;
 
@@ -48,7 +48,7 @@ public class ElementPositionSupport2 {
             frameChanged = false;
         }
 
-        log.debug("要素:{}, 要素位置:{}, 基準位置:{}", new Object[] { element, elementPos, basePosition });
+        log.debug("element.position", new Object[] { element, elementPos, basePosition });
 
         return new ElementPosition(elementPos.getX() * scale - basePosition.getX(),
                 elementPos.getY() * scale - basePosition.getY(),

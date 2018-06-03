@@ -19,6 +19,7 @@ import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.RegexHelper;
 import org.sitoolkit.wt.infra.VerifyException;
+import org.sitoolkit.wt.infra.resource.MessageManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,11 +35,10 @@ public class VerifyOperation extends SeleniumOperation {
         WebElement element = findElement(testStep.getLocator());
         String actual = getActual(element, testStep);
 
-        ctx.info(element, "{}({})の値が期待値[{}]に一致することを確認します。", testStep.getItemName(),
-                testStep.getLocator(), expected);
+        ctx.info(element, "verify", testStep.getItemName(), testStep.getLocator(), expected);
         if (!RegexHelper.matches(testStep.getValue(), actual)) {
-            throw new VerifyException("{0}({1})の値[{2}]は期待値[{3}]と異なります。", testStep.getItemName(),
-                    testStep.getLocator(), actual, expected);
+            throw new VerifyException(MessageManager.getMessage("verify.unmatch"),
+                    testStep.getItemName(), testStep.getLocator(), actual, expected);
         }
     }
 

@@ -7,13 +7,13 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.domain.evidence.EvidenceDir;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.util.ResourceUtils;
 
 public class EvidenceReportEditor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EvidenceReportEditor.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceReportEditor.class);
 
     private static final String evidenceRes = "js/report.js";
 
@@ -26,9 +26,9 @@ public class EvidenceReportEditor {
     public void edit(EvidenceDir evidenceDir) {
 
         if (!evidenceDir.exists()) {
-            LOG.error("エビデンスがありません");
+            LOG.error("evidence.error");
         } else if (!EvidenceDir.existsReport(reportResourcePath)) {
-            LOG.error("レポートファイルがありません");
+            LOG.error("report.error");
         } else {
 
             try {
@@ -39,10 +39,10 @@ public class EvidenceReportEditor {
                 FileUtils.copyURLToFile(url, dstFile);
 
             } catch (IOException e) {
-                LOG.error("リソースのコピーに失敗しました", e);
+                LOG.error("resource.copy.error", e);
                 return;
             } catch (Exception exp) {
-                LOG.error("プロキシの取得で例外が発生しました", exp);
+                LOG.error("proxy.error", exp);
                 return;
             }
 
@@ -69,7 +69,7 @@ public class EvidenceReportEditor {
             FileUtils.writeStringToFile(failsafeReport, reportHtml, "UTF-8");
 
         } catch (IOException e) {
-            LOG.error("リンク付加処理で例外が発生しました", e);
+            LOG.error("add.tags.error", e);
         }
 
     }
