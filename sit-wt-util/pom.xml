@@ -16,6 +16,16 @@
       <version>2.5</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.takari</groupId>
+      <artifactId>maven-wrapper</artifactId>
+      <version>0.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.takari</groupId>
+      <artifactId>takari-archiver</artifactId>
+      <version>0.1.9</version>
+    </dependency>
   </dependencies>
   <parent>
     <groupId>org.sitoolkit.wt</groupId>

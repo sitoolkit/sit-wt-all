@@ -73,7 +73,13 @@
     <dependency>
       <groupId>org.sitoolkit.util</groupId>
       <artifactId>sit-util-td</artifactId>
-      <version>1.3-SNAPSHOT</version>
+      <version>1.3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>

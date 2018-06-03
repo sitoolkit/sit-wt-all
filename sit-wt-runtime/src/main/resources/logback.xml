@@ -12,6 +12,15 @@
     </encoder>
   </appender>
 
+  <appender name="delegate" class="org.sitoolkit.wt.infra.log.DelegatingOutputStreamAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <encoder>
+      <pattern>%m%n</pattern>
+    </encoder>
+  </appender>
+
   <appender name="file" class="ch.qos.logback.core.FileAppender">
     <file>target/sit-wt.log</file>
     <append>false</append>
@@ -23,6 +32,7 @@
 
   <logger name="org.sitoolkit" level="debug" additivity="true">
     <appender-ref ref="stdout" />
+    <appender-ref ref="delegate" />
   </logger>
 
   <logger name="ch.qos.logback" level="error" additivity="true">

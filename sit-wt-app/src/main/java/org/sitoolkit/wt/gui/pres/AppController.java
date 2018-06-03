@@ -13,7 +13,9 @@ import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
+import org.sitoolkit.wt.gui.infra.log.TextAreaOutputStream;
 import org.sitoolkit.wt.gui.infra.process.TextAreaStdoutListener;
+import org.sitoolkit.wt.infra.log.DelegatingOutputStreamAppender;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.process.ConversationProcess;
 import org.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
@@ -26,6 +28,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
@@ -69,6 +72,9 @@ public class AppController implements Initializable {
     @FXML
     private MenuItem sampleStopMenu;
 
+    @FXML
+    private TabPane editorTab;
+
     private MessageView messageView = new MessageView();
 
     private ConversationProcess conversationProcess;
@@ -76,6 +82,8 @@ public class AppController implements Initializable {
     private ProjectState projectState = new ProjectState();
 
     UpdateController updateController = new UpdateController();
+
+    EditorTabController editorTabController = new EditorTabController();
 
     DiffEvidenceService diffEvidenceService = new DiffEvidenceService();
 
@@ -99,6 +107,8 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        DelegatingOutputStreamAppender.setStaticOutputStream(new TextAreaOutputStream(console));
+
         if (!Boolean.getBoolean("skipUpdate")) {
             ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
         }
@@ -118,6 +128,10 @@ public class AppController implements Initializable {
         diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
 
         fileTreeController.setTestRunnable(testToolbarController);
+        fileTreeController.fileOpenable = editorTabController;
+
+        editorTabController.tabs = editorTab;
+        editorTabController.initialize();
     }
 
     public void postInit() {

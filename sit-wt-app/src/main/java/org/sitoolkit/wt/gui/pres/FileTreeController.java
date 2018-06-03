@@ -13,7 +13,6 @@ import org.sitoolkit.wt.gui.app.test.TestService;
 import org.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import org.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import org.sitoolkit.wt.gui.infra.fx.FileWrapper;
-import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 import javafx.application.Platform;
@@ -55,6 +54,8 @@ public class FileTreeController implements Initializable {
 
     TestRunnable testRunnable;
 
+    FileOpenable fileOpenable;
+
     ScriptService scriptService = new ScriptService();
 
     TestCaseDialogController testCaseDialogController;
@@ -81,7 +82,7 @@ public class FileTreeController implements Initializable {
                 executeCaseMenuItem
                         .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
                 executeDebugCaseMenuItem
-                .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
+                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
             });
         });
 
@@ -170,7 +171,8 @@ public class FileTreeController implements Initializable {
     @FXML
     public void open() {
         operateSelectedItem(selectedItem -> {
-            FxContext.openFile(selectedItem.getValue().getFile());
+            // FxContext.openFile(selectedItem.getValue().getFile());
+            fileOpenable.open(selectedItem.getValue().getFile());
         });
     }
 
@@ -276,8 +278,8 @@ public class FileTreeController implements Initializable {
             File selectedFile = selectedItem.getValue().getFile();
 
             scriptService.readCaseNo(selectedFile, caseNos -> {
-                Platform.runLater(
-                        () -> testCaseDialogController.showSelectDebugDialog(selectedFile, caseNos));
+                Platform.runLater(() -> testCaseDialogController.showSelectDebugDialog(selectedFile,
+                        caseNos));
             });
 
         });
