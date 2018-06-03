@@ -14,7 +14,7 @@
   <condition property="os.windows" value="true" else="false">
     <os family="windows" />
   </condition>
-  <condition property="mvn.cmd" value="${env.MAVEN_HOME}\bin\mvn.cmd" else="/usr/local/bin/mvn">
+  <condition property="mvn.cmd" value="${basedir}\mvnw.cmd" else="${basedir}\mvnw">
     <os family="windows" />
   </condition>
 
@@ -195,8 +195,7 @@
 
   <target name="set-version">
 
-    <property name="version" value="2.2.1" />
-    <property name="version" value="2.3" />
+    <property name="version" value="3.0-SNAPSHOT" />
 
     <replaceregexp file="${distribution.pom}"
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"

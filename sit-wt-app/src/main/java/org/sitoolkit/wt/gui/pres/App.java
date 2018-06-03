@@ -58,8 +58,6 @@ public class App extends Application {
             controller.postInit();
         });
 
-        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.downloadRepository());
-
         Scene scene = new Scene(root);
 
         // TODO フォントファイルを直接ダウンロードすれば有効か要検証

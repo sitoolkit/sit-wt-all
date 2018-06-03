@@ -16,7 +16,7 @@ public class ProjectServiceTest {
     @Test
     public void testCreate() throws IOException {
         MavenUtils.findAndInstall();
-        MavenUtils.downloadRepository();
+        // MavenUtils.downloadRepository();
 
         File projectDir = new File("target/projectservicetest");
         if (projectDir.exists()) {

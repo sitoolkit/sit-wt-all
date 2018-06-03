@@ -15,10 +15,11 @@ import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.fx.FxUtils;
 import org.sitoolkit.wt.util.infra.process.ConversationProcess;
 import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
-import org.sitoolkit.wt.util.infra.util.StrUtils;
 import org.sitoolkit.wt.util.infra.util.SystemUtils;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -68,6 +69,10 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     private ConversationProcess testProcess;
 
+    private String sessionId;
+
+    private BooleanProperty pausing = new SimpleBooleanProperty(false);
+
     private ProjectState projectState;
 
     private SitWtDebugStdoutListener debugStdoutListener = new SitWtDebugStdoutListener();
@@ -78,8 +83,12 @@ public class TestToolbarController implements Initializable, TestRunnable {
     public void initialize(URL location, ResourceBundle resources) {
         browserChoice.getItems().addAll(SystemUtils.getBrowsers());
 
-        FxUtils.bindVisible(pauseButton, debugStdoutListener.getPausingProperty().not());
-        FxUtils.bindVisible(restartButton, debugStdoutListener.getPausingProperty());
+        // FxUtils.bindVisible(pauseButton,
+        // debugStdoutListener.getPausingProperty().not());
+        // FxUtils.bindVisible(restartButton,
+        // debugStdoutListener.getPausingProperty());
+        FxUtils.bindVisible(pauseButton, pausing.not());
+        FxUtils.bindVisible(restartButton, pausing);
     }
 
     public void initialize(MessageView messageView, FileTreeController fileTreeController,
@@ -107,6 +116,8 @@ public class TestToolbarController implements Initializable, TestRunnable {
         if (testProcess != null) {
             testProcess.destroy();
         }
+
+        testService.destroy();
     }
 
     @FXML
@@ -158,10 +169,13 @@ public class TestToolbarController implements Initializable, TestRunnable {
             Platform.runLater(() -> messageView.addMsg("テストを終了します。"));
         };
 
-        ConversationProcess testProcess = testService.runTest(params, debugStdoutListener,
-                callback);
+        // ConversationProcess testProcess = testService.runTest(params,
+        // debugStdoutListener,
+        // callback);
+        String sessionId = testService.runTest(params, callback);
 
-        if (testProcess == null) {
+        // if (testProcess == null) {
+        if (sessionId == null) {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("");
             alert.setContentText("");
@@ -169,7 +183,8 @@ public class TestToolbarController implements Initializable, TestRunnable {
             alert.show();
             projectState.reset();
         } else {
-            this.testProcess = testProcess;
+            // this.testProcess = testProcess;
+            this.sessionId = sessionId;
         }
 
     }
@@ -190,18 +205,22 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     public void pause() {
-        testProcess.input("");
+        // testProcess.input("");
+        testService.pause(sessionId);
+        pausing.set(true);
     }
 
     @FXML
     public void restart() {
-        String stepNo = stepNoText.getText();
-        if (!StrUtils.isEmpty(stepNo)) {
-            testProcess.input("!" + stepNo);
-            testProcess.input("#" + stepNo);
-        }
-
-        testProcess.input("s");
+        // String stepNo = stepNoText.getText();
+        // if (!StrUtils.isEmpty(stepNo)) {
+        // testProcess.input("!" + stepNo);
+        // testProcess.input("#" + stepNo);
+        // }
+        //
+        // testProcess.input("s");
+        testService.restart(sessionId);
+        pausing.set(false);
     }
 
     @FXML
@@ -226,7 +245,8 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     public void quit() {
-        testProcess.destroy();
+        // testProcess.destroy();
+        testService.stopTest(sessionId);
         projectState.reset();
     }
 

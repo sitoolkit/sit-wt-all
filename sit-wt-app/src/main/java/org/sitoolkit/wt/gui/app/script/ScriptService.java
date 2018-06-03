@@ -3,19 +3,47 @@ package org.sitoolkit.wt.gui.app.script;
 import java.io.File;
 import java.util.List;
 
+import org.sitoolkit.wt.app.config.BaseConfig;
+import org.sitoolkit.wt.app.config.TestScriptConfig;
+import org.sitoolkit.wt.domain.testscript.TestScript;
+import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.gui.domain.script.CaseNoCache;
 import org.sitoolkit.wt.gui.domain.script.CaseNoReadCallback;
 import org.sitoolkit.wt.gui.domain.script.CaseNoStdoutListener;
 import org.sitoolkit.wt.gui.domain.script.ScriptProcessClient;
+import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.process.ConversationProcess;
 import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
 import org.sitoolkit.wt.util.infra.process.ProcessParams;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class ScriptService {
 
     CaseNoCache cache = new CaseNoCache();
 
     ScriptProcessClient client = new ScriptProcessClient();
+
+    TestScriptDao dao;
+
+    public void initialize() {
+        ExecutorContainer.get().execute(() -> {
+            ApplicationContext appCtx = new AnnotationConfigApplicationContext(BaseConfig.class,
+                    TestScriptConfig.class);
+            dao = appCtx.getBean(TestScriptDao.class);
+        });
+    }
+
+    public TestScript read(File file) {
+        while (!initialized()) {
+
+        }
+        return dao.load(file, "TestScript", false);
+    }
+
+    private synchronized boolean initialized() {
+        return dao != null;
+    }
 
     public ConversationProcess page2script(String driverType, String baseUrl,
             ProcessExitCallback callback) {

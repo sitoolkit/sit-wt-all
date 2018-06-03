@@ -20,7 +20,7 @@ public class UpdateServiceTest {
     @BeforeClass
     public static void setup() {
         MavenUtils.findAndInstall();
-        MavenUtils.downloadRepository();
+        // MavenUtils.downloadRepository();
     }
 
     @Test

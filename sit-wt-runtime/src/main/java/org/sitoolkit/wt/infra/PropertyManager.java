@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
+import lombok.Setter;
+
 @Configuration
 @PropertySource(ignoreResourceNotFound = true, value = { "classpath:sit-wt-default.properties",
         "classpath:sit-wt.properties" })
@@ -58,6 +60,7 @@ public class PropertyManager {
     @Value("${pagescript.dir}")
     private String pageScriptDir;
 
+    @Setter
     @Value("${driver.type}")
     private String driverType;
 
@@ -82,12 +85,14 @@ public class PropertyManager {
     @Value("${connection.properties}")
     private String connectionProperties;
 
+    @Setter
     @Value("${baseUrl:}")
     private String baseUrl;
 
     @Value("${hubUrl}")
     private String hubUrl;
 
+    @Setter
     @Value("${sitwt.debug:false}")
     private boolean isDebug;
 

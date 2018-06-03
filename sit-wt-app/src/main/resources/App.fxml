@@ -18,6 +18,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TabPane?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity"
   prefHeight="400.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
@@ -26,7 +27,10 @@
     <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
       <items>
         <fx:include fx:id="fileTree" source="FileTree.fxml" />
-        <TextArea fx:id="console" editable="false" />
+        <SplitPane dividerPositions="0.5" orientation="VERTICAL">
+          <TabPane fx:id="editorTab"></TabPane>
+          <TextArea fx:id="console" editable="false" />
+        </SplitPane>
       </items>
     </SplitPane>
   </center>
@@ -69,16 +73,16 @@
       <ToolBar>
         <items>
           <Separator orientation="VERTICAL" />
-<!--           <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn"> -->
-<!--             <tooltip> -->
-<!--               <Tooltip text="ウィンドウを縮小します" /> -->
-<!--             </tooltip> -->
-<!--           </Label> -->
-<!--           <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn"> -->
-<!--             <tooltip> -->
-<!--               <Tooltip text="ウィンドウを拡大します" /> -->
-<!--             </tooltip> -->
-<!--           </Label> -->
+          <!-- <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn"> -->
+          <!-- <tooltip> -->
+          <!-- <Tooltip text="ウィンドウを縮小します" /> -->
+          <!-- </tooltip> -->
+          <!-- </Label> -->
+          <!-- <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn"> -->
+          <!-- <tooltip> -->
+          <!-- <Tooltip text="ウィンドウを拡大します" /> -->
+          <!-- </tooltip> -->
+          <!-- </Label> -->
           <Label onMouseClicked="#settings" styleClass="image-btn,settings-btn">
             <tooltip>
               <Tooltip text="設定ファイルのフォルダを開きます" />
