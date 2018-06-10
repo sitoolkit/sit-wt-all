@@ -230,7 +230,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     public void forward() {
-        testProcess.input("f");
+        testService.forward(sessionId);
     }
 
     @FXML

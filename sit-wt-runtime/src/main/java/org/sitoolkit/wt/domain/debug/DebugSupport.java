@@ -68,6 +68,8 @@ public class DebugSupport {
 
     private Boolean debug;
 
+    private String currentTestStepNo = "";
+
     /**
      * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき {@code TestStep}
      * とテストステップインデックスを設定します。(テストステップインデックスはテストスクリプト内でのテストステップの順番です。)
@@ -101,6 +103,8 @@ public class DebugSupport {
             current.setCurrentIndex(nextIndex);
             current.setTestStep(current.getTestScript().getTestStep(nextIndex));
 
+            currentTestStepNo = current.getTestStepNo();
+
             return true;
         } else {
             return current.isContinued();
@@ -133,11 +137,7 @@ public class DebugSupport {
      */
     protected int getNextIndex(final int currentIndex) {
 
-        if (!isPaused()) {
-            return currentIndex + 1;
-        }
-
-        int ret = currentIndex;
+        int ret = currentIndex + 1;
 
         while (isPaused()) {
             try {
@@ -232,6 +232,19 @@ public class DebugSupport {
                 }
             }
         });
+    }
+
+    public void forward() {
+        final String startTestStepNo = currentTestStepNo;
+        setPaused(false);
+        while (startTestStepNo.equals(currentTestStepNo)) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                LOG.warn("thread.sleep.error", e);
+            }
+        }
+        setPaused(true);
     }
 
     public void pause() {

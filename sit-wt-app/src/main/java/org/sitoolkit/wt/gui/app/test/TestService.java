@@ -85,6 +85,13 @@ public class TestService {
         DebugSupport debug = appCtx.getBean(DebugSupport.class);
         debug.setPaused(false);
     }
+    
+    public void forward(String sessionId) {
+      ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
+
+      DebugSupport debug = appCtx.getBean(DebugSupport.class);
+      debug.forward();
+    }
 
     public void stopTest(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
