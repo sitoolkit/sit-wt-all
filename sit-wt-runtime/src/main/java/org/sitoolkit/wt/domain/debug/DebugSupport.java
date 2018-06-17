@@ -68,7 +68,7 @@ public class DebugSupport {
 
     private Boolean debug;
 
-    private String currentTestStepNo = "";
+    private int currentIndex;
 
     /**
      * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき {@code TestStep}
@@ -103,8 +103,6 @@ public class DebugSupport {
             current.setCurrentIndex(nextIndex);
             current.setTestStep(current.getTestScript().getTestStep(nextIndex));
 
-            currentTestStepNo = current.getTestStepNo();
-
             return true;
         } else {
             return current.isContinued();
@@ -137,7 +135,7 @@ public class DebugSupport {
      */
     protected int getNextIndex(final int currentIndex) {
 
-        int ret = currentIndex + 1;
+        int ret = currentIndex;
 
         while (isPaused()) {
             try {
@@ -151,6 +149,11 @@ public class DebugSupport {
                 LOG.info("script.file.changed");
                 current.setTestScript(
                         dao.load(testScript.getScriptFile(), testScript.getSheetName(), false));
+            }
+
+            if (ret != this.currentIndex) {
+                ret = this.currentIndex;
+                writeStepLog(ret);
             }
 
             // コンソールから有効なコマンド入力があるまでループします。
@@ -170,18 +173,7 @@ public class DebugSupport {
                     break;
                 }
 
-                LOG.info("empty");
-                LOG.info("test.step.next.prev");
-                for (int i = ret - 1; i <= ret + 1; i++) {
-                    TestStep nextStep = current.getTestScript().getTestStep(i);
-                    if (nextStep == null) {
-                        continue;
-                    }
-                    String nextMark = i == ret + 1 ? " <- 次に実行" : "";
-                    LOG.info("test.step.next", new Object[] { nextStep.getNo(),
-                            nextStep.getItemName(), nextStep.getLocator(), nextMark });
-                }
-                LOG.info("empty");
+                writeStepLog(ret);
             }
 
             //
@@ -193,6 +185,12 @@ public class DebugSupport {
             }
 
         }
+
+        if (currentIndex == this.currentIndex) {
+            ret = currentIndex + 1;
+            this.currentIndex = ret;
+        }
+
         return ret;
     }
 
@@ -234,10 +232,34 @@ public class DebugSupport {
         });
     }
 
+    /**
+     * 指定されたステップとその前後のステップの情報をコンソールに出力します。
+     * 
+     * @param step
+     *            現在のステップのインデックス
+     */
+    protected void writeStepLog(int step) {
+        LOG.info("empty");
+        LOG.info("test.step.next.prev");
+        for (int i = step - 1; i <= step + 1; i++) {
+            TestStep nextStep = current.getTestScript().getTestStep(i);
+            if (nextStep == null) {
+                continue;
+            }
+            String nextMark = i == step + 1 ? " <- 次に実行" : "";
+            LOG.info("test.step.next", new Object[] { nextStep.getNo(), nextStep.getItemName(),
+                    nextStep.getLocator(), nextMark });
+        }
+        LOG.info("empty");
+    }
+
     public void forward() {
-        final String startTestStepNo = currentTestStepNo;
+        if (!isPaused())
+            return;
+
+        final int startIndex = currentIndex;
         setPaused(false);
-        while (startTestStepNo.equals(currentTestStepNo)) {
+        while (currentIndex == startIndex) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -245,6 +267,14 @@ public class DebugSupport {
             }
         }
         setPaused(true);
+    }
+
+    public void back() {
+        if (!isPaused())
+            return;
+        if (currentIndex > 0) {
+            currentIndex -= 1;
+        }
     }
 
     public void pause() {

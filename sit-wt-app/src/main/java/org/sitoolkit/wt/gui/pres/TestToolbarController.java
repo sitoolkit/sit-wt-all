@@ -225,7 +225,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     public void back() {
-        testProcess.input("b");
+        testService.back(sessionId);
     }
 
     @FXML
