@@ -32,6 +32,7 @@
     <selenium.version>2.53.1</selenium.version>
     <appium.version>3.4.1</appium.version>
     <trimStackTrace>false</trimStackTrace>
+    <mpir.skip>true</mpir.skip>
   </properties>
 
   <!-- Build Settings -->
@@ -118,8 +119,33 @@
           </filesets>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.7.1</version>
+        <executions>
+          <execution>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>site</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.22.0</version>
+        <configuration>
+          <skipSurefireReport>true</skipSurefireReport>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <!-- Environment Settings -->
   <profiles>

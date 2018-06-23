@@ -1,9 +1,6 @@
 package org.sitoolkit.wt.gui.app.project;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,8 +10,8 @@ import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.gui.infra.util.ResourceUtils;
 import org.sitoolkit.wt.gui.infra.util.VersionUtils;
-import org.sitoolkit.wt.util.infra.UnExpectedException;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.maven.MavenUtils;
 import org.sitoolkit.wt.util.infra.process.ProcessParams;
@@ -100,12 +97,7 @@ public class ProjectService {
 
     private void createPom(File pomFile, ProjectState projectState) {
 
-        try {
-            URL pomUrl = getClass().getResource("/distribution-pom.xml");
-            Files.copy(pomUrl.openStream(), pomFile.toPath());
-        } catch (IOException e) {
-            throw new UnExpectedException(e);
-        }
+        ResourceUtils.copy("distribution-pom.xml", pomFile);
 
         if (pomFile.exists()) {
 
@@ -134,6 +126,9 @@ public class ProjectService {
     }
 
     private void unpackResources(File pomFile, File projectDir) {
+
+        ResourceUtils.copy("site.xml", new File(projectDir, "src/site/site.xml"));
+
         ProcessParams params = new ProcessParams();
         params.setDirectory(projectDir);
 
