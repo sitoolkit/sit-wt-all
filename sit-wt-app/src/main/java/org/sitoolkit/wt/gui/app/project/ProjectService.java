@@ -1,6 +1,7 @@
 package org.sitoolkit.wt.gui.app.project;
 
 import java.io.File;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +53,8 @@ public class ProjectService {
             return null;
         }
 
+        Executors.newSingleThreadExecutor()
+                .submit(() -> MavenUtils.findAndInstall(projectDir.toPath()));
         createPom(pomFile, projectState);
         unpackResources(pomFile, projectDir);
 

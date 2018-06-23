@@ -57,18 +57,22 @@ public class MavenUtils {
     }
 
     public static synchronized void findAndInstall() {
+        findAndInstall(Paths.get("."));
+    }
+
+    public static synchronized void findAndInstall(Path baseDir) {
         if (StrUtils.isEmpty(mvnCommand)) {
-            mvnCommand = find();
+            mvnCommand = find(baseDir);
             if (StrUtils.isEmpty(mvnCommand)) {
-                MavenWrapperDownloader.download();
-                mvnCommand = find();
+                MavenWrapperDownloader.download(baseDir);
+                mvnCommand = find(baseDir);
             }
         }
         LOG.info("mvn command is '" + mvnCommand + "'");
     }
 
-    public static String find() {
-        Path mvnw = SystemUtils.isWindows() ? Paths.get("mvnw.cmd") : Paths.get("mvnw");
+    public static String find(Path baseDir) {
+        Path mvnw = SystemUtils.isWindows() ? baseDir.resolve("mvnw.cmd") : baseDir.resolve("mvnw");
 
         if (mvnw.toFile().exists()) {
             return mvnw.toAbsolutePath().toString();
@@ -150,13 +154,12 @@ public class MavenUtils {
     }
 
     static int setSitWtVersion(File pomFile, String newVersion, File destPomFile) {
-    	
-    	if (StrUtils.isEmpty(newVersion)) {
-            LOG.log(Level.WARNING, "new sitwt.version must not be empty",
-                    new Object[] { });
-    		return 2;
-    	}
-    	
+
+        if (StrUtils.isEmpty(newVersion)) {
+            LOG.log(Level.WARNING, "new sitwt.version must not be empty", new Object[] {});
+            return 2;
+        }
+
         try {
             Document document = parseSettingFile(pomFile);
 

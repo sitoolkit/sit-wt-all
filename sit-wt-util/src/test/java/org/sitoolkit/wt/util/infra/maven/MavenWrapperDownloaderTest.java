@@ -20,7 +20,7 @@ public class MavenWrapperDownloaderTest {
     @Test
     public void test() {
 
-        MavenWrapperDownloader.download();
+        MavenWrapperDownloader.download(Paths.get("."));
 
         pathes.forEach(
                 path -> assertThat(path + "doesnt'e xists", path.toFile().exists(), is(true)));

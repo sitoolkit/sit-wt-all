@@ -26,10 +26,10 @@ public class MavenWrapperDownloader {
     private static String distributionUrl;
 
     public static void main(String[] args) {
-        download();
+        download(Paths.get("."));
     }
 
-    public static void download() {
+    public static void download(Path rootDirectory) {
         //
         // Fetch the latest wrapper archive
         // Unpack it in the current working project
@@ -45,7 +45,6 @@ public class MavenWrapperDownloader {
         try {
             downloader.download(new URI(wrapperUrl), destination);
             UnArchiver unarchiver = UnArchiver.builder().useRoot(false).build();
-            Path rootDirectory = Paths.get(".");
             unarchiver.unarchive(destination, rootDirectory.toFile());
             overwriteDistributionUrl(rootDirectory, getDistributionUrl());
             LOG.info("");

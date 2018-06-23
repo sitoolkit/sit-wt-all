@@ -1,6 +1,5 @@
 package org.sitoolkit.wt.gui.pres;
 
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,7 +8,6 @@ import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
-import org.sitoolkit.wt.util.infra.maven.MavenUtils;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -45,8 +43,6 @@ public class App extends Application {
         FxContext.setHostServices(getHostServices());
 
         ProxySettingService.getInstance().loadProxy();
-
-        Executors.newSingleThreadExecutor().submit(() -> MavenUtils.findAndInstall());
 
         primaryStage.setTitle("SI-Toolkit for Web Testing");
 
