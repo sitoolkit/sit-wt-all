@@ -10,4 +10,8 @@ public class FxUtils {
         node.managedProperty().bind(visible);
     }
 
+    public static void bindDisable(Node node, ObservableBooleanValue disable) {
+        node.disableProperty().bind(disable);
+    }
+
 }

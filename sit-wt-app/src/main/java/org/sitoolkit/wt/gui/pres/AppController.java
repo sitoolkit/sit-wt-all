@@ -55,6 +55,9 @@ public class AppController implements Initializable {
     private Label toggleButton;
 
     @FXML
+    private Label saveButton;
+
+    @FXML
     private SampleToolbarController sampleToolbarController;
 
     @FXML
@@ -90,6 +93,8 @@ public class AppController implements Initializable {
     TestService testService = new TestService();
 
     ProjectService projectService = new ProjectService();
+
+    ScriptService scriptService = new ScriptService();
 
     // private double stageHeight;
     //
@@ -131,7 +136,9 @@ public class AppController implements Initializable {
         fileTreeController.fileOpenable = editorTabController;
 
         editorTabController.tabs = editorTab;
+        editorTabController.scriptService = scriptService;
         editorTabController.initialize();
+        FxUtils.bindDisable(saveButton, editorTabController.isEmpty());
     }
 
     public void postInit() {
@@ -192,7 +199,10 @@ public class AppController implements Initializable {
         FxContext.setTitie(projectDir.getAbsolutePath());
     }
 
-    ScriptService scriptService = new ScriptService();
+    @FXML
+    public void editor2script() {
+        editorTabController.save();
+    }
 
     @FXML
     public void page2script() {

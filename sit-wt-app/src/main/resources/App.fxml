@@ -43,6 +43,11 @@
               <Tooltip text="プロジェクトを作成/開きます" />
             </tooltip>
           </Label>
+          <Label fx:id="saveButton" onMouseClicked="#editor2script" styleClass="image-btn,save-btn">
+            <tooltip>
+              <Tooltip text="アクティブタブのテストスクリプトを保存します" />
+            </tooltip>
+          </Label>
         </children>
       </HBox>
       <fx:include fx:id="testToolbar" source="TestToolbar.fxml" />

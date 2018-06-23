@@ -1,6 +1,11 @@
 package org.sitoolkit.wt.domain.testscript;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -75,6 +80,7 @@ public class TestScriptDao {
         RowData firstRow = table.getRows().iterator().next();
         int testDataIndex = 0;
         for (Map.Entry<String, String> entry : firstRow.getData().entrySet()) {
+            testScript.addHeader(entry.getKey());
             if (entry.getKey().startsWith(testScript.getCaseNoPrefix())) {
                 String caseNo = StringUtils.substringAfter(entry.getKey(),
                         testScript.getCaseNoPrefix());
@@ -110,13 +116,44 @@ public class TestScriptDao {
 
         fileOverwriteChecker.setRebuild(overwrite);
 
-        excelDao.write(catalog.get("TestScript"), TEMPLATE_PATH, file.getAbsolutePath(), null);
+        if (file.exists()) {
+            overwrite(file, catalog);
+        } else {
+            excelDao.write(catalog.get("TestScript"), TEMPLATE_PATH, file.getAbsolutePath(), null);
+        }
 
         return file.getAbsolutePath();
     }
 
     private String sanitizeFileName(String name) {
         return name.replaceAll("[:\\\\/*?|<>]", "_");
+    }
+
+    private void overwrite(File file, TableDataCatalog catalog) {
+        Path temporaryPath = null;
+
+        try {
+            temporaryPath = Files.createTempFile(Paths.get(file.getParent()), "tmp", ".xlsx");
+            Files.copy(file.toPath(), temporaryPath, StandardCopyOption.REPLACE_EXISTING);
+            log.info("temporary.create", temporaryPath.toString());
+
+            excelDao.write(catalog.get("TestScript"), temporaryPath.toString(),
+                    file.getAbsolutePath(), null);
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+
+        } finally {
+            try {
+                if (temporaryPath != null) {
+                    log.info("temporary.delete", temporaryPath.toAbsolutePath());
+                    Files.deleteIfExists(temporaryPath);
+                }
+            } catch (IOException e) {
+                log.warn("temporary.delete.error", temporaryPath.toAbsolutePath());
+            }
+        }
+
     }
 
 }

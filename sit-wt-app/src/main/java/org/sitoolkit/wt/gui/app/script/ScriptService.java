@@ -26,7 +26,11 @@ public class ScriptService {
 
     TestScriptDao dao;
 
-    public void initialize() {
+    public ScriptService() {
+        initialize();
+    }
+
+    private void initialize() {
         ExecutorContainer.get().execute(() -> {
             ApplicationContext appCtx = new AnnotationConfigApplicationContext(BaseConfig.class,
                     TestScriptConfig.class);
@@ -39,6 +43,10 @@ public class ScriptService {
 
         }
         return dao.load(file, "TestScript", false);
+    }
+
+    public void write(TestScript testScript) {
+        dao.write(testScript.getScriptFile(), testScript.getTestStepList(), true);
     }
 
     private synchronized boolean initialized() {

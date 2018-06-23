@@ -31,6 +31,10 @@ limitations under the License.
           <localizedName locale="ja">操作</localizedName>
           <localizedName locale="en">Operation</localizedName>
         </column>
+        <column property="operationName" name="OperationName">
+          <localizedName locale="ja">操作</localizedName>
+          <localizedName locale="en">Operation</localizedName>
+        </column>
         <column property="locator.type" name="LocatorStyle">
           <localizedName locale="ja">ロケーター形式</localizedName>
           <localizedName locale="en">LocatorStyle</localizedName>

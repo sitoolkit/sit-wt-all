@@ -46,6 +46,10 @@ public class TestScript {
      */
     private List<TestStep> testStepList = new ArrayList<TestStep>();
     /**
+     * テストスクリプト内の ヘッダー文字列のリスト
+     */
+    private List<String> headers = new ArrayList<>();
+    /**
      * キー：ステップNo、値：ステップNoを持つTestScriptのtestStepList内のインデックス
      */
     private Map<String, Integer> testStepNoMap = new HashMap<String, Integer>();
@@ -100,6 +104,14 @@ public class TestScript {
             testStepList.add(testStep);
             testStepNoMap.put(testStep.getNo(), testStepList.size() - 1);
         }
+    }
+
+    public List<String> getHeaders() {
+        return Collections.unmodifiableList(headers);
+    }
+
+    public void addHeader(String header) {
+        headers.add(header);
     }
 
     public TestStep getTestStep(int index) {
