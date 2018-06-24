@@ -53,8 +53,6 @@ public class ProjectService {
             return null;
         }
 
-        Executors.newSingleThreadExecutor()
-                .submit(() -> MavenUtils.findAndInstall(projectDir.toPath()));
         createPom(pomFile, projectState);
         unpackResources(pomFile, projectDir);
 
@@ -111,6 +109,9 @@ public class ProjectService {
 
     private void loadProject(File pomFile, ProjectState projectState) {
         LOG.log(Level.INFO, "loading project with {0}", pomFile.getAbsolutePath());
+
+        Executors.newSingleThreadExecutor()
+                .submit(() -> MavenUtils.findAndInstall(pomFile.getParentFile().toPath()));
 
         File baseDir = pomFile.getAbsoluteFile().getParentFile();
         PropertyManager.get().load(baseDir);
