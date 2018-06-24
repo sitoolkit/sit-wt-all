@@ -212,14 +212,14 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     public void restart() {
-        // String stepNo = stepNoText.getText();
+        String stepNo = stepNoText.getText();
         // if (!StrUtils.isEmpty(stepNo)) {
         // testProcess.input("!" + stepNo);
         // testProcess.input("#" + stepNo);
         // }
         //
         // testProcess.input("s");
-        testService.restart(sessionId);
+        testService.restart(sessionId, stepNo);
         pausing.set(false);
     }
 
@@ -235,12 +235,13 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     public void export() {
-        testProcess.input("e");
+        testService.export(sessionId);
     }
 
     @FXML
     public void checkLocator() {
-        testProcess.input("l " + locatorText.getText());
+        String locatorStr = locatorText.getText();
+        testService.checkLocator(sessionId, locatorStr);
     }
 
     @FXML

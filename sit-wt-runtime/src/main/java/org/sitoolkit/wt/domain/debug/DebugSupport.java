@@ -24,7 +24,9 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.domain.tester.TestContext;
+import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -55,6 +57,9 @@ public class DebugSupport {
     @Resource
     PropertyManager pm;
 
+    @Resource
+    WebDriver seleniumDriver;
+
     /**
      * ポーズ中にスレッドをsleepする間隔(ミリ秒)
      */
@@ -68,7 +73,11 @@ public class DebugSupport {
 
     private Boolean debug;
 
+    // TODO スレッド間で共有する変数について実装方法検討
     private int currentIndex;
+    private String restartStepNo;
+    private boolean export = false;
+    private String locatorStr;
 
     /**
      * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき {@code TestStep}
@@ -156,6 +165,16 @@ public class DebugSupport {
                 writeStepLog(ret);
             }
 
+            if (locatorStr != null) {
+                execCheckLocator(locatorStr);
+                locatorStr = null;
+            }
+
+            if (export) {
+                execExport();
+                export = false;
+            }
+
             // コンソールから有効なコマンド入力があるまでループします。
             if (cmd == null || cmd.key == null) {
                 continue;
@@ -186,7 +205,11 @@ public class DebugSupport {
 
         }
 
-        if (currentIndex == this.currentIndex) {
+        if (restartStepNo != null) {
+            ret = current.getTestScript().getIndexByScriptNo(restartStepNo);
+            this.currentIndex = ret;
+            restartStepNo = null;
+        } else if (currentIndex == this.currentIndex) {
             ret = currentIndex + 1;
             this.currentIndex = ret;
         }
@@ -253,6 +276,14 @@ public class DebugSupport {
         LOG.info("empty");
     }
 
+    public void restart(String stepNo) {
+        // TODO stepNoを渡してから再起動するようにする
+        // if (!StringUtils.isEmpty(stepNo)) {
+        // restartStepNo = stepNo;
+        // }
+        setPaused(false);
+    }
+
     public void forward() {
         if (!isPaused())
             return;
@@ -275,6 +306,33 @@ public class DebugSupport {
         if (currentIndex > 0) {
             currentIndex -= 1;
         }
+    }
+
+    public void checkLocator(String locatorStr) {
+        this.locatorStr = locatorStr;
+    }
+
+    public void execCheckLocator(String locatorStr) {
+        LOG.info("empty");
+        LocatorChecker check = appCtx.getBean(LocatorChecker.class);
+
+        Locator locator = Locator.build(locatorStr);
+
+        if (locator.isNa()) {
+            LOG.info("format.valid");
+        } else {
+            check.check(locator);
+        }
+        LOG.info("empty");
+    }
+
+    public void export() {
+        export = true;
+    }
+
+    public void execExport() {
+        TestScriptGenerateTool exporter = appCtx.getBean(TestScriptGenerateTool.class);
+        exporter.generateFromPage();
     }
 
     public void pause() {

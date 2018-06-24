@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.app.test.TestRunner;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
+import org.sitoolkit.wt.domain.debug.LocatorChecker;
+import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
@@ -79,11 +81,11 @@ public class TestService {
         debug.pause();
     }
 
-    public void restart(String sessionId) {
+    public void restart(String sessionId, String stepNo) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
 
         DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.setPaused(false);
+        debug.restart(stepNo);
     }
     
     public void forward(String sessionId) {
@@ -100,6 +102,20 @@ public class TestService {
         debug.back();
     }
 
+    public void export(String sessionId) {
+        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
+        
+        DebugSupport debug = appCtx.getBean(DebugSupport.class);
+        debug.export();
+    }
+    
+    public void checkLocator(String sessionId, String locatorStr) {
+        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
+        
+        DebugSupport debug = appCtx.getBean(DebugSupport.class);
+        debug.checkLocator(locatorStr);
+    }
+    
     public void stopTest(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
         appCtx.close();
