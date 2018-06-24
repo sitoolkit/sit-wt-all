@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.FileTreeController">
-  <TreeView fx:id="fileTree">
+<VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.FileTreeController">
+  <TreeView fx:id="fileTree" prefHeight="1200">
     <contextMenu>
       <ContextMenu fx:id="contextMenu">
         <items>
           <MenuItem mnemonicParsing="false" onAction="#open" text="開く" />
-          <MenuItem fx:id="executeMenuItem" mnemonicParsing="false" onAction="#execute" text="実行"/>
-          <MenuItem fx:id="executeCaseMenuItem" mnemonicParsing="false" onAction="#executeCase" text="ケースを選択して実行"/>
-          <MenuItem fx:id="executeDebugCaseMenuItem" mnemonicParsing="false" onAction="#executeDebugCase" text="ケースを選択してデバッグ"/>
+          <MenuItem fx:id="executeMenuItem" mnemonicParsing="false" onAction="#execute" text="実行" />
+          <MenuItem fx:id="executeCaseMenuItem" mnemonicParsing="false" onAction="#executeCase" text="ケースを選択して実行" />
+          <MenuItem fx:id="executeDebugCaseMenuItem" mnemonicParsing="false" onAction="#executeDebugCase" text="ケースを選択してデバッグ" />
           <Menu text="新規">
-            <MenuItem mnemonicParsing="false" text="スクリプト" onAction="#newScript" />
-            <MenuItem mnemonicParsing="false" text="フォルダー" onAction="#newFolder" />
+            <MenuItem mnemonicParsing="false" onAction="#newScript" text="スクリプト" />
+            <MenuItem mnemonicParsing="false" onAction="#newFolder" text="フォルダー" />
           </Menu>
           <MenuItem mnemonicParsing="false" onAction="#rename" text="名称変更" />
 <!-- 元に戻す機能を実装するまではコメントアウト
@@ -30,4 +28,3 @@
     </contextMenu>
   </TreeView>
 </VBox>
-
