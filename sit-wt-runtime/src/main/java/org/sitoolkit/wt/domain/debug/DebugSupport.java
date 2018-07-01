@@ -206,8 +206,9 @@ public class DebugSupport {
         }
 
         if (restartStepNo != null) {
-            ret = current.getTestScript().getIndexByScriptNo(restartStepNo);
+            ret = current.getTestScript().getIndexByScriptNo(restartStepNo) - 1;
             this.currentIndex = ret;
+            writeStepLog(ret);
             restartStepNo = null;
         } else if (currentIndex == this.currentIndex) {
             ret = currentIndex + 1;
@@ -277,10 +278,10 @@ public class DebugSupport {
     }
 
     public void restart(String stepNo) {
-        // TODO stepNoを渡してから再起動するようにする
-        // if (!StringUtils.isEmpty(stepNo)) {
-        // restartStepNo = stepNo;
-        // }
+        LOG.info("test.restart");
+        if (!StringUtils.isEmpty(stepNo)) {
+            restartStepNo = stepNo;
+        }
         setPaused(false);
     }
 
