@@ -16,6 +16,7 @@
 package org.sitoolkit.wt.domain.operation;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +65,7 @@ public class ExecOperation implements Operation {
             process = pb.start();
             process.waitFor();
             is = process.getInputStream();
-            cmdlog = IOUtils.toString(is);
+            cmdlog = IOUtils.toString(is, Charset.defaultCharset());
             exitValue = process.exitValue();
         } catch (Exception e) {
             throw new TestException(e);

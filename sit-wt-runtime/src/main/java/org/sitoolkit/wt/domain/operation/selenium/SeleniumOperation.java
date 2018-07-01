@@ -21,7 +21,6 @@ import javax.annotation.Resource;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -125,17 +124,6 @@ public abstract class SeleniumOperation implements Operation {
         if (pm.isEdgeDriver()) {
             JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
             jse.executeScript("arguments[0].click();", element);
-
-        } else if (pm.isIeDriver()) {
-            String tag = element.getTagName().toLowerCase();
-            if ("label".equals(tag) || "a".equals(tag)) {
-                JavascriptExecutor jse = (JavascriptExecutor) seleniumDriver;
-                jse.executeScript("arguments[0].click();", element);
-            } else if ("a".equals(tag)) {
-                element.sendKeys(Keys.ENTER);
-            } else {
-                element.sendKeys(Keys.SPACE);
-            }
 
         } else {
             element.click();

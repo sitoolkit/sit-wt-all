@@ -4,6 +4,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.XpiDriverService;
 import org.sitoolkit.wt.domain.guidance.GuidanceUtils;
 import org.sitoolkit.wt.infra.MultiThreadUtils;
 import org.sitoolkit.wt.infra.firefox.FirefoxManager;
@@ -47,8 +48,8 @@ public class FirefoxOpener {
 
             LOG.info("firefox.start", ffBinary);
 
-            WebDriver driver = MultiThreadUtils
-                    .submitWithProgress(() -> new FirefoxDriver(ffBinary, profile));
+            WebDriver driver = MultiThreadUtils.submitWithProgress(() -> new FirefoxDriver(
+                    XpiDriverService.builder().withBinary(ffBinary).withProfile(profile).build()));
 
             String baseUrl = System.getProperty("baseUrl");
             driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));

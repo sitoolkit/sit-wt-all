@@ -30,11 +30,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
 import org.sitoolkit.wt.domain.tester.TestEventListener;
 import org.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import org.sitoolkit.wt.infra.PropertyManager;
@@ -101,28 +104,32 @@ public class WebDriverConfig {
                 options.put("prefs", prefs);
                 capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
-                webDriver = new ChromeDriver(capabilities);
+                ChromeOptions chromeOptions = new ChromeOptions().merge(capabilities);
+                webDriver = new ChromeDriver(chromeOptions);
                 break;
 
             case "ie":
             case "internet explorer":
                 webDriverInstaller.installIeDriver();
-                webDriver = new InternetExplorerDriver(capabilities);
+                InternetExplorerOptions ieOptions = new InternetExplorerOptions(capabilities);
+                webDriver = new InternetExplorerDriver(ieOptions);
                 break;
 
             case "edge":
                 webDriverInstaller.installEdgeDriver();
-                webDriver = new EdgeDriver(capabilities);
+                EdgeOptions edgeOptions = new EdgeOptions().merge(capabilities);
+                webDriver = new EdgeDriver(edgeOptions);
                 break;
 
             case "safari":
+                SafariOptions safariOptions = new SafariOptions(capabilities);
                 try {
-                    webDriver = new SafariDriver(capabilities);
+                    webDriver = new SafariDriver(safariOptions);
                 } catch (UnreachableBrowserException e) {
                     if (StringUtils.startsWith(e.getMessage(),
                             "Failed to connect to SafariDriver")) {
                         webDriverInstaller.installSafariDriver();
-                        webDriver = new SafariDriver(capabilities);
+                        webDriver = new SafariDriver(safariOptions);
                     }
                 }
                 break;
@@ -147,7 +154,7 @@ public class WebDriverConfig {
                 // geckodriver is not stable yet as of 2016/10
                 // so we doesn't support neigther selenium 3 nor firefox 48.x
                 // higher
-                // webDriverInstaller.installGeckoDriver();
+                webDriverInstaller.installGeckoDriver();
 
                 webDriver = firefoxManager.startWebDriver(capabilities);
         }

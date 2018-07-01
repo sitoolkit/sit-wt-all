@@ -42,7 +42,7 @@ public abstract class ScreenshotTaker {
 
         String driverType = StringUtils.defaultString(pm.getDriverType());
 
-        if ("chrome".equals(driverType)) {
+        if ("chrome".equals(driverType) && !ScreenshotTiming.ON_DIALOG.equals(timing)) {
             return getChromeScreenshot(timing);
         } else {
             return getFireFoxScreenShot(timing);
@@ -112,8 +112,7 @@ public abstract class ScreenshotTaker {
 
                     if (windowHeight < pageHeight) {
                         drawPosY = (scrollHeight + windowHeight >= pageHeight)
-                                ? pageHeight - windowHeight
-                                : scrollPosY;
+                                ? pageHeight - windowHeight : scrollPosY;
                     }
 
                     int scrollWidth = 0;
@@ -125,8 +124,7 @@ public abstract class ScreenshotTaker {
 
                         if (windowWidth < pageWidth) {
                             drawPosX = (scrollWidth + windowWidth >= pageWidth)
-                                    ? pageWidth - windowWidth
-                                    : scrollPosX;
+                                    ? pageWidth - windowWidth : scrollPosX;
                         }
                         executor.executeScript(
                                 "window.scrollTo(" + scrollPosX + ", " + scrollPosY + ");");

@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.sitoolkit.wt.infra.MultiThreadUtils;
 import org.sitoolkit.wt.infra.SitRepository;
@@ -24,8 +24,12 @@ public class FirefoxManager {
     private static final SitLogger LOG = SitLoggerFactory.getLogger(FirefoxManager.class);
 
     public FirefoxDriver startWebDriver(DesiredCapabilities capabilities) {
-        return MultiThreadUtils.submitWithProgress(
-                () -> new FirefoxDriver(getFirefoxBinary(), new FirefoxProfile(), capabilities));
+        return MultiThreadUtils.submitWithProgress(() -> {
+            FirefoxOptions options = new FirefoxOptions(capabilities);
+            options.setBinary(getFirefoxBinary());
+            return new FirefoxDriver(options);
+        });
+
     }
 
     public FirefoxBinary getFirefoxBinary() {
@@ -108,7 +112,7 @@ public class FirefoxManager {
     }
 
     protected void installFirefoxWindows(File repo) {
-        File ffInstaller = new File(repo, "Firefox Setup 47.0.1.exe");
+        File ffInstaller = new File(repo, "Firefox Setup 60.0.2.exe");
 
         if (ffInstaller.exists()) {
             LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
@@ -118,7 +122,7 @@ public class FirefoxManager {
 
                 // TODO 外部化
                 URL url = new URL(
-                        "https://ftp.mozilla.org/pub/firefox/releases/47.0.1/win64/ja/Firefox%20Setup%2047.0.1.exe");
+                        "https://ftp.mozilla.org/pub/firefox/releases/60.0.2/win64/ja/Firefox%20Setup%2060.0.2.exe");
 
                 LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
 
@@ -158,7 +162,7 @@ public class FirefoxManager {
 
     protected void installFirefoxMacOs(File repo) {
 
-        File ffInstaller = new File(repo, "Firefox 47.0.1.dmg");
+        File ffInstaller = new File(repo, "Firefox 60.0.2.dmg");
 
         if (ffInstaller.exists()) {
             LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
@@ -168,7 +172,7 @@ public class FirefoxManager {
 
                 // TODO 外部化
                 URL url = new URL(
-                        "https://ftp.mozilla.org/pub/firefox/releases/47.0.1/mac/ja-JP-mac/Firefox%2047.0.1.dmg");
+                        "https://ftp.mozilla.org/pub/firefox/releases/60.0.2/mac/ja-JP-mac/Firefox%2060.0.2.dmg");
 
                 LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
 

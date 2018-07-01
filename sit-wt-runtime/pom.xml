@@ -149,6 +149,16 @@
       <artifactId>sit-wt-util</artifactId>
       <version>3.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>5.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-commons</artifactId>
+      <version>5.0.2</version>
+    </dependency>
   </dependencies>
   <parent>
     <groupId>org.sitoolkit.wt</groupId>
@@ -159,8 +169,8 @@
   <properties>
     <spring.version>4.2.6.RELEASE</spring.version>
     <slf4j.version>1.7.21</slf4j.version>
-    <selenium.version>2.53.1</selenium.version>
-    <appium.version>3.4.1</appium.version>
+    <selenium.version>3.12.0</selenium.version>
+    <appium.version>6.0.0</appium.version>
     <checkstyle.skip>false</checkstyle.skip>
     <trimStackTrace>false</trimStackTrace>
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
