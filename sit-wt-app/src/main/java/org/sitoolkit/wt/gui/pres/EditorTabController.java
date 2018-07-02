@@ -10,6 +10,7 @@ import org.sitoolkit.wt.gui.pres.editor.TestScriptEditor;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
@@ -39,15 +40,24 @@ public class EditorTabController implements FileOpenable {
 
     @Override
     public void open(File file) {
-        TestScript testScript = scriptService.read(file);
-        Tab tab = new Tab(file.getName());
-        SpreadsheetView spreadSheet = testScriptEditor.buildSpreadsheet(testScript);
-        tab.setContent(spreadSheet);
+        Optional<Tab> scriptTab = tabs.getTabs().stream()
+                .filter(tab -> tab.getTooltip().getText().equals(file.getAbsolutePath())).findFirst();
 
-        Tooltip tooltip = new Tooltip();
-        tooltip.setText(file.getAbsolutePath());
-        tab.setTooltip(tooltip);
-        tabs.getTabs().add(tab);
+        if (scriptTab.isPresent()) {
+            SingleSelectionModel<Tab> selectionModel = tabs.getSelectionModel();
+            selectionModel.select(scriptTab.get());
+
+        } else {
+            TestScript testScript = scriptService.read(file);
+            Tab tab = new Tab(file.getName());
+            SpreadsheetView spreadSheet = testScriptEditor.buildSpreadsheet(testScript);
+            tab.setContent(spreadSheet);
+
+            Tooltip tooltip = new Tooltip();
+            tooltip.setText(file.getAbsolutePath());
+            tab.setTooltip(tooltip);
+            tabs.getTabs().add(tab);
+        }
     }
 
     public void save() {

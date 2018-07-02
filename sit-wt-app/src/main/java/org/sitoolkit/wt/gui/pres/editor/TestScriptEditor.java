@@ -29,8 +29,10 @@ public class TestScriptEditor {
 
         ObservableList<SpreadsheetCell> headerCells = FXCollections.observableArrayList();
         testScript.getHeaders().forEach(header -> {
-            headerCells.add(SpreadsheetCellType.STRING.createCell(rows.size(), headerCells.size(),
-                    1, 1, header));
+            SpreadsheetCell headerCell = SpreadsheetCellType.STRING.createCell(rows.size(),
+                    headerCells.size(), 1, 1, header);
+            headerCell.setEditable(false);
+            headerCells.add(headerCell);
         });
         rows.add(headerCells);
 
