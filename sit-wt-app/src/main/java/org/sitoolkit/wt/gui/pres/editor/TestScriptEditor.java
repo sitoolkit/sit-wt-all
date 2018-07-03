@@ -1,12 +1,15 @@
 package org.sitoolkit.wt.gui.pres.editor;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.Grid;
@@ -20,6 +23,9 @@ import org.sitoolkit.wt.domain.testscript.TestStep;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 public class TestScriptEditor {
 
@@ -69,6 +75,19 @@ public class TestScriptEditor {
         spreadSheet.setShowRowHeader(false);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
 
+        ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
+        spreadSheet.getContextMenu().getItems().addAll(menuItems);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/TestScriptEditorMenu.fxml"));
+        try {
+            ContextMenu menu = loader.load();
+            menuItems = menu.getItems();
+            TestScriptEditorController controller = loader.getController();
+            controller.setView(spreadSheet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        spreadSheet.getContextMenu().getItems().addAll(menuItems);
+
         return spreadSheet;
     }
 
@@ -108,4 +127,55 @@ public class TestScriptEditor {
         testScript.setTestStepList(testStepList);
         return testScript;
     }
+
+    public int getTestCaseCount(SpreadsheetView spreadSheet) {
+        return spreadSheet.getGrid().getColumnCount() -8;
+    }
+
+    public int getTestStepCount(SpreadsheetView spreadSheet) {
+        return spreadSheet.getGrid().getRowCount() -1;
+    }
+
+    public void addTestCase(SpreadsheetView spreadSheet, Optional<String> testCaseName) {
+
+        //FIXME 画面に追加されたテストケースがファイルに保存されない。原因不明。
+        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
+        IntStream.range(0, rows.size()).forEach(i -> {
+            String value = "";
+            if (i == 0) {
+                value = testCaseName.orElse("");
+            }
+            ObservableList<SpreadsheetCell> cells = rows.get(i);
+            cells.add(SpreadsheetCellType.STRING.createCell(i, cells.size(), 1, 1, value));
+        });
+
+        Grid newGrid = new GridBase(10, 10);
+        newGrid.setRows(rows);
+        spreadSheet.setGrid(newGrid);
+    }
+
+    public void addTestStep(SpreadsheetView spreadSheet) {
+
+        Grid grid = spreadSheet.getGrid();
+        int columnCount = grid.getColumnCount();
+
+        ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
+
+        ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
+
+        //TODO 自動的に入れる項目番号の仕様確認 ステップ数＋１ではなく ステップ番号の最大＋１が良いと思われる
+        cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), 0, 1, 1,
+                String.valueOf(getTestStepCount(spreadSheet) + 1)));
+
+        for (int i = 1; i < columnCount; i++) {
+            cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), i, 1, 1, ""));
+        }
+        rows.add(cells);
+
+        Grid newGrid = new GridBase(10, 10);
+        newGrid.setRows(rows);
+        spreadSheet.setGrid(newGrid);
+
+    }
+
 }
