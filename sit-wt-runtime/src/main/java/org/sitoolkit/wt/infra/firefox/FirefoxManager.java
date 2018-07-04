@@ -1,8 +1,13 @@
 package org.sitoolkit.wt.infra.firefox;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -11,6 +16,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.sitoolkit.wt.infra.MultiThreadUtils;
+import org.sitoolkit.wt.infra.PropertyUtils;
 import org.sitoolkit.wt.infra.SitRepository;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
@@ -22,6 +28,29 @@ import org.zeroturnaround.zip.ZipUtil;
 public class FirefoxManager {
 
     private static final SitLogger LOG = SitLoggerFactory.getLogger(FirefoxManager.class);
+
+    private String firefoxVersion;
+    private String winFirefoxDownloadUrl;
+    private String winFirefoxInstallFile;
+    private String macFirefoxDownloadUrl;
+    private String macFirefoxInstallFile;
+    private String seleniumIdeUrl;
+    private String seleniumIdeXpi;
+
+    @PostConstruct
+    public void init() {
+        Map<String, String> prop = PropertyUtils.loadAsMap("/firefoxinstaller-default.properties",
+                false);
+        prop.putAll(PropertyUtils.loadAsMap("/firefoxinstaller.properties", true));
+
+        firefoxVersion = prop.get("firefox.version");
+        winFirefoxDownloadUrl = prop.get("win.firefox.downloadUrl");
+        winFirefoxInstallFile = prop.get("win.firefox.installFile");
+        macFirefoxDownloadUrl = prop.get("mac.firefox.downloadUrl");
+        macFirefoxInstallFile = prop.get("mac.firefox.installFile");
+        seleniumIdeUrl = prop.get("seleniumIde.url");
+        seleniumIdeXpi = prop.get("seleniumIde.xpi");
+    }
 
     public FirefoxDriver startWebDriver(DesiredCapabilities capabilities) {
         return MultiThreadUtils.submitWithProgress(() -> {
@@ -37,7 +66,13 @@ public class FirefoxManager {
 
         if (ffBinaryFile.exists()) {
 
-            LOG.info("firefox.exist", ffBinaryFile.getAbsolutePath());
+            if (firefoxVersion.equals(getFirefoxVersion())) {
+                LOG.info("firefox.exist", ffBinaryFile.getAbsolutePath());
+
+            } else {
+                uninstallFirefox();
+                installFirefox();
+            }
 
         } else {
 
@@ -56,7 +91,7 @@ public class FirefoxManager {
             repo.mkdirs();
         }
 
-        File xpi = new File(repo, "selenium_ide-2.9.1-fx.xpi");
+        File xpi = new File(repo, seleniumIdeXpi);
 
         if (xpi.exists()) {
             LOG.info("selenium.exist", xpi.getAbsolutePath());
@@ -65,9 +100,7 @@ public class FirefoxManager {
             try {
                 ProxySettingService.getInstance().loadProxy();
 
-                // TODO 外部化
-                URL xpiUrl = new URL(
-                        "https://addons.mozilla.org/firefox/downloads/latest/selenium-ide/addon-2079-latest.xpi?src=dp-btn-primary");
+                URL xpiUrl = new URL(seleniumIdeUrl);
 
                 LOG.info("selenium.download", xpiUrl, xpi.getAbsolutePath());
 
@@ -112,7 +145,7 @@ public class FirefoxManager {
     }
 
     protected void installFirefoxWindows(File repo) {
-        File ffInstaller = new File(repo, "Firefox Setup 60.0.2.exe");
+        File ffInstaller = new File(repo, winFirefoxInstallFile);
 
         if (ffInstaller.exists()) {
             LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
@@ -120,9 +153,7 @@ public class FirefoxManager {
             try {
                 ProxySettingService.getInstance().loadProxy();
 
-                // TODO 外部化
-                URL url = new URL(
-                        "https://ftp.mozilla.org/pub/firefox/releases/60.0.2/win64/ja/Firefox%20Setup%2060.0.2.exe");
+                URL url = new URL(winFirefoxDownloadUrl);
 
                 LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
 
@@ -162,7 +193,7 @@ public class FirefoxManager {
 
     protected void installFirefoxMacOs(File repo) {
 
-        File ffInstaller = new File(repo, "Firefox 60.0.2.dmg");
+        File ffInstaller = new File(repo, macFirefoxInstallFile);
 
         if (ffInstaller.exists()) {
             LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
@@ -170,9 +201,7 @@ public class FirefoxManager {
             try {
                 ProxySettingService.getInstance().loadProxy();
 
-                // TODO 外部化
-                URL url = new URL(
-                        "https://ftp.mozilla.org/pub/firefox/releases/60.0.2/mac/ja-JP-mac/Firefox%2060.0.2.dmg");
+                URL url = new URL(macFirefoxDownloadUrl);
 
                 LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
 
@@ -209,6 +238,59 @@ public class FirefoxManager {
 
         LOG.info("firefox.unmount");
         ProcessUtils.execute("hdiutil", "detach", "/Volumes/Firefox");
+
+    }
+
+    protected String getFirefoxVersion() {
+        try {
+            Properties ffProp = new Properties();
+            File firefoxIni = getFirefoxIni();
+            ffProp.load(new FileInputStream(firefoxIni));
+            return ffProp.getProperty("Version");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected File getFirefoxIni() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new File(SitRepository.getRepositoryPath(), "firefox/runtime/application.ini");
+        } else if (SystemUtils.IS_OS_MAC) {
+            return new File(SitRepository.getRepositoryPath(),
+                    "firefox/runtime/Firefox.app/Contents/MacOS/application.ini");
+        } else {
+            throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
+        }
+    }
+
+    protected void uninstallFirefox() {
+        LOG.info("firefox.uninstall");
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            uninstallFirefoxWindows();
+        } else if (SystemUtils.IS_OS_MAC) {
+            uninstallFirefoxMacOs();
+        } else {
+            throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
+        }
+    }
+
+    protected void uninstallFirefoxWindows() {
+        File ffUninstaller = new File(SitRepository.getRepositoryPath(),
+                "firefox/runtime/uninstall/helper.exe");
+        MultiThreadUtils.submitWithProgress(() -> {
+            ProcessUtils.execute(ffUninstaller.getAbsolutePath(), "-ms");
+            return 0;
+        });
+    }
+
+    protected void uninstallFirefoxMacOs() {
+        File ffRuntime = new File(SitRepository.getRepositoryPath(), "firefox/runtime");
+        MultiThreadUtils.submitWithProgress(() -> {
+            ProcessUtils.execute("rm", "-f", ffRuntime.getAbsolutePath());
+            return 0;
+        });
 
     }
 
