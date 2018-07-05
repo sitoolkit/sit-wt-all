@@ -1,34 +1,25 @@
 package org.sitoolkit.wt.gui.pres.editor;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.event.ActionEvent;
 
-public class TestScriptEditorController implements Initializable {
+public class TestScriptEditorController{
 
-    TestScriptEditor testScriptEditor = new TestScriptEditor();
-    SpreadsheetView spreadSheet;
+    final TestScriptEditor testScriptEditor;
+    final SpreadsheetView spreadSheet;
 
-    @FXML
-    public void newTestCase() {
+    public TestScriptEditorController(TestScriptEditor testScriptEditor, SpreadsheetView spreadSheet) {
+        this.testScriptEditor = testScriptEditor;
+        this.spreadSheet = spreadSheet;
+    }
+
+    public void newTestCase(ActionEvent e) {
         testScriptEditor.addTestCase(spreadSheet);
     }
 
-    @FXML
-    public void newTestStep() {
+    public void newTestStep(ActionEvent e) {
         testScriptEditor.addTestStep(spreadSheet);
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-    }
-
-    public void setView(SpreadsheetView spreadSheet) {
-        this.spreadSheet = spreadSheet;
     }
 
 }

@@ -1,7 +1,6 @@
 package org.sitoolkit.wt.gui.pres.editor;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,8 +22,7 @@ import org.sitoolkit.wt.domain.testscript.TestStep;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
 public class TestScriptEditor {
@@ -75,18 +73,8 @@ public class TestScriptEditor {
         spreadSheet.setShowRowHeader(false);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
 
-        ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
-        spreadSheet.getContextMenu().getItems().addAll(menuItems);
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/TestScriptEditorMenu.fxml"));
-        try {
-            ContextMenu menu = loader.load();
-            menuItems = menu.getItems();
-            TestScriptEditorController controller = loader.getController();
-            controller.setView(spreadSheet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        spreadSheet.getContextMenu().getItems().addAll(menuItems);
+        TestScriptEditorController controller = new TestScriptEditorController(this, spreadSheet);
+        spreadSheet.getContextMenu().getItems().addAll(createMenuItems(controller));
 
         return spreadSheet;
     }
@@ -163,4 +151,24 @@ public class TestScriptEditor {
 
     }
 
+
+    private ObservableList<MenuItem> createMenuItems(TestScriptEditorController controller) {
+        ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
+
+        Menu menu = new Menu("新規");
+
+        MenuItem item;
+        item = new MenuItem("テストケース");
+        item.setMnemonicParsing(false);
+        item.setOnAction(e -> controller.newTestCase(e));
+        menu.getItems().add(item);
+
+        item = new MenuItem("テスト項目");
+        item.setMnemonicParsing(false);
+        item.setOnAction(e -> controller.newTestStep(e));
+        menu.getItems().add(item);
+        menuItems.add(menu);
+
+        return menuItems;
+    }
 }
