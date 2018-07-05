@@ -144,13 +144,7 @@ public class TestScriptEditor {
             cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), i, 1, 1, ""));
         }
         rows.add(cells);
-
-        Grid newGrid = new GridBase(10, 10);
-        newGrid.setRows(rows);
-        spreadSheet.setGrid(newGrid);
-
     }
-
 
     private ObservableList<MenuItem> createMenuItems(TestScriptEditorController controller) {
         ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
