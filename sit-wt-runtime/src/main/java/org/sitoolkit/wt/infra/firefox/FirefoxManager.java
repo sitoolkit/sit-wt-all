@@ -1,9 +1,13 @@
 package org.sitoolkit.wt.infra.firefox;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.Properties;
 
@@ -62,12 +66,12 @@ public class FirefoxManager {
     }
 
     public FirefoxBinary getFirefoxBinary() {
-        File ffBinaryFile = getFirefoxBinaryFile();
+        Path ffBinaryFile = getFirefoxBinaryFile();
 
-        if (ffBinaryFile.exists()) {
+        if (Files.exists(ffBinaryFile)) {
 
             if (firefoxVersion.equals(getFirefoxVersion())) {
-                LOG.info("firefox.exist", ffBinaryFile.getAbsolutePath());
+                LOG.info("firefox.exist", ffBinaryFile.toString());
 
             } else {
                 uninstallFirefox();
@@ -81,20 +85,24 @@ public class FirefoxManager {
 
         }
 
-        return new FirefoxBinary(ffBinaryFile);
+        return new FirefoxBinary(ffBinaryFile.toFile());
     }
 
-    public File getSeleniumIdeUnarchivedDir() {
-        File repo = new File(SitRepository.getRepositoryPath(), "selenium/ide");
+    public Path getSeleniumIdeUnarchivedDir() {
+        Path repo = Paths.get(SitRepository.getRepositoryPath(), "selenium/ide");
 
-        if (!repo.exists()) {
-            repo.mkdirs();
+        if (!Files.exists(repo)) {
+            try {
+                Files.createDirectories(repo);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        File xpi = new File(repo, seleniumIdeXpi);
+        Path xpi = Paths.get(repo.toString(), seleniumIdeXpi);
 
-        if (xpi.exists()) {
-            LOG.info("selenium.exist", xpi.getAbsolutePath());
+        if (Files.exists(xpi)) {
+            LOG.info("selenium.exist", xpi.toString());
         } else {
 
             try {
@@ -102,10 +110,10 @@ public class FirefoxManager {
 
                 URL xpiUrl = new URL(seleniumIdeUrl);
 
-                LOG.info("selenium.download", xpiUrl, xpi.getAbsolutePath());
+                LOG.info("selenium.download", xpiUrl, xpi.toString());
 
-                FileUtils.copyURLToFile(xpiUrl, xpi);
-                ZipUtil.unpack(xpi, repo);
+                FileUtils.copyURLToFile(xpiUrl, xpi.toFile());
+                ZipUtil.unpack(xpi.toFile(), repo.toFile());
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -117,11 +125,11 @@ public class FirefoxManager {
         return repo;
     }
 
-    protected File getFirefoxBinaryFile() {
+    protected Path getFirefoxBinaryFile() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            return new File(SitRepository.getRepositoryPath(), "firefox/runtime/firefox.exe");
+            return Paths.get(SitRepository.getRepositoryPath(), "firefox/runtime/firefox.exe");
         } else if (SystemUtils.IS_OS_MAC) {
-            return new File(SitRepository.getRepositoryPath(),
+            return Paths.get(SitRepository.getRepositoryPath(),
                     "firefox/runtime/Firefox.app/Contents/MacOS/firefox-bin");
         } else {
             throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
@@ -129,10 +137,14 @@ public class FirefoxManager {
     }
 
     protected void installFirefox() {
-        File repo = new File(SitRepository.getRepositoryPath(), "firefox");
+        Path repo = Paths.get(SitRepository.getRepositoryPath(), "firefox");
 
-        if (!repo.exists()) {
-            repo.mkdir();
+        if (!Files.exists(repo)) {
+            try {
+                Files.createDirectories(repo);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -144,21 +156,21 @@ public class FirefoxManager {
         }
     }
 
-    protected void installFirefoxWindows(File repo) {
-        File ffInstaller = new File(repo, winFirefoxInstallFile);
+    protected void installFirefoxWindows(Path repo) {
+        Path ffInstaller = Paths.get(repo.toString(), winFirefoxInstallFile);
 
-        if (ffInstaller.exists()) {
-            LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
+        if (Files.exists(ffInstaller)) {
+            LOG.info("ffInstaller.exists", ffInstaller.toString());
         } else {
             try {
                 ProxySettingService.getInstance().loadProxy();
 
                 URL url = new URL(winFirefoxDownloadUrl);
 
-                LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
+                LOG.info("firefox.download", url, ffInstaller.toString());
 
                 MultiThreadUtils.submitWithProgress(() -> {
-                    FileUtils.copyURLToFile(url, ffInstaller);
+                    FileUtils.copyURLToFile(url, ffInstaller.toFile());
                     return 0;
                 });
 
@@ -174,40 +186,43 @@ public class FirefoxManager {
         LOG.info("firefox.install");
 
         try {
-            File iniFile = File.createTempFile("ff-inst", ".ini");
-            iniFile.deleteOnExit();
+            Path iniFile = Files.createTempFile("ff-inst", ".ini");
 
-            FileUtils.copyInputStreamToFile(ClassLoader.getSystemResourceAsStream("ff-inst.ini"),
-                    iniFile);
+            try (OutputStream iniOutStream = Files.newOutputStream(iniFile,
+                    StandardOpenOption.DELETE_ON_CLOSE)) {
+                Files.copy(Paths.get(ClassLoader.getSystemResource("ff-inst.ini").toURI()),
+                        iniOutStream);
+                iniOutStream.flush();
 
-            MultiThreadUtils.submitWithProgress(() -> {
-                ProcessUtils.execute(ffInstaller.getAbsolutePath(),
-                        "/INI=" + iniFile.getAbsolutePath());
-                return 0;
-            });
+                MultiThreadUtils.submitWithProgress(() -> {
+                    ProcessUtils.execute(ffInstaller.toString(), "/INI=" + iniFile.toString());
+                    return 0;
+                });
+            } catch (Exception e) {
+                throw new RuntimeException("firefox.install.exception", e);
+            }
         } catch (IOException e) {
             throw new RuntimeException("firefox.install.exception", e);
         }
 
     }
 
-    protected void installFirefoxMacOs(File repo) {
+    protected void installFirefoxMacOs(Path repo) {
+        Path ffInstaller = Paths.get(repo.toString(), macFirefoxInstallFile);
 
-        File ffInstaller = new File(repo, macFirefoxInstallFile);
-
-        if (ffInstaller.exists()) {
-            LOG.info("ffInstaller.exists", ffInstaller.getAbsolutePath());
+        if (Files.exists(ffInstaller)) {
+            LOG.info("ffInstaller.exists", ffInstaller.toString());
         } else {
             try {
                 ProxySettingService.getInstance().loadProxy();
 
                 URL url = new URL(macFirefoxDownloadUrl);
 
-                LOG.info("firefox.download", url, ffInstaller.getAbsolutePath());
+                LOG.info("firefox.download", url, ffInstaller.toString());
 
-                FileUtils.copyURLToFile(url, ffInstaller);
+                FileUtils.copyURLToFile(url, ffInstaller.toFile());
 
-                ProcessUtils.execute("chmod", "777", ffInstaller.getAbsolutePath());
+                ProcessUtils.execute("chmod", "777", ffInstaller.toString());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (Exception exp) {
@@ -216,22 +231,21 @@ public class FirefoxManager {
         }
 
         LOG.info("firefox.mount");
-        ProcessUtils.execute("hdiutil", "attach", ffInstaller.getAbsolutePath());
+        ProcessUtils.execute("hdiutil", "attach", ffInstaller.toString());
 
-        File mountedFf = new File("/Volumes/Firefox/Firefox.app");
-        File ffRuntime = new File(repo, "runtime");
+        Path mountedFf = Paths.get("/Volumes/Firefox/Firefox.app");
+        Path ffRuntime = Paths.get(repo.toString(), "runtime");
 
-        LOG.info("firefox.install2", ffRuntime.getAbsolutePath());
+        LOG.info("firefox.install2", ffRuntime.toString());
         // たまにcp -Rコマンドが失敗してFirefox.appがコピーされないので3回リトライ
         for (int i = 0; i < 3; i++) {
 
             MultiThreadUtils.submitWithProgress(() -> {
-                ProcessUtils.execute("cp", "-R", mountedFf.getAbsolutePath(),
-                        ffRuntime.getAbsolutePath());
+                ProcessUtils.execute("cp", "-R", mountedFf.toString(), ffRuntime.toString());
                 return 0;
             });
 
-            if (new File(ffRuntime, "Firefox.app").exists()) {
+            if (Files.exists(Paths.get(ffRuntime.toString(), "Firefox.app"))) {
                 break;
             }
         }
@@ -242,10 +256,11 @@ public class FirefoxManager {
     }
 
     protected String getFirefoxVersion() {
-        try {
-            Properties ffProp = new Properties();
-            File firefoxIni = getFirefoxIni();
-            ffProp.load(new FileInputStream(firefoxIni));
+        Properties ffProp = new Properties();
+        Path firefoxIni = getFirefoxIni();
+
+        try (InputStream iniInStream = Files.newInputStream(firefoxIni)) {
+            ffProp.load(iniInStream);
             return ffProp.getProperty("Version");
 
         } catch (IOException e) {
@@ -253,11 +268,11 @@ public class FirefoxManager {
         }
     }
 
-    protected File getFirefoxIni() {
+    protected Path getFirefoxIni() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            return new File(SitRepository.getRepositoryPath(), "firefox/runtime/application.ini");
+            return Paths.get(SitRepository.getRepositoryPath(), "firefox/runtime/application.ini");
         } else if (SystemUtils.IS_OS_MAC) {
-            return new File(SitRepository.getRepositoryPath(),
+            return Paths.get(SitRepository.getRepositoryPath(),
                     "firefox/runtime/Firefox.app/Contents/MacOS/application.ini");
         } else {
             throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
@@ -277,18 +292,18 @@ public class FirefoxManager {
     }
 
     protected void uninstallFirefoxWindows() {
-        File ffUninstaller = new File(SitRepository.getRepositoryPath(),
+        Path ffUninstaller = Paths.get(SitRepository.getRepositoryPath(),
                 "firefox/runtime/uninstall/helper.exe");
         MultiThreadUtils.submitWithProgress(() -> {
-            ProcessUtils.execute(ffUninstaller.getAbsolutePath(), "-ms");
+            ProcessUtils.execute(ffUninstaller.toString(), "-ms");
             return 0;
         });
     }
 
     protected void uninstallFirefoxMacOs() {
-        File ffRuntime = new File(SitRepository.getRepositoryPath(), "firefox/runtime");
+        Path ffRuntime = Paths.get(SitRepository.getRepositoryPath(), "firefox/runtime");
         MultiThreadUtils.submitWithProgress(() -> {
-            ProcessUtils.execute("rm", "-f", ffRuntime.getAbsolutePath());
+            ProcessUtils.execute("rm", "-f", ffRuntime.toString());
             return 0;
         });
 

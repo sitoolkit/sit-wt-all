@@ -42,7 +42,7 @@ public class FirefoxOpener {
             GuidanceUtils.retrieve(guidanceResources);
 
             FirefoxProfile profile = new FirefoxProfile();
-            profile.addExtension(ffManager.getSeleniumIdeUnarchivedDir());
+            profile.addExtension(ffManager.getSeleniumIdeUnarchivedDir().toFile());
 
             FirefoxBinary ffBinary = ffManager.getFirefoxBinary();
 
