@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.app.test.TestRunner;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
-import org.sitoolkit.wt.domain.debug.LocatorChecker;
-import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
@@ -75,45 +73,27 @@ public class TestService {
     }
 
     public void pause(String sessionId) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.pause();
+        getDebugSupport(sessionId).pause();
     }
 
     public void restart(String sessionId, String stepNo) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.restart(stepNo);
+        getDebugSupport(sessionId).restart(stepNo);
     }
     
     public void forward(String sessionId) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-  
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.forward();
+        getDebugSupport(sessionId).forward();
     }
     
     public void back(String sessionId) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-  
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.back();
+        getDebugSupport(sessionId).back();
     }
 
     public void export(String sessionId) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-        
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.export();
+        getDebugSupport(sessionId).export();
     }
     
     public void checkLocator(String sessionId, String locatorStr) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-        
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.checkLocator(locatorStr);
+        getDebugSupport(sessionId).checkLocator(locatorStr);
     }
     
     public void stopTest(String sessionId) {
@@ -124,6 +104,11 @@ public class TestService {
 
     public void destroy() {
         ctxMap.values().stream().forEach(ConfigurableApplicationContext::close);
+    }
+    
+    private DebugSupport getDebugSupport(String sessionId) {
+        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
+        return appCtx.getBean(DebugSupport.class);
     }
 
     @Deprecated
