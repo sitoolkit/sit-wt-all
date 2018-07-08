@@ -24,9 +24,7 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.WebDriver;
 import org.sitoolkit.wt.domain.tester.TestContext;
-import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -57,9 +55,6 @@ public class DebugSupport {
     @Resource
     PropertyManager pm;
 
-    @Resource
-    WebDriver seleniumDriver;
-
     /**
      * ポーズ中にスレッドをsleepする間隔(ミリ秒)
      */
@@ -72,12 +67,6 @@ public class DebugSupport {
     private boolean paused = false;
 
     private Boolean debug;
-
-    // TODO スレッド間で共有する変数について実装方法検討
-    private int currentIndex;
-    private String restartStepNo;
-    private boolean export = false;
-    private String locatorStr;
 
     /**
      * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき {@code TestStep}
@@ -144,6 +133,10 @@ public class DebugSupport {
      */
     protected int getNextIndex(final int currentIndex) {
 
+        if (!isPaused()) {
+            return currentIndex + 1;
+        }
+
         int ret = currentIndex;
 
         while (isPaused()) {
@@ -158,21 +151,6 @@ public class DebugSupport {
                 LOG.info("script.file.changed");
                 current.setTestScript(
                         dao.load(testScript.getScriptFile(), testScript.getSheetName(), false));
-            }
-
-            if (ret != this.currentIndex) {
-                ret = this.currentIndex;
-                writeStepLog(ret);
-            }
-
-            if (locatorStr != null) {
-                execCheckLocator(locatorStr);
-                locatorStr = null;
-            }
-
-            if (export) {
-                execExport();
-                export = false;
             }
 
             // コンソールから有効なコマンド入力があるまでループします。
@@ -192,7 +170,18 @@ public class DebugSupport {
                     break;
                 }
 
-                writeStepLog(ret);
+                LOG.info("empty");
+                LOG.info("test.step.next.prev");
+                for (int i = ret - 1; i <= ret + 1; i++) {
+                    TestStep nextStep = current.getTestScript().getTestStep(i);
+                    if (nextStep == null) {
+                        continue;
+                    }
+                    String nextMark = i == ret + 1 ? " <- 次に実行" : "";
+                    LOG.info("test.step.next", new Object[] { nextStep.getNo(),
+                            nextStep.getItemName(), nextStep.getLocator(), nextMark });
+                }
+                LOG.info("empty");
             }
 
             //
@@ -203,16 +192,6 @@ public class DebugSupport {
                 cmd = null;
             }
 
-        }
-
-        if (restartStepNo != null) {
-            ret = current.getTestScript().getIndexByScriptNo(restartStepNo) - 1;
-            this.currentIndex = ret;
-            writeStepLog(ret);
-            restartStepNo = null;
-        } else if (currentIndex == this.currentIndex) {
-            ret = currentIndex + 1;
-            this.currentIndex = ret;
         }
 
         return ret;
@@ -256,84 +235,36 @@ public class DebugSupport {
         });
     }
 
-    /**
-     * 指定されたステップとその前後のステップの情報をコンソールに出力します。
-     * 
-     * @param step
-     *            現在のステップのインデックス
-     */
-    protected void writeStepLog(int step) {
-        LOG.info("empty");
-        LOG.info("test.step.next.prev");
-        for (int i = step - 1; i <= step + 1; i++) {
-            TestStep nextStep = current.getTestScript().getTestStep(i);
-            if (nextStep == null) {
-                continue;
-            }
-            String nextMark = i == step + 1 ? " <- 次に実行" : "";
-            LOG.info("test.step.next", new Object[] { nextStep.getNo(), nextStep.getItemName(),
-                    nextStep.getLocator(), nextMark });
-        }
-        LOG.info("empty");
-    }
-
     public void restart(String stepNo) {
         LOG.info("test.restart");
-        if (!StringUtils.isEmpty(stepNo)) {
-            restartStepNo = stepNo;
+        if (StringUtils.isEmpty(stepNo)) {
+            cmd = new DebugCommand(CommandKey.START, "");
+        } else {
+            cmd = new DebugCommand(CommandKey.EXEC_STEP_NO, stepNo);
         }
         setPaused(false);
     }
 
     public void forward() {
-        if (!isPaused())
+        if (!isPaused()) {
             return;
-
-        final int startIndex = currentIndex;
-        setPaused(false);
-        while (currentIndex == startIndex) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                LOG.warn("thread.sleep.error", e);
-            }
         }
-        setPaused(true);
+        cmd = new DebugCommand(CommandKey.FORWARD, "");
     }
 
     public void back() {
-        if (!isPaused())
+        if (!isPaused()) {
             return;
-        if (currentIndex > 0) {
-            currentIndex -= 1;
         }
+        cmd = new DebugCommand(CommandKey.BACK, "");
     }
 
     public void checkLocator(String locatorStr) {
-        this.locatorStr = locatorStr;
-    }
-
-    public void execCheckLocator(String locatorStr) {
-        LOG.info("empty");
-        LocatorChecker check = appCtx.getBean(LocatorChecker.class);
-
-        Locator locator = Locator.build(locatorStr);
-
-        if (locator.isNa()) {
-            LOG.info("format.valid");
-        } else {
-            check.check(locator);
-        }
-        LOG.info("empty");
+        cmd = new DebugCommand(CommandKey.LOC, locatorStr);
     }
 
     public void export() {
-        export = true;
-    }
-
-    public void execExport() {
-        TestScriptGenerateTool exporter = appCtx.getBean(TestScriptGenerateTool.class);
-        exporter.generateFromPage();
+        cmd = new DebugCommand(CommandKey.EXPORT, "");
     }
 
     public void pause() {

@@ -213,12 +213,6 @@ public class TestToolbarController implements Initializable, TestRunnable {
     @FXML
     public void restart() {
         String stepNo = stepNoText.getText();
-        // if (!StrUtils.isEmpty(stepNo)) {
-        // testProcess.input("!" + stepNo);
-        // testProcess.input("#" + stepNo);
-        // }
-        //
-        // testProcess.input("s");
         testService.restart(sessionId, stepNo);
         pausing.set(false);
     }
