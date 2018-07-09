@@ -193,7 +193,6 @@ public class DebugSupport {
             }
 
         }
-
         return ret;
     }
 
