@@ -3,9 +3,11 @@ package org.sitoolkit.wt.gui.pres.editor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,8 +26,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TablePosition;
 
 public class TestScriptEditor {
+
+    private final int COLUMN_INDEX_FIRST_CASE = 8;
 
     public SpreadsheetView buildSpreadsheet(TestScript testScript) {
 
@@ -118,21 +123,32 @@ public class TestScriptEditor {
 
     public void addTestCase(SpreadsheetView spreadSheet) {
 
-        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
-        IntStream.range(0, rows.size()).forEach(i -> {
-            ObservableList<SpreadsheetCell> cells = rows.get(i);
-            rows.get(i).add(SpreadsheetCellType.STRING.createCell(i, cells.size(), 1, 1, ""));
-        });
+        @SuppressWarnings("rawtypes")
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        Grid newGrid = new GridBase(10, 10);
-        newGrid.setRows(rows);
-        spreadSheet.setGrid(newGrid);
-        ObservableList<SpreadsheetColumn> columns = spreadSheet.getColumns();
-        double columnWidth = columns.get(columns.size() - 2).getWidth();
-        columns.get(columns.size() - 1).setPrefWidth(columnWidth);
+        Optional<Integer> selectedMax = selectedCells.stream().map(cell -> cell.getColumn()).distinct()
+                .max(Comparator.naturalOrder());
+
+        int columnPosition = selectedMax.orElse(spreadSheet.getGrid().getColumnCount() - 1) + 1;
+
+        if (columnPosition < COLUMN_INDEX_FIRST_CASE) {
+            columnPosition  = spreadSheet.getGrid().getColumnCount();
+        }
+        insertTestCase(spreadSheet, columnPosition);
     }
 
     public void addTestStep(SpreadsheetView spreadSheet) {
+
+        @SuppressWarnings("rawtypes")
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+
+        Optional<Integer> selectedMax = selectedCells.stream().map(cell -> cell.getRow()).distinct()
+                .max(Comparator.naturalOrder());
+
+        insertTestStep(spreadSheet, selectedMax.orElse(spreadSheet.getGrid().getRowCount() - 1) + 1);
+    }
+
+    public void insertTestStep(SpreadsheetView spreadSheet, int rowPosition) {
 
         Grid grid = spreadSheet.getGrid();
         int columnCount = grid.getColumnCount();
@@ -143,12 +159,58 @@ public class TestScriptEditor {
         for (int i = 0; i < columnCount; i++) {
             cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), i, 1, 1, ""));
         }
-        rows.add(cells);
+        rows.add(rowPosition, cells);
+        grid.setRows(recreateRows(rows));
+
+    }
+
+    private void insertTestCase(SpreadsheetView spreadSheet, int columnPosition) {
+
+        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
+        IntStream.range(0, rows.size()).forEach(i -> {
+            SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(i, columnPosition, 1, 1, "");
+            rows.get(i).add(columnPosition, cell);
+        });
+        ObservableList<SpreadsheetColumn> columns = spreadSheet.getColumns();
+        List<Double> widths = columns.stream().map(col -> col.getWidth()).collect(Collectors.toList());
+        widths.add(columnPosition, widths.get(columnPosition - 1));
+
+        Grid newGrid = new GridBase(10, 10);
+        newGrid.setRows(recreateRows(rows));
+        spreadSheet.setGrid(newGrid);
+
+        IntStream.range(columnPosition, columns.size()).forEach(i -> columns.get(i).setPrefWidth(widths.get(i)));
+    }
+
+    private ObservableList<ObservableList<SpreadsheetCell>> recreateRows(
+            ObservableList<ObservableList<SpreadsheetCell>> original) {
+        ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+        rows.addAll(
+                IntStream.range(0, original.size())
+                        .mapToObj(row -> recreateRow(original.get(row), row))
+                        .collect(Collectors.toList()));
+        return rows;
+
+    }
+
+    private ObservableList<SpreadsheetCell> recreateRow(ObservableList<SpreadsheetCell> original, int row) {
+        ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
+        cells.addAll(
+                IntStream.range(0, original.size())
+                        .mapToObj(column -> recreateCell(original.get(column), row, column))
+                        .collect(Collectors.toList()));
+
+        return cells;
+    }
+
+    private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
+        SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, original.getRowSpan(),
+                original.getColumnSpan(), original.getText());
+        return cell;
     }
 
     private ObservableList<MenuItem> createMenuItems(TestScriptEditorController controller) {
         ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
-
         Menu menu = new Menu("新規");
 
         MenuItem item;
