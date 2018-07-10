@@ -30,11 +30,19 @@ public class TestScriptEditorController {
     }
 
     public void newTestCase(ActionEvent e) {
-        testScriptEditor.addTestCase(spreadSheet);
+        testScriptEditor.insertTestCase(spreadSheet);
     }
 
     public void newTestStep(ActionEvent e) {
-        testScriptEditor.addTestStep(spreadSheet);
+        testScriptEditor.insertTestStep(spreadSheet);
+    }
+
+    public void newTestCaseTail(ActionEvent e) {
+        testScriptEditor.appendTestCase(spreadSheet);
+    }
+
+    public void newTestStepTail(ActionEvent e) {
+        testScriptEditor.appendTestStep(spreadSheet);
     }
 
     public void pasteCase(ActionEvent e) {
@@ -46,12 +54,13 @@ public class TestScriptEditorController {
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
             int count = testScriptEditor.getCaseCount(spreadSheet, changeList);
             if (count > 0) {
-                testScriptEditor.addTestCases(spreadSheet, count);
-                spreadSheet.pasteClipboard();
+                if (testScriptEditor.insertTestCases(spreadSheet, count)) {
+                    spreadSheet.pasteClipboard();
+                }
             }
         }
-
     }
+
 
     public void pasteStep(ActionEvent e) {
 
@@ -62,10 +71,13 @@ public class TestScriptEditorController {
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
             int count = testScriptEditor.getStepCount(spreadSheet, changeList);
             if (count > 0) {
-                testScriptEditor.addTestSteps(spreadSheet, count);
-                spreadSheet.pasteClipboard();
+                if (testScriptEditor.insertTestSteps(spreadSheet, count)) {
+                    spreadSheet.pasteClipboard();
+                }
             }
         }
-
     }
+
+
+
 }

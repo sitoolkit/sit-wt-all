@@ -125,40 +125,58 @@ public class TestScriptEditor {
         return testScript;
     }
 
-    public void addTestCase(SpreadsheetView spreadSheet) {
+    public void appendTestCase(SpreadsheetView spreadSheet) {
+    
+        insertTestCase(spreadSheet, spreadSheet.getGrid().getColumnCount(), null);
 
-        insertTestCase(spreadSheet,  getInsertColumnPosition(spreadSheet), null);
     }
 
+    public void appendTestStep(SpreadsheetView spreadSheet) {
+        insertTestStep(spreadSheet, spreadSheet.getGrid().getRowCount(), null);
 
-    public void addTestCases(SpreadsheetView spreadSheet, int count) {
-        int colPosition = getInsertColumnPosition(spreadSheet);
-        IntStream.range(0, count).forEach(i ->{
-            insertTestCase(spreadSheet,  colPosition, null);
+    }
+
+    public void insertTestCase(SpreadsheetView spreadSheet) {
+        Optional<Integer> insertPosition = getInsertColumnPosition(spreadSheet);
+        insertPosition.ifPresent(colPosition -> insertTestCase(spreadSheet, colPosition, null));
+    }
+
+    public boolean insertTestCases(SpreadsheetView spreadSheet, int count) {
+        Optional<Integer> insertPosition = getInsertColumnPosition(spreadSheet);
+
+        insertPosition.ifPresent(colPosition -> {
+            IntStream.range(0, count).forEach(i -> {
+                insertTestCase(spreadSheet, colPosition, null);
+            });
+
+            spreadSheet.getSelectionModel().clearSelection();
+            spreadSheet.getSelectionModel().selectRange(0, spreadSheet.getColumns().get(colPosition),
+                    spreadSheet.getGrid().getRowCount() - 1, spreadSheet.getColumns().get(colPosition + count - 1));
         });
-
-        spreadSheet.getSelectionModel().clearSelection();
-        spreadSheet.getSelectionModel().selectRange(0, spreadSheet.getColumns().get(colPosition),
-                spreadSheet.getGrid().getRowCount() - 1, spreadSheet.getColumns().get(colPosition + count - 1));
-
+        return insertPosition.isPresent();
     }
 
 
-    public void addTestStep(SpreadsheetView spreadSheet) {
+    public void insertTestStep(SpreadsheetView spreadSheet) {
 
-        insertTestStep(spreadSheet, getInsertRowPosition(spreadSheet), null);
+
+        Optional<Integer> insertPosition = getInsertRowPosition(spreadSheet);
+        insertPosition.ifPresent(rowPosition -> insertTestStep(spreadSheet, rowPosition, null));
     }
 
-    public void addTestSteps(SpreadsheetView spreadSheet, int count) {
+    public boolean insertTestSteps(SpreadsheetView spreadSheet, int count) {
+        Optional<Integer> insertPosition = getInsertRowPosition(spreadSheet);
+        insertPosition.ifPresent(rowPosition -> {
 
-        int rowPosition = getInsertRowPosition(spreadSheet);
-        IntStream.range(0, count).forEach(i -> {
-            insertTestStep(spreadSheet, rowPosition, null);
+            IntStream.range(0, count).forEach(i -> {
+                insertTestStep(spreadSheet, rowPosition, null);
+            });
+
+            spreadSheet.getSelectionModel().clearSelection();
+            spreadSheet.getSelectionModel().selectRange(rowPosition, spreadSheet.getColumns().get(0),
+                    rowPosition + count - 1, spreadSheet.getColumns().get(spreadSheet.getColumns().size() - 1));
         });
-
-        spreadSheet.getSelectionModel().clearSelection();
-        spreadSheet.getSelectionModel().selectRange(rowPosition, spreadSheet.getColumns().get(0),
-                rowPosition + count - 1, spreadSheet.getColumns().get(spreadSheet.getColumns().size() - 1));
+        return insertPosition.isPresent();
 
     }
 
@@ -191,7 +209,7 @@ public class TestScriptEditor {
     }
 
 
-    private int getInsertColumnPosition(SpreadsheetView spreadSheet) {
+    private Optional<Integer> getInsertColumnPosition(SpreadsheetView spreadSheet) {
 
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
@@ -199,16 +217,10 @@ public class TestScriptEditor {
         Optional<Integer> selectedMax = selectedCells.stream().map(cell -> cell.getColumn()).distinct()
                 .max(Comparator.naturalOrder());
 
-        int columnPosition = selectedMax.orElse(spreadSheet.getGrid().getColumnCount() - 1) + 1;
-
-        if (columnPosition < COLUMN_INDEX_FIRST_CASE) {
-            columnPosition  = spreadSheet.getGrid().getColumnCount();
-        }
-
-        return columnPosition;
+        return selectedMax.filter(i -> i >= COLUMN_INDEX_FIRST_CASE);
     }
 
-    private int getInsertRowPosition(SpreadsheetView spreadSheet) {
+    private Optional<Integer> getInsertRowPosition(SpreadsheetView spreadSheet) {
 
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
@@ -216,13 +228,8 @@ public class TestScriptEditor {
         Optional<Integer> selectedMax = selectedCells.stream().map(cell -> cell.getRow()).distinct()
                 .max(Comparator.naturalOrder());
 
-        int rowPosition = selectedMax.orElse(spreadSheet.getGrid().getRowCount() - 1) + 1;
-        if (rowPosition < ROW_INDEX_FIRST_STEP) {
-            rowPosition  = spreadSheet.getGrid().getRowCount();
-        }
-        return rowPosition;
+        return selectedMax.filter(i -> i >= ROW_INDEX_FIRST_STEP);
     }
-
 
     private void insertTestStep(SpreadsheetView spreadSheet, int rowPosition, List<String> values) {
 
@@ -316,14 +323,17 @@ public class TestScriptEditor {
         item.setOnAction(e -> controller.newTestCase(e));
         menu.getItems().add(item);
 
-
-
-        item = new MenuItem("ケースの挿入貼付け");
+        item = new MenuItem("コピーしたケースの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(e -> controller.pasteCase(e));
         menu.getItems().add(item);
+
         menuItems.add(menu);
 
+        item = new MenuItem("新規ケースを末尾に追加");
+        item.setMnemonicParsing(false);
+        item.setOnAction(e -> controller.newTestCaseTail(e));
+        menu.getItems().add(item);
 
         menu = new Menu("テストステップ");
         item = new MenuItem("新規ステップの挿入");
@@ -331,9 +341,14 @@ public class TestScriptEditor {
         item.setOnAction(e -> controller.newTestStep(e));
         menu.getItems().add(item);
 
-        item = new MenuItem("ステップの挿入貼付け");
+        item = new MenuItem("コピーしたステップの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(e -> controller.pasteStep(e));
+        menu.getItems().add(item);
+
+        item = new MenuItem("新規ステップを末尾に追加");
+        item.setMnemonicParsing(false);
+        item.setOnAction(e -> controller.newTestStepTail(e));
         menu.getItems().add(item);
 
         menuItems.add(menu);
