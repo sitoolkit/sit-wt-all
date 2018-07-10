@@ -3,18 +3,19 @@ package org.sitoolkit.wt.gui.pres.editor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridBase;
+import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
@@ -77,8 +78,8 @@ public class TestScriptEditor {
         grid.setRows(rows);
 
         SpreadsheetView spreadSheet = new SpreadsheetView(grid);
-        spreadSheet.setShowColumnHeader(false);
-        spreadSheet.setShowRowHeader(false);
+        spreadSheet.setShowColumnHeader(true);
+        spreadSheet.setShowRowHeader(true);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
 
         TestScriptEditorController controller = new TestScriptEditorController(this, spreadSheet);
@@ -129,67 +130,66 @@ public class TestScriptEditor {
         insertTestCase(spreadSheet,  getInsertColumnPosition(spreadSheet), null);
     }
 
-    public void pasteCases(SpreadsheetView spreadSheet, List<List<String>> cases) {
 
-        int columnPosition = getInsertColumnPosition(spreadSheet);
-        List<List<String>> reversedCases = new ArrayList<List<String>>(cases);
-        Collections.reverse(reversedCases);
-        reversedCases.stream().forEachOrdered(testCase -> insertTestCase(spreadSheet, columnPosition, testCase));
+    public void addTestCases(SpreadsheetView spreadSheet, int count) {
+        int colPosition = getInsertColumnPosition(spreadSheet);
+        IntStream.range(0, count).forEach(i ->{
+            insertTestCase(spreadSheet,  colPosition, null);
+        });
+
+        spreadSheet.getSelectionModel().clearSelection();
+        spreadSheet.getSelectionModel().selectRange(0, spreadSheet.getColumns().get(colPosition),
+                spreadSheet.getGrid().getRowCount() - 1, spreadSheet.getColumns().get(colPosition + count - 1));
+
     }
+
 
     public void addTestStep(SpreadsheetView spreadSheet) {
 
         insertTestStep(spreadSheet, getInsertRowPosition(spreadSheet), null);
     }
 
-    public void pasteSteps(SpreadsheetView spreadSheet, List<List<String>> steps) {
+    public void addTestSteps(SpreadsheetView spreadSheet, int count) {
 
         int rowPosition = getInsertRowPosition(spreadSheet);
-        List<List<String>> reversedSteps = new ArrayList<List<String>>(steps);
-        Collections.reverse(reversedSteps);
-        reversedSteps.stream().forEachOrdered(testStep -> insertTestStep(spreadSheet, rowPosition, testStep));
+        IntStream.range(0, count).forEach(i -> {
+            insertTestStep(spreadSheet, rowPosition, null);
+        });
+
+        spreadSheet.getSelectionModel().clearSelection();
+        spreadSheet.getSelectionModel().selectRange(rowPosition, spreadSheet.getColumns().get(0),
+                rowPosition + count - 1, spreadSheet.getColumns().get(spreadSheet.getColumns().size() - 1));
 
     }
 
-    public List<List<String>> getSelectedCases(SpreadsheetView spreadSheet) {
-
-        @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
-
-        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
-
-        List<List<String>> cases = selectedCells.stream()
-                .map(cell -> cell.getColumn())
-                .filter(col -> col >= COLUMN_INDEX_FIRST_CASE)
-                .distinct()
-                .sorted()
-                .map(i -> rows.stream()
-                        .map(row -> row.get(i).getText())
-                        .collect(Collectors.toList()))
-                .collect(Collectors.toList());
-
-        return cases;
+    public int getCaseCount(SpreadsheetView spreadSheet, List<GridChange> changeList) {
+        int columnCount = getColumnCount(changeList);
+        int rowCount = getRowCount(changeList);
+        return spreadSheet.getGrid().getRowCount() == rowCount ? columnCount : 0;
     }
 
-
-    public List<List<String>> getSelectedSteps(SpreadsheetView spreadSheet) {
-        @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
-
-        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
-
-        List<List<String>> steps = selectedCells.stream()
-                .map(cell -> cell.getRow())
-                .filter(row -> row >= ROW_INDEX_FIRST_STEP)
-                .distinct()
-                .sorted()
-                .map(i -> rows.get(i).stream()
-                        .map(cell -> cell.getText())
-                        .collect(Collectors.toList()))
-                .collect(Collectors.toList());
-
-        return steps;
+    public int getStepCount(SpreadsheetView spreadSheet, List<GridChange> changeList) {
+        int columnCount = getColumnCount(changeList);
+        int rowCount = getRowCount(changeList);
+        return spreadSheet.getGrid().getColumnCount() == columnCount ? rowCount : 0;
     }
+
+    private int getColumnCount(List<GridChange> changeList) {
+        Set<Integer> colSet = changeList.stream().map(change -> change.getColumn()).collect(Collectors.toSet());
+        return countMinToMax(colSet);
+    }
+
+    private int getRowCount(List<GridChange> changeList) {
+        Set<Integer> rowSet = changeList.stream().map(change -> change.getRow()).collect(Collectors.toSet());
+        return countMinToMax(rowSet);
+    }
+
+    private int countMinToMax(Collection<Integer> values) {
+        return values.stream().max(Comparator.naturalOrder()).get()
+                - values.stream().min(Comparator.naturalOrder()).get() + 1;
+
+    }
+
 
     private int getInsertColumnPosition(SpreadsheetView spreadSheet) {
 
@@ -316,10 +316,7 @@ public class TestScriptEditor {
         item.setOnAction(e -> controller.newTestCase(e));
         menu.getItems().add(item);
 
-        item = new MenuItem("ケースのコピー");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.copyCase(e));
-        menu.getItems().add(item);
+
 
         item = new MenuItem("ケースの挿入貼付け");
         item.setMnemonicParsing(false);
@@ -334,11 +331,6 @@ public class TestScriptEditor {
         item.setOnAction(e -> controller.newTestStep(e));
         menu.getItems().add(item);
 
-        item = new MenuItem("項目のコピー");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.copyStep(e));
-        menu.getItems().add(item);
-
         item = new MenuItem("項目の挿入貼付け");
         item.setMnemonicParsing(false);
         item.setOnAction(e -> controller.pasteStep(e));
@@ -348,5 +340,6 @@ public class TestScriptEditor {
 
         return menuItems;
     }
+
 
 }
