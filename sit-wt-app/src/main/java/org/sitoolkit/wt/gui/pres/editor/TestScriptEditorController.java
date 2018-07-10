@@ -93,7 +93,7 @@ public class TestScriptEditorController {
         }
     }
 
-    private void pasteCaseTail(ActionEvent e) {
+    public void pasteCaseTail(ActionEvent e) {
         Clipboard cb = Clipboard.getSystemClipboard();
         if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
 
@@ -107,7 +107,7 @@ public class TestScriptEditorController {
         }
     }
 
-    private void pasteStepTail(ActionEvent e) {
+    public void pasteStepTail(ActionEvent e) {
         Clipboard cb = Clipboard.getSystemClipboard();
         if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
 
@@ -115,7 +115,7 @@ public class TestScriptEditorController {
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
             int count = editor.getStepCount(spreadSheet, changeList);
             if (count > 0) {
-                editor.insertTestSteps(spreadSheet, count);
+                editor.appendTestSteps(spreadSheet, count);
                 spreadSheet.pasteClipboard();
             }
         }
