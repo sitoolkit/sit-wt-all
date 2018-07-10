@@ -325,13 +325,13 @@ public class TestScriptEditor {
         menuItems.add(menu);
 
 
-        menu = new Menu("テスト項目");
-        item = new MenuItem("新規項目の挿入");
+        menu = new Menu("テストステップ");
+        item = new MenuItem("新規ステップの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(e -> controller.newTestStep(e));
         menu.getItems().add(item);
 
-        item = new MenuItem("項目の挿入貼付け");
+        item = new MenuItem("ステップの挿入貼付け");
         item.setMnemonicParsing(false);
         item.setOnAction(e -> controller.pasteStep(e));
         menu.getItems().add(item);
