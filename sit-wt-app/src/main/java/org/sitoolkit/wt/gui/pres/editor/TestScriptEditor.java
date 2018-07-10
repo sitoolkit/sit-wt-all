@@ -27,9 +27,6 @@ import org.sitoolkit.wt.domain.testscript.TestStep;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TablePosition;
 
 public class TestScriptEditor {
@@ -83,8 +80,7 @@ public class TestScriptEditor {
         spreadSheet.setShowRowHeader(true);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
 
-        TestScriptEditorController controller = new TestScriptEditorController(this, spreadSheet);
-        spreadSheet.getContextMenu().getItems().addAll(createMenuItems(controller));
+        new TestScriptEditorController(spreadSheet);
 
         return spreadSheet;
     }
@@ -127,13 +123,17 @@ public class TestScriptEditor {
     }
 
     public void appendTestCase(SpreadsheetView spreadSheet) {
-        insertTestCases(spreadSheet, spreadSheet.getGrid().getColumnCount(), 1);
+        appendTestCases(spreadSheet, 1);
     }
-
+    public void appendTestCases(SpreadsheetView spreadSheet, int count) {
+        insertTestCases(spreadSheet, spreadSheet.getGrid().getColumnCount(), count);
+    }
     public void appendTestStep(SpreadsheetView spreadSheet) {
-        insertTestSteps(spreadSheet, spreadSheet.getGrid().getRowCount(), 1);
+        appendTestSteps(spreadSheet, 1);
     }
-
+    public void appendTestSteps(SpreadsheetView spreadSheet, int count) {
+        insertTestSteps(spreadSheet, spreadSheet.getGrid().getRowCount(), count);
+    }
     public boolean insertTestCase(SpreadsheetView spreadSheet) {
         return insertTestCases(spreadSheet, getSelectedColumnCount(spreadSheet));
     }
@@ -153,6 +153,14 @@ public class TestScriptEditor {
         insertPosition.ifPresent(rowPosition -> insertTestSteps(spreadSheet, rowPosition, count));
         return insertPosition.isPresent();
 
+    }
+
+    public boolean isCaseInsertable(SpreadsheetView spreadSheet) {
+        return getInsertColumnPosition(spreadSheet).isPresent();
+    }
+
+    public boolean isStepInsertable(SpreadsheetView spreadSheet) {
+        return getInsertRowPosition(spreadSheet).isPresent();
     }
 
     public int getCaseCount(SpreadsheetView spreadSheet, List<GridChange> changeList) {
@@ -297,51 +305,6 @@ public class TestScriptEditor {
         return cell;
     }
 
-    private ObservableList<MenuItem> createMenuItems(TestScriptEditorController controller) {
-        ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
-        MenuItem item;
-        Menu menu;
-
-        menuItems.add(new SeparatorMenuItem());
-
-        menu = new Menu("テストケース");
-        item = new MenuItem("新規ケースの挿入");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.newTestCase(e));
-        menu.getItems().add(item);
-
-        item = new MenuItem("コピーしたケースの挿入");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.pasteCase(e));
-        menu.getItems().add(item);
-
-        menuItems.add(menu);
-
-        item = new MenuItem("新規ケースを末尾に追加");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.newTestCaseTail(e));
-        menu.getItems().add(item);
-
-        menu = new Menu("テストステップ");
-        item = new MenuItem("新規ステップの挿入");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.newTestStep(e));
-        menu.getItems().add(item);
-
-        item = new MenuItem("コピーしたステップの挿入");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.pasteStep(e));
-        menu.getItems().add(item);
-
-        item = new MenuItem("新規ステップを末尾に追加");
-        item.setMnemonicParsing(false);
-        item.setOnAction(e -> controller.newTestStepTail(e));
-        menu.getItems().add(item);
-
-        menuItems.add(menu);
-
-        return menuItems;
-    }
 
 
 }
