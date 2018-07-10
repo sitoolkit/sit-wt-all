@@ -20,6 +20,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.SpreadsheetViewSelectionModel;
 import org.sitoolkit.wt.domain.testscript.Locator;
 import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -126,56 +127,30 @@ public class TestScriptEditor {
     }
 
     public void appendTestCase(SpreadsheetView spreadSheet) {
-    
-        insertTestCase(spreadSheet, spreadSheet.getGrid().getColumnCount(), null);
-
+        insertTestCases(spreadSheet, spreadSheet.getGrid().getColumnCount(), 1);
     }
 
     public void appendTestStep(SpreadsheetView spreadSheet) {
-        insertTestStep(spreadSheet, spreadSheet.getGrid().getRowCount(), null);
-
+        insertTestSteps(spreadSheet, spreadSheet.getGrid().getRowCount(), 1);
     }
 
-    public void insertTestCase(SpreadsheetView spreadSheet) {
-        Optional<Integer> insertPosition = getInsertColumnPosition(spreadSheet);
-        insertPosition.ifPresent(colPosition -> insertTestCase(spreadSheet, colPosition, null));
+    public boolean insertTestCase(SpreadsheetView spreadSheet) {
+        return insertTestCases(spreadSheet, getSelectedColumnCount(spreadSheet));
     }
 
     public boolean insertTestCases(SpreadsheetView spreadSheet, int count) {
         Optional<Integer> insertPosition = getInsertColumnPosition(spreadSheet);
-
-        insertPosition.ifPresent(colPosition -> {
-            IntStream.range(0, count).forEach(i -> {
-                insertTestCase(spreadSheet, colPosition, null);
-            });
-
-            spreadSheet.getSelectionModel().clearSelection();
-            spreadSheet.getSelectionModel().selectRange(0, spreadSheet.getColumns().get(colPosition),
-                    spreadSheet.getGrid().getRowCount() - 1, spreadSheet.getColumns().get(colPosition + count - 1));
-        });
+        insertPosition.ifPresent(colPosition -> insertTestCases(spreadSheet, colPosition, count));
         return insertPosition.isPresent();
     }
 
-
-    public void insertTestStep(SpreadsheetView spreadSheet) {
-
-
-        Optional<Integer> insertPosition = getInsertRowPosition(spreadSheet);
-        insertPosition.ifPresent(rowPosition -> insertTestStep(spreadSheet, rowPosition, null));
+    public boolean insertTestStep(SpreadsheetView spreadSheet) {
+        return insertTestSteps(spreadSheet, getSelectedRowCount(spreadSheet));
     }
 
     public boolean insertTestSteps(SpreadsheetView spreadSheet, int count) {
         Optional<Integer> insertPosition = getInsertRowPosition(spreadSheet);
-        insertPosition.ifPresent(rowPosition -> {
-
-            IntStream.range(0, count).forEach(i -> {
-                insertTestStep(spreadSheet, rowPosition, null);
-            });
-
-            spreadSheet.getSelectionModel().clearSelection();
-            spreadSheet.getSelectionModel().selectRange(rowPosition, spreadSheet.getColumns().get(0),
-                    rowPosition + count - 1, spreadSheet.getColumns().get(spreadSheet.getColumns().size() - 1));
-        });
+        insertPosition.ifPresent(rowPosition -> insertTestSteps(spreadSheet, rowPosition, count));
         return insertPosition.isPresent();
 
     }
@@ -208,16 +183,15 @@ public class TestScriptEditor {
 
     }
 
-
     private Optional<Integer> getInsertColumnPosition(SpreadsheetView spreadSheet) {
 
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        Optional<Integer> selectedMax = selectedCells.stream().map(cell -> cell.getColumn()).distinct()
-                .max(Comparator.naturalOrder());
+        Optional<Integer> selectedMin = selectedCells.stream().map(cell -> cell.getColumn()).distinct()
+                .min(Comparator.naturalOrder());
 
-        return selectedMax.filter(i -> i >= COLUMN_INDEX_FIRST_CASE);
+        return selectedMin.filter(i -> i >= COLUMN_INDEX_FIRST_CASE);
     }
 
     private Optional<Integer> getInsertRowPosition(SpreadsheetView spreadSheet) {
@@ -225,13 +199,29 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        Optional<Integer> selectedMax = selectedCells.stream().map(cell -> cell.getRow()).distinct()
-                .max(Comparator.naturalOrder());
+        Optional<Integer> selectedMin = selectedCells.stream().map(cell -> cell.getRow()).distinct()
+                .min(Comparator.naturalOrder());
 
-        return selectedMax.filter(i -> i >= ROW_INDEX_FIRST_STEP);
+        return selectedMin.filter(i -> i >= ROW_INDEX_FIRST_STEP);
     }
 
-    private void insertTestStep(SpreadsheetView spreadSheet, int rowPosition, List<String> values) {
+    private int getSelectedRowCount(SpreadsheetView spreadSheet) {
+
+        @SuppressWarnings("rawtypes")
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+
+        return (int) selectedCells.stream().map(cell -> cell.getRow()).distinct().count();
+    }
+
+    private int getSelectedColumnCount(SpreadsheetView spreadSheet) {
+
+        @SuppressWarnings("rawtypes")
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+
+        return (int) selectedCells.stream().map(cell -> cell.getColumn()).distinct().count();
+    }
+
+    private void insertTestSteps(SpreadsheetView spreadSheet, int rowPosition, int rowCount) {
 
         Grid grid = spreadSheet.getGrid();
         int columnCount = grid.getColumnCount();
@@ -239,49 +229,46 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        IntStream.range(0, columnCount).forEachOrdered(i -> {
-            String value = "";
-            if (values != null && i < values.size()) {
-                value = values.get(i);
-            }
-            cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), i, 1, 1, value));
+        IntStream.range(0, rowCount).forEachOrdered(i -> {
+            IntStream.range(0, columnCount).forEachOrdered(j -> {
+                cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), j, 1, 1, ""));
+            });
+            rows.add(rowPosition, cells);
         });
-        rows.add(rowPosition, cells);
         grid.setRows(recreateRows(rows));
 
+        SpreadsheetViewSelectionModel selection = spreadSheet.getSelectionModel();
+        selection.clearSelection();
+        selection.selectRange(rowPosition, spreadSheet.getColumns().get(0),
+                rowPosition + rowCount - 1, spreadSheet.getColumns().get(spreadSheet.getColumns().size() - 1));
     }
 
-    private void insertTestCase(SpreadsheetView spreadSheet, int columnPosition, List<String> values) {
+    private void insertTestCases(SpreadsheetView spreadSheet, int columnPosition, int columnCount) {
 
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
         IntStream.range(0, rows.size()).forEach(i -> {
-            String value = "";
-            if (values != null && i < values.size()) {
-                value = values.get(i);
-            }
-            SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(i, columnPosition, 1, 1, value);
-            rows.get(i).add(columnPosition, cell);
+            IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(j -> {
+                SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(i, j, 1, 1, "");
+                rows.get(i).add(j, cell);
+            });
         });
         ObservableList<SpreadsheetColumn> columns = spreadSheet.getColumns();
         List<Double> widths = columns.stream().map(col -> col.getWidth()).collect(Collectors.toList());
-        widths.add(columnPosition, widths.get(columnPosition - 1));
+        IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(j -> {
+            widths.add(j, widths.get(j - 1));
+        });
 
         Grid newGrid = new GridBase(10, 10);
         newGrid.setRows(recreateRows(rows));
         spreadSheet.setGrid(newGrid);
-
         IntStream.range(columnPosition, columns.size()).forEach(i -> columns.get(i).setPrefWidth(widths.get(i)));
-        if(values != null && !values.isEmpty()) {
-            SpreadsheetColumn col =columns.get(columnPosition);
-            boolean isFixed = col.isFixed();
-            col.setFixed(false);
-            col.fitColumn();
-            col.setFixed(isFixed);
-        }
+
+        SpreadsheetViewSelectionModel selection = spreadSheet.getSelectionModel();
+        selection.clearSelection();
+        selection.selectRange(0, spreadSheet.getColumns().get(columnPosition),
+                spreadSheet.getGrid().getRowCount() - 1,
+                spreadSheet.getColumns().get(columnPosition + columnCount - 1));
     }
-
-
-
 
     private ObservableList<ObservableList<SpreadsheetCell>> recreateRows(
             ObservableList<ObservableList<SpreadsheetCell>> original) {
