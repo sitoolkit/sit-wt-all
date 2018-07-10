@@ -212,35 +212,30 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     @FXML
     public void restart() {
-        // String stepNo = stepNoText.getText();
-        // if (!StrUtils.isEmpty(stepNo)) {
-        // testProcess.input("!" + stepNo);
-        // testProcess.input("#" + stepNo);
-        // }
-        //
-        // testProcess.input("s");
-        testService.restart(sessionId);
+        String stepNo = stepNoText.getText();
+        testService.restart(sessionId, stepNo);
         pausing.set(false);
     }
 
     @FXML
     public void back() {
-        testProcess.input("b");
+        testService.back(sessionId);
     }
 
     @FXML
     public void forward() {
-        testProcess.input("f");
+        testService.forward(sessionId);
     }
 
     @FXML
     public void export() {
-        testProcess.input("e");
+        testService.export(sessionId);
     }
 
     @FXML
     public void checkLocator() {
-        testProcess.input("l " + locatorText.getText());
+        String locatorStr = locatorText.getText();
+        testService.checkLocator(sessionId, locatorStr);
     }
 
     @FXML

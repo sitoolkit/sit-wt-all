@@ -234,6 +234,38 @@ public class DebugSupport {
         });
     }
 
+    public void restart(String stepNo) {
+        LOG.info("test.restart");
+        if (StringUtils.isEmpty(stepNo)) {
+            cmd = new DebugCommand(CommandKey.START, "");
+        } else {
+            cmd = new DebugCommand(CommandKey.EXEC_STEP_NO, stepNo);
+        }
+        setPaused(false);
+    }
+
+    public void forward() {
+        if (!isPaused()) {
+            return;
+        }
+        cmd = new DebugCommand(CommandKey.FORWARD, "");
+    }
+
+    public void back() {
+        if (!isPaused()) {
+            return;
+        }
+        cmd = new DebugCommand(CommandKey.BACK, "");
+    }
+
+    public void checkLocator(String locatorStr) {
+        cmd = new DebugCommand(CommandKey.LOC, locatorStr);
+    }
+
+    public void export() {
+        cmd = new DebugCommand(CommandKey.EXPORT, "");
+    }
+
     public void pause() {
         LOG.info("test.pause");
         if (pm.isCli()) {
