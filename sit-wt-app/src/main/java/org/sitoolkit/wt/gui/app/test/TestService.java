@@ -73,19 +73,29 @@ public class TestService {
     }
 
     public void pause(String sessionId) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.pause();
+        getDebugSupport(sessionId).pause();
     }
 
-    public void restart(String sessionId) {
-        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-
-        DebugSupport debug = appCtx.getBean(DebugSupport.class);
-        debug.setPaused(false);
+    public void restart(String sessionId, String stepNo) {
+        getDebugSupport(sessionId).restart(stepNo);
+    }
+    
+    public void forward(String sessionId) {
+        getDebugSupport(sessionId).forward();
+    }
+    
+    public void back(String sessionId) {
+        getDebugSupport(sessionId).back();
     }
 
+    public void export(String sessionId) {
+        getDebugSupport(sessionId).export();
+    }
+    
+    public void checkLocator(String sessionId, String locatorStr) {
+        getDebugSupport(sessionId).checkLocator(locatorStr);
+    }
+    
     public void stopTest(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
         appCtx.close();
@@ -94,6 +104,11 @@ public class TestService {
 
     public void destroy() {
         ctxMap.values().stream().forEach(ConfigurableApplicationContext::close);
+    }
+    
+    private DebugSupport getDebugSupport(String sessionId) {
+        ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
+        return appCtx.getBean(DebugSupport.class);
     }
 
     @Deprecated
