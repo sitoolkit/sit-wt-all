@@ -26,8 +26,11 @@ import org.sitoolkit.wt.domain.testscript.TestStep;
 import org.sitoolkit.wt.infra.ApplicationContextHelper;
 import org.sitoolkit.wt.infra.ELSupport;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.infra.template.TemplateEngine;
 import org.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
+import org.sitoolkit.wt.util.infra.util.SystemUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +42,12 @@ import org.springframework.context.annotation.ScopedProxyMode;
 @Import({ BaseConfig.class, WebDriverConfig.class, Page2ScriptConfig.class, DbConfig.class })
 @ComponentScan("org.sitoolkit.wt.domain.operation")
 public class RuntimeConfig {
+
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(RuntimeConfig.class);
+
+    public RuntimeConfig() {
+        LOG.info("environment.info", SystemUtils.getEnvironmentInfo());
+    }
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.DEFAULT, scopeName = "thread")

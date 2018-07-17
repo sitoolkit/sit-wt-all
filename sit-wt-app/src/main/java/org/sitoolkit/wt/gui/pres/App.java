@@ -8,6 +8,7 @@ import org.sitoolkit.wt.gui.infra.fx.FxContext;
 import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
+import org.sitoolkit.wt.util.infra.util.SystemUtils;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -26,6 +27,7 @@ public class App extends Application {
     private AppController controller;
 
     public static void main(String[] args) {
+        LOG.info(() -> "environment info: " + SystemUtils.getEnvironmentInfo());
         launch(args);
     }
 
@@ -72,4 +74,5 @@ public class App extends Application {
         PropertyManager.get().save();
         ExecutorContainer.get().shutdown();
     }
+
 }
