@@ -68,7 +68,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
      * @param testStepList
      * @return
      */
-    public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList) {
+    public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList,
+            List<String> headers) {
         if (cellNameMap == null) {
             initCellNameMap();
         }
@@ -92,9 +93,11 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
                 row.setCellValue(cellNameMap.get(case_) + entry.getKey(), entry.getValue());
             }
             tableData.add(row);
+
         }
 
         tableData.setName(sheetName);
+        tableData.setColumnNameList(headers);
         tableDataCatalog.add(tableData);
 
         return tableDataCatalog;
@@ -116,4 +119,5 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         cellNameMap.put(screenshot, MessageManager.getMessage(screenshot));
         cellNameMap.put(case_, MessageManager.getMessage(case_));
     }
+
 }

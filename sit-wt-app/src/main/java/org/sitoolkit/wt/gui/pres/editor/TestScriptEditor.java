@@ -95,6 +95,7 @@ public class TestScriptEditor {
 
         List<String> headers = rows.iterator().next().stream().map(SpreadsheetCell::getText)
                 .collect(Collectors.toList());
+        headers.stream().forEach(header -> testScript.addHeader(header));
 
         List<TestStep> testStepList = new ArrayList<TestStep>();
         rows.stream().skip(1L).forEach(row -> {
@@ -121,6 +122,8 @@ public class TestScriptEditor {
         });
 
         testScript.setTestStepList(testStepList);
+
+
         return testScript;
     }
 
