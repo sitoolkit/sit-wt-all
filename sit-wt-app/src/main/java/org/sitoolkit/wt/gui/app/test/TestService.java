@@ -42,19 +42,18 @@ public class TestService {
             return null;
         }
 
-        ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
-                RuntimeConfig.class);
-
         String sessionId = UUID.randomUUID().toString();
 
-        ctxMap.put(sessionId, appCtx);
-
         ExecutorContainer.get().execute(() -> {
+            System.setProperty("driver.type", params.getDriverType());
+            ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                    RuntimeConfig.class);
+            ctxMap.put(sessionId, appCtx);
+
             try {
 
                 PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
                 runtimePm.setBaseUrl(params.getBaseUrl());
-                runtimePm.setDriverType(params.getDriverType());
                 runtimePm.setDebug(params.isDebug());
 
                 runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
@@ -79,11 +78,11 @@ public class TestService {
     public void restart(String sessionId, String stepNo) {
         getDebugSupport(sessionId).restart(stepNo);
     }
-    
+
     public void forward(String sessionId) {
         getDebugSupport(sessionId).forward();
     }
-    
+
     public void back(String sessionId) {
         getDebugSupport(sessionId).back();
     }
@@ -91,11 +90,11 @@ public class TestService {
     public void export(String sessionId) {
         getDebugSupport(sessionId).export();
     }
-    
+
     public void checkLocator(String sessionId, String locatorStr) {
         getDebugSupport(sessionId).checkLocator(locatorStr);
     }
-    
+
     public void stopTest(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
         appCtx.close();
@@ -105,7 +104,7 @@ public class TestService {
     public void destroy() {
         ctxMap.values().stream().forEach(ConfigurableApplicationContext::close);
     }
-    
+
     private DebugSupport getDebugSupport(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
         return appCtx.getBean(DebugSupport.class);
