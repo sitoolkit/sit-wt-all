@@ -57,6 +57,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
 
     private static String screenshot = "Screenshot";
 
+    private static String breakpoint = "Breakpoint";
+
     private static String case_ = "Case";
 
     public TestScriptConvertUtils() {
@@ -88,7 +90,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
             row.setCellValue(cellNameMap.get(locator), testStep.getLocator().getValue());
             row.setCellValue(cellNameMap.get(dataStyle), testStep.getDataType());
             row.setCellValue(cellNameMap.get(screenshot), testStep.getScreenshotTiming());
-
+            row.setCellValue(cellNameMap.get(breakpoint), testStep.getBreakPoint());
+            
             for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
                 row.setCellValue(cellNameMap.get(case_) + entry.getKey(), entry.getValue());
             }
@@ -117,6 +120,7 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         cellNameMap.put(locator, MessageManager.getMessage(locator));
         cellNameMap.put(dataStyle, MessageManager.getMessage(dataStyle));
         cellNameMap.put(screenshot, MessageManager.getMessage(screenshot));
+        cellNameMap.put(breakpoint, MessageManager.getMessage(breakpoint));
         cellNameMap.put(case_, MessageManager.getMessage(case_));
     }
 
