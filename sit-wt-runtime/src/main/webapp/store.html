@@ -31,4 +31,13 @@ limitations under the License.
 	rect:<span id="rect">117</span><br/>
 	size:<span id="size">19</span><br/>
 	</body>
+	<script>
+		window.onload = function() {
+			var element = document.getElementById("message");
+			var rect = element.getBoundingClientRect();
+			document.getElementById("location").innerText = rect.left;
+			document.getElementById("rect").innerText = parseInt(rect.top);
+			document.getElementById("size").innerText = rect.height;
+		}
+	</script>
 </html>
