@@ -254,10 +254,10 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        Optional<Integer> selectedMin = selectedCells.stream().map(cell -> cell.getColumn()).distinct()
+        Optional<Integer> selectedMin = selectedCells.stream().map(TablePosition::getColumn).distinct()
                 .min(Comparator.naturalOrder());
 
-        return selectedMin.filter(i -> i >= COLUMN_INDEX_FIRST_CASE);
+        return selectedMin.filter(this::isCaseColumn);
     }
 
     private Optional<Integer> getInsertRowPosition(SpreadsheetView spreadSheet) {
@@ -265,10 +265,10 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        Optional<Integer> selectedMin = selectedCells.stream().map(cell -> cell.getRow()).distinct()
+        Optional<Integer> selectedMin = selectedCells.stream().map(TablePosition::getRow).distinct()
                 .min(Comparator.naturalOrder());
 
-        return selectedMin.filter(i -> i >= ROW_INDEX_FIRST_STEP);
+        return selectedMin.filter(this::isStepRow);
     }
 
     private int getSelectedRowCount(SpreadsheetView spreadSheet) {
@@ -276,7 +276,7 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        return (int) selectedCells.stream().map(cell -> cell.getRow()).distinct().count();
+        return (int) selectedCells.stream().map(TablePosition::getRow).distinct().count();
     }
 
     private int getSelectedColumnCount(SpreadsheetView spreadSheet) {
@@ -284,7 +284,7 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        return (int) selectedCells.stream().map(cell -> cell.getColumn()).distinct().count();
+        return (int) selectedCells.stream().map(TablePosition::getColumn).distinct().count();
     }
 
     private Set<Integer> getSelectedCase(SpreadsheetView spreadSheet) {
