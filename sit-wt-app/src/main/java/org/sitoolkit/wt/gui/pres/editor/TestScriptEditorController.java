@@ -121,6 +121,16 @@ public class TestScriptEditorController {
         }
     }
 
+
+    public void deleteCase(ActionEvent e) {
+        editor.deleteTestCase(spreadSheet);
+    }
+
+    public void deleteStep(ActionEvent e) {
+        editor.deleteTestStep(spreadSheet);
+    }
+
+
     public void onContextMenuShowing(WindowEvent e) {
         myItems.stream().forEach(item -> item.refreshDisable(spreadSheet));
     }
@@ -192,6 +202,26 @@ public class TestScriptEditorController {
         myItems.add(item);
 
         menuItems.add(menu);
+
+
+        menu = new Menu("削除");
+
+        item = new EditorMenuItem("ステップを削除");
+        item.setMnemonicParsing(false);
+        item.setOnAction(this::deleteStep);
+        item.setExcutableTest(editor::isStepSelected);
+        menu.getItems().add(item);
+        myItems.add(item);
+
+        item = new EditorMenuItem("ケースを削除");
+        item.setMnemonicParsing(false);
+        item.setOnAction(this::deleteCase);
+        item.setExcutableTest(editor::isCaseSelected);
+        menu.getItems().add(item);
+        myItems.add(item);
+
+        menuItems.add(menu);
+
 
         return menuItems;
     }
