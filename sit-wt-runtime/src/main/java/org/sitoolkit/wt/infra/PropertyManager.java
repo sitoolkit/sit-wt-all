@@ -117,6 +117,8 @@ public class PropertyManager {
 
     private boolean isRemoteDriver;
 
+    private boolean isChromeDriver;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -143,6 +145,7 @@ public class PropertyManager {
         isEdgeDriver = equalsAny("edge", driverType, browserName);
         isMsDriver = isIeDriver || isEdgeDriver;
         isRemoteDriver = "remote".equals(driverType);
+        isChromeDriver = equalsAny("chrome", driverType, browserName);
     }
 
     private String toLowerCase(String str) {
@@ -208,6 +211,10 @@ public class PropertyManager {
 
     public boolean isSafariDriver() {
         return "safari".equalsIgnoreCase(driverType);
+    }
+
+    public boolean isChromeDriver() {
+        return isChromeDriver;
     }
 
     public URL getAppiumAddress() {

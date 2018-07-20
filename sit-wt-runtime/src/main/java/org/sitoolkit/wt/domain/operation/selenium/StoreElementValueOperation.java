@@ -17,6 +17,7 @@ package org.sitoolkit.wt.domain.operation.selenium;
 
 import javax.annotation.Resource;
 
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 import org.sitoolkit.wt.domain.tester.TestContext;
 import org.sitoolkit.wt.domain.testscript.TestStep;
@@ -62,7 +63,11 @@ public class StoreElementValueOperation extends SeleniumOperation {
                 value = element.getLocation();
                 break;
             case "rect":
-                value = element.getRect();
+                if (pm.isChromeDriver()) {
+                    value = new Rectangle(element.getLocation(), element.getSize());
+                } else {
+                    value = element.getRect();
+                }
                 break;
             case "size":
                 value = element.getSize();
