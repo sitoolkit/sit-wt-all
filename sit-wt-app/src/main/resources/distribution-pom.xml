@@ -29,8 +29,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <sitwt.version>3.0-SNAPSHOT</sitwt.version>
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
-    <selenium.version>2.53.1</selenium.version>
-    <appium.version>3.4.1</appium.version>
+    <selenium.version>3.12.0</selenium.version>
+    <appium.version>6.0.0</appium.version>
     <trimStackTrace>false</trimStackTrace>
     <mpir.skip>true</mpir.skip>
   </properties>
