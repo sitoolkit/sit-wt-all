@@ -25,6 +25,7 @@ import org.sitoolkit.util.tabledata.TableDataDao;
 import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.util.tabledata.csv.TableDataDaoCsvImpl;
 import org.sitoolkit.util.tabledata.excel.TableDataDaoExcelImpl;
+import org.sitoolkit.wt.domain.operation.Operation;
 import org.sitoolkit.wt.infra.csv.CsvFileReader;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
@@ -105,19 +106,20 @@ public class TestScriptDao {
         });
 
         if (!loadCaseOnly) {
-            List<TestStep> testStepList = loadedData.stream().skip(1)
-                    .map(row -> createTestStep(row, caseNoList)).collect(Collectors.toList());
-
-            testScript.setTestStepList(testStepList);
+            loadedData.stream().skip(1).forEachOrdered(row -> {
+                testScript.addTestStep(createTestStep(row, caseNoList));
+            });
         }
     }
 
     private TestStep createTestStep(String[] row, List<String> caseNoList) {
 
-        TestStep testStep = new TestStep();
+        TestStep testStep = appCtx.getBean(TestStep.class);
         testStep.setNo(row[0]);
         testStep.setItemName(row[1]);
         testStep.setOperationName(row[2]);
+        Operation operation = (Operation) operationConverter.convert(Operation.class, row[2]);
+        testStep.setOperation(operation);
         Locator locator = new Locator();
         locator.setType(row[3]);
         locator.setValue(row[4]);
