@@ -6,13 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
@@ -76,27 +74,22 @@ public class TestScriptDao {
         if (scriptFileName.endsWith(".xlsx") || scriptFileName.endsWith(".xls")) {
             loadScript(excelDao, testScript, testScript.getSheetName(), loadCaseOnly);
         } else if (scriptFileName.endsWith(".csv")) {
-            loadScript(csvReader, testScript, loadCaseOnly);
+            loadCsv(testScript, loadCaseOnly);
         }
 
         return testScript;
     }
 
-    private void loadScript(CsvFileReader dao, TestScript testScript, boolean loadCaseOnly) {
+    private void loadCsv(TestScript testScript, boolean loadCaseOnly) {
 
-        List<String[]> loadedData = dao.read(testScript.getScriptFile().getAbsolutePath(),
-                loadCaseOnly);
-        loadScript(testScript, loadedData, loadCaseOnly);
+        List<Map<String, String>> loadedData = csvReader
+                .read(testScript.getScriptFile().getAbsolutePath(), loadCaseOnly);
 
-    }
+        Map<String, String> firstRow = loadedData.iterator().next();
 
-    private void loadScript(TestScript testScript, List<String[]> loadedData,
-            boolean loadCaseOnly) {
+        firstRow.values().stream().forEachOrdered(key -> testScript.addHeader(key));
 
-        String[] firstRow = loadedData.iterator().next();
-        Stream.of(firstRow).forEachOrdered(key -> testScript.addHeader(key));
-
-        List<String> caseNoList = Stream.of(firstRow)
+        List<String> caseNoList = firstRow.keySet().stream()
                 .filter(key -> key.startsWith(testScript.getCaseNoPrefix()))
                 .map(key -> StringUtils.substringAfter(key, testScript.getCaseNoPrefix()))
                 .collect(Collectors.toList());
@@ -105,35 +98,19 @@ public class TestScriptDao {
             testScript.getCaseNoMap().put(caseNoList.get(index), index);
         });
 
-        if (!loadCaseOnly) {
-            loadedData.stream().skip(1).forEachOrdered(row -> {
-                testScript.addTestStep(createTestStep(row, caseNoList));
-            });
-        }
+        loadedData.stream().skip(1).forEachOrdered(row -> {
+            testScript.addTestStep(createTestStep(row, caseNoList));
+        });
     }
 
-    private TestStep createTestStep(String[] row, List<String> caseNoList) {
-
+    private TestStep createTestStep(Map<String, String> row, List<String> caseNoList) {
         TestStep testStep = appCtx.getBean(TestStep.class);
-        testStep.setNo(row[0]);
-        testStep.setItemName(row[1]);
-        testStep.setOperationName(row[2]);
-        Operation operation = (Operation) operationConverter.convert(Operation.class, row[2]);
-        testStep.setOperation(operation);
-        Locator locator = new Locator();
-        locator.setType(row[3]);
-        locator.setValue(row[4]);
-        testStep.setLocator(locator);
-        testStep.setDataType(row[5]);
-        testStep.setScreenshotTiming(row[6]);
-        testStep.setBreakPoint(row[7]);
-        Map<String, String> testData = new HashMap<String, String>();
-        IntStream.range(0, caseNoList.size()).forEach(idx -> {
-            String caseNo = caseNoList.get(idx);
-            testData.put(caseNo, row[8 + idx]);
-        });
 
-        testStep.setTestData(testData);
+        TestScriptConvertUtils.loadStep(testStep, row, caseNoList);
+        Operation operation = (Operation) operationConverter.convert(Operation.class,
+                testStep.getOperationName());
+        testStep.setOperation(operation);
+
         return testStep;
 
     }
