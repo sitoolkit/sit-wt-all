@@ -6,9 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
@@ -21,6 +25,7 @@ import org.sitoolkit.util.tabledata.TableDataDao;
 import org.sitoolkit.util.tabledata.TableDataMapper;
 import org.sitoolkit.util.tabledata.csv.TableDataDaoCsvImpl;
 import org.sitoolkit.util.tabledata.excel.TableDataDaoExcelImpl;
+import org.sitoolkit.wt.infra.csv.CsvFileReader;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -50,6 +55,8 @@ public class TestScriptDao {
     @Resource
     FileOverwriteChecker fileOverwriteChecker;
 
+    CsvFileReader csvReader = new CsvFileReader();
+
     public TestScript load(String scriptPath, String sheetName, boolean loadCaseOnly) {
         return load(new File(scriptPath), sheetName, loadCaseOnly);
     }
@@ -67,10 +74,65 @@ public class TestScriptDao {
         if (scriptFileName.endsWith(".xlsx") || scriptFileName.endsWith(".xls")) {
             loadScript(excelDao, testScript, testScript.getSheetName(), loadCaseOnly);
         } else if (scriptFileName.endsWith(".csv")) {
-            loadScript(csvDao, testScript, "", loadCaseOnly);
+            loadScript(csvReader, testScript, loadCaseOnly);
         }
 
         return testScript;
+    }
+
+    private void loadScript(CsvFileReader dao, TestScript testScript, boolean loadCaseOnly) {
+
+        List<String[]> loadedData = dao.read(testScript.getScriptFile().getAbsolutePath(),
+                loadCaseOnly);
+        loadScript(testScript, loadedData, loadCaseOnly);
+
+    }
+
+    private void loadScript(TestScript testScript, List<String[]> loadedData,
+            boolean loadCaseOnly) {
+
+        String[] firstRow = loadedData.iterator().next();
+        Stream.of(firstRow).forEachOrdered(key -> testScript.addHeader(key));
+
+        List<String> caseNoList = Stream.of(firstRow)
+                .filter(key -> key.startsWith(testScript.getCaseNoPrefix()))
+                .map(key -> StringUtils.substringAfter(key, testScript.getCaseNoPrefix()))
+                .collect(Collectors.toList());
+
+        IntStream.range(0, caseNoList.size()).forEach(index -> {
+            testScript.getCaseNoMap().put(caseNoList.get(index), index);
+        });
+
+        if (!loadCaseOnly) {
+            List<TestStep> testStepList = loadedData.stream().skip(1)
+                    .map(row -> createTestStep(row, caseNoList)).collect(Collectors.toList());
+
+            testScript.setTestStepList(testStepList);
+        }
+    }
+
+    private TestStep createTestStep(String[] row, List<String> caseNoList) {
+
+        TestStep testStep = new TestStep();
+        testStep.setNo(row[0]);
+        testStep.setItemName(row[1]);
+        testStep.setOperationName(row[2]);
+        Locator locator = new Locator();
+        locator.setType(row[3]);
+        locator.setValue(row[4]);
+        testStep.setLocator(locator);
+        testStep.setDataType(row[5]);
+        testStep.setScreenshotTiming(row[6]);
+        testStep.setBreakPoint(row[7]);
+        Map<String, String> testData = new HashMap<String, String>();
+        IntStream.range(0, caseNoList.size()).forEach(idx -> {
+            String caseNo = caseNoList.get(idx);
+            testData.put(caseNo, row[8 + idx]);
+        });
+
+        testStep.setTestData(testData);
+        return testStep;
+
     }
 
     private void loadScript(TableDataDao dao, TestScript testScript, String sheetName,
