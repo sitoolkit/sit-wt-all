@@ -55,7 +55,8 @@ public class TestScriptDao {
     @Resource
     FileOverwriteChecker fileOverwriteChecker;
 
-    CsvFileReader csvReader = new CsvFileReader();
+    @Resource
+    CsvFileReader csvReader;
 
     public TestScript load(String scriptPath, String sheetName, boolean loadCaseOnly) {
         return load(new File(scriptPath), sheetName, loadCaseOnly);
