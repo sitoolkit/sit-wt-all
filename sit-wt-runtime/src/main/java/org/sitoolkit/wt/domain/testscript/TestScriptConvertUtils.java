@@ -15,10 +15,13 @@
  */
 package org.sitoolkit.wt.domain.testscript;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.sitoolkit.util.tabledata.RowData;
 import org.sitoolkit.util.tabledata.TableData;
@@ -151,4 +154,32 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         });
         testStep.setTestData(testData);
     }
+
+    public static List<String> createHeaderRow(List<String> caseNoList) {
+
+        String casePrefix = (new TestScript()).getCaseNoPrefix();
+
+        Stream<String> itemStream = Stream.of(stepNo, itemName, operation, locatorStyle, locator,
+                dataStyle, screenshot, breakpoint).map(cellNameMap::get);
+        Stream<String> caseStream = caseNoList.stream().map(caseNo -> casePrefix + caseNo);
+
+        return Stream.concat(itemStream, caseStream).collect(Collectors.toList());
+    }
+
+    public static List<String> createRow(TestStep testStep, List<String> caseNoList) {
+
+        List<String> row = new ArrayList<>();
+
+        row.add(testStep.getNo());
+        row.add(testStep.getItemName());
+        row.add(testStep.getOperationName());
+        row.add(testStep.getLocator().getType());
+        row.add(testStep.getLocator().getValue());
+        row.add(testStep.getDataType());
+        row.add(testStep.getScreenshotTiming());
+        row.add(testStep.getBreakPoint());
+        caseNoList.stream().map(testStep.getTestData()::get).forEachOrdered(row::add);
+        return row;
+    }
+
 }

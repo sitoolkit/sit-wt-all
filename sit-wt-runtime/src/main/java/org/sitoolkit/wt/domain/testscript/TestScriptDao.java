@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.stream.IntStream;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.util.tabledata.FileOverwriteChecker;
 import org.sitoolkit.util.tabledata.RowData;
@@ -25,6 +28,7 @@ import org.sitoolkit.util.tabledata.csv.TableDataDaoCsvImpl;
 import org.sitoolkit.util.tabledata.excel.TableDataDaoExcelImpl;
 import org.sitoolkit.wt.domain.operation.Operation;
 import org.sitoolkit.wt.infra.csv.CsvFileReader;
+import org.sitoolkit.wt.infra.csv.CsvFileWriter;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -56,6 +60,9 @@ public class TestScriptDao {
 
     @Resource
     CsvFileReader csvReader;
+
+    @Resource
+    CsvFileWriter csvWriter;
 
     public TestScript load(String scriptPath, String sheetName, boolean loadCaseOnly) {
         return load(new File(scriptPath), sheetName, loadCaseOnly);
@@ -145,6 +152,12 @@ public class TestScriptDao {
     }
 
     public String write(File file, List<TestStep> testStepList, boolean overwrite) {
+
+        if (file.getName().endsWith("csv")) {
+            writeCsv(file.toPath(), testStepList, overwrite);
+            return file.getAbsolutePath();
+        }
+
         File dir = file.getParentFile();
         if (dir == null) {
             dir = new File(".");
@@ -196,6 +209,40 @@ public class TestScriptDao {
             }
         }
 
+    }
+
+    private void writeCsv(Path path, List<TestStep> testSteps, boolean overwrite) {
+        if (!isWritable(path, overwrite)) {
+            return;
+        }
+
+        List<List<String>> data = createWriteData(testSteps);
+        csvWriter.write(data, path.toAbsolutePath().toString());
+        log.info("script.file.saved", path.toAbsolutePath().toString());
+    }
+
+    private boolean isWritable(Path path, boolean overwrite) {
+        // TODO GUIによる上書き可否のユーザ確認
+        return true;
+    }
+
+    private List<List<String>> createWriteData(List<TestStep> testSteps) {
+        List<String> caseNoList = getCaseNoList(testSteps);
+        List<String> headerRow = TestScriptConvertUtils.createHeaderRow(caseNoList);
+        List<List<String>> writeData = new ArrayList<>();
+        writeData.add(headerRow);
+        testSteps.stream().map(step -> TestScriptConvertUtils.createRow(step, caseNoList))
+                .forEachOrdered(writeData::add);
+        return writeData;
+    }
+
+    private List<String> getCaseNoList(List<TestStep> testSteps) {
+        if (CollectionUtils.isEmpty(testSteps)) {
+            return Collections.emptyList();
+
+        } else {
+            return new ArrayList<>(testSteps.get(0).getTestData().keySet());
+        }
     }
 
 }

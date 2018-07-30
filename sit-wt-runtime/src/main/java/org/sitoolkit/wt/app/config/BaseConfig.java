@@ -13,6 +13,7 @@ import org.sitoolkit.wt.domain.testscript.TestScriptDao;
 import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SpringBeanFactory;
 import org.sitoolkit.wt.infra.csv.CsvFileReader;
+import org.sitoolkit.wt.infra.csv.CsvFileWriter;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +51,11 @@ public class BaseConfig {
     @Bean
     public CsvFileReader getCsvFileReader() {
         return new CsvFileReader();
+    }
+
+    @Bean
+    public CsvFileWriter getCsvFileWriter() {
+        return new CsvFileWriter();
     }
 
     @Bean
