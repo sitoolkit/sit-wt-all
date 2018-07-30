@@ -15,6 +15,7 @@
  */
 package org.sitoolkit.wt.domain.debug;
 
+import java.nio.file.Path;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,12 +33,17 @@ import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+
+import lombok.Setter;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-public class DebugSupport {
+public class DebugSupport implements ApplicationListener<ApplicationEvent> {
 
     private static SitLogger LOG = SitLoggerFactory.getLogger(DebugSupport.class);
 
@@ -55,6 +61,9 @@ public class DebugSupport {
     @Resource
     PropertyManager pm;
 
+    @Setter
+    DebugListener listener;
+
     /**
      * ポーズ中にスレッドをsleepする間隔(ミリ秒)
      */
@@ -66,10 +75,13 @@ public class DebugSupport {
 
     private boolean paused = false;
 
-    private Boolean debug;
+    private Boolean debugging = false;
+    private Path debuggingPath = null;
+    private int debuggingStep = -1;
 
     /**
-     * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき {@code TestStep}
+     * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき
+     * {@code TestStep}
      * とテストステップインデックスを設定します。(テストステップインデックスはテストスクリプト内でのテストステップの順番です。)
      *
      * @return テスト実行を継続する場合にtrue
@@ -140,6 +152,8 @@ public class DebugSupport {
         int ret = currentIndex;
 
         while (isPaused()) {
+
+            setDebuggingStep(ret + 1);
             try {
                 Thread.sleep(getPauseSpan());
             } catch (InterruptedException e) {
@@ -193,6 +207,9 @@ public class DebugSupport {
             }
 
         }
+
+        clearDebugging();
+
         return ret;
     }
 
@@ -287,6 +304,15 @@ public class DebugSupport {
         }
     }
 
+    @Override
+    public void onApplicationEvent(ApplicationEvent event) {
+        if (event instanceof ContextClosedEvent) {
+            if (debugging) {
+                listener.onInterrupted(debuggingPath);
+            }
+        }
+    }
+
     public int getPauseSpan() {
         return pauseSpan;
     }
@@ -302,4 +328,24 @@ public class DebugSupport {
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
+
+    private void setDebuggingStep(int stepIndex) {
+        if (debugging && this.debuggingStep == stepIndex) {
+            return;
+        }
+        debugging = true;
+        debuggingPath = current.getTestScript().getScriptFile().toPath();
+        this.debuggingStep = stepIndex;
+        int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+        listener.onDebugging(debuggingPath, stepIndex, caseIndex);
+    }
+
+    private void clearDebugging() {
+        Path path = debuggingPath;
+        debugging = false;
+        debuggingPath = null;
+        debuggingStep = -1;
+        listener.onResume(path);
+    }
+
 }

@@ -1,0 +1,16 @@
+.spreadsheet-cell.header {
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+.spreadsheet-cell.waitingStep {
+    -fx-background-color: lightgreen;
+}
+
+.spreadsheet-cell.waitingCase {
+    -fx-background-color: lightyellow;
+}
+
+.spreadsheet-cell.waitingCase.waitingStep{
+    -fx-background-color: yellowgreen;
+}

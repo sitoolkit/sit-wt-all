@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.app.test.TestRunner;
+import org.sitoolkit.wt.domain.debug.DebugListener;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
@@ -24,6 +25,8 @@ import org.sitoolkit.wt.util.infra.util.SystemUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import lombok.Setter;
+
 public class TestService {
 
     private static final Logger LOG = LogUtils.get(TestService.class);
@@ -36,7 +39,11 @@ public class TestService {
 
     private Map<String, ConfigurableApplicationContext> ctxMap = new HashMap<>();
 
+    @Setter
+    private DebugListener debugListener;
+
     public String runTest(TestRunParams params, ProcessExitCallback callback) {
+
 
         if (params.getTargetScripts() == null) {
             return null;
@@ -56,6 +63,9 @@ public class TestService {
                 runtimePm.setBaseUrl(params.getBaseUrl());
                 runtimePm.setDebug(params.isDebug());
 
+                DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
+                debugSupport.setListener(debugListener);
+                
                 runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
                 callback.callback(0);
             } catch (Exception e) {

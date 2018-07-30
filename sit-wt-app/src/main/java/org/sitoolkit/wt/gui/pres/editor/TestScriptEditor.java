@@ -81,6 +81,8 @@ public class TestScriptEditor {
         spreadSheet.setShowColumnHeader(true);
         spreadSheet.setShowRowHeader(true);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
+        spreadSheet.getStylesheets().add(
+                getClass().getResource("/testScriptEditor.css").toExternalForm());
 
         new TestScriptEditorController(spreadSheet);
 
@@ -231,6 +233,15 @@ public class TestScriptEditor {
         return (int) selectedCells.stream().map(cell -> cell.getColumn()).distinct().count();
     }
 
+
+    private int getColumnPosition(int caseIndex) {
+        return COLUMN_INDEX_FIRST_CASE + caseIndex;
+    }
+
+    private int getRowPosition(int stepIndex) {
+        return ROW_INDEX_FIRST_STEP + stepIndex;
+    }
+
     private void insertTestSteps(SpreadsheetView spreadSheet, int rowPosition, int rowCount) {
 
         Grid grid = spreadSheet.getGrid();
@@ -307,6 +318,28 @@ public class TestScriptEditor {
         return cell;
     }
 
+    public void setDebugStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex) {
+        removeDebugStyle(spreadSheet);
 
+        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
+
+        rows.get(getRowPosition(stepIndex)).stream().forEach(cell -> {
+            cell.getStyleClass().add("waitingStep");
+        });
+
+        rows.stream().forEach(row -> {
+            row.get(getColumnPosition(caseIndex)).getStyleClass().add("waitingCase");
+        });
+
+    }
+
+    public void removeDebugStyle(SpreadsheetView spreadSheet) {
+        spreadSheet.getGrid().getRows().stream()
+                .flatMap(ObservableList::stream)
+                .forEach(cell -> {
+                    cell.getStyleClass().remove("waitingStep");
+                    cell.getStyleClass().remove("waitingCase");
+                });
+    }
 
 }
