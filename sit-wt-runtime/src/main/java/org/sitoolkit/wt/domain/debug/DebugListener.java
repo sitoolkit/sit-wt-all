@@ -20,10 +20,12 @@ import java.nio.file.Path;
 
 public interface DebugListener {
 
-    void onDebugging(Path scriptPath, int stepIndex, int caseIndex);
+    void onStepStart(Path scriptPath, int stepIndex, int caseIndex);
 
-    void onResume(Path scriptPath);
+    void onPause(Path scriptPath, int nextStepIndex, int caseIndex);
 
-    void onInterrupted(Path scriptPath);
+    void onCaseEnd(Path scriptPath, int caseIndex);
+
+    void onClose();
 
 }

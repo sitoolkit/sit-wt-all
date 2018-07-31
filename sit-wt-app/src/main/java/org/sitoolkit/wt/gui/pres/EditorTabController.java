@@ -30,7 +30,7 @@ public class EditorTabController implements FileOpenable, DebugListener {
 
     TestScriptEditor testScriptEditor = new TestScriptEditor();
 
-    Map<Path, WaitingPoint> waitingMap  = new HashMap<>();
+    Map<String, WaitingPoint> waitingMap  = new HashMap<>();
 
     private BooleanProperty empty = new SimpleBooleanProperty(true);
 
@@ -58,7 +58,7 @@ public class EditorTabController implements FileOpenable, DebugListener {
             TestScript testScript = scriptService.read(file);
             Tab tab = new Tab(file.getName());
             SpreadsheetView spreadSheet = testScriptEditor.buildSpreadsheet(testScript);
-            WaitingPoint wp = waitingMap.get(file.toPath());
+            WaitingPoint wp = waitingMap.get(file.getAbsolutePath());
             if (wp != null) {
                 testScriptEditor.setDebugStyle(spreadSheet, wp.stepIndex, wp.caseIndex);
             }
@@ -85,8 +85,8 @@ public class EditorTabController implements FileOpenable, DebugListener {
     }
 
     @Override
-    public void onDebugging(Path scriptPath, int stepIndex, int caseIndex) {
-        waitingMap.put(scriptPath, new WaitingPoint(stepIndex, caseIndex));
+    public void onPause(Path scriptPath, int stepIndex, int caseIndex) {
+        waitingMap.put(scriptPath.toAbsolutePath().toString(), new WaitingPoint(stepIndex, caseIndex));
         Optional<Tab> targetTab = getTab(scriptPath);
         targetTab.ifPresent(tab -> {
             tabs.getSelectionModel().select(tab);
@@ -95,18 +95,28 @@ public class EditorTabController implements FileOpenable, DebugListener {
     }
 
     @Override
-    public void onResume(Path scriptPath) {
-        waitingMap.remove(scriptPath);
+    public void onStepStart(Path scriptPath, int stepIndex, int caseIndex) {
+        waitingMap.remove(scriptPath.toAbsolutePath().toString());
         Optional<Tab> targetTab = getTab(scriptPath);
         targetTab.ifPresent(tab -> {
-            tabs.getSelectionModel().select(tab);
-            testScriptEditor.removeDebugStyle((SpreadsheetView) tab.getContent());
+            testScriptEditor.setRunningStyle((SpreadsheetView) tab.getContent(), stepIndex, caseIndex);
         });
     }
 
     @Override
-    public void onInterrupted(Path scriptPath) {
-        onResume(scriptPath);
+    public void onCaseEnd(Path scriptPath, int caseIndex) {
+        waitingMap.remove(scriptPath.toAbsolutePath().toString());
+        Optional<Tab> targetTab = getTab(scriptPath);
+        targetTab.ifPresent(tab -> {
+            testScriptEditor.removeRunningDebugStyle((SpreadsheetView) tab.getContent());
+        });
+    }
+
+    @Override
+    public void onClose() {
+        waitingMap.clear();
+        tabs.getTabs().stream().map(Tab::getContent).map(content -> (SpreadsheetView) content)
+                .forEach(testScriptEditor::removeRunningDebugStyle);
     }
 
 
@@ -114,7 +124,6 @@ public class EditorTabController implements FileOpenable, DebugListener {
         String absolutePath = scriptPath.toAbsolutePath().toString();
         return tabs.getTabs().stream()
                 .filter(tab -> tab.getTooltip().getText().equals(absolutePath)).findFirst();
-
     }
 
     @Data

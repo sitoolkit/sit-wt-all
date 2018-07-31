@@ -14,3 +14,14 @@
 .spreadsheet-cell.waitingCase.waitingStep{
     -fx-background-color: yellowgreen;
 }
+.spreadsheet-cell.runningStep {
+    -fx-background-color: mistyrose;
+}
+
+.spreadsheet-cell.runningCase {
+    -fx-background-color: lightyellow;
+}
+
+.spreadsheet-cell.runningCase.runningStep{
+    -fx-background-color: orange;
+}

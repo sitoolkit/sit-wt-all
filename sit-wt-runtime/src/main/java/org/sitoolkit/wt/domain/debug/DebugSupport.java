@@ -75,10 +75,6 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
 
     private boolean paused = false;
 
-    private Boolean debugging = false;
-    private Path debuggingPath = null;
-    private int debuggingStep = -1;
-
     /**
      * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき
      * {@code TestStep}
@@ -107,14 +103,17 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
             }
 
             if (nextIndex >= testScript.getTestStepCount()) {
+                sendCaseEnd();
                 return current.isContinued();
             }
 
             current.setCurrentIndex(nextIndex);
             current.setTestStep(current.getTestScript().getTestStep(nextIndex));
+            sendStepStart();
 
             return true;
         } else {
+            sendCaseEnd();
             return current.isContinued();
         }
     }
@@ -150,10 +149,16 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
         }
 
         int ret = currentIndex;
+        int retBefore = currentIndex;
+        sendStepPausing(ret + 1);
 
         while (isPaused()) {
 
-            setDebuggingStep(ret + 1);
+            if (ret != retBefore) {
+                sendStepPausing(ret + 1);
+                retBefore = ret;
+            }
+
             try {
                 Thread.sleep(getPauseSpan());
             } catch (InterruptedException e) {
@@ -207,8 +212,6 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
             }
 
         }
-
-        clearDebugging();
 
         return ret;
     }
@@ -307,9 +310,7 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if (event instanceof ContextClosedEvent) {
-            if (debugging) {
-                listener.onInterrupted(debuggingPath);
-            }
+            sendClose();
         }
     }
 
@@ -329,23 +330,30 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
         this.paused = paused;
     }
 
-    private void setDebuggingStep(int stepIndex) {
-        if (debugging && this.debuggingStep == stepIndex) {
-            return;
-        }
-        debugging = true;
-        debuggingPath = current.getTestScript().getScriptFile().toPath();
-        this.debuggingStep = stepIndex;
+    public void start() {
+        sendStepStart();
+    }
+
+    private void sendStepPausing(int nextStepIndex) {
+        Path path = current.getTestScript().getScriptFile().toPath();
         int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
-        listener.onDebugging(debuggingPath, stepIndex, caseIndex);
+        listener.onPause(path, nextStepIndex, caseIndex);
     }
 
-    private void clearDebugging() {
-        Path path = debuggingPath;
-        debugging = false;
-        debuggingPath = null;
-        debuggingStep = -1;
-        listener.onResume(path);
+    private void sendStepStart() {
+        Path path = current.getTestScript().getScriptFile().toPath();
+        int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+        int stepIndex = current.getCurrentIndex();
+        listener.onStepStart(path, stepIndex, caseIndex);
     }
 
+    private void sendCaseEnd() {
+        Path path = current.getTestScript().getScriptFile().toPath();
+        int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+        listener.onCaseEnd(path, caseIndex);
+    }
+
+    private void sendClose() {
+        listener.onClose();
+    }
 }
