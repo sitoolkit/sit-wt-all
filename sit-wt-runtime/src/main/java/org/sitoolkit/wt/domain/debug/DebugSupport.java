@@ -16,6 +16,7 @@
 package org.sitoolkit.wt.domain.debug;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,8 +37,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
-
-import lombok.Setter;
 
 /**
  *
@@ -61,8 +60,7 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
     @Resource
     PropertyManager pm;
 
-    @Setter
-    DebugListener listener;
+    Optional<DebugListener> listener = Optional.empty();
 
     /**
      * ポーズ中にスレッドをsleepする間隔(ミリ秒)
@@ -330,30 +328,42 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
         this.paused = paused;
     }
 
+    public void setListener(DebugListener listener) {
+        this.listener = Optional.ofNullable(listener);
+    }
+
     public void start() {
         sendStepStart();
     }
 
     private void sendStepPausing(int nextStepIndex) {
-        Path path = current.getTestScript().getScriptFile().toPath();
-        int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
-        listener.onPause(path, nextStepIndex, caseIndex);
+        listener.ifPresent(l -> {
+            Path path = current.getTestScript().getScriptFile().toPath();
+            int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+            l.onPause(path, nextStepIndex, caseIndex);
+        });
     }
 
     private void sendStepStart() {
-        Path path = current.getTestScript().getScriptFile().toPath();
-        int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
-        int stepIndex = current.getCurrentIndex();
-        listener.onStepStart(path, stepIndex, caseIndex);
+        listener.ifPresent(l -> {
+            Path path = current.getTestScript().getScriptFile().toPath();
+            int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+            int stepIndex = current.getCurrentIndex();
+            l.onStepStart(path, stepIndex, caseIndex);
+        });
     }
 
     private void sendCaseEnd() {
-        Path path = current.getTestScript().getScriptFile().toPath();
-        int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
-        listener.onCaseEnd(path, caseIndex);
+        listener.ifPresent(l -> {
+            Path path = current.getTestScript().getScriptFile().toPath();
+            int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+            l.onCaseEnd(path, caseIndex);
+        });
     }
 
     private void sendClose() {
-        listener.onClose();
+        listener.ifPresent(l -> {
+            l.onClose();
+        });
     }
 }
