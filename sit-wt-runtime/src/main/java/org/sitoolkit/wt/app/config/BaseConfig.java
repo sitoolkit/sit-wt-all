@@ -14,6 +14,7 @@ import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.SpringBeanFactory;
 import org.sitoolkit.wt.infra.csv.CsvFileReader;
 import org.sitoolkit.wt.infra.csv.CsvFileWriter;
+import org.sitoolkit.wt.util.infra.util.OverwriteChecker;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +42,11 @@ public class BaseConfig {
     @Bean
     public FileOverwriteChecker fileOverwriteChecker() {
         return new FileOverwriteChecker();
+    }
+
+    @Bean
+    public OverwriteChecker overwriteChecker() {
+        return new OverwriteChecker();
     }
 
     @Bean

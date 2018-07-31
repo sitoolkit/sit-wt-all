@@ -31,6 +31,7 @@ import org.sitoolkit.wt.infra.csv.CsvFileReader;
 import org.sitoolkit.wt.infra.csv.CsvFileWriter;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
+import org.sitoolkit.wt.util.infra.util.OverwriteChecker;
 import org.springframework.context.ApplicationContext;
 
 public class TestScriptDao {
@@ -57,6 +58,9 @@ public class TestScriptDao {
 
     @Resource
     FileOverwriteChecker fileOverwriteChecker;
+
+    @Resource
+    OverwriteChecker overwriteChecker;
 
     @Resource
     CsvFileReader csvReader;
@@ -212,18 +216,14 @@ public class TestScriptDao {
     }
 
     private void writeCsv(Path path, List<TestStep> testSteps, boolean overwrite) {
-        if (!isWritable(path, overwrite)) {
+        overwriteChecker.setRebuild(overwrite);
+        if (!overwriteChecker.isWritable(path)) {
             return;
         }
 
         List<List<String>> data = createWriteData(testSteps);
         csvWriter.write(data, path.toAbsolutePath().toString());
         log.info("script.file.saved", path.toAbsolutePath().toString());
-    }
-
-    private boolean isWritable(Path path, boolean overwrite) {
-        // TODO GUIによる上書き可否のユーザ確認
-        return true;
     }
 
     private List<List<String>> createWriteData(List<TestStep> testSteps) {
