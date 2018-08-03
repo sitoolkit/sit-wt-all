@@ -4,12 +4,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.io.ByteOrderMark;
+import org.sitoolkit.wt.infra.PropertyManager;
 
 import com.opencsv.CSVWriter;
 
 public class CsvFileWriter {
+
+    @Resource
+    PropertyManager pm;
 
     public void write(List<List<String>> data, String absolutePath) {
 
@@ -23,10 +33,15 @@ public class CsvFileWriter {
     private void writeFile(List<String[]> allLines, String absolutePath) {
 
         try (OutputStream out = new FileOutputStream(absolutePath);
-                CSVWriter writer = new CSVWriter(new OutputStreamWriter(out))) {
+                Writer writer = new OutputStreamWriter(out, pm.getCsvCharset());
+                CSVWriter csvWriter = new CSVWriter(writer)) {
+
+            if (pm.isCsvHasBOM() && StandardCharsets.UTF_8.equals(pm.getCsvCharset())) {
+                out.write(ByteOrderMark.UTF_8.getBytes());
+            }
 
             boolean applyQuotesToAll = false;
-            writer.writeAll(allLines, applyQuotesToAll);
+            csvWriter.writeAll(allLines, applyQuotesToAll);
 
         } catch (IOException e) {
             throw new IllegalStateException(e);

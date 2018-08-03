@@ -13,12 +13,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.sitoolkit.wt.infra.PropertyManager;
 
 import com.opencsv.CSVReader;
 
 public class CsvFileReader {
+
+    @Resource
+    PropertyManager pm;
 
     public List<Map<String, String>> read(String absolutePath, boolean headerRowOnly) {
 
@@ -43,7 +49,7 @@ public class CsvFileReader {
     private List<String[]> readFile(String absolutePath, boolean headerRowOnly) {
 
         try (InputStream in = new BOMInputStream(new FileInputStream(absolutePath));
-                CSVReader reader = new CSVReader(new InputStreamReader(in))) {
+                CSVReader reader = new CSVReader(new InputStreamReader(in, pm.getCsvCharset()))) {
 
             if (headerRowOnly) {
                 return Collections.singletonList(reader.readNext());

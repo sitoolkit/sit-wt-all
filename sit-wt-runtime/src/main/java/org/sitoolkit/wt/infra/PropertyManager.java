@@ -3,6 +3,8 @@ package org.sitoolkit.wt.infra;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
+import lombok.Getter;
 import lombok.Setter;
 
 @Configuration
@@ -104,6 +107,14 @@ public class PropertyManager {
 
     @Value("${wait.waitSpan}")
     private int waitSpan;
+
+    @Setter
+    @Getter
+    private Charset csvCharset = StandardCharsets.UTF_8;
+
+    @Setter
+    @Getter
+    private boolean csvHasBOM = true;
 
     private Map<String, String> capabilities = new HashMap<>();
 
@@ -305,4 +316,5 @@ public class PropertyManager {
     public int getWaitSpan() {
         return waitSpan;
     }
+
 }
