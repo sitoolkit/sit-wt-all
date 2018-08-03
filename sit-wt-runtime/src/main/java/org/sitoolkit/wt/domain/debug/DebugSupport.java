@@ -34,15 +34,12 @@ import org.sitoolkit.wt.infra.PropertyManager;
 import org.sitoolkit.wt.infra.log.SitLogger;
 import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-public class DebugSupport implements ApplicationListener<ApplicationEvent> {
+public class DebugSupport {
 
     private static SitLogger LOG = SitLoggerFactory.getLogger(DebugSupport.class);
 
@@ -147,15 +144,10 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
         }
 
         int ret = currentIndex;
-        int retBefore = currentIndex;
-        sendStepPausing(ret + 1);
 
         while (isPaused()) {
 
-            if (ret != retBefore) {
-                sendStepPausing(ret + 1);
-                retBefore = ret;
-            }
+            sendStepPausing(ret + 1);
 
             try {
                 Thread.sleep(getPauseSpan());
@@ -300,15 +292,9 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
 
     @PreDestroy
     public void destroy() {
+        sendClose();
         if (pm.isDebug()) {
             executor.shutdownNow();
-        }
-    }
-
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof ContextClosedEvent) {
-            sendClose();
         }
     }
 
@@ -366,4 +352,5 @@ public class DebugSupport implements ApplicationListener<ApplicationEvent> {
             l.onClose();
         });
     }
+
 }
