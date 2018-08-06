@@ -82,6 +82,8 @@ public class PropertyManager {
         try (FileOutputStream fos = new FileOutputStream(new File(baseDir, FILE_NAME), false)) {
 
             setProp(BASE_URL, StrUtils.join(baseUrls));
+            setProp(CSV_CHARSET, getCsvCharset().name());
+            setProp(CSV_BOM, String.valueOf(getCsvHasBOM()));
 
             prop.store(fos, "SI-Toolkit for Web Testing");
             LOG.log(Level.INFO, "saved properties : {0}", prop);
