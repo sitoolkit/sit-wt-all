@@ -10,6 +10,7 @@ import org.sitoolkit.wt.domain.testscript.TestScript;
 import org.sitoolkit.wt.gui.app.script.ScriptService;
 import org.sitoolkit.wt.gui.pres.editor.TestScriptEditor;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.SingleSelectionModel;
@@ -77,34 +78,41 @@ public class EditorTabController implements FileOpenable, DebugListener {
 
     @Override
     public void onPause(Path scriptPath, int stepIndex, int caseIndex) {
-        Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
-        targetView.ifPresent(view -> {
-            testScriptEditor.setDebugStyle(view, stepIndex, caseIndex);
+        Platform.runLater(() -> {
+            Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
+            targetView.ifPresent(view -> {
+                testScriptEditor.setDebugStyle(view, stepIndex, caseIndex);
+            });
         });
     }
 
     @Override
     public void onStepStart(Path scriptPath, int stepIndex, int caseIndex) {
-        Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
-        targetView.ifPresent(view -> {
-            testScriptEditor.setRunningStyle(view, stepIndex, caseIndex);
+        Platform.runLater(() -> {
+            Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
+            targetView.ifPresent(view -> {
+                testScriptEditor.setRunningStyle(view, stepIndex, caseIndex);
+            });
         });
     }
 
     @Override
     public void onCaseEnd(Path scriptPath, int caseIndex) {
-        Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
-        targetView.ifPresent(view -> {
-            testScriptEditor.removeRunningDebugStyle(view);
+        Platform.runLater(() -> {
+            Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
+            targetView.ifPresent(view -> {
+                testScriptEditor.removeRunningDebugStyle(view);
+            });
         });
     }
 
     @Override
     public void onClose() {
-        tabs.getTabs().stream().map(Tab::getContent).map(content -> (SpreadsheetView) content)
-                .forEach(testScriptEditor::removeRunningDebugStyle);
+        Platform.runLater(() -> {
+            tabs.getTabs().stream().map(Tab::getContent).map(content -> (SpreadsheetView) content)
+                    .forEach(testScriptEditor::removeRunningDebugStyle);
+        });
     }
-
 
     private Optional<Tab> getTab(Path scriptPath) {
         String absolutePath = scriptPath.toAbsolutePath().toString();
