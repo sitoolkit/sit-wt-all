@@ -3,25 +3,14 @@
     -fx-alignment: center;
 }
 
-.spreadsheet-cell.waitingStep {
+.spreadsheet-cell.debugStep {
     -fx-background-color: lightgreen;
 }
 
-.spreadsheet-cell.waitingCase {
+.spreadsheet-cell.debugCase {
     -fx-background-color: lightyellow;
 }
 
-.spreadsheet-cell.waitingCase.waitingStep{
+.spreadsheet-cell.debugCase.debugStep{
     -fx-background-color: yellowgreen;
-}
-.spreadsheet-cell.runningStep {
-    -fx-background-color: mistyrose;
-}
-
-.spreadsheet-cell.runningCase {
-    -fx-background-color: lightyellow;
-}
-
-.spreadsheet-cell.runningCase.runningStep{
-    -fx-background-color: orange;
 }

@@ -326,7 +326,7 @@ public class DebugSupport {
         listener.ifPresent(l -> {
             Path path = current.getTestScript().getScriptFile().toPath();
             int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
-            l.onPause(path, nextStepIndex, caseIndex);
+            l.onDebugging(path, nextStepIndex, caseIndex);
         });
     }
 
@@ -335,7 +335,7 @@ public class DebugSupport {
             Path path = current.getTestScript().getScriptFile().toPath();
             int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
             int stepIndex = current.getCurrentIndex();
-            l.onStepStart(path, stepIndex, caseIndex);
+            l.onDebugging(path, stepIndex, caseIndex);
         });
     }
 

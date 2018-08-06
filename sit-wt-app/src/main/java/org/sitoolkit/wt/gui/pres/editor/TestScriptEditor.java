@@ -344,24 +344,16 @@ public class TestScriptEditor {
     }
 
     public void setDebugStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex) {
-        removeRunningDebugStyle(spreadSheet);
-        setStyle(spreadSheet, stepIndex, caseIndex, "waitingStep","waitingCase");
+        removeDebugStyle(spreadSheet);
+        setStyle(spreadSheet, stepIndex, caseIndex, "debugStep","debugCase");
     }
 
-    public void setRunningStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex) {
-        removeRunningDebugStyle(spreadSheet);
-        setStyle(spreadSheet, stepIndex, caseIndex, "runningStep","runningCase");
-
-    }
-
-    public void removeRunningDebugStyle(SpreadsheetView spreadSheet) {
+    public void removeDebugStyle(SpreadsheetView spreadSheet) {
         spreadSheet.getGrid().getRows().stream()
                 .flatMap(ObservableList::stream)
                 .forEach(cell -> {
-                    cell.getStyleClass().remove("waitingStep");
-                    cell.getStyleClass().remove("waitingCase");
-                    cell.getStyleClass().remove("runningStep");
-                    cell.getStyleClass().remove("runningCase");
+                    cell.getStyleClass().remove("debugStep");
+                    cell.getStyleClass().remove("debugCase");
                 });
     }
 

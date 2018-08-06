@@ -77,7 +77,7 @@ public class EditorTabController implements FileOpenable, DebugListener {
     }
 
     @Override
-    public void onPause(Path scriptPath, int stepIndex, int caseIndex) {
+    public void onDebugging(Path scriptPath, int stepIndex, int caseIndex) {
         Platform.runLater(() -> {
             Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
             targetView.ifPresent(view -> {
@@ -87,21 +87,11 @@ public class EditorTabController implements FileOpenable, DebugListener {
     }
 
     @Override
-    public void onStepStart(Path scriptPath, int stepIndex, int caseIndex) {
-        Platform.runLater(() -> {
-            Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
-            targetView.ifPresent(view -> {
-                testScriptEditor.setRunningStyle(view, stepIndex, caseIndex);
-            });
-        });
-    }
-
-    @Override
     public void onCaseEnd(Path scriptPath, int caseIndex) {
         Platform.runLater(() -> {
             Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
             targetView.ifPresent(view -> {
-                testScriptEditor.removeRunningDebugStyle(view);
+                testScriptEditor.removeDebugStyle(view);
             });
         });
     }
@@ -110,7 +100,7 @@ public class EditorTabController implements FileOpenable, DebugListener {
     public void onClose() {
         Platform.runLater(() -> {
             tabs.getTabs().stream().map(Tab::getContent).map(content -> (SpreadsheetView) content)
-                    .forEach(testScriptEditor::removeRunningDebugStyle);
+                    .forEach(testScriptEditor::removeDebugStyle);
         });
     }
 
