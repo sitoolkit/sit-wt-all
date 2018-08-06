@@ -30,7 +30,7 @@ public class SampleManager {
         unarchive("sample/terms.html");
         unarchive("sample/bootstrap.min.css");
         unarchive("sample/pom.xml");
-        unarchive("sample/ExcelTestScript.xlsx", new File("testscript", "SampleTestScript.xlsx"));
+        unarchive("sample/CsvTestScript.csv", new File("testscript", "SampleTestScript.csv"));
     }
 
     private void unarchive(String resource) {

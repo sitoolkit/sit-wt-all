@@ -199,7 +199,7 @@
       <resource>
         <directory>${project.basedir}/testscript</directory>
         <includes>
-          <include>ExcelTestScript.xlsx</include>
+          <include>CsvTestScript.csv</include>
         </includes>
         <targetPath>${project.build.outputDirectory}/sample</targetPath>
       </resource>

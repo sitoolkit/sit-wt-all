@@ -25,7 +25,7 @@ public class SampleService {
      *    :
      *    pom.xml
      *   testscript
-     *     SampleTestScript.xlsx
+     *     SampleTestScript.csv
      * </pre>
      *
      * @param destDir
