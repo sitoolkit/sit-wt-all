@@ -134,6 +134,7 @@ public class AppController implements Initializable {
 
         fileTreeController.setTestRunnable(testToolbarController);
         fileTreeController.fileOpenable = editorTabController;
+        fileTreeController.scriptService = scriptService;
 
         editorTabController.tabs = editorTab;
         editorTabController.scriptService = scriptService;
@@ -196,6 +197,7 @@ public class AppController implements Initializable {
         messageView.addMsg("プロジェクトを開きます。" + projectDir.getAbsolutePath());
         fileTreeController.setFileTreeRoot(projectDir);
         testToolbarController.loadProject();
+        scriptService.loadProject();
         FxContext.setTitie(projectDir.getAbsolutePath());
     }
 
