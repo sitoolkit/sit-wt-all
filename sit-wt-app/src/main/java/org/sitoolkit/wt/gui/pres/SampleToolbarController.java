@@ -73,7 +73,7 @@ public class SampleToolbarController implements Initializable {
                 String sampleBaseUrl = "http://localhost:8280";
                 messageView.addMsg("サンプルWebサイトを起動しました。" + sampleBaseUrl + "/input.html");
                 messageView
-                        .addMsg("サンプルテストスクリプトtestscript/SampleTestScript.xlsxを左のツリーで選択して実行できます。");
+                        .addMsg("サンプルテストスクリプトtestscript/SampleTestScript.csvを左のツリーで選択して実行できます。");
                 // TODO サンプルURLの動的取得
                 testToolbarController.setBaseUrl(sampleBaseUrl);
                 running.set(true);

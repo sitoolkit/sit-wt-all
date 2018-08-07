@@ -3,6 +3,8 @@ package org.sitoolkit.wt.infra;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
+import lombok.Getter;
 import lombok.Setter;
 
 @Configuration
@@ -105,6 +108,14 @@ public class PropertyManager {
     @Value("${wait.waitSpan}")
     private int waitSpan;
 
+    @Setter
+    @Getter
+    private Charset csvCharset = StandardCharsets.UTF_8;
+
+    @Setter
+    @Getter
+    private boolean csvHasBOM = true;
+
     private Map<String, String> capabilities = new HashMap<>();
 
     private boolean isFirefoxDriver;
@@ -116,6 +127,8 @@ public class PropertyManager {
     private boolean isMsDriver;
 
     private boolean isRemoteDriver;
+
+    private boolean isChromeDriver;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
@@ -143,6 +156,7 @@ public class PropertyManager {
         isEdgeDriver = equalsAny("edge", driverType, browserName);
         isMsDriver = isIeDriver || isEdgeDriver;
         isRemoteDriver = "remote".equals(driverType);
+        isChromeDriver = equalsAny("chrome", driverType, browserName);
     }
 
     private String toLowerCase(String str) {
@@ -208,6 +222,10 @@ public class PropertyManager {
 
     public boolean isSafariDriver() {
         return "safari".equalsIgnoreCase(driverType);
+    }
+
+    public boolean isChromeDriver() {
+        return isChromeDriver;
     }
 
     public URL getAppiumAddress() {
@@ -298,4 +316,5 @@ public class PropertyManager {
     public int getWaitSpan() {
         return waitSpan;
     }
+
 }

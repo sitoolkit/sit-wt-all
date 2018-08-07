@@ -159,6 +159,11 @@
       <artifactId>asm-commons</artifactId>
       <version>5.0.2</version>
     </dependency>
+	<dependency>
+		<groupId>com.opencsv</groupId>
+		<artifactId>opencsv</artifactId>
+		<version>4.2</version>
+    </dependency>
   </dependencies>
   <parent>
     <groupId>org.sitoolkit.wt</groupId>
@@ -194,7 +199,7 @@
       <resource>
         <directory>${project.basedir}/testscript</directory>
         <includes>
-          <include>ExcelTestScript.xlsx</include>
+          <include>CsvTestScript.csv</include>
         </includes>
         <targetPath>${project.build.outputDirectory}/sample</targetPath>
       </resource>

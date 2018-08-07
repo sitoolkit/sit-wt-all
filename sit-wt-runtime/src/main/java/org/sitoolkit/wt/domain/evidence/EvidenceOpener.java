@@ -50,7 +50,7 @@ public class EvidenceOpener {
 
         List<File> targetFiles = new ArrayList<File>(FileUtils.listFiles(evidenceDir,
                 new RegexFileFilter(targetFileRegex), TrueFileFilter.INSTANCE));
-        LOG.info("evidence.info ", evidenceDir.getName(), targetFiles.size(), evidenceType);
+        LOG.info("evidence.info", evidenceDir.getName(), targetFiles.size(), evidenceType);
 
         Collections.sort(targetFiles, new FileLastModifiedComarator(true));
 

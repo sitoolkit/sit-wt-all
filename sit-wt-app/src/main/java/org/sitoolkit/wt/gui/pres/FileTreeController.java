@@ -56,7 +56,7 @@ public class FileTreeController implements Initializable {
 
     FileOpenable fileOpenable;
 
-    ScriptService scriptService = new ScriptService();
+    ScriptService scriptService;
 
     TestCaseDialogController testCaseDialogController;
 

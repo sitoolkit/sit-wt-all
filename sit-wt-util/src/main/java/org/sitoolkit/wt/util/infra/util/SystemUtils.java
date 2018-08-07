@@ -3,6 +3,8 @@ package org.sitoolkit.wt.util.infra.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SystemUtils {
 
@@ -56,4 +58,13 @@ public class SystemUtils {
 
         return repo;
     }
+
+    public static String getEnvironmentInfo() {
+        String info = Stream.of("java.version", "java.vendor", "os.name", "os.arch", "os.version")
+                .map(key -> String.format("%s=%s", key, System.getProperty(key)))
+                .collect(Collectors.joining(", "));
+
+        return info;
+    }
+
 }
