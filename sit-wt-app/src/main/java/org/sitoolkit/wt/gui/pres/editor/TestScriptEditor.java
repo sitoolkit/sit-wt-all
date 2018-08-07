@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -111,7 +111,7 @@ public class TestScriptEditor {
             testStep.setScreenshotTiming(row.get(6).getText());
             testStep.setBreakPoint(row.get(7).getText());
 
-            Map<String, String> testData = new HashMap<String, String>();
+            Map<String, String> testData = new LinkedHashMap<String, String>();
             for (int idx = 8; idx < row.size(); idx++) {
                 String caseNo = StringUtils.substringAfter(headers.get(idx),
                         testScript.getCaseNoPrefix());
