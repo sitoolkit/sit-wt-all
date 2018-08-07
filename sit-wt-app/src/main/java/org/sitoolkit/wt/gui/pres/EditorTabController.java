@@ -5,7 +5,10 @@ import java.util.Optional;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.sitoolkit.wt.domain.testscript.TestScript;
+import org.sitoolkit.wt.gui.app.script.ScriptFileType;
 import org.sitoolkit.wt.gui.app.script.ScriptService;
+import org.sitoolkit.wt.gui.infra.fx.FxContext;
+import org.sitoolkit.wt.gui.infra.fx.ScriptDialog;
 import org.sitoolkit.wt.gui.pres.editor.TestScriptEditor;
 
 import javafx.beans.property.BooleanProperty;
@@ -25,6 +28,8 @@ public class EditorTabController implements FileOpenable {
 
     TestScriptEditor testScriptEditor = new TestScriptEditor();
 
+    ScriptDialog scriptDialog = new ScriptDialog();
+
     private BooleanProperty empty = new SimpleBooleanProperty(true);
 
     public void initialize() {
@@ -40,6 +45,10 @@ public class EditorTabController implements FileOpenable {
 
     @Override
     public void open(File file) {
+        open(file, Optional.empty());
+    }
+
+    private void open(File file, Optional<ScriptFileType> fileType) {
         Optional<Tab> scriptTab = tabs.getTabs().stream()
                 .filter(tab -> tab.getTooltip().getText().equals(file.getAbsolutePath())).findFirst();
 
@@ -48,7 +57,7 @@ public class EditorTabController implements FileOpenable {
             selectionModel.select(scriptTab.get());
 
         } else {
-            TestScript testScript = scriptService.read(file);
+            TestScript testScript = scriptService.read(file, fileType);
             Tab tab = new Tab(file.getName());
             SpreadsheetView spreadSheet = testScriptEditor.buildSpreadsheet(testScript);
             tab.setContent(spreadSheet);
@@ -68,7 +77,34 @@ public class EditorTabController implements FileOpenable {
         scriptService.write(testScript);
     }
 
+    public void open() {
+        File file = scriptDialog.showOpenDialog(FxContext.getPrimaryStage());
+        if (file != null) {
+            Optional<ScriptFileType> fileType = scriptDialog.getSelectedFileType();
+            open(file, fileType);
+        }
+    }
+
+    public void saveAs() {
+        File file = scriptDialog.showSaveDialog(FxContext.getPrimaryStage());
+        if (file != null) {
+
+            Optional<ScriptFileType> fileType = scriptDialog.getSelectedFileType();
+            Tab selectedTab = tabs.getTabs().stream().filter(Tab::isSelected).findFirst().get();
+
+            SpreadsheetView spreadSheet = (SpreadsheetView) selectedTab.getContent();
+            TestScript testScript = testScriptEditor.buildTestscript(spreadSheet);
+            testScript.setScriptFile(file);
+            scriptService.write(testScript, fileType);
+            selectedTab.setText(file.getName());
+            selectedTab.getTooltip().setText(file.getAbsolutePath());
+            spreadSheet.setId(file.getAbsolutePath());
+        }
+
+    }
+
     public BooleanProperty isEmpty() {
         return this.empty;
     }
+
 }
