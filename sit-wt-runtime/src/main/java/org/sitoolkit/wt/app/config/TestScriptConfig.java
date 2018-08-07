@@ -71,4 +71,22 @@ public class TestScriptConfig {
         return tdm;
     }
 
+    @Bean
+    @Primary
+    public OperationConverter getOperationConverter() {
+        return new OperationConverter() {
+
+            @Override
+            public Object convert(Class type, Object o) {
+                return new Operation() {
+
+                    @Override
+                    public OperationResult operate(TestStep testStep) {
+                        return null;
+                    }
+                };
+            }
+        };
+    }
+
 }

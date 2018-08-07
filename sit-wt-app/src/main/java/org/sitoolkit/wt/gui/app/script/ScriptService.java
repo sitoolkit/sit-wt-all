@@ -11,6 +11,7 @@ import org.sitoolkit.wt.gui.domain.script.CaseNoCache;
 import org.sitoolkit.wt.gui.domain.script.CaseNoReadCallback;
 import org.sitoolkit.wt.gui.domain.script.CaseNoStdoutListener;
 import org.sitoolkit.wt.gui.domain.script.ScriptProcessClient;
+import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.process.ConversationProcess;
 import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
@@ -26,16 +27,25 @@ public class ScriptService {
 
     TestScriptDao dao;
 
+    ApplicationContext appCtx;
+
     public ScriptService() {
         initialize();
     }
 
     private void initialize() {
         ExecutorContainer.get().execute(() -> {
-            ApplicationContext appCtx = new AnnotationConfigApplicationContext(BaseConfig.class,
+            appCtx = new AnnotationConfigApplicationContext(BaseConfig.class,
                     TestScriptConfig.class);
             dao = appCtx.getBean(TestScriptDao.class);
         });
+    }
+
+    public void loadProject() {
+        PropertyManager pm = PropertyManager.get();
+        org.sitoolkit.wt.infra.PropertyManager runtimePm  = appCtx.getBean(org.sitoolkit.wt.infra.PropertyManager.class);
+        runtimePm.setCsvCharset(pm.getCsvCharset());
+        runtimePm.setCsvHasBOM(pm.getCsvHasBOM());
     }
 
     public TestScript read(File file) {
@@ -94,4 +104,5 @@ public class ScriptService {
 
         client.readCaseNo(testScript, params);
     }
+
 }

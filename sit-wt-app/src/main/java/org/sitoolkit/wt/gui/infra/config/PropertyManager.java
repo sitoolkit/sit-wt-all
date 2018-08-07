@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,10 @@ public class PropertyManager {
     private static final String BASE_URL = "baseUrl";
 
     private static final String BASE_URL_LIMIT = "baseUrlLimit";
+
+    private static final String CSV_CHARSET = "script.file.csv.charset";
+
+    private static final String CSV_BOM = "script.file.csv.bom";
 
     private static final Logger LOG = Logger.getLogger(PropertyManager.class.getName());
 
@@ -77,6 +82,8 @@ public class PropertyManager {
         try (FileOutputStream fos = new FileOutputStream(new File(baseDir, FILE_NAME), false)) {
 
             setProp(BASE_URL, StrUtils.join(baseUrls));
+            setProp(CSV_CHARSET, getCsvCharset().name());
+            setProp(CSV_BOM, String.valueOf(getCsvHasBOM()));
 
             prop.store(fos, "SI-Toolkit for Web Testing");
             LOG.log(Level.INFO, "saved properties : {0}", prop);
@@ -99,6 +106,14 @@ public class PropertyManager {
 
     public int getBaseUrlLimit() {
         return Integer.parseInt(getProp(BASE_URL_LIMIT, "5"));
+    }
+
+    public Charset getCsvCharset() {
+        return Charset.forName(getProp(CSV_CHARSET, "UTF-8"));
+    }
+
+    public boolean getCsvHasBOM() {
+        return Boolean.valueOf(getProp(CSV_BOM, "true"));
     }
 
     private String getProp(String key) {

@@ -15,10 +15,13 @@
  */
 package org.sitoolkit.wt.domain.testscript;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.sitoolkit.util.tabledata.RowData;
 import org.sitoolkit.util.tabledata.TableData;
@@ -45,6 +48,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
      */
     private static String sheetName = "TestScript";
 
+    private static String stepNo = "StepNo";
+
     private static String itemName = "ItemName";
 
     private static String operation = "Operation";
@@ -56,6 +61,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
     private static String dataStyle = "DataStyle";
 
     private static String screenshot = "Screenshot";
+
+    private static String breakpoint = "Breakpoint";
 
     private static String case_ = "Case";
 
@@ -108,12 +115,71 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
     private static void initCellNameMap() {
         cellNameMap = new HashMap<String, String>();
 
+        cellNameMap.put(stepNo, MessageManager.getMessage(stepNo));
         cellNameMap.put(itemName, MessageManager.getMessage(itemName));
         cellNameMap.put(operation, MessageManager.getMessage(operation));
         cellNameMap.put(locatorStyle, MessageManager.getMessage(locatorStyle));
         cellNameMap.put(locator, MessageManager.getMessage(locator));
         cellNameMap.put(dataStyle, MessageManager.getMessage(dataStyle));
         cellNameMap.put(screenshot, MessageManager.getMessage(screenshot));
+        cellNameMap.put(breakpoint, MessageManager.getMessage(breakpoint));
         cellNameMap.put(case_, MessageManager.getMessage(case_));
     }
+
+    private static String getValue(Map<String, String> row, String key) {
+        if (cellNameMap == null) {
+            initCellNameMap();
+        }
+        return row.get(cellNameMap.get(key));
+    }
+
+    public static void loadStep(TestStep testStep, Map<String, String> row,
+            List<String> caseNoList) {
+
+        testStep.setNo(getValue(row, stepNo));
+        testStep.setItemName(getValue(row, itemName));
+        testStep.setOperationName(getValue(row, operation));
+        Locator l = new Locator();
+        l.setType(getValue(row, locatorStyle));
+        l.setValue(getValue(row, locator));
+        testStep.setLocator(l);
+        testStep.setDataType(getValue(row, dataStyle));
+        testStep.setScreenshotTiming(getValue(row, screenshot));
+        testStep.setBreakPoint(getValue(row, breakpoint));
+        Map<String, String> testData = new HashMap<String, String>();
+
+        String casePrefix = (new TestScript()).getCaseNoPrefix();
+        caseNoList.stream().forEach(s -> {
+            testData.put(s, row.get(casePrefix + s));
+        });
+        testStep.setTestData(testData);
+    }
+
+    public static List<String> createHeaderRow(List<String> caseNoList) {
+
+        String casePrefix = (new TestScript()).getCaseNoPrefix();
+
+        Stream<String> itemStream = Stream.of(stepNo, itemName, operation, locatorStyle, locator,
+                dataStyle, screenshot, breakpoint).map(cellNameMap::get);
+        Stream<String> caseStream = caseNoList.stream().map(caseNo -> casePrefix + caseNo);
+
+        return Stream.concat(itemStream, caseStream).collect(Collectors.toList());
+    }
+
+    public static List<String> createRow(TestStep testStep, List<String> caseNoList) {
+
+        List<String> row = new ArrayList<>();
+
+        row.add(testStep.getNo());
+        row.add(testStep.getItemName());
+        row.add(testStep.getOperationName());
+        row.add(testStep.getLocator().getType());
+        row.add(testStep.getLocator().getValue());
+        row.add(testStep.getDataType());
+        row.add(testStep.getScreenshotTiming());
+        row.add(testStep.getBreakPoint());
+        caseNoList.stream().map(testStep.getTestData()::get).forEachOrdered(row::add);
+        return row;
+    }
+
 }
