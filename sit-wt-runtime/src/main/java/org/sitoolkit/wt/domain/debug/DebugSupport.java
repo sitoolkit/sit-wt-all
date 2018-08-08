@@ -15,6 +15,8 @@
  */
 package org.sitoolkit.wt.domain.debug;
 
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,6 +57,8 @@ public class DebugSupport {
     @Resource
     PropertyManager pm;
 
+    Optional<DebugListener> listener = Optional.empty();
+
     /**
      * ポーズ中にスレッドをsleepする間隔(ミリ秒)
      */
@@ -66,10 +70,9 @@ public class DebugSupport {
 
     private boolean paused = false;
 
-    private Boolean debug;
-
     /**
-     * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき {@code TestStep}
+     * テスト実行を継続する場合にtrueを返します。 また内部では、{@code TestContext}に次に実行すべき
+     * {@code TestStep}
      * とテストステップインデックスを設定します。(テストステップインデックスはテストスクリプト内でのテストステップの順番です。)
      *
      * @return テスト実行を継続する場合にtrue
@@ -95,14 +98,17 @@ public class DebugSupport {
             }
 
             if (nextIndex >= testScript.getTestStepCount()) {
+                sendCaseEnd();
                 return current.isContinued();
             }
 
             current.setCurrentIndex(nextIndex);
             current.setTestStep(current.getTestScript().getTestStep(nextIndex));
+            sendStepStart();
 
             return true;
         } else {
+            sendCaseEnd();
             return current.isContinued();
         }
     }
@@ -140,6 +146,9 @@ public class DebugSupport {
         int ret = currentIndex;
 
         while (isPaused()) {
+
+            sendStepPausing(ret + 1);
+
             try {
                 Thread.sleep(getPauseSpan());
             } catch (InterruptedException e) {
@@ -193,6 +202,7 @@ public class DebugSupport {
             }
 
         }
+
         return ret;
     }
 
@@ -282,6 +292,7 @@ public class DebugSupport {
 
     @PreDestroy
     public void destroy() {
+        sendClose();
         if (pm.isDebug()) {
             executor.shutdownNow();
         }
@@ -302,4 +313,44 @@ public class DebugSupport {
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
+
+    public void setListener(DebugListener listener) {
+        this.listener = Optional.ofNullable(listener);
+    }
+
+    public void start() {
+        sendStepStart();
+    }
+
+    private void sendStepPausing(int nextStepIndex) {
+        listener.ifPresent(l -> {
+            Path path = current.getTestScript().getScriptFile().toPath();
+            int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+            l.onDebugging(path, nextStepIndex, caseIndex);
+        });
+    }
+
+    private void sendStepStart() {
+        listener.ifPresent(l -> {
+            Path path = current.getTestScript().getScriptFile().toPath();
+            int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+            int stepIndex = current.getCurrentIndex();
+            l.onDebugging(path, stepIndex, caseIndex);
+        });
+    }
+
+    private void sendCaseEnd() {
+        listener.ifPresent(l -> {
+            Path path = current.getTestScript().getScriptFile().toPath();
+            int caseIndex = current.getTestScript().getCaseNoMap().get(current.getCaseNo());
+            l.onCaseEnd(path, caseIndex);
+        });
+    }
+
+    private void sendClose() {
+        listener.ifPresent(l -> {
+            l.onClose();
+        });
+    }
+
 }

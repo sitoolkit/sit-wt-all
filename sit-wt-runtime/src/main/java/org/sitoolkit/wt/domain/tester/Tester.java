@@ -157,7 +157,7 @@ public class Tester {
         TestStep testStep = null;
 
         try {
-
+            debug.start();
             do {
                 testStep = current.getTestStep();
                 dialog.reserveWindowRect(testStep.getNo());

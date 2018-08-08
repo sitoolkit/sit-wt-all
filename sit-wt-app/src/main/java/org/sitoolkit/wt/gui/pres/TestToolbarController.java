@@ -77,7 +77,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     private SitWtDebugStdoutListener debugStdoutListener = new SitWtDebugStdoutListener();
 
-    private TestService testService = new TestService();
+    TestService testService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

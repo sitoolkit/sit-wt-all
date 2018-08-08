@@ -81,6 +81,8 @@ public class TestScriptEditor {
         spreadSheet.setShowColumnHeader(true);
         spreadSheet.setShowRowHeader(true);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
+        spreadSheet.getStylesheets().add(
+                getClass().getResource("/testScriptEditor.css").toExternalForm());
 
         new TestScriptEditorController(spreadSheet);
 
@@ -231,6 +233,21 @@ public class TestScriptEditor {
         return (int) selectedCells.stream().map(cell -> cell.getColumn()).distinct().count();
     }
 
+
+    private Optional<Integer> getColumnPosition(SpreadsheetView spreadSheet, int caseIndex) {
+        int columnCount = spreadSheet.getGrid().getColumnCount();
+        int position = COLUMN_INDEX_FIRST_CASE + caseIndex;
+        return Optional.of(position)
+                .filter(p -> p >= COLUMN_INDEX_FIRST_CASE && p < columnCount);
+    }
+
+    private Optional<Integer> getRowPosition(SpreadsheetView spreadSheet, int stepIndex) {
+        int rowCount = spreadSheet.getGrid().getRowCount();
+        int position = ROW_INDEX_FIRST_STEP + stepIndex;
+        return Optional.of(position)
+                .filter(p -> p >= ROW_INDEX_FIRST_STEP && p < rowCount);
+    }
+
     private void insertTestSteps(SpreadsheetView spreadSheet, int rowPosition, int rowCount) {
 
         Grid grid = spreadSheet.getGrid();
@@ -307,6 +324,38 @@ public class TestScriptEditor {
         return cell;
     }
 
+
+    private void setStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex, String stepStyle,
+            String caseStyle) {
+
+        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
+
+        getRowPosition(spreadSheet, stepIndex).ifPresent(position -> {
+            rows.get(position).stream().forEach(cell -> {
+                cell.getStyleClass().add(stepStyle);
+            });
+        });
+
+        getColumnPosition(spreadSheet, caseIndex).ifPresent(position -> {
+            rows.stream().forEach(row -> {
+                row.get(position).getStyleClass().add(caseStyle);
+            });
+        });
+    }
+
+    public void setDebugStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex) {
+        removeDebugStyle(spreadSheet);
+        setStyle(spreadSheet, stepIndex, caseIndex, "debugStep","debugCase");
+    }
+
+    public void removeDebugStyle(SpreadsheetView spreadSheet) {
+        spreadSheet.getGrid().getRows().stream()
+                .flatMap(ObservableList::stream)
+                .forEach(cell -> {
+                    cell.getStyleClass().remove("debugStep");
+                    cell.getStyleClass().remove("debugCase");
+                });
+    }
 
 
 }

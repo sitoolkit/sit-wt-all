@@ -1,0 +1,16 @@
+.spreadsheet-cell.header {
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+.spreadsheet-cell.debugStep {
+    -fx-background-color: lightgreen;
+}
+
+.spreadsheet-cell.debugCase {
+    -fx-background-color: lightyellow;
+}
+
+.spreadsheet-cell.debugCase.debugStep{
+    -fx-background-color: yellowgreen;
+}
