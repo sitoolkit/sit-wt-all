@@ -110,18 +110,18 @@ public class ScriptService {
         client.readCaseNo(testScript, params);
     }
 
-    public void write(TestScript testScript, Optional<ScriptFileType> ScriptFileType) {
-        doWithScriptFileType(ScriptFileType, () -> write(testScript));
+    public void write(TestScript testScript, Optional<ScriptFileType> scriptFileType) {
+        doWithScriptFileType(scriptFileType, () -> write(testScript));
     }
 
-    public TestScript read(File file, Optional<ScriptFileType> ScriptFileType) {
-        return doWithScriptFileType(ScriptFileType, () -> read(file));
+    public TestScript read(File file, Optional<ScriptFileType> scriptFileType) {
+        return doWithScriptFileType(scriptFileType, () -> read(file));
     }
 
-    private <T> T doWithScriptFileType (Optional<ScriptFileType> ScriptFileType, Supplier<T> s) {
+    private <T> T doWithScriptFileType (Optional<ScriptFileType> scriptFileType, Supplier<T> s) {
         Charset charset = runtimePm.getCsvCharset();
         boolean hasBom = runtimePm.isCsvHasBOM();
-        ScriptFileType.ifPresent(ft -> {
+        scriptFileType.ifPresent(ft -> {
             if (ft.isTextFile()) {
                 runtimePm.setCsvCharset(ft.getCharset());
                 runtimePm.setCsvHasBOM(ft.isHasBom());
@@ -133,8 +133,8 @@ public class ScriptService {
         return result;
     }
 
-    private void doWithScriptFileType (Optional<ScriptFileType> ScriptFileType, Runnable r) {
-        doWithScriptFileType(ScriptFileType, () -> {
+    private void doWithScriptFileType (Optional<ScriptFileType> scriptFileType, Runnable r) {
+        doWithScriptFileType(scriptFileType, () -> {
             r.run();
             return null;
         });
