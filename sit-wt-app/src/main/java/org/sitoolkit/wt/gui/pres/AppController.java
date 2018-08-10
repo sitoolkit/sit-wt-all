@@ -135,6 +135,7 @@ public class AppController implements Initializable {
         StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
 
         testToolbarController.initialize(messageView, fileTreeController, projectState);
+        testToolbarController.testService = testService;
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
         diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
 
@@ -147,6 +148,8 @@ public class AppController implements Initializable {
         editorTabController.initialize();
         FxUtils.bindDisable(saveButton, editorTabController.isEmpty());
         FxUtils.bindDisable(saveAsButton, editorTabController.isEmpty());
+
+        testService.setDebugListener(editorTabController);
     }
 
     public void postInit() {
