@@ -1,0 +1,6 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,Add Contactボタン,click,name,Add Contact,,前,y
+2,Contact Nameテキストボックス,input,id,contactNameEditText,,,Some Name
+3,Contact Emailテキストボックス,input,id,contactEmailEditText,,,someone@abc.com
+4,Contact Emailセレクトボックス,spin,id,contactEmailTypeSpinner,name,前後,Mobile
+5,Saveボタン,click,name,Save,,前,y
