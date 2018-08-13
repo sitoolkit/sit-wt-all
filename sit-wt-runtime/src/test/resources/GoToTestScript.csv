@@ -1,0 +1,9 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,開始URL,open,,input.html,,,y
+2,名前,input,id,name,,,試験太郎
+3,移動,goto,,,,,5
+4,性別,choose,name,gender,label,,男性
+5,備考,input,id,remark,,,GoToのテスト
+6,確定,click,id,confirm,,前,y
+7,確認ダイアログ,dialog,,,,,OK
+8,備考確認,verify,xpath,"//*[@id=""confirm""]/tbody/tr[3]/td",,後,GoToのテスト
