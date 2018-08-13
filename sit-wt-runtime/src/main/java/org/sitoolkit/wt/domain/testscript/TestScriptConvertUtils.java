@@ -139,10 +139,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         testStep.setNo(getValue(row, stepNo));
         testStep.setItemName(getValue(row, itemName));
         testStep.setOperationName(getValue(row, operation));
-        Locator l = new Locator();
-        l.setType(getValue(row, locatorStyle));
-        l.setValue(getValue(row, locator));
-        testStep.setLocator(l);
+        testStep.getLocator().setType(getValue(row, locatorStyle));
+        testStep.getLocator().setValue(getValue(row, locator));
         testStep.setDataType(getValue(row, dataStyle));
         testStep.setScreenshotTiming(getValue(row, screenshot));
         testStep.setBreakPoint(getValue(row, breakpoint));
