@@ -31,7 +31,7 @@ public class DrawLineOperationTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/DrawTestScript.xlsx";
+        return "src/test/resources/DrawTestScript.csv";
     }
 
     @Override
