@@ -125,7 +125,7 @@ public class DbVerifyOperationTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/selenium/DBVerifyOperationTestScript.xlsx";
+        return "src/test/resources/selenium/DBVerifyOperationTestScript.csv";
     }
 
     @Override

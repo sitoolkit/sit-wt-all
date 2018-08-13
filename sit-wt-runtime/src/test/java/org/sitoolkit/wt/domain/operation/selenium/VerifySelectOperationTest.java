@@ -24,7 +24,7 @@ public class VerifySelectOperationTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/selenium/VerifySelectOperationTestScript.xlsx";
+        return "src/test/resources/selenium/VerifySelectOperationTestScript.csv";
     }
 
     @Override

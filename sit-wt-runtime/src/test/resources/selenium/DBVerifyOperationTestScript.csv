@@ -1,0 +1,15 @@
+﻿No.,項目名,操作,"ロケーター
+形式",ロケーター,データ形式,"スクリーン
+ショット","ブレーク
+ポイント",ケース_001,ケース_002,ケース_003,ケース_004,ケース_005,ケース_006,ケース_007
+1,正常系,dbverify,,db/verify.sql,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""col1"" : ""111"" }",,,,,,
+2,正常系_複数キー、複数列検証,dbverify,,db/verify_composite_key.sql,,,,"""param"" : { ""id"" : ""001"", ""COL1"" : ""111"" }, ""verify"" : { ""col1"" : ""111"" , ""col2"" : ""222"" }",,,,,,
+3,正常系_複数カラム検証,dbverify,,db/verify_3_columns.sql,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""id"" : ""001"", ""col1"" : ""111"", ""col2"" : ""222"" }","""param"" : { ""id"" : ""001"" }, ""verify"" : { ""col1"" : ""val1"" , ""col2"" : ""333"" }",,,,,
+4,異常系_期待値と相違,dbverify,,db/verify.sql,,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""col1"" : ""val1"" , ""col2"" : ""333"" }",,,,,
+5,異常系_期待値と相違、非選択カラムを検証,dbverify,,db/verify.sql,,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""col4"" : ""val4"" , ""col5"" : ""555"" }",,,,,
+6,異常系_期待値と相違、非選択カラム、正常の組み合わせを検証,dbverify,,db/verify_3_columns.sql,,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""id"" : ""001"", ""col2"" : ""223"" , ""col5"" : ""555"" }",,,,,
+5,異常系_検証SQLの取得0件,dbverify,,db/verify.sql,,,,,,"""param"" : { ""id"" : ""999"" }, ""verify"" : { ""col1"" : ""111"" }",,,,
+8,異常系_検証SQLの取得2件以上,dbverify,,db/verify_2_rows.sql,,,,,,,"""param"" : { ""col1"" : ""111"" }, ""verify"" : { ""col1"" : ""111"" }",,,
+9,異常系_SQLエラー_バインド先なし,dbverify,,db/verify_no_bind.sql,,,,,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""col4"" : ""val4"" , ""col5"" : ""555"" }",,
+10,異常系_SQLエラー_文法エラー,dbverify,,db/verify_syntax_error.sql,,,,,,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""col4"" : ""val4"" , ""col5"" : ""555"" }",
+11,異常系_該当SQLなし,dbverify,,aaa.sql,,,,,,,,,,"""param"" : { ""id"" : ""001"" }, ""verify"" : { ""col4"" : ""val4"" , ""col5"" : ""555"" }"
