@@ -156,6 +156,9 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
     }
 
     public static List<String> createHeaderRow(List<String> caseNoList) {
+        if (cellNameMap == null) {
+            initCellNameMap();
+        }
 
         String casePrefix = (new TestScript()).getCaseNoPrefix();
 
