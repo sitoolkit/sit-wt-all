@@ -31,7 +31,7 @@ public class SwitchFrameOperationTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/SwitchFrameTestScript.xlsx";
+        return "src/test/resources/SwitchFrameTestScript.csv";
     }
 
     @Override

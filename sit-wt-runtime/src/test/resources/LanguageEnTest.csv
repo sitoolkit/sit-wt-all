@@ -1,0 +1,3 @@
+﻿No.,ItemName,Operation,LocatorStyle,Locator,DataStyle,Screenshot,Case_001
+1,開始URL,open,,input.html,,,y
+2,性別,choose,name,性別,label,後,男性

@@ -103,8 +103,14 @@
     -fx-background-image:url('/icon/ic_help_outline_black_18dp_1x.png');
 }
 
+.open-btn {
+    -fx-background-image:url('/icon/ic_description_black_18dp_1x.png');
+}
 .save-btn {
     -fx-background-image:url('/icon/ic_save_black_18dp_1x.png');
+}
+.save-as-btn {
+    -fx-background-image:url('/icon/ic_save_alt_black_18dp_1x.png');
 }
 
 .spreadsheet-cell.header {

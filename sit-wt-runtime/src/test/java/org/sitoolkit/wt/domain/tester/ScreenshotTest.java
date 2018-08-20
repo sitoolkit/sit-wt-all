@@ -30,7 +30,7 @@ public class ScreenshotTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/ScreenshotTest.xlsx";
+        return "src/test/resources/ScreenshotTest.csv";
     }
 
     @Override

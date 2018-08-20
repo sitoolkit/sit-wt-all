@@ -55,7 +55,13 @@ public class AppController implements Initializable {
     private Label toggleButton;
 
     @FXML
+    private Label openButton;
+
+    @FXML
     private Label saveButton;
+
+    @FXML
+    private Label saveAsButton;
 
     @FXML
     private SampleToolbarController sampleToolbarController;
@@ -141,6 +147,7 @@ public class AppController implements Initializable {
         editorTabController.scriptService = scriptService;
         editorTabController.initialize();
         FxUtils.bindDisable(saveButton, editorTabController.isEmpty());
+        FxUtils.bindDisable(saveAsButton, editorTabController.isEmpty());
 
         testService.setDebugListener(editorTabController);
     }
@@ -205,8 +212,18 @@ public class AppController implements Initializable {
     }
 
     @FXML
+    public void editScript() {
+        editorTabController.open();
+    }
+
+    @FXML
     public void editor2script() {
         editorTabController.save();
+    }
+
+    @FXML
+    public void editor2scriptAs() {
+        editorTabController.saveAs();
     }
 
     @FXML

@@ -14,7 +14,7 @@ public class AndroidNativeTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/appium/AndroidNativeTest.xlsx";
+        return "src/test/resources/appium/AndroidNativeTest.csv";
     }
 
     @Override

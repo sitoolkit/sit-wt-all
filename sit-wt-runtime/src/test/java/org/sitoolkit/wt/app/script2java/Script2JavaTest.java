@@ -18,9 +18,9 @@ public class Script2JavaTest {
 
     @Test
     public void testLoad() {
-        TestClass actual = loadScript("testscript/a/b/c/ABCTestScript.xlsx", "testscript");
+        TestClass actual = loadScript("testscript/a/b/c/ABCTestScript.csv", "testscript");
 
-        assertThat("スクリプトパス", actual.getScriptPath(), is("testscript/a/b/c/ABCTestScript.xlsx"));
+        assertThat("スクリプトパス", actual.getScriptPath(), is("testscript/a/b/c/ABCTestScript.csv"));
         assertThat("テストクラス物理名", actual.getFileBase(), is("ABCTestScriptIT"));
         assertThat("テストクラスファイル拡張子", actual.getFileExt(), is("java"));
         assertThat("テストクラス出力ディレクトリ", actual.getOutDir(),
@@ -30,11 +30,10 @@ public class Script2JavaTest {
 
     @Test
     public void testMultiByteScript() {
-        TestClass actual = loadScript("src/test/resources/テスト-スクリプト(サンプル).xlsx",
+        TestClass actual = loadScript("src/test/resources/テスト-スクリプト(サンプル).csv",
                 "src/test/resources");
 
-        assertThat("スクリプトパス", actual.getScriptPath(),
-                is("src/test/resources/テスト-スクリプト(サンプル).xlsx"));
+        assertThat("スクリプトパス", actual.getScriptPath(), is("src/test/resources/テスト-スクリプト(サンプル).csv"));
         assertThat("テストクラス物理名", actual.getFileBase(), is("テスト_スクリプト_サンプル_IT"));
         assertThat("テストクラスファイル拡張子", actual.getFileExt(), is("java"));
         assertThat("テストクラス出力ディレクトリ", actual.getOutDir(),

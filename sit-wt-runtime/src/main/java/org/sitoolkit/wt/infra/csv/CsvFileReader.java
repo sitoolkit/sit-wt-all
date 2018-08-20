@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.sitoolkit.wt.infra.PropertyManager;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.RFC4180Parser;
+import com.opencsv.RFC4180ParserBuilder;
 
 public class CsvFileReader {
 
@@ -49,14 +53,21 @@ public class CsvFileReader {
     private List<String[]> readFile(String absolutePath, boolean headerRowOnly) {
 
         try (InputStream in = new BOMInputStream(new FileInputStream(absolutePath));
-                CSVReader reader = new CSVReader(new InputStreamReader(in, pm.getCsvCharset()))) {
+                Reader reader = new InputStreamReader(in, pm.getCsvCharset())) {
 
-            if (headerRowOnly) {
-                return Collections.singletonList(reader.readNext());
-            } else {
-                return reader.readAll();
+            RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
+            CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(reader)
+                    .withCSVParser(rfc4180Parser);
+
+            try (CSVReader csvReader = csvReaderBuilder.build()) {
+
+                if (headerRowOnly) {
+                    return Collections.singletonList(csvReader.readNext());
+                } else {
+                    return csvReader.readAll();
+                }
+
             }
-
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

@@ -23,7 +23,7 @@ public class MultiByteScriptTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/テスト-スクリプト(サンプル).xlsx";
+        return "src/test/resources/テスト-スクリプト(サンプル).csv";
     }
 
     @Override
