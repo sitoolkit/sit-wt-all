@@ -1,0 +1,8 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,開始URL,open,,outer.html,,,y
+2,フレーム,switchFrame,id,inner,,,y
+3,内側のボタン,click,id,inner_btn,,前,y
+4,アラート,dialog,,,,前,OK
+5,デフォルトコンテンツ,switchFrame,,,,,y
+6,外側のボタン,click,id,outer_btn,,前,y
+7,アラート,dialog,,,,前,OK

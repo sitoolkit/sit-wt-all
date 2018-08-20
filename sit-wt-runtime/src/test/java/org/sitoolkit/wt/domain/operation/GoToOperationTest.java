@@ -31,7 +31,7 @@ public class GoToOperationTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/GoToTestScript.xlsx";
+        return "src/test/resources/GoToTestScript.csv";
     }
 
     @Override

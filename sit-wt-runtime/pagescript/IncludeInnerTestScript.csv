@@ -1,0 +1,4 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_1,ケース_2
+IN-1,名前確認,verifyAttribute,id,name@value,,,試験太郎,試験花子
+IN-2,名前入力,input,id,name,,,append:１,append:２
+IN-3,性別,choose,name,性別,label,,男性,女性

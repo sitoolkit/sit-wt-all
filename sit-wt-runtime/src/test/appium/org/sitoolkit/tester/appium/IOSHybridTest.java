@@ -14,7 +14,7 @@ public class IOSHybridTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/appium/HybridTest.xlsx";
+        return "src/test/resources/appium/HybridTest.csv";
     }
 
     @Override

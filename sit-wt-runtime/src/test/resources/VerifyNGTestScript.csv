@@ -1,0 +1,5 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,開始URL,open,,list.html,,,y
+2,1行目の確認,verify,xpath,"//*[@id=""content""]/table/tbody/tr[1]/td[2]",,,試験参
+3,2行目の確認,verify,xpath,"//*[@id=""content""]/table/tbody/tr[2]/td[2]",,,試験壱
+4,3行目の確認,verify,xpath,"//*[@id=""content""]/table/tbody/tr[3]/td[2]",,,試験弐

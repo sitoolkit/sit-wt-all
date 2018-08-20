@@ -1,0 +1,7 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001,ケース_002
+OUT−1,開始URL,open,,input.html,,,y,y
+OUT−2,名前,input,id,name,,,試験花子,試験太郎
+OUT−3,Script実行,include,,IncludeInnerTestScript.csv,,,2,1
+OUT−4,名前確認,verifyAttribute,id,name@value,,,試験花子２,試験太郎１
+OUT−5,性別,verifyAttribute,id,gender-male@checked,,,null,true
+OUT−6,備考,input,id,remark,,後,IncludeOuterのテスト001,IncludeOuterのテスト002

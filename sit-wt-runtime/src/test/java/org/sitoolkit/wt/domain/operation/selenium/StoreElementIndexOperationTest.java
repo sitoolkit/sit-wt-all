@@ -31,7 +31,7 @@ public class StoreElementIndexOperationTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/StoreElementIndexTestScript.xlsx";
+        return "src/test/resources/StoreElementIndexTestScript.csv";
     }
 
     @Override
