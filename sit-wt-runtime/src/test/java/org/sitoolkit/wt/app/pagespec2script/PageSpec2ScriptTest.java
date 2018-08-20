@@ -39,7 +39,7 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
     @Before
     @Override
     public void setUp() {
-        File testScript = new File("pageobj/入力TestScript.xlsx");
+        File testScript = new File("pageobj/入力TestScript.csv");
         if (testScript.exists()) {
             testScript.delete();
         }
@@ -68,7 +68,9 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return new File(new PageSpec2Script().getTestScriptDir(), "入力TestScript.xlsx")
+        System.out.println(new File(new PageSpec2Script().getTestScriptDir(), "入力TestScript.csv")
+                .getAbsolutePath());
+        return new File(new PageSpec2Script().getTestScriptDir(), "入力TestScript.csv")
                 .getAbsolutePath();
     }
 

@@ -120,7 +120,7 @@ public class PageSpec2Script implements ApplicationContextAware {
     protected File convert(File pageSpec) {
         String pageSpecBaseName = FilenameUtils.getBaseName(pageSpec.getName());
         String testScriptName = StringUtils.substringAfter(pageSpecBaseName, "_")
-                + "TestScript.xlsx";
+                + "TestScript.csv";
 
         List<PageItemSpec> pageItemSpeclist = loadPageSpec(pageSpec.getAbsolutePath(), sheetName);
 
