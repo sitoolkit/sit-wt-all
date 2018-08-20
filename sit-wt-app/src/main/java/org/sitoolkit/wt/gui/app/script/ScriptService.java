@@ -1,7 +1,10 @@
 package org.sitoolkit.wt.gui.app.script;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.sitoolkit.wt.app.config.BaseConfig;
 import org.sitoolkit.wt.app.config.TestScriptConfig;
@@ -29,6 +32,8 @@ public class ScriptService {
 
     ApplicationContext appCtx;
 
+    org.sitoolkit.wt.infra.PropertyManager runtimePm;
+
     public ScriptService() {
         initialize();
     }
@@ -38,12 +43,12 @@ public class ScriptService {
             appCtx = new AnnotationConfigApplicationContext(BaseConfig.class,
                     TestScriptConfig.class);
             dao = appCtx.getBean(TestScriptDao.class);
+            runtimePm  = appCtx.getBean(org.sitoolkit.wt.infra.PropertyManager.class);
         });
     }
 
     public void loadProject() {
         PropertyManager pm = PropertyManager.get();
-        org.sitoolkit.wt.infra.PropertyManager runtimePm  = appCtx.getBean(org.sitoolkit.wt.infra.PropertyManager.class);
         runtimePm.setCsvCharset(pm.getCsvCharset());
         runtimePm.setCsvHasBOM(pm.getCsvHasBOM());
     }
@@ -103,6 +108,36 @@ public class ScriptService {
         });
 
         client.readCaseNo(testScript, params);
+    }
+
+    public void write(TestScript testScript, Optional<ScriptFileType> scriptFileType) {
+        doWithScriptFileType(scriptFileType, () -> write(testScript));
+    }
+
+    public TestScript read(File file, Optional<ScriptFileType> scriptFileType) {
+        return doWithScriptFileType(scriptFileType, () -> read(file));
+    }
+
+    private <T> T doWithScriptFileType (Optional<ScriptFileType> scriptFileType, Supplier<T> s) {
+        Charset charset = runtimePm.getCsvCharset();
+        boolean hasBom = runtimePm.isCsvHasBOM();
+        scriptFileType.ifPresent(ft -> {
+            if (ft.isTextFile()) {
+                runtimePm.setCsvCharset(ft.getCharset());
+                runtimePm.setCsvHasBOM(ft.isHasBom());
+            }
+        });
+        T result = s.get();
+        runtimePm.setCsvCharset(charset);
+        runtimePm.setCsvHasBOM(hasBom);
+        return result;
+    }
+
+    private void doWithScriptFileType (Optional<ScriptFileType> scriptFileType, Runnable r) {
+        doWithScriptFileType(scriptFileType, () -> {
+            r.run();
+            return null;
+        });
     }
 
 }
