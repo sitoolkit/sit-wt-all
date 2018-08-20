@@ -2,6 +2,7 @@ package org.sitoolkit.wt.gui.app.test;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -31,7 +32,8 @@ public class TestService {
 
     private static final Logger LOG = LogUtils.get(TestService.class);
 
-    private static final String SCRIPT_TEMPLATE = "TestScriptTemplate.xlsx";
+    private static final String SCRIPT_TEMPLATE = "TestScriptTemplate_"
+            + Locale.getDefault().getLanguage() + ".csv";
 
     SitWtRuntimeProcessClient client = new SitWtRuntimeProcessClient();
 
@@ -65,7 +67,7 @@ public class TestService {
 
                 DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
                 debugSupport.setListener(debugListener);
-                
+
                 runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
                 callback.callback(0);
             } catch (Exception e) {

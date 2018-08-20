@@ -216,7 +216,7 @@
                   <version>${sitwt.version}</version>
                 </artifactItem>
               </artifactItems>
-              <includes>TestScriptTemplate.xlsx</includes>
+              <includes>TestScriptTemplate_*.*</includes>
               <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
           </plugin>
