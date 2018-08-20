@@ -68,8 +68,6 @@ public class PageSpec2ScriptTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        System.out.println(new File(new PageSpec2Script().getTestScriptDir(), "入力TestScript.csv")
-                .getAbsolutePath());
         return new File(new PageSpec2Script().getTestScriptDir(), "入力TestScript.csv")
                 .getAbsolutePath();
     }
