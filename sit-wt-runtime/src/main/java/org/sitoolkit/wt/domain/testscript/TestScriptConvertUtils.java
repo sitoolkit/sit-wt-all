@@ -32,7 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(xlsx)に変換するクラスです。
+ * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプトに変換するクラスです。
  *
  * @author yuichi.kuwahara
  * @author kaori.ogawa

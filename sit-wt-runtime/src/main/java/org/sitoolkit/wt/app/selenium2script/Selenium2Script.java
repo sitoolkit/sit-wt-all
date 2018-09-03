@@ -43,7 +43,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(xlsx)に変換するクラスです。
+ * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(csv)に変換するクラスです。
  *
  * @author yuichi.kuwahara
  */
@@ -82,7 +82,7 @@ public class Selenium2Script implements ApplicationContextAware {
     }
 
     /**
-     * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(xlsx)に変換します。
+     * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(csv)に変換します。
      *
      * @return 0:正常終了
      */
@@ -126,7 +126,7 @@ public class Selenium2Script implements ApplicationContextAware {
         // SeleniumTestScriptオブジェクトをTestScriptオブジェクトに変換
         List<TestStep> testStepList = seleniumStepConverter.convertTestScript(list, caseNo);
 
-        String sitScriptName = seleniumScript.getName().replace(".html", ".xlsx");
+        String sitScriptName = seleniumScript.getName().replace(".html", ".csv");
         File sitScriptFile = new File(outputDir, sitScriptName);
 
         dao.write(sitScriptFile, testStepList, overwriteScript);

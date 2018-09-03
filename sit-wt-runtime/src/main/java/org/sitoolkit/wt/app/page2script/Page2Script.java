@@ -114,7 +114,7 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
             fileName = StringUtils.substringAfterLast(fileName, "/");
             fileName = StringUtils.substringBefore(fileName, "?");
         }
-        fileName = fileName + ".xlsx";
+        fileName = fileName + ".csv";
         String filePath = FilenameUtils.concat(outputDir, fileName);
 
         filePath = dao.write(filePath, pageCtx.asList(), false);

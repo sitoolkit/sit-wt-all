@@ -40,7 +40,7 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
     @Before
     @Override
     public void setUp() {
-        File testScript = new File("testscript/SeleniumIDETestScript.xlsx");
+        File testScript = new File("testscript/SeleniumIDETestScript.csv");
         if (testScript.exists()) {
             testScript.delete();
         }
