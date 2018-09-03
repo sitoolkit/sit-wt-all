@@ -43,6 +43,12 @@
           <groupId>com.google.code.gson</groupId>
         </exclusion>
       </exclusions>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring.version}</version>
     </dependency>
   </dependencies>
   <parent>
@@ -56,54 +62,102 @@
     <threadCountMethods>1</threadCountMethods>
     <selenium.version>3.12.0</selenium.version>
     <appium.version>6.0.0</appium.version>
+    <spring.version>5.0.8.RELEASE</spring.version>
   </properties>
 
   <!-- Build Settings -->
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
-        <configuration>
-          <archive>
-            <index>true</index>
-            <manifest>
-              <mainClass>org.sitoolkit.wt.gui.pres.App</mainClass>
-              <useUniqueVersions>true</useUniqueVersions>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2</version>
-        <executions>
-          <execution>
-            <id>sit-wt-util</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <index>true</index>
-            <manifest>
-              <mainClass>org.sitoolkit.wt.gui.pres.App</mainClass>
-              <useUniqueVersions>true</useUniqueVersions>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-            </manifest>
-          </archive>
-          <finalName>sit-wt-app-${project.version}</finalName>
-          <appendAssemblyId>false</appendAssemblyId>
-        </configuration>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.1.0</version>
+          <executions>
+            <execution>
+              <id>sit-wt-util</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <descriptors>
+                  <descriptor>${build.profile}-dependency.xml</descriptor>
+                </descriptors>
+                <finalName>${build.finalName}</finalName>
+              </configuration>
+            </execution>
+          </executions>
+          <configuration>
+            <archive>
+              <index>true</index>
+              <manifest>
+                <mainClass>org.sitoolkit.wt.gui.pres.App</mainClass>
+                <useUniqueVersions>true</useUniqueVersions>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+            <appendAssemblyId>false</appendAssemblyId>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+          <executions>
+            <execution>
+              <phase>install</phase>
+              <goals>
+                <goal>install-file</goal>
+              </goals>
+              <configuration>
+                <file>${project.basedir}/target/${build.finalName}.jar</file>
+                <classifier>${build.classifier}</classifier>
+                <artifactId>${project.artifactId}</artifactId>
+                <groupId>${project.groupId}</groupId>
+                <version>${project.version}</version>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>include</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <build.profile>include</build.profile>
+        <build.finalName>sit-wt-app-${project.version}</build.finalName>
+        <build.classifier>pc</build.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>exclude</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <build.profile>exclude</build.profile>
+        <build.finalName>sit-wt-app-mobile-${project.version}</build.finalName>
+        <build.classifier>mobile</build.classifier>
+      </properties>
+    </profile>
+  </profiles>
 </project>

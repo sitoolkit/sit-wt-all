@@ -44,6 +44,15 @@
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-Dmaven.test.skip=true" />
+      <arg value="-P include" />
+      <arg value="clean" />
+      <arg value="install" />
+    </exec>
+
+    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-Dmaven.test.skip=true" />
+      <arg value="-P exclude" />
       <arg value="clean" />
       <arg value="install" />
     </exec>
