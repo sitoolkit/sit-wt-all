@@ -70,6 +70,14 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <classifier>${build.classifier}</classifier>
+          </configuration>
+        </plugin>
+        <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>3.1.0</version>
           <executions>
@@ -83,7 +91,7 @@
                 <descriptors>
                   <descriptor>${build.profile}-dependency.xml</descriptor>
                 </descriptors>
-                <finalName>${build.finalName}</finalName>
+                <finalName>${project.artifactId}-${project.version}-${build.classifier}</finalName>
               </configuration>
             </execution>
           </executions>
@@ -98,27 +106,6 @@
             </archive>
             <appendAssemblyId>false</appendAssemblyId>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
-          <executions>
-            <execution>
-              <phase>deploy</phase>
-              <goals>
-                <goal>deploy-file</goal>
-              </goals>
-              <configuration>
-                <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                <file>${project.basedir}/target/${build.finalName}.jar</file>
-                <classifier>${build.classifier}</classifier>
-                <artifactId>${project.artifactId}</artifactId>
-                <groupId>${project.groupId}</groupId>
-                <version>${project.version}</version>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -140,7 +127,6 @@
       </build>
       <properties>
         <build.profile>include</build.profile>
-        <build.finalName>sit-wt-app-${project.version}</build.finalName>
         <build.classifier>pc</build.classifier>
       </properties>
     </profile>
@@ -156,7 +142,6 @@
       </build>
       <properties>
         <build.profile>exclude</build.profile>
-        <build.finalName>sit-wt-app-mobile-${project.version}</build.finalName>
         <build.classifier>mobile</build.classifier>
       </properties>
     </profile>
