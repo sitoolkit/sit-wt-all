@@ -54,28 +54,37 @@ public class TestService {
         String sessionId = UUID.randomUUID().toString();
 
         ExecutorContainer.get().execute(() -> {
-            System.setProperty("driver.type", params.getDriverType());
-            ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
-                    RuntimeConfig.class);
-            ctxMap.put(sessionId, appCtx);
-
             try {
+                System.setProperty("driver.type", params.getDriverType());
+                String profile = ("android".equals(params.getDriverType()) || "ios".equals(params.getDriverType()))
+                        ? "mobile" : "pc";
+                AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext();
+                appCtx.register(RuntimeConfig.class);
+                appCtx.getEnvironment().addActiveProfile(profile);
+                appCtx.refresh();
+                ctxMap.put(sessionId, appCtx);
 
-                PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
-                runtimePm.setBaseUrl(params.getBaseUrl());
-                runtimePm.setDebug(params.isDebug());
+                try {
 
-                DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
-                debugSupport.setListener(debugListener);
+                    PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
+                    runtimePm.setBaseUrl(params.getBaseUrl());
+                    runtimePm.setDebug(params.isDebug());
 
-                runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
-                callback.callback(0);
+                    DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
+                    debugSupport.setListener(debugListener);
+
+                    runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
+                    callback.callback(0);
+                } catch (Exception e) {
+                    LOG.log(Level.SEVERE, "unexpected exception", e);
+                    callback.callback(1);
+                } finally {
+                    appCtx.close();
+                    ctxMap.remove(sessionId);
+                }
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "unexpected exception", e);
                 callback.callback(1);
-            } finally {
-                appCtx.close();
-                ctxMap.remove(sessionId);
             }
         });
 
