@@ -9,28 +9,21 @@ import org.sitoolkit.wt.domain.evidence.appium.MobileNativeElementPositionStarte
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ios.IOSDriver;
 
-public class ElementPositionSupportFactory {
+public class ElementPositionSupportFactoryMobile {
 
     public static ElementPositionStrategy getStrategy(WebDriver driver) {
 
-        if (driver instanceof AppiumDriver<?>) {
+        AppiumDriver<?> appiumDriver = (AppiumDriver<?>) driver;
+        if (appiumDriver.getContext().startsWith("WEBVIEW")) {
 
-            AppiumDriver<?> appiumDriver = (AppiumDriver<?>) driver;
-            if (appiumDriver.getContext().startsWith("WEBVIEW")) {
-
-                if (appiumDriver instanceof IOSDriver<?>) {
-                    return new IOSHybridElementPositionStrategy();
-                } else {
-                    return new AndroidHybridElementPositionStrategy();
-                }
-
+            if (appiumDriver instanceof IOSDriver<?>) {
+                return new IOSHybridElementPositionStrategy();
             } else {
-                return new MobileNativeElementPositionStartegy();
+                return new AndroidHybridElementPositionStrategy();
             }
 
         } else {
-            return new PcBrowserElementPositionStrategy();
+            return new MobileNativeElementPositionStartegy();
         }
-
     }
 }
