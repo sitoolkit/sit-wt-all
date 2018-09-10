@@ -54,37 +54,24 @@ public class TestService {
         String sessionId = UUID.randomUUID().toString();
 
         ExecutorContainer.get().execute(() -> {
-            try {
-                System.setProperty("driver.type", params.getDriverType());
-                String profile = ("android".equals(params.getDriverType()) || "ios".equals(params.getDriverType()))
-                        ? "mobile" : "pc";
-                AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext();
-                appCtx.register(RuntimeConfig.class);
-                appCtx.getEnvironment().addActiveProfile(profile);
-                appCtx.refresh();
-                ctxMap.put(sessionId, appCtx);
-
-                try {
-
-                    PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
-                    runtimePm.setBaseUrl(params.getBaseUrl());
-                    runtimePm.setDebug(params.isDebug());
-
-                    DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
-                    debugSupport.setListener(debugListener);
-
-                    runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
-                    callback.callback(0);
-                } catch (Exception e) {
-                    LOG.log(Level.SEVERE, "unexpected exception", e);
-                    callback.callback(1);
-                } finally {
-                    appCtx.close();
-                    ctxMap.remove(sessionId);
-                }
+            System.setProperty("driver.type", params.getDriverType());
+            ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                    RuntimeConfig.class);
+            ctxMap.put(sessionId, appCtx);
+             try {
+                 PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
+                runtimePm.setBaseUrl(params.getBaseUrl());
+                runtimePm.setDebug(params.isDebug());
+                 DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
+                debugSupport.setListener(debugListener);
+                 runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
+                callback.callback(0);
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "unexpected exception", e);
                 callback.callback(1);
+            } finally {
+                appCtx.close();
+                ctxMap.remove(sessionId);
             }
         });
 

@@ -184,16 +184,7 @@
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
-      <arg value="release,include" />
-      <arg value="-Dmaven.test.skip=true" />
-      <arg value="clean" />
-      <arg value="deploy" />
-    </exec>
-
-    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-P" />
-      <arg value="release,exclude" />
+      <arg value="release" />
       <arg value="-Dmaven.test.skip=true" />
       <arg value="clean" />
       <arg value="deploy" />
