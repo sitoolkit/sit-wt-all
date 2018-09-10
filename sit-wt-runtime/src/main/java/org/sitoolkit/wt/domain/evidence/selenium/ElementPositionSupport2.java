@@ -34,10 +34,7 @@ public class ElementPositionSupport2 {
         }
 
         if (strategy == null) {
-            String driverType = System.getProperty("driver.type");
-            strategy = ("android".equals(driverType) || "ios".equals(driverType))
-                    ? ElementPositionSupportFactoryMobile.getStrategy(driver)
-                    : ElementPositionSupportFactoryPc.getStrategy(driver);
+            strategy = ElementPositionSupportFactory.getStrategy(driver);
         }
 
         if (basePosition == null) {
