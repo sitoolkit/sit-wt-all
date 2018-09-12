@@ -12,17 +12,16 @@ import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 
 import javafx.scene.control.TreeItem;
 
 public class FileSystemWatchService {
 
-    private static final Logger LOG = LogUtils.get(FileSystemWatchService.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(FileSystemWatchService.class);
 
     private WatchService watcher;
 
@@ -50,7 +49,7 @@ public class FileSystemWatchService {
                     com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
 
             watchKeyPathMap.put(watchKey, path);
-            LOG.log(Level.INFO, "registered {0} {1}",
+            LOG.info("app.filePathRegistered",
                     new Object[] { path.toAbsolutePath(), watchKey });
 
         } catch (IOException e) {
@@ -84,7 +83,7 @@ public class FileSystemWatchService {
                 watching = false;
                 watcher.close();
             } catch (IOException e) {
-                LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
+                LOG.error("app.exceptionLocalizedMsg", e.getLocalizedMessage(), e);
             }
         }
     }
@@ -100,10 +99,8 @@ public class FileSystemWatchService {
 
             for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
 
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.FINE, "{0} {1} {2} {3}", new Object[] { watchKey,
-                            watchEvent.kind(), watchEvent.context(), eventSourcePath });
-                }
+                LOG.debug("app.watchParams", new Object[] { watchKey,
+                        watchEvent.kind(), watchEvent.context(), eventSourcePath });
 
                 Object context = watchEvent.context();
                 if (context == null || !(context instanceof Path)) {
@@ -125,11 +122,11 @@ public class FileSystemWatchService {
 
         } catch (ClosedWatchServiceException e) {
 
-            LOG.log(Level.INFO, "ignorable exception {0}", e.getClass());
+            LOG.info("app.ignorableException", e.getClass());
 
         } catch (Exception e) {
 
-            LOG.log(Level.SEVERE, "exception occurs while watching file system", e);
+            LOG.error("app.exceptionOccurs", e);
 
         } finally {
 
@@ -143,7 +140,7 @@ public class FileSystemWatchService {
     void create(Path eventSourcePath, Path eventTargetPath, FileTreeItem eventSourceItem) {
 
         FileTreeItem childItem = eventSourceItem.addChild(eventTargetPath.toFile());
-        LOG.log(Level.INFO, "created {0} {1}", new Object[] { eventTargetPath, childItem });
+        LOG.info("app.createPath", new Object[] { eventTargetPath, childItem });
         register(childItem);
     }
 
@@ -161,7 +158,7 @@ public class FileSystemWatchService {
         }
         watchKeyPathMap.remove(removingWatchKey);
 
-        LOG.log(Level.INFO, "deleted {0} {1} {2}",
+        LOG.info("app.deletePath",
                 new Object[] { eventTargetPath, eventTargetItem, removingWatchKey });
     }
 }

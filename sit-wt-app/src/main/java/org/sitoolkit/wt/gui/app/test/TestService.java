@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.app.test.TestRunner;
@@ -15,8 +13,9 @@ import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.process.ConversationProcess;
 import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
@@ -30,7 +29,7 @@ import lombok.Setter;
 
 public class TestService {
 
-    private static final Logger LOG = LogUtils.get(TestService.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestService.class);
 
     private static final String SCRIPT_TEMPLATE = "TestScriptTemplate_"
             + Locale.getDefault().getLanguage() + ".csv";
@@ -72,14 +71,14 @@ public class TestService {
                     runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
                     callback.callback(0);
                 } catch (Exception e) {
-                    LOG.log(Level.SEVERE, "unexpected exception", e);
+                    LOG.error("app.unexpectedException", e);
                     callback.callback(1);
                 } finally {
                     appCtx.close();
                     ctxMap.remove(sessionId);
                 }
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "unexpected exception", e);
+                LOG.error("app.unexpectedException", e);
                 callback.callback(1);
             }
         });
@@ -148,7 +147,7 @@ public class TestService {
 
         File dir = new File(SystemUtils.getSitRepository(), "sit-wt");
         if (!dir.exists()) {
-            LOG.log(Level.INFO, "mkdir sit-wt repo {0}", dir.getAbsolutePath());
+            LOG.info("app.makeSitwtDir", dir.getAbsolutePath());
             dir.mkdir();
         }
 
@@ -166,7 +165,7 @@ public class TestService {
             params.getExitClallbacks().add(exitCode -> {
 
                 File testscript = new File(baseDir, "target/" + SCRIPT_TEMPLATE);
-                LOG.log(Level.INFO, "{0} rename to {1}",
+                LOG.info("app.scriptRename",
                         new Object[] { testscript.getAbsolutePath(), template.getAbsolutePath() });
                 testscript.renameTo(template);
 

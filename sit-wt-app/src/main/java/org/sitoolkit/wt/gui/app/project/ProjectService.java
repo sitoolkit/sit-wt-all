@@ -2,24 +2,23 @@ package org.sitoolkit.wt.gui.app.project;
 
 import java.io.File;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.app.test.SitWtRuntimeService;
 import org.sitoolkit.wt.gui.domain.project.ProjectProcessClient;
 import org.sitoolkit.wt.gui.domain.project.ProjectState;
 import org.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.gui.infra.util.ResourceUtils;
 import org.sitoolkit.wt.gui.infra.util.VersionUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.maven.MavenUtils;
 import org.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class ProjectService {
 
-    private static final Logger LOG = LogUtils.get(ProjectService.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(ProjectService.class);
 
     SitWtRuntimeService runtimeService = new SitWtRuntimeService();
 
@@ -81,7 +80,7 @@ public class ProjectService {
      * @return プロジェクトのpom.xml {@code projectDir}に既にpom.xmlが存在する場合はnull
      */
     public File openProject(File projectDir, ProjectState projectState) {
-        LOG.log(Level.INFO, "opening project in {0}", projectDir.getAbsolutePath());
+        LOG.info("app.openProject", projectDir.getAbsolutePath());
         File pomFile = new File(projectDir.getAbsolutePath(), "pom.xml");
 
         if (pomFile.exists()) {
@@ -108,7 +107,7 @@ public class ProjectService {
     }
 
     private void loadProject(File pomFile, ProjectState projectState) {
-        LOG.log(Level.INFO, "loading project with {0}", pomFile.getAbsolutePath());
+        LOG.info("app.loadProject", pomFile.getAbsolutePath());
 
         Executors.newSingleThreadExecutor()
                 .submit(() -> MavenUtils.findAndInstall(pomFile.getParentFile().toPath()));
