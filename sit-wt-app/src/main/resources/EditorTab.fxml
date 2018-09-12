@@ -6,7 +6,7 @@
 <?import javafx.scene.control.Tab?>
 
 
-<HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.EditorTabController"
+<HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.sitoolkit.wt.gui.pres.EditorTabController"
   style="-fx-padding: 0 0 0 0;">
   <TabPane fx:id="tabs"></TabPane>
 </HBox>

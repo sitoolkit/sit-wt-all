@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />  
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -12,7 +12,7 @@
     </encoder>
   </appender>
 
-  <appender name="delegate" class="org.sitoolkit.wt.infra.log.DelegatingOutputStreamAppender">
+  <appender name="delegate" class="io.sitoolkit.wt.infra.log.DelegatingOutputStreamAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
     </filter>
@@ -30,7 +30,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.sitoolkit" level="debug" additivity="true">
+  <logger name="io.sitoolkit" level="debug" additivity="true">
     <appender-ref ref="stdout" />
     <appender-ref ref="delegate" />
   </logger>

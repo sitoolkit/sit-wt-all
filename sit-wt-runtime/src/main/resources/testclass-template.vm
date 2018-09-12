@@ -4,7 +4,7 @@ package ${test.pkg};
 #end
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
