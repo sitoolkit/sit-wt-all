@@ -1,14 +1,12 @@
 package org.sitoolkit.wt.gui.domain.sample;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.process.StdoutListener;
 
 public class JettyMavenPluginStdoutListener implements StdoutListener {
 
-    private static final Logger LOG = LogUtils.get(JettyMavenPluginStdoutListener.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(JettyMavenPluginStdoutListener.class);
 
     private volatile int exitLevel = -1;
 
@@ -35,7 +33,7 @@ public class JettyMavenPluginStdoutListener implements StdoutListener {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
-                LOG.log(Level.WARNING, "", e);
+                LOG.warn("app.noMsg", e);
             }
         }
         return exitLevel == 0;

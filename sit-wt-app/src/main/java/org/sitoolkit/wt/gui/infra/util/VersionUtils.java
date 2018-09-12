@@ -4,15 +4,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class VersionUtils {
 
-    private static final Logger LOG = LogUtils.get(VersionUtils.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(VersionUtils.class);
 
     private VersionUtils() {
     }
@@ -34,7 +33,7 @@ public class VersionUtils {
             }
 
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "fail to get version", e);
+            LOG.warn("fail to get version", e);
         }
         return "";
     }

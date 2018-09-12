@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class PropertyManager {
@@ -28,7 +28,7 @@ public class PropertyManager {
 
     private static final String CSV_BOM = "script.file.csv.bom";
 
-    private static final Logger LOG = Logger.getLogger(PropertyManager.class.getName());
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(PropertyManager.class);
 
     private static final PropertyManager pm = new PropertyManager();
 
@@ -52,14 +52,14 @@ public class PropertyManager {
         File propertyFile = new File(baseDir, FILE_NAME);
 
         if (!propertyFile.exists()) {
-            LOG.log(Level.CONFIG, "no property file ", baseDir.getAbsolutePath());
+            LOG.debug("app.noPropertyFile", baseDir.getAbsolutePath());
             return;
         }
 
         try (FileInputStream fis = new FileInputStream(propertyFile)) {
 
             prop.load(fis);
-            LOG.log(Level.INFO, "loaded properties : {0}", prop);
+            LOG.info("app.loadProperties", prop);
 
             List<String> savedBaseUrls = Arrays.asList(getProp(BASE_URL).split(SEPARATOR));
             savedBaseUrls = savedBaseUrls.subList(0,
@@ -68,7 +68,7 @@ public class PropertyManager {
 
         } catch (IOException e) {
 
-            LOG.log(Level.WARNING, "exception in loading properties", e);
+            LOG.warn("app.loadPropertiesFailed", e);
 
         }
     }
@@ -86,11 +86,11 @@ public class PropertyManager {
             setProp(CSV_BOM, String.valueOf(getCsvHasBOM()));
 
             prop.store(fos, "SI-Toolkit for Web Testing");
-            LOG.log(Level.INFO, "saved properties : {0}", prop);
+            LOG.info("app.saveProperties", prop);
 
         } catch (IOException e) {
 
-            LOG.log(Level.WARNING, "exception in saving properties", e);
+            LOG.warn("app.savePropertiesFailed", e);
 
         }
 

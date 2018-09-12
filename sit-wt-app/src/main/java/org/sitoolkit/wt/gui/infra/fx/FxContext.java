@@ -3,10 +3,9 @@ package org.sitoolkit.wt.gui.infra.fx;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.util.SystemUtils;
 
 import javafx.application.HostServices;
@@ -14,7 +13,7 @@ import javafx.stage.Stage;
 
 public class FxContext {
 
-    private static final Logger LOG = LogUtils.get(FxContext.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(FxContext.class);
 
     private static Stage primaryStage;
 
@@ -46,14 +45,14 @@ public class FxContext {
             try {
                 Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
             } catch (IOException e) {
-                LOG.log(Level.SEVERE, "", e);
+                LOG.error("app.noMsg", e);
             }
         }
 
         try {
             hostServices.showDocument(file.toURI().toURL().toExternalForm());
         } catch (MalformedURLException e) {
-            LOG.log(Level.SEVERE, "", e);
+            LOG.error("app.noMsg", e);
         }
     }
 

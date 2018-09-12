@@ -1,11 +1,9 @@
 package org.sitoolkit.wt.gui.pres;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.gui.infra.fx.FxContext;
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.util.SystemUtils;
@@ -22,12 +20,12 @@ import javafx.stage.WindowEvent;
 
 public class App extends Application {
 
-    private static final Logger LOG = LogUtils.get(App.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(App.class);
 
     private AppController controller;
 
     public static void main(String[] args) {
-        LOG.info(() -> "environment info: " + SystemUtils.getEnvironmentInfo());
+        LOG.info("app.envInfo", SystemUtils.getEnvironmentInfo());
         launch(args);
     }
 
@@ -35,7 +33,7 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            LOG.log(Level.SEVERE, "unexpected exception", throwable);
+            LOG.error("app.unexpectedException", throwable);
             Alert alert = new Alert(AlertType.ERROR);
             alert.setContentText("エラーが発生しました。");
             alert.show();

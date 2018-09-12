@@ -1,15 +1,14 @@
 package org.sitoolkit.wt.gui.testutil;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.util.SystemUtils;
 
 public class Uninstaller {
 
-    private static final Logger LOG = LogUtils.get(Uninstaller.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(Uninstaller.class);
 
     public static void main(String[] args) {
         uninstall(new File(SystemUtils.getSitRepository(), "maven/runtime/apache-maven-3.3.9"),
@@ -23,7 +22,7 @@ public class Uninstaller {
             if (file.exists()) {
                 delete(file);
             } else {
-                LOG.log(Level.WARNING, "no such file or directory {0}", file.getAbsolutePath());
+                LOG.warn("app.test.noSuchFile", file.getAbsolutePath());
             }
         }
     }
@@ -34,7 +33,7 @@ public class Uninstaller {
                 delete(sub);
             }
         }
-        LOG.log(Level.INFO, "deleting {0}", file.getAbsolutePath());
+        LOG.info("app.test.delete", file.getAbsolutePath());
         file.delete();
     }
 }
