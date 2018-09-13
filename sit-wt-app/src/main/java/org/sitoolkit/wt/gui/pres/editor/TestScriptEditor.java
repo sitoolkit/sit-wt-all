@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +42,8 @@ public class TestScriptEditor {
         testScript.getHeaders().forEach(header -> {
             SpreadsheetCell headerCell = SpreadsheetCellType.STRING.createCell(rows.size(),
                     headerCells.size(), 1, 1, header);
-            headerCell.setEditable(false);
+            boolean editable = (headerCells.size() < 8) ? false : true;
+            headerCell.setEditable(editable);
             headerCells.add(headerCell);
         });
         rows.add(headerCells);
@@ -97,6 +98,7 @@ public class TestScriptEditor {
 
         List<String> headers = rows.iterator().next().stream().map(SpreadsheetCell::getText)
                 .collect(Collectors.toList());
+        headers.stream().forEach(header -> testScript.addHeader(header));
 
         List<TestStep> testStepList = new ArrayList<TestStep>();
         rows.stream().skip(1L).forEach(row -> {
@@ -112,10 +114,10 @@ public class TestScriptEditor {
             testStep.setScreenshotTiming(row.get(6).getText());
             testStep.setBreakPoint(row.get(7).getText());
 
-            Map<String, String> testData = new HashMap<String, String>();
+            Map<String, String> testData = new LinkedHashMap<String, String>();
             for (int idx = 8; idx < row.size(); idx++) {
-                String caseNo = StringUtils.substringAfter(headers.get(idx),
-                        testScript.getCaseNoPrefix());
+                String caseNo = (headers.get(idx).startsWith(testScript.getCaseNoPrefix())) ?
+                        StringUtils.substringAfter(headers.get(idx), testScript.getCaseNoPrefix()) : headers.get(idx);
                 testData.put(caseNo, row.get(idx).getText());
             }
             testStep.setTestData(testData);
@@ -123,6 +125,8 @@ public class TestScriptEditor {
         });
 
         testScript.setTestStepList(testStepList);
+
+
         return testScript;
     }
 
@@ -321,6 +325,8 @@ public class TestScriptEditor {
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
         SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, original.getRowSpan(),
                 original.getColumnSpan(), original.getText());
+        boolean editable = (row == 0 && column < 8) ? false : true;
+        cell.setEditable(editable);
         return cell;
     }
 

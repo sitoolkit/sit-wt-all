@@ -156,12 +156,16 @@ public class TestScriptDao {
     }
 
     public String write(File file, List<TestStep> testStepList, boolean overwrite) {
+        return write(file, testStepList, null, overwrite);
+    }
 
+    public String write(File file, List<TestStep> testStepList, List<String> headers,
+            boolean overwrite) {
+            
         if (file.getName().endsWith("csv")) {
             writeCsv(file.toPath(), testStepList, overwrite);
             return file.getAbsolutePath();
         }
-
         File dir = file.getParentFile();
         if (dir == null) {
             dir = new File(".");
@@ -169,7 +173,8 @@ public class TestScriptDao {
             dir.mkdirs();
         }
 
-        TableDataCatalog catalog = TestScriptConvertUtils.getTableDataCatalog(testStepList);
+        TableDataCatalog catalog = TestScriptConvertUtils.getTableDataCatalog(testStepList,
+                headers);
         String fileName = sanitizeFileName(file.getName());
         file = new File(file.getParent(), fileName);
 
@@ -214,7 +219,7 @@ public class TestScriptDao {
         }
 
     }
-
+    
     private void writeCsv(Path path, List<TestStep> testSteps, boolean overwrite) {
         overwriteChecker.setRebuild(overwrite);
         if (!overwriteChecker.isWritable(path)) {
