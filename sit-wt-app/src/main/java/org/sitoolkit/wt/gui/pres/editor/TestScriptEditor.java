@@ -42,7 +42,8 @@ public class TestScriptEditor {
         testScript.getHeaders().forEach(header -> {
             SpreadsheetCell headerCell = SpreadsheetCellType.STRING.createCell(rows.size(),
                     headerCells.size(), 1, 1, header);
-            headerCell.setEditable(false);
+            boolean editable = (headerCells.size() < 8) ? false : true;
+            headerCell.setEditable(editable);
             headerCells.add(headerCell);
         });
         rows.add(headerCells);
@@ -113,8 +114,8 @@ public class TestScriptEditor {
 
             Map<String, String> testData = new LinkedHashMap<String, String>();
             for (int idx = 8; idx < row.size(); idx++) {
-                String caseNo = StringUtils.substringAfter(headers.get(idx),
-                        testScript.getCaseNoPrefix());
+                String caseNo = (headers.get(idx).startsWith(testScript.getCaseNoPrefix())) ?
+                        StringUtils.substringAfter(headers.get(idx), testScript.getCaseNoPrefix()) : headers.get(idx);
                 testData.put(caseNo, row.get(idx).getText());
             }
             testStep.setTestData(testData);
@@ -307,6 +308,8 @@ public class TestScriptEditor {
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
         SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, original.getRowSpan(),
                 original.getColumnSpan(), original.getText());
+        boolean editable = (row == 0 && column < 8) ? false : true;
+        cell.setEditable(editable);
         return cell;
     }
 
