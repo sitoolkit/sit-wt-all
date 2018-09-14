@@ -1,11 +1,7 @@
 package org.sitoolkit.wt.domain.testscript;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -161,7 +157,7 @@ public class TestScriptDao {
 
     public String write(File file, List<TestStep> testStepList, List<String> headers,
             boolean overwrite) {
-            
+
         if (file.getName().endsWith("csv")) {
             writeCsv(file.toPath(), testStepList, overwrite);
             return file.getAbsolutePath();
@@ -180,11 +176,7 @@ public class TestScriptDao {
 
         fileOverwriteChecker.setRebuild(overwrite);
 
-        if (file.exists()) {
-            overwrite(file, catalog);
-        } else {
-            excelDao.write(catalog.get("TestScript"), TEMPLATE_PATH, file.getAbsolutePath(), null);
-        }
+        excelDao.write(catalog.get("TestScript"), TEMPLATE_PATH, file.getAbsolutePath(), null);
 
         return file.getAbsolutePath();
     }
@@ -193,33 +185,6 @@ public class TestScriptDao {
         return name.replaceAll("[:\\\\/*?|<>]", "_");
     }
 
-    private void overwrite(File file, TableDataCatalog catalog) {
-        Path temporaryPath = null;
-
-        try {
-            temporaryPath = Files.createTempFile(Paths.get(file.getParent()), "tmp", ".xlsx");
-            Files.copy(file.toPath(), temporaryPath, StandardCopyOption.REPLACE_EXISTING);
-            log.info("temporary.create", temporaryPath.toString());
-
-            excelDao.write(catalog.get("TestScript"), temporaryPath.toString(),
-                    file.getAbsolutePath(), null);
-
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-
-        } finally {
-            try {
-                if (temporaryPath != null) {
-                    log.info("temporary.delete", temporaryPath.toAbsolutePath());
-                    Files.deleteIfExists(temporaryPath);
-                }
-            } catch (IOException e) {
-                log.warn("temporary.delete.error", temporaryPath.toAbsolutePath());
-            }
-        }
-
-    }
-    
     private void writeCsv(Path path, List<TestStep> testSteps, boolean overwrite) {
         overwriteChecker.setRebuild(overwrite);
         if (!overwriteChecker.isWritable(path)) {

@@ -3,8 +3,11 @@ package org.sitoolkit.wt.gui.pres.editor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -133,15 +136,19 @@ public class TestScriptEditor {
     public void appendTestCase(SpreadsheetView spreadSheet) {
         appendTestCases(spreadSheet, 1);
     }
+
     public void appendTestCases(SpreadsheetView spreadSheet, int count) {
         insertTestCases(spreadSheet, spreadSheet.getGrid().getColumnCount(), count);
     }
+
     public void appendTestStep(SpreadsheetView spreadSheet) {
         appendTestSteps(spreadSheet, 1);
     }
+
     public void appendTestSteps(SpreadsheetView spreadSheet, int count) {
         insertTestSteps(spreadSheet, spreadSheet.getGrid().getRowCount(), count);
     }
+
     public boolean insertTestCase(SpreadsheetView spreadSheet) {
         return insertTestCases(spreadSheet, getSelectedColumnCount(spreadSheet));
     }
@@ -163,12 +170,62 @@ public class TestScriptEditor {
 
     }
 
+    public void deleteTestCase(SpreadsheetView spreadSheet) {
+        Set<Integer> deleteColumns = getSelectedCase(spreadSheet);
+
+        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
+        ObservableList<SpreadsheetColumn> columns = spreadSheet.getColumns();
+        List<Double> widths = columns.stream()
+                .map(SpreadsheetColumn::getWidth)
+                .collect(Collectors.toCollection(LinkedList::new));
+
+        rows.stream().forEach(row -> {
+            deleteColumns.stream()
+                    .sorted(Comparator.reverseOrder())
+                    .mapToInt(Integer::intValue)
+                    .forEachOrdered(row::remove);
+        });
+        deleteColumns.stream()
+                .sorted(Comparator.reverseOrder())
+                .mapToInt(Integer::intValue)
+                .forEachOrdered(widths::remove);
+
+        Grid newGrid = new GridBase(10, 10);
+        newGrid.setRows(recreateRows(rows));
+        spreadSheet.setGrid(newGrid);
+
+        IntStream.range(0, widths.size()).forEach(i -> columns.get(i).setPrefWidth(widths.get(i)));
+    }
+
+    public void deleteTestStep(SpreadsheetView spreadSheet) {
+        Set<Integer> deleteRows = getSelectedStep(spreadSheet);
+
+        ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
+        deleteRows.stream()
+                .sorted(Comparator.reverseOrder())
+                .mapToInt(Integer::intValue)
+                .forEachOrdered(rows::remove);
+
+        Grid newGrid = new GridBase(10, 10);
+        newGrid.setRows(recreateRows(rows));
+        spreadSheet.setGrid(newGrid);
+
+    }
+
     public boolean isCaseInsertable(SpreadsheetView spreadSheet) {
         return getInsertColumnPosition(spreadSheet).isPresent();
     }
 
     public boolean isStepInsertable(SpreadsheetView spreadSheet) {
         return getInsertRowPosition(spreadSheet).isPresent();
+    }
+
+    public boolean isCaseSelected(SpreadsheetView spreadSheet) {
+        return !getSelectedCase(spreadSheet).isEmpty();
+    }
+
+    public boolean isStepSelected(SpreadsheetView spreadSheet) {
+        return !getSelectedStep(spreadSheet).isEmpty();
     }
 
     public int getCaseCount(SpreadsheetView spreadSheet, List<GridChange> changeList) {
@@ -204,10 +261,10 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        Optional<Integer> selectedMin = selectedCells.stream().map(cell -> cell.getColumn()).distinct()
+        Optional<Integer> selectedMin = selectedCells.stream().map(TablePosition::getColumn).distinct()
                 .min(Comparator.naturalOrder());
 
-        return selectedMin.filter(i -> i >= COLUMN_INDEX_FIRST_CASE);
+        return selectedMin.filter(this::isCaseColumn);
     }
 
     private Optional<Integer> getInsertRowPosition(SpreadsheetView spreadSheet) {
@@ -215,10 +272,10 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        Optional<Integer> selectedMin = selectedCells.stream().map(cell -> cell.getRow()).distinct()
+        Optional<Integer> selectedMin = selectedCells.stream().map(TablePosition::getRow).distinct()
                 .min(Comparator.naturalOrder());
 
-        return selectedMin.filter(i -> i >= ROW_INDEX_FIRST_STEP);
+        return selectedMin.filter(this::isStepRow);
     }
 
     private int getSelectedRowCount(SpreadsheetView spreadSheet) {
@@ -226,7 +283,7 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        return (int) selectedCells.stream().map(cell -> cell.getRow()).distinct().count();
+        return (int) selectedCells.stream().map(TablePosition::getRow).distinct().count();
     }
 
     private int getSelectedColumnCount(SpreadsheetView spreadSheet) {
@@ -234,9 +291,58 @@ public class TestScriptEditor {
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
 
-        return (int) selectedCells.stream().map(cell -> cell.getColumn()).distinct().count();
+        return (int) selectedCells.stream().map(TablePosition::getColumn).distinct().count();
     }
 
+    private Set<Integer> getSelectedCase(SpreadsheetView spreadSheet) {
+
+        @SuppressWarnings("rawtypes")
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+
+        Map<Integer, Integer> map = new HashMap<>();
+        selectedCells.stream().forEach(cell -> {
+            int col = cell.getColumn();
+            Optional<Integer> count = Optional.ofNullable(map.get(col));
+            map.put(col, count.orElse(0) + 1);
+        });
+
+        int gridRowCount = spreadSheet.getGrid().getRowCount();
+        boolean onlyCaseSelected = map.entrySet().stream().allMatch(entity -> {
+            return isCaseColumn(entity.getKey()) && entity.getValue() == gridRowCount;
+        });
+
+        return onlyCaseSelected ? map.keySet() : Collections.emptySet();
+
+    }
+
+    private Set<Integer> getSelectedStep(SpreadsheetView spreadSheet) {
+
+        @SuppressWarnings("rawtypes")
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+
+        Map<Integer, Integer> map = new HashMap<>();
+        selectedCells.stream().forEach(cell -> {
+            int row = cell.getRow();
+            Optional<Integer> count = Optional.ofNullable(map.get(row));
+            map.put(row, count.orElse(0) + 1);
+        });
+
+        int gridColumnCount = spreadSheet.getGrid().getColumnCount();
+        boolean onlyStepSelected = map.entrySet().stream().allMatch(entity -> {
+            return isStepRow(entity.getKey()) && entity.getValue() == gridColumnCount;
+        });
+
+        return onlyStepSelected ? map.keySet() : Collections.emptySet();
+
+    }
+
+    private boolean isCaseColumn(int columnPosition) {
+        return columnPosition >= COLUMN_INDEX_FIRST_CASE;
+    }
+
+    private boolean isStepRow(int rowPosition) {
+        return rowPosition >= ROW_INDEX_FIRST_STEP;
+    }
 
     private Optional<Integer> getColumnPosition(SpreadsheetView spreadSheet, int caseIndex) {
         int columnCount = spreadSheet.getGrid().getColumnCount();
@@ -330,7 +436,6 @@ public class TestScriptEditor {
         return cell;
     }
 
-
     private void setStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex, String stepStyle,
             String caseStyle) {
 
@@ -362,6 +467,5 @@ public class TestScriptEditor {
                     cell.getStyleClass().remove("debugCase");
                 });
     }
-
 
 }
