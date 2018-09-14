@@ -1,7 +1,10 @@
 package org.sitoolkit.wt.gui.app.script;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.sitoolkit.wt.app.config.BaseConfig;
 import org.sitoolkit.wt.app.config.TestScriptConfig;
@@ -11,6 +14,7 @@ import org.sitoolkit.wt.gui.domain.script.CaseNoCache;
 import org.sitoolkit.wt.gui.domain.script.CaseNoReadCallback;
 import org.sitoolkit.wt.gui.domain.script.CaseNoStdoutListener;
 import org.sitoolkit.wt.gui.domain.script.ScriptProcessClient;
+import org.sitoolkit.wt.gui.infra.config.PropertyManager;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.process.ConversationProcess;
 import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
@@ -26,16 +30,27 @@ public class ScriptService {
 
     TestScriptDao dao;
 
+    ApplicationContext appCtx;
+
+    org.sitoolkit.wt.infra.PropertyManager runtimePm;
+
     public ScriptService() {
         initialize();
     }
 
     private void initialize() {
         ExecutorContainer.get().execute(() -> {
-            ApplicationContext appCtx = new AnnotationConfigApplicationContext(BaseConfig.class,
+            appCtx = new AnnotationConfigApplicationContext(BaseConfig.class,
                     TestScriptConfig.class);
             dao = appCtx.getBean(TestScriptDao.class);
+            runtimePm  = appCtx.getBean(org.sitoolkit.wt.infra.PropertyManager.class);
         });
+    }
+
+    public void loadProject() {
+        PropertyManager pm = PropertyManager.get();
+        runtimePm.setCsvCharset(pm.getCsvCharset());
+        runtimePm.setCsvHasBOM(pm.getCsvHasBOM());
     }
 
     public TestScript read(File file) {
@@ -46,7 +61,7 @@ public class ScriptService {
     }
 
     public void write(TestScript testScript) {
-        dao.write(testScript.getScriptFile(), testScript.getTestStepList(), true);
+        dao.write(testScript.getScriptFile(), testScript.getTestStepList(), testScript.getHeaders(), true);
     }
 
     private synchronized boolean initialized() {
@@ -94,4 +109,35 @@ public class ScriptService {
 
         client.readCaseNo(testScript, params);
     }
+
+    public void write(TestScript testScript, Optional<ScriptFileType> scriptFileType) {
+        doWithScriptFileType(scriptFileType, () -> write(testScript));
+    }
+
+    public TestScript read(File file, Optional<ScriptFileType> scriptFileType) {
+        return doWithScriptFileType(scriptFileType, () -> read(file));
+    }
+
+    private <T> T doWithScriptFileType (Optional<ScriptFileType> scriptFileType, Supplier<T> s) {
+        Charset charset = runtimePm.getCsvCharset();
+        boolean hasBom = runtimePm.isCsvHasBOM();
+        scriptFileType.ifPresent(ft -> {
+            if (ft.isTextFile()) {
+                runtimePm.setCsvCharset(ft.getCharset());
+                runtimePm.setCsvHasBOM(ft.isHasBom());
+            }
+        });
+        T result = s.get();
+        runtimePm.setCsvCharset(charset);
+        runtimePm.setCsvHasBOM(hasBom);
+        return result;
+    }
+
+    private void doWithScriptFileType (Optional<ScriptFileType> scriptFileType, Runnable r) {
+        doWithScriptFileType(scriptFileType, () -> {
+            r.run();
+            return null;
+        });
+    }
+
 }

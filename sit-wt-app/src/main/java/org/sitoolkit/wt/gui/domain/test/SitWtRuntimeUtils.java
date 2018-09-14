@@ -4,17 +4,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.sitoolkit.wt.gui.infra.UnInitializedException;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class SitWtRuntimeUtils {
 
-    private static final Logger LOG = Logger.getLogger(SitWtRuntimeUtils.class.getName());
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(SitWtRuntimeUtils.class);
 
     private static String sitwtClasspath;
 
@@ -53,7 +53,7 @@ public class SitWtRuntimeUtils {
 
         if (javaHome == null) {
             javaHome = System.getProperty("java.home");
-            LOG.log(Level.INFO, "set JAVA_HOME to {0}", new Object[] { javaHome });
+            LOG.info("app.setJavahome", new Object[] { javaHome });
         }
         map.put("JAVA_HOME", javaHome);
 

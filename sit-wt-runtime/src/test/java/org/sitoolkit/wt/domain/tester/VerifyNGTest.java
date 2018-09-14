@@ -15,7 +15,7 @@
  */
 package org.sitoolkit.wt.domain.tester;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class VerifyNGTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/VerifyNGTestScript.xlsx";
+        return "src/test/resources/VerifyNGTestScript.csv";
     }
 
     @Override

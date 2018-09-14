@@ -36,7 +36,7 @@ public class LanguageEnTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/LanguageEnTest.xlsx";
+        return "src/test/resources/LanguageEnTest.csv";
     }
 
     @Override

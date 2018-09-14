@@ -43,9 +43,20 @@
               <Tooltip text="プロジェクトを作成/開きます" />
             </tooltip>
           </Label>
+          <Separator orientation="VERTICAL" />
+          <Label fx:id="openButton" onMouseClicked="#editScript" styleClass="image-btn,open-btn">
+            <tooltip>
+              <Tooltip text="テストスクリプトを開きます" />
+            </tooltip>
+          </Label>
           <Label fx:id="saveButton" onMouseClicked="#editor2script" styleClass="image-btn,save-btn">
             <tooltip>
               <Tooltip text="アクティブタブのテストスクリプトを保存します" />
+            </tooltip>
+          </Label>
+          <Label fx:id="saveAsButton" onMouseClicked="#editor2scriptAs" styleClass="image-btn,save-as-btn">
+            <tooltip>
+              <Tooltip text="アクティブタブのテストスクリプトを別名で保存します" />
             </tooltip>
           </Label>
         </children>

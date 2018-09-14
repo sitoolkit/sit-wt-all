@@ -1,0 +1,5 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,開始URL,open,,list.html,,,y
+2,値が「試験弐」であるセル,storeElementIndex,xpath,"//table[@class=""list""]/tbody/tr/td[text()=""試験弐""]/..",idx,,y
+3,値が「試験弐」であるセルの行にあるボタン,click,xpath,"//table[@class=""list""]/tbody/tr[#{params['idx']}]/td/button",,前,y
+4,アラート,dialog,,,,前,OK

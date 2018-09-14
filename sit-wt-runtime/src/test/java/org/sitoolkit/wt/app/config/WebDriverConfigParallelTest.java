@@ -27,7 +27,7 @@ public class WebDriverConfigParallelTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/WebDriverConfigParallelTestScript.xlsx";
+        return "src/test/resources/WebDriverConfigParallelTestScript.csv";
     }
 
     @Override

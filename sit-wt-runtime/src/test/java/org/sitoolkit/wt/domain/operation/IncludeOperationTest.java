@@ -53,7 +53,7 @@ public class IncludeOperationTest extends SitTesterTestBase {
 
     @Override
     protected String getTestScriptPath() {
-        return "src/test/resources/IncludeOuterTestScript.xlsx";
+        return "src/test/resources/IncludeOuterTestScript.csv";
     }
 
     @Override

@@ -55,7 +55,13 @@ public class AppController implements Initializable {
     private Label toggleButton;
 
     @FXML
+    private Label openButton;
+
+    @FXML
     private Label saveButton;
+
+    @FXML
+    private Label saveAsButton;
 
     @FXML
     private SampleToolbarController sampleToolbarController;
@@ -129,16 +135,21 @@ public class AppController implements Initializable {
         StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
 
         testToolbarController.initialize(messageView, fileTreeController, projectState);
+        testToolbarController.testService = testService;
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
         diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
 
         fileTreeController.setTestRunnable(testToolbarController);
         fileTreeController.fileOpenable = editorTabController;
+        fileTreeController.scriptService = scriptService;
 
         editorTabController.tabs = editorTab;
         editorTabController.scriptService = scriptService;
         editorTabController.initialize();
         FxUtils.bindDisable(saveButton, editorTabController.isEmpty());
+        FxUtils.bindDisable(saveAsButton, editorTabController.isEmpty());
+
+        testService.setDebugListener(editorTabController);
     }
 
     public void postInit() {
@@ -196,12 +207,23 @@ public class AppController implements Initializable {
         messageView.addMsg("プロジェクトを開きます。" + projectDir.getAbsolutePath());
         fileTreeController.setFileTreeRoot(projectDir);
         testToolbarController.loadProject();
+        scriptService.loadProject();
         FxContext.setTitie(projectDir.getAbsolutePath());
+    }
+
+    @FXML
+    public void editScript() {
+        editorTabController.open();
     }
 
     @FXML
     public void editor2script() {
         editorTabController.save();
+    }
+
+    @FXML
+    public void editor2scriptAs() {
+        editorTabController.saveAs();
     }
 
     @FXML

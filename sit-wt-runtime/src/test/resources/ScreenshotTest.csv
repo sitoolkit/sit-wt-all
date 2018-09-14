@@ -1,0 +1,8 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,開始URL,open,,screenshot.html,,後,y
+2,名前,input,id,name,,,スクリーンショット
+3,性別,choose,name,性別,label,,男性
+4,住所,select,id,prefecture,label,,青森
+5,趣味,click,id,hobby-sports,,,y
+6,確定,click,id,confirm,,前,y
+7,確認ダイアログ,dialog,,,,後,OK

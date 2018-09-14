@@ -2,19 +2,20 @@ package org.sitoolkit.wt.gui.app.test;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.sitoolkit.wt.app.config.RuntimeConfig;
 import org.sitoolkit.wt.app.test.TestRunner;
+import org.sitoolkit.wt.domain.debug.DebugListener;
 import org.sitoolkit.wt.domain.debug.DebugSupport;
 import org.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import org.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import org.sitoolkit.wt.gui.domain.test.TestRunParams;
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
 import org.sitoolkit.wt.infra.PropertyManager;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 import org.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import org.sitoolkit.wt.util.infra.process.ConversationProcess;
 import org.sitoolkit.wt.util.infra.process.ProcessExitCallback;
@@ -24,11 +25,14 @@ import org.sitoolkit.wt.util.infra.util.SystemUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import lombok.Setter;
+
 public class TestService {
 
-    private static final Logger LOG = LogUtils.get(TestService.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestService.class);
 
-    private static final String SCRIPT_TEMPLATE = "TestScriptTemplate.xlsx";
+    private static final String SCRIPT_TEMPLATE = "TestScriptTemplate_"
+            + Locale.getDefault().getLanguage() + ".csv";
 
     SitWtRuntimeProcessClient client = new SitWtRuntimeProcessClient();
 
@@ -36,7 +40,11 @@ public class TestService {
 
     private Map<String, ConfigurableApplicationContext> ctxMap = new HashMap<>();
 
+    @Setter
+    private DebugListener debugListener;
+
     public String runTest(TestRunParams params, ProcessExitCallback callback) {
+
 
         if (params.getTargetScripts() == null) {
             return null;
@@ -45,25 +53,33 @@ public class TestService {
         String sessionId = UUID.randomUUID().toString();
 
         ExecutorContainer.get().execute(() -> {
-            System.setProperty("driver.type", params.getDriverType());
-            ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
-                    RuntimeConfig.class);
-            ctxMap.put(sessionId, appCtx);
-
             try {
-
-                PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
-                runtimePm.setBaseUrl(params.getBaseUrl());
-                runtimePm.setDebug(params.isDebug());
-
-                runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
-                callback.callback(0);
+                System.setProperty("driver.type", params.getDriverType());
+                String profile = ("android".equals(params.getDriverType()) || "ios".equals(params.getDriverType()))
+                        ? "mobile" : "pc";
+                AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext();
+                appCtx.register(RuntimeConfig.class);
+                appCtx.getEnvironment().addActiveProfile(profile);
+                appCtx.refresh();
+                ctxMap.put(sessionId, appCtx);
+                try {
+                    PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
+                    runtimePm.setBaseUrl(params.getBaseUrl());
+                    runtimePm.setDebug(params.isDebug());
+                    DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
+                    debugSupport.setListener(debugListener);
+                    runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
+                    callback.callback(0);
+                } catch (Exception e) {
+                    LOG.error("app.unexpectedException", e);
+                    callback.callback(1);
+                } finally {
+                    appCtx.close();
+                    ctxMap.remove(sessionId);
+                }
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "unexpected exception", e);
+                LOG.error("app.unexpectedException", e);
                 callback.callback(1);
-            } finally {
-                appCtx.close();
-                ctxMap.remove(sessionId);
             }
         });
 
@@ -131,7 +147,7 @@ public class TestService {
 
         File dir = new File(SystemUtils.getSitRepository(), "sit-wt");
         if (!dir.exists()) {
-            LOG.log(Level.INFO, "mkdir sit-wt repo {0}", dir.getAbsolutePath());
+            LOG.info("app.makeSitwtDir", dir.getAbsolutePath());
             dir.mkdir();
         }
 
@@ -149,7 +165,7 @@ public class TestService {
             params.getExitClallbacks().add(exitCode -> {
 
                 File testscript = new File(baseDir, "target/" + SCRIPT_TEMPLATE);
-                LOG.log(Level.INFO, "{0} rename to {1}",
+                LOG.info("app.scriptRename",
                         new Object[] { testscript.getAbsolutePath(), template.getAbsolutePath() });
                 testscript.renameTo(template);
 

@@ -15,10 +15,13 @@
  */
 package org.sitoolkit.wt.domain.testscript;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.sitoolkit.util.tabledata.RowData;
 import org.sitoolkit.util.tabledata.TableData;
@@ -29,7 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(xlsx)に変換するクラスです。
+ * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプトに変換するクラスです。
  *
  * @author yuichi.kuwahara
  * @author kaori.ogawa
@@ -45,6 +48,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
      */
     private static String sheetName = "TestScript";
 
+    private static String stepNo = "StepNo";
+
     private static String itemName = "ItemName";
 
     private static String operation = "Operation";
@@ -57,6 +62,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
 
     private static String screenshot = "Screenshot";
 
+    private static String breakpoint = "Breakpoint";
+
     private static String case_ = "Case";
 
     public TestScriptConvertUtils() {
@@ -68,7 +75,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
      * @param testStepList
      * @return
      */
-    public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList) {
+    public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList,
+            List<String> headers) {
         if (cellNameMap == null) {
             initCellNameMap();
         }
@@ -87,14 +95,17 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
             row.setCellValue(cellNameMap.get(locator), testStep.getLocator().getValue());
             row.setCellValue(cellNameMap.get(dataStyle), testStep.getDataType());
             row.setCellValue(cellNameMap.get(screenshot), testStep.getScreenshotTiming());
-
+            row.setCellValue(cellNameMap.get(breakpoint), testStep.getBreakPoint());
+            
             for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
                 row.setCellValue(cellNameMap.get(case_) + entry.getKey(), entry.getValue());
             }
             tableData.add(row);
+
         }
 
         tableData.setName(sheetName);
+        tableData.setColumnNameList(headers);
         tableDataCatalog.add(tableData);
 
         return tableDataCatalog;
@@ -108,12 +119,72 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
     private static void initCellNameMap() {
         cellNameMap = new HashMap<String, String>();
 
+        cellNameMap.put(stepNo, MessageManager.getMessage(stepNo));
         cellNameMap.put(itemName, MessageManager.getMessage(itemName));
         cellNameMap.put(operation, MessageManager.getMessage(operation));
         cellNameMap.put(locatorStyle, MessageManager.getMessage(locatorStyle));
         cellNameMap.put(locator, MessageManager.getMessage(locator));
         cellNameMap.put(dataStyle, MessageManager.getMessage(dataStyle));
         cellNameMap.put(screenshot, MessageManager.getMessage(screenshot));
+        cellNameMap.put(breakpoint, MessageManager.getMessage(breakpoint));
         cellNameMap.put(case_, MessageManager.getMessage(case_));
     }
+
+    private static String getValue(Map<String, String> row, String key) {
+        if (cellNameMap == null) {
+            initCellNameMap();
+        }
+        return row.get(cellNameMap.get(key));
+    }
+
+    public static void loadStep(TestStep testStep, Map<String, String> row,
+            List<String> caseNoList) {
+
+        testStep.setNo(getValue(row, stepNo));
+        testStep.setItemName(getValue(row, itemName));
+        testStep.setOperationName(getValue(row, operation));
+        testStep.getLocator().setType(getValue(row, locatorStyle));
+        testStep.getLocator().setValue(getValue(row, locator));
+        testStep.setDataType(getValue(row, dataStyle));
+        testStep.setScreenshotTiming(getValue(row, screenshot));
+        testStep.setBreakPoint(getValue(row, breakpoint));
+        Map<String, String> testData = new HashMap<String, String>();
+
+        String casePrefix = (new TestScript()).getCaseNoPrefix();
+        caseNoList.stream().forEach(s -> {
+            testData.put(s, row.get(casePrefix + s));
+        });
+        testStep.setTestData(testData);
+    }
+
+    public static List<String> createHeaderRow(List<String> caseNoList) {
+        if (cellNameMap == null) {
+            initCellNameMap();
+        }
+
+        String casePrefix = (new TestScript()).getCaseNoPrefix();
+
+        Stream<String> itemStream = Stream.of(stepNo, itemName, operation, locatorStyle, locator,
+                dataStyle, screenshot, breakpoint).map(cellNameMap::get);
+        Stream<String> caseStream = caseNoList.stream().map(caseNo -> casePrefix + caseNo);
+
+        return Stream.concat(itemStream, caseStream).collect(Collectors.toList());
+    }
+
+    public static List<String> createRow(TestStep testStep, List<String> caseNoList) {
+
+        List<String> row = new ArrayList<>();
+
+        row.add(testStep.getNo());
+        row.add(testStep.getItemName());
+        row.add(testStep.getOperationName());
+        row.add(testStep.getLocator().getType());
+        row.add(testStep.getLocator().getValue());
+        row.add(testStep.getDataType());
+        row.add(testStep.getScreenshotTiming());
+        row.add(testStep.getBreakPoint());
+        caseNoList.stream().map(testStep.getTestData()::get).forEachOrdered(row::add);
+        return row;
+    }
+
 }

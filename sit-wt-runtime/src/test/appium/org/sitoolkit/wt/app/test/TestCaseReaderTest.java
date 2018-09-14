@@ -13,7 +13,7 @@ public class TestCaseReaderTest {
 
     @Test
     public void test() {
-        List<String> caseNos = reader.read("testscript/ExcelTestScript.xlsx", "TestScript");
+        List<String> caseNos = reader.read("testscript/CsvTestScript.csv", "TestScript");
 
         assertThat(caseNos.size(), is(2));
         assertThat("001", is(caseNos.get(0)));

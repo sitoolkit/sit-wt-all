@@ -56,7 +56,7 @@ public class FileTreeController implements Initializable {
 
     FileOpenable fileOpenable;
 
-    ScriptService scriptService = new ScriptService();
+    ScriptService scriptService;
 
     TestCaseDialogController testCaseDialogController;
 
@@ -201,13 +201,13 @@ public class FileTreeController implements Initializable {
     @FXML
     public void newScript() {
         operateSelectedDir(selectedItem -> {
-            TextInputDialog dialog = new TextInputDialog("NewTestScript.xlsx");
+            TextInputDialog dialog = new TextInputDialog("NewTestScript.csv");
             dialog.setTitle("新規テストスクリプト");
             dialog.setHeaderText("テストスクリプトの名前を入力してください。");
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(name -> {
-                name = name.endsWith(".xlsx") ? name : name + ".xlsx";
+                name = name.endsWith(".csv") ? name : name + ".csv";
                 File newTestScript = new File(selectedItem.getValue().getFile(), name);
 
                 if (newTestScript.exists()) {

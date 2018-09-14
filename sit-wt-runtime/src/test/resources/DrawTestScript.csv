@@ -1,0 +1,4 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,開始URL,open,,http://www.mrdoob.com/projects/harmony/,,,y
+2,直線を描画,drawLine,tag,canvas,,,300;300;50;70
+3,直線を描画,drawLine,tag,canvas,,後,50;-140

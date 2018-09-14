@@ -1,0 +1,5 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,ログインページ,startApp,,,,,#/login
+2,UserNameテキストボックス,input,id,username,,,user
+3,Passwordテキストボックス,input,id,password,,,secret
+4,Loginボタン,click,id,login,,前後,y

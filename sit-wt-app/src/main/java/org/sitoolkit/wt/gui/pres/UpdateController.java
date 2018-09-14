@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.sitoolkit.wt.gui.app.update.UpdateService;
-import org.sitoolkit.wt.gui.infra.log.LogUtils;
+import org.sitoolkit.wt.infra.log.SitLogger;
+import org.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -18,7 +17,7 @@ import javafx.scene.control.ButtonType;
 
 public class UpdateController {
 
-    private static final Logger LOG = LogUtils.get(UpdateController.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(UpdateController.class);
 
     UpdateService service = new UpdateService();
 
@@ -32,7 +31,7 @@ public class UpdateController {
             service.checkSitWtAppUpdate(pomFile, newVersion -> confirmAndInstall(newVersion));
 
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "can't unarchive pom.xml", e);
+            LOG.warn("app.pomUnarchiveFailed", e);
         }
 
     }
@@ -72,13 +71,13 @@ public class UpdateController {
             if (result.get() == ButtonType.OK) {
                 ProcessBuilder builder = new ProcessBuilder();
                 builder.command("java", "-jar", jar.getAbsolutePath());
-                LOG.log(Level.INFO, "execute {0}", builder.command());
+                LOG.info("app.execute", builder.command());
 
                 try {
                     builder.start();
                     Platform.exit();
                 } catch (IOException e) {
-                    LOG.log(Level.SEVERE, "fail to restart", e);
+                    LOG.error("app.restartFailed", e);
                 }
             }
 
