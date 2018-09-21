@@ -198,6 +198,7 @@ public class AppController implements Initializable {
             loadProject(pomFile);
 
         }
+        projectState.setProjectDir(projectDir);
 
     }
 

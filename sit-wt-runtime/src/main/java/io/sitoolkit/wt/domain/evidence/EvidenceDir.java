@@ -73,7 +73,8 @@ public class EvidenceDir {
 
     public static File getLatestEvidenceDir() {
 
-        File outputDir = new File(EVIDENCE_ROOT_DIR);
+        File outputDir = new File(
+                System.getProperty("sitwt.projectDirectory") + "/" + EVIDENCE_ROOT_DIR);
         List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
                 FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
         evidenceDirs.remove(outputDir);

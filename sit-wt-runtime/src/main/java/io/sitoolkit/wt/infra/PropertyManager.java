@@ -116,6 +116,10 @@ public class PropertyManager {
     @Getter
     private boolean csvHasBOM = true;
 
+    @Getter
+    @Value("${sitwt.projectDirectory:#{null}}")
+    private File projectDir;
+
     private Map<String, String> capabilities = new HashMap<>();
 
     private boolean isFirefoxDriver;

@@ -160,6 +160,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
         params.setCompareScreenshot(compareToggle.isSelected());
         params.setDriverType(getDriverType());
         params.setBaseUrl(getBaseUrl());
+        params.setProjectDir(projectState.getProjectDir());
 
         addBaseUrl(params.getBaseUrl());
 

@@ -6,6 +6,8 @@ public class TestRunParams {
 
     private File baseDir;
 
+    private File projectDir;
+
     private String baseUrl;
 
     private boolean debug;
@@ -67,6 +69,14 @@ public class TestRunParams {
 
     public void setBaseDir(File baseDir) {
         this.baseDir = baseDir;
+    }
+
+    public void setProjectDir(File projectDir) {
+        this.projectDir = projectDir;
+    }
+
+    public File getProjectDir() {
+        return projectDir;
     }
 
     public String getTargetScripts() {
