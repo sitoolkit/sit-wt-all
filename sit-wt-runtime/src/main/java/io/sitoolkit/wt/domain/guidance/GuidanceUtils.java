@@ -43,7 +43,7 @@ public class GuidanceUtils {
                 URL resUrl = ResourceUtils.getURL("classpath:" + res);
                 File destFile = new File(destDir, res);
                 if (destFile.exists()) {
-                    return;
+                    continue;
                 }
                 LOG.info("guidance.file.open", destFile.getAbsolutePath());
                 FileUtils.copyURLToFile(resUrl, destFile);
