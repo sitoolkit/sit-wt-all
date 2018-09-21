@@ -17,7 +17,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.sitoolkit.wt</groupId>
+      <groupId>io.sitoolkit.wt</groupId>
       <artifactId>sit-wt-runtime</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -56,7 +56,7 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <parent>
-    <groupId>org.sitoolkit.wt</groupId>
+    <groupId>io.sitoolkit.wt</groupId>
     <artifactId>sit-wt-all</artifactId>
     <version>3.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>

@@ -15,12 +15,12 @@
     </encoder>
   </appender>
 
-  <logger name="org.sitoolkit" level="debug" additivity="true">
+  <logger name="io.sitoolkit" level="debug" additivity="true">
     <appender-ref ref="stdout" />
   </logger>
-  <logger name="org.sitoolkit.wt.infra.selenium.WebElementMethodInterceptor" level="debug"
+  <logger name="io.sitoolkit.wt.infra.selenium.WebElementMethodInterceptor" level="debug"
     additivity="true" />
-  <logger name="org.sitoolkit.wt.app.config" level="debug" additivity="true" />
+  <logger name="io.sitoolkit.wt.app.config" level="debug" additivity="true" />
 
   <logger name="org.springframework" level="warn" additivity="true" >
   </logger>

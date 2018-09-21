@@ -2,13 +2,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.sitoolkit.wt</groupId>
+  <groupId>io.sitoolkit.wt</groupId>
   <artifactId>sit-wt-maven-plugin-it</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
-      <groupId>org.sitoolkit.wt</groupId>
+      <groupId>io.sitoolkit.wt</groupId>
       <artifactId>sit-wt-runtime</artifactId>
       <version>0.9-SNAPSHOT</version>
     </dependency>
@@ -19,7 +19,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sitoolkit.wt</groupId>
+        <groupId>io.sitoolkit.wt</groupId>
         <artifactId>sit-wt-maven-plugin</artifactId>
         <version>0.9-SNAPSHOT</version>
         <executions>

@@ -15,7 +15,7 @@
 <?import javafx.scene.control.ToggleButton?>
 
 
-<HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.sitoolkit.wt.gui.pres.TestToolbarController"
+<HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.sitoolkit.wt.gui.pres.TestToolbarController"
   style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
   <ToolBar fx:id="startGroup">
     <items>
