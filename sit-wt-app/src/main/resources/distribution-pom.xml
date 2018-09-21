@@ -9,7 +9,7 @@
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
-      <groupId>org.sitoolkit.wt</groupId>
+      <groupId>io.sitoolkit.wt</groupId>
       <artifactId>sit-wt-runtime</artifactId>
       <version>${sitwt.version}</version>
     </dependency>
@@ -39,7 +39,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sitoolkit.wt</groupId>
+        <groupId>io.sitoolkit.wt</groupId>
         <artifactId>sit-wt-maven-plugin</artifactId>
         <version>${sitwt.version}</version>
         <dependencies>
@@ -186,7 +186,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.sitoolkit.wt</groupId>
+                  <groupId>io.sitoolkit.wt</groupId>
                   <artifactId>sit-wt-runtime</artifactId>
                   <version>${sitwt.version}</version>
                 </artifactItem>
@@ -211,7 +211,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.sitoolkit.wt</groupId>
+                  <groupId>io.sitoolkit.wt</groupId>
                   <artifactId>sit-wt-runtime</artifactId>
                   <version>${sitwt.version}</version>
                 </artifactItem>
