@@ -121,6 +121,16 @@ public class TestScriptEditorController {
         }
     }
 
+
+    public void deleteCase(ActionEvent e) {
+        editor.deleteTestCase(spreadSheet);
+    }
+
+    public void deleteStep(ActionEvent e) {
+        editor.deleteTestStep(spreadSheet);
+    }
+
+
     public void onContextMenuShowing(WindowEvent e) {
         myItems.stream().forEach(item -> item.refreshDisable(spreadSheet));
     }
@@ -135,28 +145,28 @@ public class TestScriptEditorController {
         menu = new Menu("挿入");
         item = new EditorMenuItem("新規ケースの挿入");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> newTestCase(e));
-        item.setExcutableTest(spreadSheet -> editor.isCaseInsertable(spreadSheet));
+        item.setOnAction(this::newTestCase);
+        item.setExcutableTest(editor::isCaseInsertable);
         menu.getItems().add(item);
         myItems.add(item);
 
         item = new EditorMenuItem("コピーしたケースの挿入");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> pasteCase(e));
+        item.setOnAction(this::pasteCase);
         item.setExcutableTest(spreadSheet -> editor.isCaseInsertable(spreadSheet) && hasClipboardCases());
         menu.getItems().add(item);
         myItems.add(item);
 
         item = new EditorMenuItem("新規ステップの挿入");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> newTestStep(e));
-        item.setExcutableTest(spreadSheet -> editor.isStepInsertable(spreadSheet));
+        item.setOnAction(this::newTestStep);
+        item.setExcutableTest(editor::isStepInsertable);
         menu.getItems().add(item);
         myItems.add(item);
 
         item = new EditorMenuItem("コピーしたステップの挿入");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> pasteStep(e));
+        item.setOnAction(this::pasteStep);
         item.setExcutableTest(spreadSheet -> editor.isStepInsertable(spreadSheet) && hasClipboardSteps());
         menu.getItems().add(item);
         myItems.add(item);
@@ -167,31 +177,51 @@ public class TestScriptEditorController {
 
         item = new EditorMenuItem("新規ステップを末尾に追加");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> newTestStepTail(e));
+        item.setOnAction(this::newTestStepTail);
         menu.getItems().add(item);
         myItems.add(item);
 
         item = new EditorMenuItem("新規ケースを末尾に追加");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> newTestCaseTail(e));
+        item.setOnAction(this::newTestCaseTail);
         menu.getItems().add(item);
         myItems.add(item);
 
         item = new EditorMenuItem("コピーしたケースを末尾に追加");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> pasteCaseTail(e));
+        item.setOnAction(this::pasteCaseTail);
         item.setExcutableTest(spreadSheet -> hasClipboardCases());
         menu.getItems().add(item);
         myItems.add(item);
 
         item = new EditorMenuItem("コピーしたステップを末尾に追加");
         item.setMnemonicParsing(false);
-        item.setOnAction(e -> pasteStepTail(e));
+        item.setOnAction(this::pasteStepTail);
         item.setExcutableTest(spreadSheet -> hasClipboardSteps());
         menu.getItems().add(item);
         myItems.add(item);
 
         menuItems.add(menu);
+
+
+        menu = new Menu("削除");
+
+        item = new EditorMenuItem("ステップを削除");
+        item.setMnemonicParsing(false);
+        item.setOnAction(this::deleteStep);
+        item.setExcutableTest(editor::isStepSelected);
+        menu.getItems().add(item);
+        myItems.add(item);
+
+        item = new EditorMenuItem("ケースを削除");
+        item.setMnemonicParsing(false);
+        item.setOnAction(this::deleteCase);
+        item.setExcutableTest(editor::isCaseSelected);
+        menu.getItems().add(item);
+        myItems.add(item);
+
+        menuItems.add(menu);
+
 
         return menuItems;
     }

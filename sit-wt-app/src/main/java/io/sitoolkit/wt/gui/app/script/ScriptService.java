@@ -62,7 +62,7 @@ public class ScriptService {
     }
 
     public void write(TestScript testScript) {
-        dao.write(testScript.getScriptFile(), testScript.getTestStepList(), true);
+        dao.write(testScript.getScriptFile(), testScript.getTestStepList(), testScript.getHeaders(), true);
     }
 
     private synchronized boolean initialized() {

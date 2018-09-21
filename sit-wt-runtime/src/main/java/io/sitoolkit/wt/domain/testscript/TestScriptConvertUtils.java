@@ -76,7 +76,8 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
      * @param testStepList
      * @return
      */
-    public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList) {
+    public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList,
+            List<String> headers) {
         if (cellNameMap == null) {
             initCellNameMap();
         }
@@ -95,14 +96,17 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
             row.setCellValue(cellNameMap.get(locator), testStep.getLocator().getValue());
             row.setCellValue(cellNameMap.get(dataStyle), testStep.getDataType());
             row.setCellValue(cellNameMap.get(screenshot), testStep.getScreenshotTiming());
-
+            row.setCellValue(cellNameMap.get(breakpoint), testStep.getBreakPoint());
+            
             for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
                 row.setCellValue(cellNameMap.get(case_) + entry.getKey(), entry.getValue());
             }
             tableData.add(row);
+
         }
 
         tableData.setName(sheetName);
+        tableData.setColumnNameList(headers);
         tableDataCatalog.add(tableData);
 
         return tableDataCatalog;
