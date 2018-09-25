@@ -21,9 +21,12 @@
     </encoder>
   </appender>
 
-  <appender name="file" class="ch.qos.logback.core.FileAppender">
-    <file>target/sit-wt.log</file>
-    <append>false</append>
+  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>log/sit-wt.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>sit-wt.%d.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
     <encoder>
       <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-7.7thread] %-5p %-30.30logger{0} - %m%n</pattern>
       <charset>UTF-8</charset>

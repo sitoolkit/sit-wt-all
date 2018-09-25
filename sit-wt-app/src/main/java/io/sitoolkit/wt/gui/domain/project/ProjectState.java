@@ -6,7 +6,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 /**
- * 
+ *
  * <dl>
  * <dt>初期化前
  * <dd>pom.xmlをロードしていない状態
@@ -19,7 +19,7 @@ import javafx.beans.property.SimpleBooleanProperty;
  * <dt>ブラウザ実行中
  * <dd>page2scriptでブラウザを実行中
  * </dl>
- * 
+ *
  * @author yuichi_kuwahara
  *
  */
@@ -28,6 +28,8 @@ public class ProjectState {
     private File pomFile;
 
     private File baseDir;
+
+    private File projectDir;
 
     private BooleanProperty running = new SimpleBooleanProperty();
 
@@ -87,6 +89,14 @@ public class ProjectState {
 
     public File getBaseDir() {
         return baseDir;
+    }
+
+    public File getProjectDir() {
+        return projectDir;
+    }
+
+    public void setProjectDir(File projectDir) {
+        this.projectDir = projectDir;
     }
 
 }

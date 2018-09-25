@@ -55,6 +55,7 @@ public class TestService {
         ExecutorContainer.get().execute(() -> {
             try {
                 System.setProperty("driver.type", params.getDriverType());
+                System.setProperty("sitwt.projectDirectory", params.getProjectDir().getAbsolutePath());
                 String profile = ("android".equals(params.getDriverType()) || "ios".equals(params.getDriverType()))
                         ? "mobile" : "pc";
                 AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext();
