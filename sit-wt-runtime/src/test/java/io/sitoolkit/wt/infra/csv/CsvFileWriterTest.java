@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +26,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import io.sitoolkit.wt.app.config.BaseConfig;
 import io.sitoolkit.wt.infra.PropertyManager;
-import io.sitoolkit.wt.infra.csv.CsvFileWriter;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = BaseConfig.class)
@@ -41,49 +41,50 @@ public class CsvFileWriterTest {
 
     @Test
     public void test() throws IOException {
+        Charset encoding = StandardCharsets.UTF_8;
+        boolean useBOM = true;
+
+        pm.setCsvCharset(encoding);
+        pm.setCsvHasBOM(useBOM);
 
         Path actualPath = Paths.get("target/CsvWriteTestActual.csv");
         target.write(data, actualPath.toAbsolutePath().toString());
         Path expectedPath = Paths.get("testdata/csv/CsvWriteTestExpectedBom.csv");
 
-        List<String> actualAllLines = FileUtils.readLines(actualPath.toFile(),
-                StandardCharsets.UTF_8);
-        Iterator<String> actualItr = actualAllLines.iterator();
-
-        List<String> expectedAllLines = FileUtils.readLines(expectedPath.toFile(),
-                StandardCharsets.UTF_8);
-
-        assertThat(actualAllLines.size(), is(expectedAllLines.size()));
-
-        for (Iterator<String> expectedItr = expectedAllLines.iterator(); expectedItr.hasNext();) {
-            assertThat(actualItr.next(), is(expectedItr.next()));
-        }
-
-        assertThat(Files.readAllBytes(actualPath), is(Files.readAllBytes(expectedPath)));
+        verifyCsv(actualPath, expectedPath, encoding);
+        assertThat(hasBOM(actualPath), is(useBOM));
     }
 
     @Test
     public void testNoBom() throws IOException {
-        pm.setCsvCharset(StandardCharsets.UTF_8);
-        pm.setCsvHasBOM(false);
+        Charset encoding = StandardCharsets.UTF_8;
+        boolean useBOM = false;
+
+        pm.setCsvCharset(encoding);
+        pm.setCsvHasBOM(useBOM);
 
         Path actualPath = Paths.get("target/CsvWriteTestActual.csv");
         target.write(data, actualPath.toAbsolutePath().toString());
         Path expectedPath = Paths.get("testdata/csv/CsvWriteTestExpectedNoBom.csv");
 
-        assertThat(Files.readAllBytes(actualPath), is(Files.readAllBytes(expectedPath)));
+        verifyCsv(actualPath, expectedPath, encoding);
+        assertThat(hasBOM(actualPath), is(useBOM));
     }
 
     @Test
     public void testSJIS() throws IOException {
-        pm.setCsvCharset(Charset.forName("Windows-31j"));
-        pm.setCsvHasBOM(false);
+        Charset encoding = Charset.forName("Windows-31j");
+        boolean useBOM = false;
+
+        pm.setCsvCharset(encoding);
+        pm.setCsvHasBOM(useBOM);
 
         Path actualPath = Paths.get("target/CsvWriteTestActual.csv");
         target.write(data, actualPath.toAbsolutePath().toString());
         Path expectedPath = Paths.get("testdata/csv/CsvWriteTestExpectedSJIS.csv");
 
-        assertThat(Files.readAllBytes(actualPath), is(Files.readAllBytes(expectedPath)));
+        verifyCsv(actualPath, expectedPath, encoding);
+        assertThat(hasBOM(actualPath), is(useBOM));
     }
 
     @Before
@@ -100,10 +101,23 @@ public class CsvFileWriterTest {
         data.add(Arrays.asList("先頭列,カンマ,あり,データ", "92", "", "", ""));
         data.add(Arrays.asList("ダブルクォートあり", "最後だけ\"", "\"真\"ん中\"", "\"最初だけ", "真中\"だけ"));
         data.add(Arrays.asList("ダブルクォートだけ", "\"", "\"\"", "\"\"\"", "\"\"\"\""));
-
-        pm.setCsvCharset(StandardCharsets.UTF_8);
-        pm.setCsvHasBOM(true);
-
     }
 
+    public void verifyCsv(Path actualPath, Path expectedPath, Charset encoding) throws IOException {
+        List<String> actualAllLines = FileUtils.readLines(actualPath.toFile(), encoding);
+        Iterator<String> actualItr = actualAllLines.iterator();
+
+        List<String> expectedAllLines = FileUtils.readLines(expectedPath.toFile(), encoding);
+
+        assertThat(actualAllLines.size(), is(expectedAllLines.size()));
+
+        for (Iterator<String> expectedItr = expectedAllLines.iterator(); expectedItr.hasNext();) {
+            assertThat(actualItr.next(), is(expectedItr.next()));
+        }
+    }
+
+    public boolean hasBOM(Path actualPath) throws IOException {
+        byte[] actualBOM = Arrays.copyOfRange(Files.readAllBytes(actualPath), 0, 3);
+        return Arrays.equals(actualBOM, ByteOrderMark.UTF_8.getBytes());
+    }
 }
