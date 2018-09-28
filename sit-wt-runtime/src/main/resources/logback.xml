@@ -24,7 +24,7 @@
   <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>log/sit-wt.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>sit-wt.%d.log</fileNamePattern>
+      <fileNamePattern>log/sit-wt.%d.log</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
