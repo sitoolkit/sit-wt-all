@@ -288,16 +288,16 @@ public class FirefoxManager {
         Path ffRuntime = Paths.get(repo.toString(), "runtime");
 
         LOG.info("firefox.install2", ffRuntime.toString());
+        if (!Files.exists(ffRuntime)) {
+            try {
+                Files.createDirectories(ffRuntime);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // たまにcp -Rコマンドが失敗してFirefox.appがコピーされないので3回リトライ
         for (int i = 0; i < 3; i++) {
-
-            if (!Files.exists(ffRuntime)) {
-                try {
-                    Files.createDirectories(ffRuntime);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
 
             MultiThreadUtils.submitWithProgress(() -> {
                 ProcessUtils.execute("cp", "-R", mountedFf.toString(), ffRuntime.toString());
