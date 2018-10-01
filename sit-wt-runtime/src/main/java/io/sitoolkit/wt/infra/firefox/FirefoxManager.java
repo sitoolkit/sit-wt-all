@@ -175,10 +175,6 @@ public class FirefoxManager {
         }
     }
 
-    public void emptyDirectoryRecursively(Path path) {
-
-    }
-
     protected Path getFirefoxBinaryFile() {
         if (SystemUtils.IS_OS_WINDOWS) {
             return Paths.get(SitRepository.getRepositoryPath(), installDir, "runtime/firefox.exe");
@@ -295,6 +291,14 @@ public class FirefoxManager {
         // たまにcp -Rコマンドが失敗してFirefox.appがコピーされないので3回リトライ
         for (int i = 0; i < 3; i++) {
 
+            if (!Files.exists(ffRuntime)) {
+                try {
+                    Files.createDirectories(ffRuntime);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             MultiThreadUtils.submitWithProgress(() -> {
                 ProcessUtils.execute("cp", "-R", mountedFf.toString(), ffRuntime.toString());
                 return 0;
@@ -329,7 +333,7 @@ public class FirefoxManager {
                     "runtime/application.ini");
         } else if (SystemUtils.IS_OS_MAC) {
             return Paths.get(SitRepository.getRepositoryPath(), installDir,
-                    "runtime/Firefox.app/Contents/MacOS/application.ini");
+                    "runtime/Firefox.app/Contents/Resources/application.ini");
         } else {
             throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
         }
