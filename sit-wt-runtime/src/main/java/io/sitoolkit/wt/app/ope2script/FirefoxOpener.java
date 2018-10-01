@@ -3,14 +3,15 @@ package io.sitoolkit.wt.app.ope2script;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.XpiDriverService;
 
 import io.sitoolkit.wt.domain.guidance.GuidanceUtils;
 import io.sitoolkit.wt.infra.MultiThreadUtils;
 import io.sitoolkit.wt.infra.firefox.FirefoxManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import io.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 
 public class FirefoxOpener {
 
@@ -18,12 +19,16 @@ public class FirefoxOpener {
 
     private FirefoxManager ffManager = new FirefoxManager();
 
+    private WebDriverInstaller webDriverInstaller = new WebDriverInstaller();
+
     private String guidanceFile = "guidance/guidance-ope2script.html";
 
     private String[] guidanceResources = new String[] { guidanceFile,
             "guidance/css/bootstrap.min.css", "guidance/css/style.css", "guidance/js/open.js" };
 
     public FirefoxOpener() {
+        ffManager.init();
+        webDriverInstaller.init();
     }
 
     public static void main(String[] args) {
@@ -39,6 +44,8 @@ public class FirefoxOpener {
      */
     public int open() {
         try {
+            ffManager.switchEsr();
+            webDriverInstaller.installGeckoDriver();
 
             GuidanceUtils.retrieve(guidanceResources);
 
@@ -49,14 +56,14 @@ public class FirefoxOpener {
 
             LOG.info("firefox.start", ffBinary);
 
-            WebDriver driver = MultiThreadUtils.submitWithProgress(() -> new FirefoxDriver(
-                    XpiDriverService.builder().withBinary(ffBinary).withProfile(profile).build()));
+            FirefoxOptions ffOptions = new FirefoxOptions();
+            ffOptions.setBinary(ffBinary);
+            ffOptions.setProfile(profile);
+            WebDriver driver = MultiThreadUtils
+                    .submitWithProgress(() -> new FirefoxDriver(ffOptions));
 
             String baseUrl = System.getProperty("baseUrl");
             driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));
-
-            // wait for Firefox window is closed
-            ffBinary.waitFor();
 
             return 0;
         } catch (Exception e) {
