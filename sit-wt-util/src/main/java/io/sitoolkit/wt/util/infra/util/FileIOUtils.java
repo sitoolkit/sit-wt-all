@@ -9,10 +9,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -168,6 +172,25 @@ public class FileIOUtils {
                 new Object[] { src.getAbsolutePath(), dst.getAbsolutePath() });
         try {
             Files.copy(src.toPath(), dst.toPath());
+        } catch (IOException e) {
+            throw new UnExpectedException(e);
+        }
+    }
+
+    public static void copyDirectoryWithPermission(Path src, Path parent) {
+        try {
+            Path dst = Paths.get(parent.toString(), src.toFile().getName());
+            Files.copy(src, dst, StandardCopyOption.COPY_ATTRIBUTES);
+
+            if (Files.isDirectory(src)) {
+                try (Stream<Path> children = Files.list(src)) {
+                    children.forEach(child -> {
+                        copyDirectoryWithPermission(child, dst);
+                    });
+                } catch (IOException e) {
+                    throw new UnExpectedException(e);
+                }
+            }
         } catch (IOException e) {
             throw new UnExpectedException(e);
         }

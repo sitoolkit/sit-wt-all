@@ -33,6 +33,8 @@ import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.process.ProcessUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
 import io.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
+import io.sitoolkit.wt.util.infra.UnExpectedException;
+import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 
 public class FirefoxManager {
 
@@ -175,10 +177,6 @@ public class FirefoxManager {
         }
     }
 
-    public void emptyDirectoryRecursively(Path path) {
-
-    }
-
     protected Path getFirefoxBinaryFile() {
         if (SystemUtils.IS_OS_WINDOWS) {
             return Paths.get(SitRepository.getRepositoryPath(), installDir, "runtime/firefox.exe");
@@ -292,21 +290,19 @@ public class FirefoxManager {
         Path ffRuntime = Paths.get(repo.toString(), "runtime");
 
         LOG.info("firefox.install2", ffRuntime.toString());
-        // たまにcp -Rコマンドが失敗してFirefox.appがコピーされないので3回リトライ
-        for (int i = 0; i < 3; i++) {
-
-            MultiThreadUtils.submitWithProgress(() -> {
-                ProcessUtils.execute("cp", "-R", mountedFf.toString(), ffRuntime.toString());
-                return 0;
-            });
-
-            if (Files.exists(Paths.get(ffRuntime.toString(), "Firefox.app"))) {
-                break;
+        try {
+            if (!Files.exists(ffRuntime)) {
+                Files.createDirectories(ffRuntime);
             }
-        }
+            FileIOUtils.copyDirectoryWithPermission(mountedFf, ffRuntime);
 
-        LOG.info("firefox.unmount");
-        ProcessUtils.execute("hdiutil", "detach", "/Volumes/Firefox");
+        } catch (IOException | UnExpectedException e) {
+            throw new RuntimeException(e);
+
+        } finally {
+            LOG.info("firefox.unmount");
+            ProcessUtils.execute("hdiutil", "detach", "/Volumes/Firefox");
+        }
 
     }
 
@@ -329,7 +325,7 @@ public class FirefoxManager {
                     "runtime/application.ini");
         } else if (SystemUtils.IS_OS_MAC) {
             return Paths.get(SitRepository.getRepositoryPath(), installDir,
-                    "runtime/Firefox.app/Contents/MacOS/application.ini");
+                    "runtime/Firefox.app/Contents/Resources/application.ini");
         } else {
             throw new UnsupportedOperationException(MessageManager.getMessage("os.unsupport"));
         }
@@ -358,11 +354,11 @@ public class FirefoxManager {
 
     protected void uninstallFirefoxMacOs() {
         Path ffRuntime = Paths.get(SitRepository.getRepositoryPath(), installDir, "runtime");
-        MultiThreadUtils.submitWithProgress(() -> {
-            ProcessUtils.execute("rm", "-f", ffRuntime.toString());
-            return 0;
-        });
-
+        try {
+            FileUtils.deleteDirectory(ffRuntime.toFile());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
