@@ -117,3 +117,21 @@
     -fx-font-weight: bold;
     -fx-alignment: center;
 }
+
+.menu:hover,
+.menu:focused,
+.menu:showing,
+.menu-item:hover,
+.menu-item:focused,
+.menu-item:showing {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+}
+
+.menu:hover .label,
+.menu:focused .label,
+.menu:showing .label,
+.menu-item:hover .label,
+.menu-item:focused .label,
+.menu-item:showing  .label {
+    -fx-text-fill: black;
+}

@@ -35,79 +35,82 @@
     </SplitPane>
   </center>
   <top>
-    <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
-      <HBox fx:id="projectGroup" style="-fx-padding: 0 0 0 10px;" styleClass="tool-bar">
-        <children>
-          <Label onMouseClicked="#openProject" styleClass="image-btn,project-btn">
-            <tooltip>
-              <Tooltip text="プロジェクトを作成/開きます" />
-            </tooltip>
-          </Label>
-          <Separator orientation="VERTICAL" />
-          <Label fx:id="openButton" onMouseClicked="#editScript" styleClass="image-btn,open-btn">
-            <tooltip>
-              <Tooltip text="テストスクリプトを開きます" />
-            </tooltip>
-          </Label>
-          <Label fx:id="saveButton" onMouseClicked="#editor2script" styleClass="image-btn,save-btn">
-            <tooltip>
-              <Tooltip text="アクティブタブのテストスクリプトを保存します" />
-            </tooltip>
-          </Label>
-          <Label fx:id="saveAsButton" onMouseClicked="#editor2scriptAs" styleClass="image-btn,save-as-btn">
-            <tooltip>
-              <Tooltip text="アクティブタブのテストスクリプトを別名で保存します" />
-            </tooltip>
-          </Label>
-        </children>
+    <VBox>
+      <fx:include fx:id="menuBar" source="MenuBar.fxml"/>
+      <HBox style="-fx-padding: 0 0 0 0;" styleClass="tool-bar">
+        <HBox fx:id="projectGroup" style="-fx-padding: 0 0 0 10px;" styleClass="tool-bar">
+          <children>
+            <Label onMouseClicked="#openProject" styleClass="image-btn,project-btn">
+              <tooltip>
+                <Tooltip text="プロジェクトを作成/開きます" />
+              </tooltip>
+            </Label>
+            <Separator orientation="VERTICAL" />
+            <Label fx:id="openButton" onMouseClicked="#editScript" styleClass="image-btn,open-btn">
+              <tooltip>
+                <Tooltip text="テストスクリプトを開きます" />
+              </tooltip>
+            </Label>
+            <Label fx:id="saveButton" onMouseClicked="#editor2script" styleClass="image-btn,save-btn">
+              <tooltip>
+                <Tooltip text="アクティブタブのテストスクリプトを保存します" />
+              </tooltip>
+            </Label>
+            <Label fx:id="saveAsButton" onMouseClicked="#editor2scriptAs" styleClass="image-btn,save-as-btn">
+              <tooltip>
+                <Tooltip text="アクティブタブのテストスクリプトを別名で保存します" />
+              </tooltip>
+            </Label>
+          </children>
+        </HBox>
+        <fx:include fx:id="testToolbar" source="TestToolbar.fxml" />
+        <fx:include fx:id="diffEvidenceToolbar" source="DiffEvidenceToolbar.fxml" />
+        <ToolBar fx:id="genScriptGroup">
+          <items>
+            <Separator orientation="VERTICAL" />
+            <Label onMouseClicked="#ope2script" styleClass="image-btn,record-btn">
+              <tooltip>
+                <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します" />
+              </tooltip>
+            </Label>
+            <Label onMouseClicked="#page2script" styleClass="image-btn,export-btn">
+              <tooltip>
+                <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します" />
+              </tooltip>
+            </Label>
+          </items>
+        </ToolBar>
+        <ToolBar fx:id="browsingGroup">
+          <items>
+            <Separator orientation="VERTICAL" />
+            <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
+            <Label onMouseClicked="#quitBrowsing" styleClass="image-btn,quit-btn" />
+          </items>
+        </ToolBar>
+        <fx:include fx:id="sampleToolbar" source="SampleToolbar.fxml" />
+        <ToolBar>
+          <items>
+            <Separator orientation="VERTICAL" />
+            <!-- <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn"> -->
+            <!-- <tooltip> -->
+            <!-- <Tooltip text="ウィンドウを縮小します" /> -->
+            <!-- </tooltip> -->
+            <!-- </Label> -->
+            <!-- <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn"> -->
+            <!-- <tooltip> -->
+            <!-- <Tooltip text="ウィンドウを拡大します" /> -->
+            <!-- </tooltip> -->
+            <!-- </Label> -->
+            <Label onMouseClicked="#settings" styleClass="image-btn,settings-btn">
+              <tooltip>
+                <Tooltip text="設定ファイルのフォルダを開きます" />
+              </tooltip>
+            </Label>
+            <Label onMouseClicked="#help" styleClass="image-btn,help-btn">
+            </Label>
+          </items>
+        </ToolBar>
       </HBox>
-      <fx:include fx:id="testToolbar" source="TestToolbar.fxml" />
-      <fx:include fx:id="diffEvidenceToolbar" source="DiffEvidenceToolbar.fxml" />
-      <ToolBar fx:id="genScriptGroup">
-        <items>
-          <Separator orientation="VERTICAL" />
-          <Label onMouseClicked="#ope2script" styleClass="image-btn,record-btn">
-            <tooltip>
-              <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します" />
-            </tooltip>
-          </Label>
-          <Label onMouseClicked="#page2script" styleClass="image-btn,export-btn">
-            <tooltip>
-              <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します" />
-            </tooltip>
-          </Label>
-        </items>
-      </ToolBar>
-      <ToolBar fx:id="browsingGroup">
-        <items>
-          <Separator orientation="VERTICAL" />
-          <Label onMouseClicked="#export" styleClass="image-btn,export-btn" />
-          <Label onMouseClicked="#quitBrowsing" styleClass="image-btn,quit-btn" />
-        </items>
-      </ToolBar>
-      <fx:include fx:id="sampleToolbar" source="SampleToolbar.fxml" />
-      <ToolBar>
-        <items>
-          <Separator orientation="VERTICAL" />
-          <!-- <Label fx:id="minimizeButton" onMouseClicked="#minimizeWindow" styleClass="image-btn,minimize-btn"> -->
-          <!-- <tooltip> -->
-          <!-- <Tooltip text="ウィンドウを縮小します" /> -->
-          <!-- </tooltip> -->
-          <!-- </Label> -->
-          <!-- <Label fx:id="maximizeButton" onMouseClicked="#maximizeWindow" styleClass="image-btn,maximize-btn"> -->
-          <!-- <tooltip> -->
-          <!-- <Tooltip text="ウィンドウを拡大します" /> -->
-          <!-- </tooltip> -->
-          <!-- </Label> -->
-          <Label onMouseClicked="#settings" styleClass="image-btn,settings-btn">
-            <tooltip>
-              <Tooltip text="設定ファイルのフォルダを開きます" />
-            </tooltip>
-          </Label>
-          <Label onMouseClicked="#help" styleClass="image-btn,help-btn">
-          </Label>
-        </items>
-      </ToolBar>
-    </HBox>
+    </VBox>
   </top>
 </BorderPane>
