@@ -29,10 +29,6 @@ public enum ScriptFileType {
                 Charset.forName("Windows-31J"),
                 false ,
                 "*.csv"),
-
-        EXCEL(
-                "test script (excel)",
-                "*.xlsx"),
         ;
 
         @Getter

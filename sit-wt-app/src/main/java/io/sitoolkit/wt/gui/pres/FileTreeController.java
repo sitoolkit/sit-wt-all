@@ -77,11 +77,11 @@ public class FileTreeController implements Initializable {
                 String selectedFileName = selectedItem.getValue().getFile().getName();
 
                 executeMenuItem.setVisible(
-                        StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls", ".csv"));
+                        StrUtils.endsWithAny(selectedFileName, ".csv"));
                 executeCaseMenuItem
-                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
+                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".csv"));
                 executeDebugCaseMenuItem
-                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".xlsx", ".xls"));
+                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".csv"));
             });
         });
 

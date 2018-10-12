@@ -21,7 +21,7 @@ public class SitWtRuntimeUtils {
     private static String javaHome;
 
     private static final Pattern SCRIPT_FILE_PATTERN = Pattern
-            .compile(".*\\.xlsx$|.*\\.xls$|.*\\.csv$|.*\\.html$");
+            .compile(".*\\.csv$|.*\\.html$");
 
     public static String buildScriptStr(List<File> selectedFiles) {
         return StrUtils.join(filterTestScripts(selectedFiles));

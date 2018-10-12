@@ -1,15 +1,10 @@
 package io.sitoolkit.wt.domain.testscript;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -20,14 +15,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
-import io.sitoolkit.util.tabledata.FileOverwriteChecker;
-import io.sitoolkit.util.tabledata.RowData;
-import io.sitoolkit.util.tabledata.TableData;
-import io.sitoolkit.util.tabledata.TableDataCatalog;
-import io.sitoolkit.util.tabledata.TableDataDao;
-import io.sitoolkit.util.tabledata.TableDataMapper;
-import io.sitoolkit.util.tabledata.csv.TableDataDaoCsvImpl;
-import io.sitoolkit.util.tabledata.excel.TableDataDaoExcelImpl;
 import io.sitoolkit.wt.domain.operation.Operation;
 import io.sitoolkit.wt.infra.csv.CsvFileReader;
 import io.sitoolkit.wt.infra.csv.CsvFileWriter;
@@ -39,26 +26,11 @@ public class TestScriptDao {
 
     protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
-    private static final String TEMPLATE_PATH = "classpath:TestScriptTemplate_"
-            + Locale.getDefault().getLanguage() + ".xlsx";
-
     @Resource
     ApplicationContext appCtx;
 
     @Resource
     OperationConverter operationConverter;
-
-    @Resource
-    TableDataMapper dm;
-
-    @Resource
-    TableDataDaoExcelImpl excelDao;
-
-    @Resource
-    TableDataDaoCsvImpl csvDao;
-
-    @Resource
-    FileOverwriteChecker fileOverwriteChecker;
 
     @Resource
     OverwriteChecker overwriteChecker;
@@ -81,13 +53,7 @@ public class TestScriptDao {
         testScript.setLastModified(scriptFile.lastModified());
         testScript.setName(scriptFile.getName());
 
-        String scriptFileName = testScript.getName();
-
-        if (scriptFileName.endsWith(".xlsx") || scriptFileName.endsWith(".xls")) {
-            loadScript(excelDao, testScript, testScript.getSheetName(), loadCaseOnly);
-        } else if (scriptFileName.endsWith(".csv")) {
-            loadCsv(testScript, loadCaseOnly);
-        }
+        loadCsv(testScript, loadCaseOnly);
 
         return testScript;
     }
@@ -127,31 +93,6 @@ public class TestScriptDao {
 
     }
 
-    private void loadScript(TableDataDao dao, TestScript testScript, String sheetName,
-            boolean loadCaseOnly) {
-        TableData table = dao.read(testScript.getScriptFile().getAbsolutePath(), sheetName);
-
-        RowData firstRow = table.getRows().iterator().next();
-        int testDataIndex = 0;
-        for (Map.Entry<String, String> entry : firstRow.getData().entrySet()) {
-            testScript.addHeader(entry.getKey());
-            if (entry.getKey().startsWith(testScript.getCaseNoPrefix())) {
-                String caseNo = StringUtils.substringAfter(entry.getKey(),
-                        testScript.getCaseNoPrefix());
-                testScript.getCaseNoMap().put(caseNo, testDataIndex++);
-            }
-        }
-
-        if (loadCaseOnly) {
-            return;
-        }
-
-        for (RowData row : table.getRows()) {
-            TestStep testStep = dm.map("testStep", row, TestStep.class);
-            testScript.addTestStep(testStep);
-        }
-    }
-
     public String write(String filePath, List<TestStep> testStepList, boolean overwrite) {
         return write(new File(filePath), testStepList, overwrite);
     }
@@ -163,32 +104,8 @@ public class TestScriptDao {
     public String write(File file, List<TestStep> testStepList, List<String> headers,
             boolean overwrite) {
 
-        if (file.getName().endsWith("csv")) {
-            writeCsv(file.toPath(), testStepList, overwrite);
-            return file.getAbsolutePath();
-        }
-
-        File dir = file.getParentFile();
-        if (dir == null) {
-            dir = new File(".");
-        } else if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
-        TableDataCatalog catalog = TestScriptConvertUtils.getTableDataCatalog(testStepList,
-                headers);
-        String fileName = sanitizeFileName(file.getName());
-        file = new File(file.getParent(), fileName);
-
-        fileOverwriteChecker.setRebuild(overwrite);
-
-        excelDao.write(catalog.get("TestScript"), TEMPLATE_PATH, file.getAbsolutePath(), null);
-
+        writeCsv(file.toPath(), testStepList, overwrite);
         return file.getAbsolutePath();
-    }
-
-    private String sanitizeFileName(String name) {
-        return name.replaceAll("[:\\\\/*?|<>]", "_");
     }
 
     private void writeCsv(Path path, List<TestStep> testSteps, boolean overwrite) {
