@@ -27,7 +27,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import io.sitoolkit.util.tabledata.FileIOUtils;
 import io.sitoolkit.wt.app.config.ExtConfig;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
@@ -93,8 +92,6 @@ public class Script2Java implements ApplicationContextAware {
     }
 
     public static int staticExecute(String testSrcDir, String testScriptCsvEncoding) {
-        FileIOUtils.setFileEncoding(testScriptCsvEncoding);
-
         ApplicationContext appCtx = new AnnotationConfigApplicationContext(Script2JavaConfig.class,
                 ExtConfig.class);
         Script2Java script2java = appCtx.getBean(Script2Java.class);
@@ -128,8 +125,8 @@ public class Script2Java implements ApplicationContextAware {
                 }
 
                 log.info("test.script", testScriptDirF.getAbsolutePath());
-                for (File scriptFile : FileUtils.listFiles(testScriptDirF,
-                        new String[] { "csv", "xls", "xlsx" }, true)) {
+                for (File scriptFile : FileUtils.listFiles(testScriptDirF, new String[] { "csv" },
+                        true)) {
                     generate(scriptFile, testScriptDir);
                 }
             }

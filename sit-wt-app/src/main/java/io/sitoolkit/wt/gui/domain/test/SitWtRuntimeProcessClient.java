@@ -18,7 +18,7 @@ public class SitWtRuntimeProcessClient {
      * </pre>
      *
      * @param pomFile
-     *            pom.xls
+     *            pom.xml
      * @param params
      *            プロセス実行パラメーター
      */

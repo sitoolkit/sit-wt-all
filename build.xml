@@ -101,7 +101,7 @@
     <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-e" />
-      <arg value="org.sitoolkit.wt:sit-wt-maven-plugin:sample" />
+      <arg value="io.sitoolkit.wt:sit-wt-maven-plugin:sample" />
     </exec>
 
     <parallel>
