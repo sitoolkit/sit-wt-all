@@ -18,7 +18,7 @@
         <MenuItem text="名前を付けて保存" fx:id="saveAsMenu" onAction="#saveAs"/>
       </items>
     </Menu>
-    <Menu text="テスト実施">
+    <Menu text="テスト">
       <items>
         <MenuItem text="実行" fx:id="runMenu" onAction="#run"/>
         <MenuItem text="デバッグ" fx:id="debugMenu" onAction="#debug"/>
