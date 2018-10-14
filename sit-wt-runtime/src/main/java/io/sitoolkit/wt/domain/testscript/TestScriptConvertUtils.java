@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,9 +26,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import io.sitoolkit.util.tabledata.RowData;
-import io.sitoolkit.util.tabledata.TableData;
-import io.sitoolkit.util.tabledata.TableDataCatalog;
 import io.sitoolkit.wt.infra.resource.MessageManager;
 
 /**
@@ -68,48 +64,6 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
     private static String case_ = "Case";
 
     public TestScriptConvertUtils() {
-    }
-
-    /**
-     * TestScriptオブジェクトをRowDataオブジェクトに変換して TableDataCatalogに格納します。
-     *
-     * @param testStepList
-     * @return
-     */
-    public static TableDataCatalog getTableDataCatalog(List<TestStep> testStepList,
-            List<String> headers) {
-        if (cellNameMap == null) {
-            initCellNameMap();
-        }
-        TableDataCatalog tableDataCatalog = new TableDataCatalog();
-        TableData tableData = new TableData();
-
-        for (TestStep testStep : testStepList) {
-            RowData row = new RowData();
-
-            row.setCellValue("No.", testStep.getNo());
-            row.setCellValue(cellNameMap.get(itemName), testStep.getItemName());
-            row.setCellValue(cellNameMap.get(operation), testStep.getOperationName());
-            if (!Locator.Type.na.equals(testStep.getLocator().getType())) {
-                row.setCellValue(cellNameMap.get(locatorStyle), testStep.getLocator().getType());
-            }
-            row.setCellValue(cellNameMap.get(locator), testStep.getLocator().getValue());
-            row.setCellValue(cellNameMap.get(dataStyle), testStep.getDataType());
-            row.setCellValue(cellNameMap.get(screenshot), testStep.getScreenshotTiming());
-            row.setCellValue(cellNameMap.get(breakpoint), testStep.getBreakPoint());
-            
-            for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
-                row.setCellValue(cellNameMap.get(case_) + entry.getKey(), entry.getValue());
-            }
-            tableData.add(row);
-
-        }
-
-        tableData.setName(sheetName);
-        tableData.setColumnNameList(headers);
-        tableDataCatalog.add(tableData);
-
-        return tableDataCatalog;
     }
 
     @Override

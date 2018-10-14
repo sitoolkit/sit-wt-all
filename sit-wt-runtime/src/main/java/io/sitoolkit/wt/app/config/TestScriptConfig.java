@@ -1,14 +1,11 @@
 package io.sitoolkit.wt.app.config;
 
-import org.apache.commons.beanutils.Converter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
-import io.sitoolkit.util.tabledata.BeanFactory;
-import io.sitoolkit.util.tabledata.TableDataMapper;
 import io.sitoolkit.wt.domain.operation.Operation;
 import io.sitoolkit.wt.domain.operation.OperationResult;
 import io.sitoolkit.wt.domain.tester.TestContext;
@@ -48,28 +45,6 @@ public class TestScriptConfig {
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
     public TestContext testContext() {
         return new TestContext();
-    }
-
-    @Bean
-    @Primary
-    public TableDataMapper tableDataMapper(OperationConverter converter, BeanFactory beanFactory) {
-        TableDataMapper tdm = new TableDataMapper();
-        tdm.getConverterMap().put(Operation.class, new Converter() {
-
-            @Override
-            public <T> T convert(Class<T> type, Object value) {
-                return (T) new Operation() {
-
-                    @Override
-                    public OperationResult operate(TestStep testStep) {
-                        // TODO Auto-generated method stub
-                        return null;
-                    }
-                };
-            }
-        });
-        tdm.setBeanFactory(beanFactory);
-        return tdm;
     }
 
     @Bean
