@@ -83,6 +83,9 @@ public class AppController implements Initializable {
     @FXML
     private TabPane editorTab;
 
+    @FXML
+    private MenuBarController menuBarController;
+
     private MessageView messageView = new MessageView();
 
     private ConversationProcess conversationProcess;
@@ -149,6 +152,14 @@ public class AppController implements Initializable {
         FxUtils.bindDisable(saveAsButton, editorTabController.isEmpty());
 
         testService.setDebugListener(editorTabController);
+
+        menuBarController.setProjectState(projectState);
+        menuBarController.setAppController(this);
+        menuBarController.setEditorTabController(editorTabController);
+        menuBarController.setTestToolbarController(testToolbarController);
+        menuBarController.setDiffEvidenceToolbarController(diffEvidenceToolbarController);
+        menuBarController.setSampleToolbarController(sampleToolbarController);
+        menuBarController.initialize();
     }
 
     public void postInit() {

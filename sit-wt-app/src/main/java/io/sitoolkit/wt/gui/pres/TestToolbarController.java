@@ -29,6 +29,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import lombok.Getter;
 
 public class TestToolbarController implements Initializable, TestRunnable {
 
@@ -70,6 +71,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     private String sessionId;
 
+    @Getter
     private BooleanProperty pausing = new SimpleBooleanProperty(false);
 
     private ProjectState projectState;

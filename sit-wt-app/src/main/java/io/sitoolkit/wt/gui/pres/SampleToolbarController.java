@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import lombok.Getter;
 
 public class SampleToolbarController implements Initializable {
 
@@ -33,6 +34,7 @@ public class SampleToolbarController implements Initializable {
 
     private ProjectState projectState;
 
+    @Getter
     private BooleanProperty running = new SimpleBooleanProperty(false);
 
     SampleService service = new SampleService();

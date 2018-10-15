@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Label?>
+
+<MenuBar prefWidth="Infinity" fx:controller="io.sitoolkit.wt.gui.pres.MenuBarController"
+    xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+  <menus>
+    <Menu text="ファイル">
+      <items>
+        <MenuItem text="プロジェクトを開く" onAction="#openProject"/>
+        <SeparatorMenuItem />
+        <MenuItem text="開く" onAction="#open"/>
+        <MenuItem text="上書き保存" fx:id="saveMenu" onAction="#save"/>
+        <MenuItem text="名前を付けて保存" fx:id="saveAsMenu" onAction="#saveAs"/>
+      </items>
+    </Menu>
+    <Menu text="テスト">
+      <items>
+        <MenuItem text="実行" fx:id="runMenu" onAction="#run"/>
+        <MenuItem text="デバッグ" fx:id="debugMenu" onAction="#debug"/>
+        <MenuItem text="並列実行" fx:id="runParallelMenu" onAction="#runParallel"/>
+        <MenuItem text="停止" fx:id="quitMenu" onAction="#quit"/>
+        <MenuItem text="一時停止" fx:id="pauseMenu" onAction="#pause"/>
+        <MenuItem text="再開" fx:id="restartMenu" onAction="#restart"/>
+        <MenuItem text="前のステップへ" fx:id="backMenu" onAction="#back"/>
+        <MenuItem text="次のステップへ" fx:id="forwardMenu" onAction="#forward"/>
+      </items>
+    </Menu>
+    <Menu text="エビデンス">
+      <items>
+        <MenuItem text="スクリーンショットをマスク" fx:id="maskEvidenceMenu" onAction="#maskEvidence"/>
+        <MenuItem text="基準エビデンスを確定" fx:id="setBaseEvidenceMenu" onAction="#setBaseEvidence"/>
+        <MenuItem text="比較エビデンスを生成" fx:id="genDiffEvidenceMenu" onAction="#genDiffEvidence"/>
+      </items>
+    </Menu>
+    <Menu text="テストスクリプト作成">
+      <items>
+        <MenuItem text="ブラウザ操作を記録" fx:id="ope2scriptMenu" onAction="#ope2script"/>
+        <MenuItem text="表示したページから生成" fx:id="page2scriptMenu" onAction="#page2script"/>
+        <MenuItem text="スクリプト作成" fx:id="exportMenu" onAction="#export"/>
+        <MenuItem text="ブラウザを閉じる" fx:id="quitBrowsingMenu" onAction="#quitBrowsing"/>
+      </items>
+    </Menu>
+    <Menu text="サンプルWebサイト">
+      <items>
+        <MenuItem text="起動" fx:id="runSampleMenu" onAction="#runSample"/>
+        <MenuItem text="停止" fx:id="stopSampleMenu" onAction="#stopSample"/>
+      </items>
+    </Menu>
+    <Menu text="設定">
+      <items>
+        <MenuItem text="設定" onAction="#settings"/>
+        <MenuItem text="ヘルプ" onAction="#help"/>
+      </items>
+    </Menu>
+  </menus>
+</MenuBar>
