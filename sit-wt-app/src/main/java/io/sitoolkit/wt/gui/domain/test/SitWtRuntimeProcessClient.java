@@ -36,41 +36,6 @@ public class SitWtRuntimeProcessClient {
         process.start(params);
     }
 
-    public ConversationProcess runTest(TestRunParams testRunParams, ProcessParams params) {
-        List<String> command = SitWtRuntimeUtils.buildJavaCommand();
-        SitWtRuntimeUtils.addVmArgs(command, testRunParams.getDriverType(),
-                testRunParams.getBaseUrl());
-
-        command.add("-cp");
-        command.add(
-                "src/main/resources" + File.pathSeparator + SitWtRuntimeUtils.getSitWtClasspath());
-
-        if (testRunParams.isDebug()) {
-            command.add("-Dsitwt.debug=true");
-        }
-
-        if (testRunParams.isParallel()) {
-            command.add("-Dsitwt.parallel=true");
-        }
-
-        command.add("-Dsitwt.open-evidence=true");
-
-        if (testRunParams.isCompareScreenshot()) {
-            command.add("-Dsitwt.compare-screenshot=true");
-        }
-
-        command.add("io.sitoolkit.wt.app.test.TestRunner");
-
-        command.add(testRunParams.getTargetScripts());
-
-        params.setCommand(command);
-
-        ConversationProcess process = ConversationProcessContainer.create();
-        process.start(params);
-
-        return process;
-    }
-
     public void unpackTestScript(ProcessParams params) {
 
         List<String> command = MavenUtils.getCommand(params);

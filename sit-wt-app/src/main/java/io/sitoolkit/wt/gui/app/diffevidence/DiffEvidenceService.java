@@ -83,8 +83,6 @@ public class DiffEvidenceService {
             targetDir = selectedFiles.get(0);
         }
 
-        targetDir = projectDir.toPath().relativize(targetDir.toPath()).toFile();
-
         client.genDiffEvidence(baseDir, targetDir, params);
 
         return true;

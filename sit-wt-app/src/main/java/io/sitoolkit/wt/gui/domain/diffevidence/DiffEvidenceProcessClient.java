@@ -1,56 +1,43 @@
 package io.sitoolkit.wt.gui.domain.diffevidence;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
-import io.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
-import io.sitoolkit.wt.util.infra.process.ConversationProcess;
-import io.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
+import io.sitoolkit.wt.app.compareevidence.BaseEvidenceManager;
+import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
+import io.sitoolkit.wt.app.compareevidence.MaskEvidenceGenerator;
+import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
 import io.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class DiffEvidenceProcessClient {
 
     public void genMaskEvidence(File targetDir, ProcessParams params) {
-        List<String> command = SitWtRuntimeUtils.buildJavaCommand();
-        command.add("io.sitoolkit.wt.app.compareevidence.MaskEvidenceGenerator");
-        command.add(targetDir.getPath());
-
-        ConversationProcess process = ConversationProcessContainer.create();
-        params.setCommand(command);
-
-        process.start(params);
-
+        MaskEvidenceGenerator.staticExecute(targetDir.getPath());
+        executeCallbacks(params.getExitClallbacks(), 0);
     }
 
     public void setBaseEvidence(File targetDir, ProcessParams params) {
-        List<String> command = SitWtRuntimeUtils.buildJavaCommand();
-        command.add("io.sitoolkit.wt.app.compareevidence.BaseEvidenceManager");
-        command.add(targetDir.getPath());
-
-        ConversationProcess process = ConversationProcessContainer.create();
-        params.setCommand(command);
-
-        process.start(params);
-
+        BaseEvidenceManager.staticExecute(targetDir.getPath());
+        executeCallbacks(params.getExitClallbacks(), 0);
     }
 
     public void genDiffEvidence(File baseDir, File targetDir, ProcessParams params) {
 
-        List<String> command = SitWtRuntimeUtils.buildJavaCommand();
-
-        command.add("io.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator");
-
+        List<String> args = new ArrayList<>();
         if (baseDir != null) {
-            command.add(baseDir.getPath());
+            args.add(baseDir.getPath());
         }
         if (targetDir != null) {
-            command.add(targetDir.getPath());
+            args.add(targetDir.getPath());
         }
+        DiffEvidenceGenerator.staticExecute(args.toArray(new String[0]));
+        executeCallbacks(params.getExitClallbacks(), 0);
+    }
 
-        ConversationProcess process = ConversationProcessContainer.create();
-        params.setCommand(command);
-
-        process.start(params);
-
+    public void executeCallbacks(List<ProcessExitCallback> callbacks, int exitCode) {
+        for (ProcessExitCallback callback : callbacks) {
+            callback.callback(exitCode);
+        }
     }
 }

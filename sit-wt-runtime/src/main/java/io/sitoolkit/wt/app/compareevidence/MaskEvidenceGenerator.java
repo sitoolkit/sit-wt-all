@@ -23,7 +23,12 @@ public class MaskEvidenceGenerator {
 
     public static void main(String[] args) {
 
-        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(args[0]);
+        MaskEvidenceGenerator.staticExecute(args[0]);
+    }
+
+    public static void staticExecute(String target) {
+
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(target);
 
         MaskScreenshotGenerator mask = new MaskScreenshotGenerator();
         mask.generate(targetDir);
