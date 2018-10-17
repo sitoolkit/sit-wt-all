@@ -5,9 +5,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.sitoolkit.wt.gui.domain.diffevidence.DiffEvidenceProcessClient;
-import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
-import io.sitoolkit.wt.util.infra.process.ProcessParams;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import io.sitoolkit.wt.app.compareevidence.BaseEvidenceManager;
+import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
+import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGeneratorConfig;
+import io.sitoolkit.wt.app.compareevidence.MaskEvidenceGenerator;
+import io.sitoolkit.wt.app.compareevidence.MaskScreenshotGenerator;
+import io.sitoolkit.wt.domain.evidence.EvidenceDir;
+import io.sitoolkit.wt.domain.evidence.EvidenceOpener;
 
 public class DiffEvidenceService {
 
@@ -15,28 +22,17 @@ public class DiffEvidenceService {
 
     private Pattern evidenceDirPattern = Pattern.compile(evidenceDirRegex);
 
-    DiffEvidenceProcessClient client = new DiffEvidenceProcessClient();
+    MaskEvidenceGenerator maskEvidenceGenerator = new MaskEvidenceGenerator();
 
-    public boolean genMaskEvidence(File selectedItem, ProcessExitCallback callback) {
+    MaskScreenshotGenerator maskScreenShotGenerator = new MaskScreenshotGenerator();
 
-        if (selectedItem == null) {
-            return false;
-        }
+    EvidenceOpener evidenceOpener = new EvidenceOpener();
 
-        Matcher m = evidenceDirPattern.matcher(selectedItem.getName());
-        if (!m.matches()) {
-            return false;
-        }
+    BaseEvidenceManager baseEvidenceManager = new BaseEvidenceManager();
 
-        ProcessParams params = new ProcessParams();
-        params.getExitClallbacks().add(callback);
+    DiffEvidenceGenerator diffEvidenceGenerator;
 
-        client.genMaskEvidence(selectedItem, params);
-
-        return true;
-    }
-
-    public boolean setBaseEvidence(File selectedItem, ProcessExitCallback callback) {
+    public boolean genMaskEvidence(File selectedItem) {
 
         if (selectedItem == null) {
             return false;
@@ -47,16 +43,32 @@ public class DiffEvidenceService {
             return false;
         }
 
-        ProcessParams params = new ProcessParams();
-        params.getExitClallbacks().add(callback);
-
-        client.setBaseEvidence(selectedItem, params);
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(selectedItem.getAbsolutePath());
+        maskScreenShotGenerator.generate(targetDir);
+        maskEvidenceGenerator.generate(targetDir);
+        evidenceOpener.openMaskEvidence(targetDir);
 
         return true;
     }
 
-    public boolean genDiffEvidence(File projectDir, List<File> selectedFiles,
-            ProcessExitCallback callback) {
+    public boolean setBaseEvidence(File selectedItem) {
+
+        if (selectedItem == null) {
+            return false;
+        }
+
+        Matcher m = evidenceDirPattern.matcher(selectedItem.getName());
+        if (!m.matches()) {
+            return false;
+        }
+
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(selectedItem.getAbsolutePath());
+        baseEvidenceManager.setBaseEvidence(targetDir);
+
+        return true;
+    }
+
+    public boolean genDiffEvidence(File projectDir, List<File> selectedFiles) {
 
         int selectedCount = selectedFiles.size();
 
@@ -71,21 +83,23 @@ public class DiffEvidenceService {
             }
         }
 
-        ProcessParams params = new ProcessParams();
-        params.getExitClallbacks().add(callback);
-
-        File baseDir = null;
-        File targetDir = null;
+        String baseDir = null;
+        String targetDir = null;
         if (selectedCount == 2) {
-            baseDir = selectedFiles.get(0);
-            targetDir = selectedFiles.get(1);
+            baseDir = selectedFiles.get(0).getAbsolutePath();
+            targetDir = selectedFiles.get(1).getAbsolutePath();
         } else if (selectedCount == 1) {
-            targetDir = selectedFiles.get(0);
+            targetDir = selectedFiles.get(0).getAbsolutePath();
         }
 
-        targetDir = projectDir.toPath().relativize(targetDir.toPath()).toFile();
+        ApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                DiffEvidenceGeneratorConfig.class);
+        diffEvidenceGenerator = appCtx.getBean(DiffEvidenceGenerator.class);
+        EvidenceDir targetEvidence = EvidenceDir.targetEvidenceDir(targetDir);
+        EvidenceDir baseEvidence = EvidenceDir.baseEvidenceDir(baseDir, targetEvidence.getBrowser());
 
-        client.genDiffEvidence(baseDir, targetDir, params);
+        diffEvidenceGenerator.generate(baseEvidence, targetEvidence, false);
+        evidenceOpener.openCompareEvidence(targetEvidence);
 
         return true;
     }

@@ -51,7 +51,6 @@ public class DiffEvidenceGenerator {
     private ScreenshotComparator screenshotComparator = new ScreenshotComparator();
 
     public static void main(String[] args) {
-
         ApplicationContext appCtx = new AnnotationConfigApplicationContext(
                 DiffEvidenceGeneratorConfig.class);
         DiffEvidenceGenerator generator = appCtx.getBean(DiffEvidenceGenerator.class);

@@ -60,7 +60,8 @@ public class EvidenceDir {
     }
 
     public static EvidenceDir getBase(String browser) {
-        return getInstance(new File(BASE_EVIDENCE_ROOT, browser));
+        return getInstance(new File(System.getProperty("sitwt.projectDirectory"),
+                BASE_EVIDENCE_ROOT + "/" + browser));
     }
 
     public static String getRoot() {

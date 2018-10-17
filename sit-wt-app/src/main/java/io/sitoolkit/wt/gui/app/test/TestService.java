@@ -13,14 +13,12 @@ import io.sitoolkit.wt.app.config.RuntimeConfig;
 import io.sitoolkit.wt.app.test.TestRunner;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.debug.DebugSupport;
-import io.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
 import io.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import io.sitoolkit.wt.gui.domain.test.TestRunParams;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
-import io.sitoolkit.wt.util.infra.process.ConversationProcess;
 import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
 import io.sitoolkit.wt.util.infra.process.ProcessParams;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
@@ -55,7 +53,6 @@ public class TestService {
         ExecutorContainer.get().execute(() -> {
             try {
                 System.setProperty("driver.type", params.getDriverType());
-                System.setProperty("sitwt.projectDirectory", params.getProjectDir().getAbsolutePath());
                 String profile = ("android".equals(params.getDriverType()) || "ios".equals(params.getDriverType()))
                         ? "mobile" : "pc";
                 AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext();
@@ -125,23 +122,6 @@ public class TestService {
     private DebugSupport getDebugSupport(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
         return appCtx.getBean(DebugSupport.class);
-    }
-
-    @Deprecated
-    public ConversationProcess runTest(TestRunParams params, SitWtDebugStdoutListener listener,
-            ProcessExitCallback callback) {
-
-        if (params.getTargetScripts() == null) {
-            return null;
-        }
-
-        ProcessParams processParams = new ProcessParams();
-
-        processParams.getStdoutListeners().add(listener);
-        processParams.getExitClallbacks().add(callback);
-
-        return client.runTest(params, processParams);
-
     }
 
     public void createNewScript(File baseDir, File destFile) {

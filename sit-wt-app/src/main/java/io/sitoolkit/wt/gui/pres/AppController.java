@@ -209,7 +209,7 @@ public class AppController implements Initializable {
             loadProject(pomFile);
 
         }
-        projectState.setProjectDir(projectDir);
+        System.setProperty("sitwt.projectDirectory", projectDir.getAbsolutePath());
 
     }
 

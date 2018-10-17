@@ -29,8 +29,6 @@ public class ProjectState {
 
     private File baseDir;
 
-    private File projectDir;
-
     private BooleanProperty running = new SimpleBooleanProperty();
 
     private BooleanProperty loaded = new SimpleBooleanProperty();
@@ -89,14 +87,6 @@ public class ProjectState {
 
     public File getBaseDir() {
         return baseDir;
-    }
-
-    public File getProjectDir() {
-        return projectDir;
-    }
-
-    public void setProjectDir(File projectDir) {
-        this.projectDir = projectDir;
     }
 
 }
