@@ -22,13 +22,7 @@ public class MaskEvidenceGenerator {
     private static final SitLogger LOG = SitLoggerFactory.getLogger(MaskEvidenceGenerator.class);
 
     public static void main(String[] args) {
-
-        MaskEvidenceGenerator.staticExecute(args[0]);
-    }
-
-    public static void staticExecute(String target) {
-
-        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(target);
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(args[0]);
 
         MaskScreenshotGenerator mask = new MaskScreenshotGenerator();
         mask.generate(targetDir);

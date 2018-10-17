@@ -15,11 +15,7 @@ public class BaseEvidenceManager {
     private static final SitLogger LOG = SitLoggerFactory.getLogger(BaseEvidenceManager.class);
 
     public static void main(String[] args) {
-        BaseEvidenceManager.staticExecute(args[0]);
-    }
-
-    public static void staticExecute(String target) {
-        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(target);
+        EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(args[0]);
         BaseEvidenceManager baseEvidenceManager = new BaseEvidenceManager();
         baseEvidenceManager.setBaseEvidence(targetDir);
     }

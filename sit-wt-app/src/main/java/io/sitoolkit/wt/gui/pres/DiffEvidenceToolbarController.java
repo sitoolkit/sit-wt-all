@@ -44,10 +44,8 @@ public class DiffEvidenceToolbarController implements Initializable {
 
         messageView.startMsg("スクリーンショットにマスク処理を施したエビデンスを生成します。");
 
-        boolean success = diffEvidenceService.genMaskEvidence(fileTreeController.getSelectedItem(),
-                exitCode -> {
-                    projectState.reset();
-                });
+        boolean success = diffEvidenceService.genMaskEvidence(fileTreeController.getSelectedItem());
+        projectState.reset();
 
         if (!success) {
             Alert alert = new Alert(AlertType.INFORMATION);
@@ -63,10 +61,8 @@ public class DiffEvidenceToolbarController implements Initializable {
 
         messageView.startMsg("基準エビデンス確定処理を実行します。");
 
-        boolean success = diffEvidenceService.setBaseEvidence(fileTreeController.getSelectedItem(),
-                exitCode -> {
-                    projectState.reset();
-                });
+        boolean success = diffEvidenceService.setBaseEvidence(fileTreeController.getSelectedItem());
+        projectState.reset();
 
         if (!success) {
             Alert alert = new Alert(AlertType.INFORMATION);
@@ -83,9 +79,8 @@ public class DiffEvidenceToolbarController implements Initializable {
         messageView.startMsg("比較エビデンスを生成します。");
 
         boolean success = diffEvidenceService.genDiffEvidence(fileTreeController.getRoot(),
-                fileTreeController.getSelectedItems(false), exitCode -> {
-                    projectState.reset();
-                });
+                fileTreeController.getSelectedItems(false));
+        projectState.reset();
 
         if (!success) {
             Alert alert = new Alert(AlertType.INFORMATION);
