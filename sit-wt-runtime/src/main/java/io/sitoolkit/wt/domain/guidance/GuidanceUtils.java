@@ -25,7 +25,9 @@ public class GuidanceUtils {
      *            ガイダンスの表示に必要なファイル
      */
     public static void retrieve(String[] resources) {
-        retrieve(resources, new File("."));
+        String projectDir = System.getProperty("sitwt.projectDirectory");
+        String destDir = (StringUtils.isEmpty(projectDir)) ? "." : projectDir;
+        retrieve(resources, new File(destDir));
     }
 
     /**
@@ -57,6 +59,9 @@ public class GuidanceUtils {
     }
 
     public static String appendBaseUrl(String guidanceFile, String baseUrl) {
-        return new File(guidanceFile).toURI() + (StringUtils.isEmpty(baseUrl) ? "" : "?" + baseUrl);
+        String projectDir = System.getProperty("sitwt.projectDirectory");
+        String guidancePath = (StringUtils.isEmpty(projectDir)) ? guidanceFile
+                : projectDir + "/" + guidanceFile;
+        return new File(guidancePath).toURI() + (StringUtils.isEmpty(baseUrl) ? "" : "?" + baseUrl);
     }
 }

@@ -7,33 +7,38 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import io.sitoolkit.wt.app.config.BaseConfig;
+import io.sitoolkit.wt.app.config.ExtConfig;
 import io.sitoolkit.wt.app.config.TestScriptConfig;
+import io.sitoolkit.wt.app.ope2script.FirefoxOpener;
+import io.sitoolkit.wt.app.page2script.Page2Script;
+import io.sitoolkit.wt.app.page2script.Page2ScriptConfig;
+import io.sitoolkit.wt.app.test.TestCaseReader;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.gui.domain.script.CaseNoCache;
-import io.sitoolkit.wt.gui.domain.script.CaseNoReadCallback;
-import io.sitoolkit.wt.gui.domain.script.CaseNoStdoutListener;
-import io.sitoolkit.wt.gui.domain.script.ScriptProcessClient;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
-import io.sitoolkit.wt.util.infra.process.ConversationProcess;
 import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
-import io.sitoolkit.wt.util.infra.process.ProcessParams;
 
 public class ScriptService {
 
     CaseNoCache cache = new CaseNoCache();
-
-    ScriptProcessClient client = new ScriptProcessClient();
 
     TestScriptDao dao;
 
     ApplicationContext appCtx;
 
     io.sitoolkit.wt.infra.PropertyManager runtimePm;
+
+    Page2Script page2script;
+
+    FirefoxOpener firefoxOpener = new FirefoxOpener();
+
+    TestCaseReader testCaseReader = new TestCaseReader();
 
     public ScriptService() {
         initialize();
@@ -69,46 +74,41 @@ public class ScriptService {
         return dao != null;
     }
 
-    public ConversationProcess page2script(String driverType, String baseUrl,
-            ProcessExitCallback callback) {
+    public void page2script(String driverType, String baseUrl, ProcessExitCallback callback) {
+        System.setProperty("driver.type", driverType);
+        System.setProperty("baseUrl", baseUrl);
 
-        ProcessParams params = new ProcessParams();
-        params.getExitClallbacks().add(callback);
+        ExecutorContainer.get().execute(() -> {
+            ConfigurableApplicationContext pageCtx = new AnnotationConfigApplicationContext(
+                    Page2ScriptConfig.class, ExtConfig.class);
+            page2script = pageCtx.getBean(Page2Script.class);
+            page2script.setOpenScript(true);
+            int retcode = page2script.internalExecution();
+            pageCtx.close();
+            callback.callback(retcode);
+        });
 
-        return client.page2script(driverType, baseUrl, params);
     }
 
-    public ConversationProcess ope2script(String baseUrl) {
-        return client.ope2script(baseUrl);
+    public void ope2script(String baseUrl) {
+        System.setProperty("baseUrl", baseUrl);
+        ExecutorContainer.get().execute(() -> {
+            firefoxOpener.open();
+        });
     }
 
-    public void readCaseNo(File testScript, CaseNoReadCallback callback) {
+    public List<String> readCaseNo(File testScript) {
 
         List<String> caseNos = cache.getCaseNosIfNotModified(testScript);
 
         if (caseNos != null) {
-            callback.onRead(caseNos);
-            return;
+            return caseNos;
         }
 
-        ProcessParams params = new ProcessParams();
+        List<String> readCaseNos = testCaseReader.getTestCase(testScript.getAbsolutePath());
+        cache.putCaesNos(testScript, readCaseNos);
 
-        CaseNoStdoutListener caseNoStdoutListener = new CaseNoStdoutListener();
-        params.getStdoutListeners().add(caseNoStdoutListener);
-
-        params.getExitClallbacks().add(exitCode -> {
-
-            if (exitCode == 0) {
-                List<String> readCaseNos = caseNoStdoutListener.getCaseNoList();
-                cache.putCaesNos(testScript, readCaseNos);
-                callback.onRead(readCaseNos);
-            } else {
-                // TODO 例外処理
-            }
-
-        });
-
-        client.readCaseNo(testScript, params);
+        return readCaseNos;
     }
 
     public void write(TestScript testScript, Optional<ScriptFileType> scriptFileType) {
@@ -141,4 +141,11 @@ public class ScriptService {
         });
     }
 
+    public void export() {
+        page2script.exportScript();
+    }
+
+    public void quitBrowsing() {
+        page2script.quitBrowsing();
+    }
 }

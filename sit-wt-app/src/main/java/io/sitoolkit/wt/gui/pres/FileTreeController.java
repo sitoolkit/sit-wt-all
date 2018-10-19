@@ -14,7 +14,6 @@ import io.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import io.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import io.sitoolkit.wt.gui.infra.fx.FileWrapper;
 import io.sitoolkit.wt.util.infra.util.StrUtils;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -263,10 +262,8 @@ public class FileTreeController implements Initializable {
         operateSelectedItem(selectedItem -> {
             File selectedFile = selectedItem.getValue().getFile();
 
-            scriptService.readCaseNo(selectedFile, caseNos -> {
-                Platform.runLater(
-                        () -> testCaseDialogController.showSelectDialog(selectedFile, caseNos));
-            });
+            List<String> caseNos = scriptService.readCaseNo(selectedFile);
+            testCaseDialogController.showSelectDebugDialog(selectedFile, caseNos);
 
         });
     }
@@ -276,10 +273,8 @@ public class FileTreeController implements Initializable {
         operateSelectedItem(selectedItem -> {
             File selectedFile = selectedItem.getValue().getFile();
 
-            scriptService.readCaseNo(selectedFile, caseNos -> {
-                Platform.runLater(() -> testCaseDialogController.showSelectDebugDialog(selectedFile,
-                        caseNos));
-            });
+            List<String> caseNos = scriptService.readCaseNo(selectedFile);
+            testCaseDialogController.showSelectDebugDialog(selectedFile, caseNos);
 
         });
     }

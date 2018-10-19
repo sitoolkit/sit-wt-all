@@ -2,6 +2,7 @@ package io.sitoolkit.wt.app.page2script;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -33,7 +34,10 @@ public class Page2ScriptConfig {
         page2script.setDao(dao);
         page2script.setLoaders(Arrays.asList(loaders));
         page2script.setListener(listener);
-        page2script.setOutputDir(pm.getPageScriptDir());
+        String projectDir = System.getProperty("sitwt.projectDirectory");
+        String pageScriptDir = (StringUtils.isEmpty(projectDir)) ? pm.getPageScriptDir()
+                : projectDir + "/" + pm.getPageScriptDir();
+        page2script.setOutputDir(pageScriptDir);
         page2script.setCli(pm.isCli());
 
         return page2script;

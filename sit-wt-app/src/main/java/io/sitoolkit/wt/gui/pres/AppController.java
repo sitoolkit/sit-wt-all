@@ -243,16 +243,15 @@ public class AppController implements Initializable {
 
         projectState.setState(State.BROWSING);
 
-        conversationProcess = scriptService.page2script(testToolbarController.getDriverType(),
+        scriptService.page2script(testToolbarController.getDriverType(),
                 testToolbarController.getBaseUrl(), exitCode -> {
                     projectState.reset();
                 });
-
     }
 
     @FXML
     public void quitBrowsing() {
-        conversationProcess.input("q");
+        scriptService.quitBrowsing();
     }
 
     @FXML
@@ -266,7 +265,7 @@ public class AppController implements Initializable {
 
     @FXML
     public void export() {
-        conversationProcess.input("e");
+        scriptService.export();
     }
 
     @FXML

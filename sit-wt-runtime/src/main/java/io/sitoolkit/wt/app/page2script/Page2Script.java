@@ -44,6 +44,10 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
     private boolean isCli = true;
 
+    private boolean waitAction = true;
+
+    private boolean execExport = false;
+
     public static void main(String[] args) {
         System.exit(staticStart(true));
     }
@@ -79,6 +83,31 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
             }
 
             scan.close();
+
+        } catch (Exception e) {
+            LOG.error("unexpected.error", e);
+            return -1;
+
+        } finally {
+            listener.tearDown();
+        }
+
+        return 0;
+    }
+
+    public int internalExecution() {
+
+        try {
+            listener.setUp();
+            LOG.info("browser.start.operation");
+
+            while (waitAction) {
+                if (execExport) {
+                    generateFromPage();
+                    execExport = false;
+                }
+                Thread.sleep(100);
+            }
 
         } catch (Exception e) {
             LOG.error("unexpected.error", e);
@@ -177,6 +206,14 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
     public void setCli(boolean isCli) {
         this.isCli = isCli;
+    }
+
+    public void quitBrowsing() {
+        this.waitAction = false;
+    }
+
+    public void exportScript() {
+        this.execExport = true;
     }
 
 }

@@ -38,6 +38,10 @@ public class TestCaseReader {
         return 0;
     }
 
+    public List<String> getTestCase(String scriptPath) {
+        return read(scriptPath, "TestScript");
+    }
+
     List<String> read(String scriptPath, String sheetName) {
         ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
                 TestCaseReaderConfig.class);
