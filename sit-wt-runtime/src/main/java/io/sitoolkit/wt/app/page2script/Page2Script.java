@@ -3,8 +3,12 @@ package io.sitoolkit.wt.app.page2script;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +24,7 @@ import io.sitoolkit.wt.domain.pageload.PageContext;
 import io.sitoolkit.wt.domain.pageload.PageListener;
 import io.sitoolkit.wt.domain.pageload.PageLoader;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
+import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
@@ -44,9 +49,10 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
 
     private boolean isCli = true;
 
-    private boolean waitAction = true;
+    private Path createFile;
 
-    private boolean execExport = false;
+    @Resource
+    private PropertyManager pm;
 
     public static void main(String[] args) {
         System.exit(staticStart(true));
@@ -95,29 +101,11 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
         return 0;
     }
 
-    public int internalExecution() {
-
-        try {
-            listener.setUp();
-            LOG.info("browser.start.operation");
-
-            while (waitAction) {
-                if (execExport) {
-                    generateFromPage();
-                    execExport = false;
-                }
-                Thread.sleep(100);
-            }
-
-        } catch (Exception e) {
-            LOG.error("unexpected.error", e);
-            return -1;
-
-        } finally {
-            listener.tearDown();
-        }
-
-        return 0;
+    public void openBrowser(String baseUrl, String driverType) {
+        pm.setBaseUrl(baseUrl);
+        pm.setDriverType(driverType);
+        listener.setUp();
+        LOG.info("browser.start.operation");
     }
 
     public void generateFromPage() {
@@ -148,6 +136,7 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
         String filePath = FilenameUtils.concat(outputDir, fileName);
 
         filePath = dao.write(filePath, pageCtx.asList(), false);
+        setCreateFile(Paths.get(filePath));
 
         if (isOpenScript()) {
             try {
@@ -208,12 +197,12 @@ public class Page2Script implements TestScriptGenerateTool, ApplicationContextAw
         this.isCli = isCli;
     }
 
-    public void quitBrowsing() {
-        this.waitAction = false;
+    public Path getCreateFile() {
+        return this.createFile;
     }
 
-    public void exportScript() {
-        this.execExport = true;
+    public void setCreateFile(Path createFile) {
+        this.createFile = createFile;
     }
 
 }

@@ -2,6 +2,7 @@ package io.sitoolkit.wt.gui.pres;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -243,15 +244,13 @@ public class AppController implements Initializable {
 
         projectState.setState(State.BROWSING);
 
-        scriptService.page2script(testToolbarController.getDriverType(),
-                testToolbarController.getBaseUrl(), exitCode -> {
-                    projectState.reset();
-                });
+        scriptService.page2script(testToolbarController.getDriverType(), testToolbarController.getBaseUrl());
     }
 
     @FXML
     public void quitBrowsing() {
         scriptService.quitBrowsing();
+        projectState.reset();
     }
 
     @FXML
@@ -265,7 +264,8 @@ public class AppController implements Initializable {
 
     @FXML
     public void export() {
-        scriptService.export();
+        Path exportScript = scriptService.export();
+        editorTabController.open(exportScript.toFile());
     }
 
     @FXML

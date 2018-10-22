@@ -2,6 +2,7 @@ package io.sitoolkit.wt.gui.app.script;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -22,7 +23,6 @@ import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.gui.domain.script.CaseNoCache;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
-import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
 
 public class ScriptService {
 
@@ -37,6 +37,8 @@ public class ScriptService {
     Page2Script page2script;
 
     FirefoxOpener firefoxOpener = new FirefoxOpener();
+
+    ConfigurableApplicationContext pageCtx;
 
     TestCaseReader testCaseReader = new TestCaseReader();
 
@@ -74,26 +76,17 @@ public class ScriptService {
         return dao != null;
     }
 
-    public void page2script(String driverType, String baseUrl, ProcessExitCallback callback) {
-        System.setProperty("driver.type", driverType);
-        System.setProperty("baseUrl", baseUrl);
-
-        ExecutorContainer.get().execute(() -> {
-            ConfigurableApplicationContext pageCtx = new AnnotationConfigApplicationContext(
-                    Page2ScriptConfig.class, ExtConfig.class);
-            page2script = pageCtx.getBean(Page2Script.class);
-            page2script.setOpenScript(true);
-            int retcode = page2script.internalExecution();
-            pageCtx.close();
-            callback.callback(retcode);
-        });
+    public void page2script(String driverType, String baseUrl) {
+        pageCtx = new AnnotationConfigApplicationContext(Page2ScriptConfig.class, ExtConfig.class);
+        page2script = pageCtx.getBean(Page2Script.class);
+        page2script.setOpenScript(false);
+        page2script.openBrowser(baseUrl, driverType);
 
     }
 
     public void ope2script(String baseUrl) {
-        System.setProperty("baseUrl", baseUrl);
         ExecutorContainer.get().execute(() -> {
-            firefoxOpener.open();
+            firefoxOpener.open(baseUrl);
         });
     }
 
@@ -141,11 +134,12 @@ public class ScriptService {
         });
     }
 
-    public void export() {
-        page2script.exportScript();
+    public Path export() {
+        page2script.generateFromPage();
+        return page2script.getCreateFile();
     }
 
     public void quitBrowsing() {
-        page2script.quitBrowsing();
+        pageCtx.close();
     }
 }
