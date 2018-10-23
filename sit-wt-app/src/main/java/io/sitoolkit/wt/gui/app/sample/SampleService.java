@@ -2,8 +2,8 @@ package io.sitoolkit.wt.gui.app.sample;
 
 import java.io.File;
 
+import io.sitoolkit.wt.app.sample.SampleManager;
 import io.sitoolkit.wt.gui.domain.sample.JettyMavenPluginStdoutListener;
-import io.sitoolkit.wt.gui.domain.sample.SampleCreatedCallback;
 import io.sitoolkit.wt.gui.domain.sample.SampleProcessClient;
 import io.sitoolkit.wt.gui.domain.sample.SampleStartedCallback;
 import io.sitoolkit.wt.gui.domain.sample.SampleStoppedCallback;
@@ -14,6 +14,8 @@ import io.sitoolkit.wt.util.infra.process.ProcessParams;
 public class SampleService {
 
     SampleProcessClient client = new SampleProcessClient();
+
+    SampleManager sampleManager = new SampleManager();
 
     /**
      * サンプルWebサイトを{@code destDir}以下に展開します。
@@ -33,18 +35,12 @@ public class SampleService {
      * @param callback
      *            サンプル展開後に実行されるCallback
      */
-    public void create(File destDir, SampleCreatedCallback callback) {
-        ProcessParams params = new ProcessParams();
-
-        params.getExitClallbacks().add(exitCode -> {
-            File sampledir = getSampleDir(destDir);
-            if (!sampledir.exists()) {
-                sampledir.mkdirs();
-            }
-            callback.onCreated(sampledir);
-        });
-
-        client.create(destDir, params);
+    public void create(File destDir) {
+        File sampledir = getSampleDir(destDir);
+        if (!sampledir.exists()) {
+            sampledir.mkdirs();
+        }
+        sampleManager.unarchiveBasicSample(destDir.getAbsolutePath());
     }
 
     public ConversationProcess start(File baseDir, SampleStartedCallback callback) {

@@ -1,9 +1,7 @@
 package io.sitoolkit.wt.gui.domain.sample;
 
-import java.io.File;
 import java.util.List;
 
-import io.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import io.sitoolkit.wt.util.infra.maven.MavenUtils;
 import io.sitoolkit.wt.util.infra.process.ConversationProcess;
 import io.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
@@ -12,30 +10,6 @@ import io.sitoolkit.wt.util.infra.process.ProcessParams;
 public class SampleProcessClient {
 
     public SampleProcessClient() {
-    }
-
-    /**
-     * 次のコマンドを実行します。
-     *
-     * <pre>
-     * cd $[destDir}
-     * java -cp ${sitWtClasspath} io.sitoolkit.wt.app.sample.SampleManager
-     * </pre>
-     *
-     * @param destDir
-     *            サンプル展開先のディレクトリ
-     * @param params
-     *            プロセス実行パラメーター
-     */
-    public void create(File destDir, ProcessParams params) {
-        params.setDirectory(destDir);
-
-        List<String> command = SitWtRuntimeUtils.buildJavaCommand();
-        command.add("io.sitoolkit.wt.app.sample.SampleManager");
-        params.setCommand(command);
-
-        ConversationProcess process = ConversationProcessContainer.create();
-        process.start(params);
     }
 
     /**

@@ -11,6 +11,8 @@ import io.sitoolkit.wt.infra.ConfigurationException;
 
 public class SampleManager {
 
+    private String projectDir = null;
+
     public SampleManager() {
     }
 
@@ -31,12 +33,22 @@ public class SampleManager {
         unarchive("sample/terms.html");
         unarchive("sample/bootstrap.min.css");
         unarchive("sample/pom.xml");
-        unarchive("sample/CsvTestScript.csv", new File("testscript", "SampleTestScript.csv"));
+        unarchive("sample/CsvTestScript.csv",
+                new File(getDestDir("testscript"), "SampleTestScript.csv"));
     }
 
     private void unarchive(String resource) {
         String[] dest = resource.split("/");
-        unarchive(resource, new File(dest[0], dest[1]));
+        unarchive(resource, new File(getDestDir(dest[0]), dest[1]));
+    }
+
+    public void unarchiveBasicSample(String projectDir) {
+        this.projectDir = projectDir;
+        unarchiveBasicSample();
+    }
+
+    public String getDestDir(String dir) {
+        return (projectDir == null) ? dir : projectDir + "/" + dir;
     }
 
     public static void main(String[] args) {
