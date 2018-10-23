@@ -51,7 +51,7 @@ public class SeleniumPageLietener implements PageListener {
         String driverType = driver.toString();
         LOG.info("browser.start", driverType);
 
-        String baseUrl = System.getProperty("baseUrl");
+        String baseUrl = pm.getBaseUrl();
         driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));
     }
 

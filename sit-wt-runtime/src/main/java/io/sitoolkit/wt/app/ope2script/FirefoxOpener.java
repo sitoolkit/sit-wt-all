@@ -26,9 +26,12 @@ public class FirefoxOpener {
     private String[] guidanceResources = new String[] { guidanceFile,
             "guidance/css/bootstrap.min.css", "guidance/css/style.css", "guidance/js/open.js" };
 
+    private String baseUrl;
+
     public FirefoxOpener() {
         ffManager.init();
         webDriverInstaller.init();
+        baseUrl = System.getProperty("baseUrl");
     }
 
     public static void main(String[] args) {
@@ -62,7 +65,6 @@ public class FirefoxOpener {
             WebDriver driver = MultiThreadUtils
                     .submitWithProgress(() -> new FirefoxDriver(ffOptions));
 
-            String baseUrl = System.getProperty("baseUrl");
             driver.get(GuidanceUtils.appendBaseUrl(guidanceFile, baseUrl));
 
             return 0;
@@ -72,4 +74,8 @@ public class FirefoxOpener {
         }
     }
 
+    public int open(String baseUrl) {
+        this.baseUrl = baseUrl;
+        return open();
+    }
 }
