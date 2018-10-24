@@ -1,11 +1,15 @@
 package io.sitoolkit.wt.gui.app.test;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -13,14 +17,12 @@ import io.sitoolkit.wt.app.config.RuntimeConfig;
 import io.sitoolkit.wt.app.test.TestRunner;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.debug.DebugSupport;
-import io.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import io.sitoolkit.wt.gui.domain.test.TestRunParams;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
-import io.sitoolkit.wt.util.infra.process.ProcessParams;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 import io.sitoolkit.wt.util.infra.util.SystemUtils;
 import lombok.Setter;
@@ -31,8 +33,6 @@ public class TestService {
 
     private static final String SCRIPT_TEMPLATE = "TestScriptTemplate_"
             + Locale.getDefault().getLanguage() + ".csv";
-
-    SitWtRuntimeProcessClient client = new SitWtRuntimeProcessClient();
 
     private TestRunner runner = new TestRunner();
 
@@ -140,21 +140,14 @@ public class TestService {
 
         } else {
 
-            ProcessParams params = new ProcessParams();
-            params.setDirectory(baseDir);
-
-            params.getExitClallbacks().add(exitCode -> {
-
-                File testscript = new File(baseDir, "target/" + SCRIPT_TEMPLATE);
-                LOG.info("app.scriptRename",
-                        new Object[] { testscript.getAbsolutePath(), template.getAbsolutePath() });
-                testscript.renameTo(template);
-
-                FileIOUtils.copy(template, destFile);
-
-            });
-
-            client.unpackTestScript(params);
+            try (PrintWriter writer = new PrintWriter(
+                    Files.newOutputStream(destFile.toPath(), StandardOpenOption.CREATE))) {
+                String script = IOUtils.toString(ClassLoader.getSystemResource(SCRIPT_TEMPLATE), "UTF-8");
+                writer.println(script);
+                writer.flush();
+            } catch (Exception e) {
+                LOG.error("app.unexpectedException", e);
+            }
 
         }
 
