@@ -2,19 +2,16 @@ package io.sitoolkit.wt.infra.firefox;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -240,12 +237,8 @@ public class FirefoxManager {
         try {
             Path iniFile = Files.createTempFile("ff-inst", ".ini");
 
-            try (PrintWriter writer = new PrintWriter(
-                    Files.newOutputStream(iniFile, StandardOpenOption.DELETE_ON_CLOSE))) {
-                String iniString = IOUtils.toString(ClassLoader.getSystemResource(installIni),
-                        "UTF-8");
-                writer.println(iniString);
-                writer.flush();
+            try {
+                FileIOUtils.sysRes2file(installIni, iniFile, true);
 
                 MultiThreadUtils.submitWithProgress(() -> {
                     ProcessUtils.execute(ffInstaller.toString(), "/INI=" + iniFile.toString());

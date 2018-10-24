@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.apache.commons.io.FileUtils;
 
 import io.sitoolkit.wt.util.infra.UnExpectedException;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
@@ -193,6 +196,22 @@ public class FileIOUtils {
             }
         } catch (IOException e) {
             throw new UnExpectedException(e);
+        }
+    }
+
+    public static void sysRes2file(String resourceName, Path targetPath) {
+        sysRes2file(resourceName, targetPath, false);
+    }
+
+    public static void sysRes2file(String resourceName, Path targetPath, boolean deleteOnExit) {
+        URL resourceUrl = ClassLoader.getSystemResource(resourceName);
+
+        try {
+            File targetFile = targetPath.toFile();
+            if (deleteOnExit) targetFile.deleteOnExit();
+            FileUtils.copyURLToFile(resourceUrl, targetFile);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

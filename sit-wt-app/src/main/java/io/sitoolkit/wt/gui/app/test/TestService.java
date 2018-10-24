@@ -1,15 +1,11 @@
 package io.sitoolkit.wt.gui.app.test;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -139,15 +135,7 @@ public class TestService {
             FileIOUtils.copy(template, destFile);
 
         } else {
-
-            try (PrintWriter writer = new PrintWriter(
-                    Files.newOutputStream(destFile.toPath(), StandardOpenOption.CREATE))) {
-                String script = IOUtils.toString(ClassLoader.getSystemResource(SCRIPT_TEMPLATE), "UTF-8");
-                writer.println(script);
-                writer.flush();
-            } catch (Exception e) {
-                LOG.error("app.unexpectedException", e);
-            }
+            FileIOUtils.sysRes2file(SCRIPT_TEMPLATE, destFile.toPath());
 
         }
 
