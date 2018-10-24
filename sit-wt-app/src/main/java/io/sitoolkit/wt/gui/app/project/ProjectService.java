@@ -3,10 +3,8 @@ package io.sitoolkit.wt.gui.app.project;
 import java.io.File;
 import java.util.concurrent.Executors;
 
-import io.sitoolkit.wt.gui.app.test.SitWtRuntimeService;
 import io.sitoolkit.wt.gui.domain.project.ProjectProcessClient;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
-import io.sitoolkit.wt.gui.domain.project.ProjectState.State;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.gui.infra.util.ResourceUtils;
 import io.sitoolkit.wt.gui.infra.util.VersionUtils;
@@ -20,25 +18,9 @@ public class ProjectService {
 
     private static final SitLogger LOG = SitLoggerFactory.getLogger(ProjectService.class);
 
-    SitWtRuntimeService runtimeService = new SitWtRuntimeService();
-
     ProjectProcessClient client = new ProjectProcessClient();
 
     /**
-     * {@code projectDir}にpom.xmlを生成し、{@code projectSate}を初期状態に設定します。
-     *
-     * <h3>処理順</h3>
-     *
-     * <ol>
-     * <li>copy classpath:/distribution-pom.xml ${projectDir}/pom.xml
-     * <li>mvn dependency:build-classpath -f ${pomFile} (
-     * {@link SitWtRuntimeService#loadClasspath(File, io.sitoolkit.wt.gui.infra.process.ProcessExitCallback)}
-     * )
-     * <li>mvn -f ${pomFile} -P unpack-property-resources (
-     * {@link ProjectProcessClient#unpack(File, ProcessParams)})
-     * <li>mvn dependency:build-classpath -f ${pomFile}
-     * </ol>
-     *
      * @param projectDir
      *            プロジェクトとするディレクトリ
      * @param projectState
@@ -59,20 +41,6 @@ public class ProjectService {
     }
 
     /**
-     * {@code projectDir}直下のpom.xmlにもとづきプロジェクトを初期化します。{@code projectSate}
-     * を初期状態に設定します。
-     *
-     * <h3>処理順</h3>
-     *
-     * <ol>
-     * <li>mvn dependency:build-classpath -f ${pomFile} (
-     * {@link SitWtRuntimeService#loadClasspath(File, io.sitoolkit.wt.gui.infra.process.ProcessExitCallback)}
-     * )
-     * <li>mvn -f ${pomFile} -P unpack-property-resources (
-     * {@link ProjectProcessClient#unpack(File, ProcessParams)})
-     * <li>mvn dependency:build-classpath -f ${pomFile}
-     * </ol>
-     *
      * @param projectDir
      *            プロジェクトとするディレクトリ
      * @param projectState
@@ -115,17 +83,7 @@ public class ProjectService {
         File baseDir = pomFile.getAbsoluteFile().getParentFile();
         PropertyManager.get().load(baseDir);
         ProcessParams.setDefaultCurrentDir(baseDir);
-
-        ExecutorContainer.get().execute(() -> {
-            runtimeService.loadClasspath(pomFile, exitCode -> {
-                if (exitCode == 0) {
-                    // TODO プロジェクトの初期化判定は"pom.xml内にSIT-WTの設定があること"としたい
-                    projectState.init(pomFile);
-                } else {
-                    projectState.setState(State.NOT_LOADED);
-                }
-            });
-        });
+        projectState.init(pomFile);
     }
 
     private void unpackResources(File pomFile, File projectDir) {

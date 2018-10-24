@@ -13,14 +13,12 @@ import io.sitoolkit.wt.app.config.RuntimeConfig;
 import io.sitoolkit.wt.app.test.TestRunner;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.debug.DebugSupport;
-import io.sitoolkit.wt.gui.domain.test.SitWtRuntimeProcessClient;
 import io.sitoolkit.wt.gui.domain.test.TestRunParams;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
-import io.sitoolkit.wt.util.infra.process.ProcessParams;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 import io.sitoolkit.wt.util.infra.util.SystemUtils;
 import lombok.Setter;
@@ -31,8 +29,6 @@ public class TestService {
 
     private static final String SCRIPT_TEMPLATE = "TestScriptTemplate_"
             + Locale.getDefault().getLanguage() + ".csv";
-
-    SitWtRuntimeProcessClient client = new SitWtRuntimeProcessClient();
 
     private TestRunner runner = new TestRunner();
 
@@ -139,22 +135,7 @@ public class TestService {
             FileIOUtils.copy(template, destFile);
 
         } else {
-
-            ProcessParams params = new ProcessParams();
-            params.setDirectory(baseDir);
-
-            params.getExitClallbacks().add(exitCode -> {
-
-                File testscript = new File(baseDir, "target/" + SCRIPT_TEMPLATE);
-                LOG.info("app.scriptRename",
-                        new Object[] { testscript.getAbsolutePath(), template.getAbsolutePath() });
-                testscript.renameTo(template);
-
-                FileIOUtils.copy(template, destFile);
-
-            });
-
-            client.unpackTestScript(params);
+            FileIOUtils.sysRes2file(SCRIPT_TEMPLATE, destFile.toPath());
 
         }
 
