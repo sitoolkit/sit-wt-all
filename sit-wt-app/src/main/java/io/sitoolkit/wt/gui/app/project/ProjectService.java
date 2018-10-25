@@ -1,24 +1,22 @@
 package io.sitoolkit.wt.gui.app.project;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 
-import io.sitoolkit.wt.gui.domain.project.ProjectProcessClient;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
-import io.sitoolkit.wt.gui.infra.util.ResourceUtils;
 import io.sitoolkit.wt.gui.infra.util.VersionUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
-import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import io.sitoolkit.wt.util.infra.maven.MavenUtils;
 import io.sitoolkit.wt.util.infra.process.ProcessParams;
+import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 
 public class ProjectService {
 
     private static final SitLogger LOG = SitLoggerFactory.getLogger(ProjectService.class);
-
-    ProjectProcessClient client = new ProjectProcessClient();
 
     /**
      * @param projectDir
@@ -65,7 +63,7 @@ public class ProjectService {
 
     private void createPom(File pomFile, ProjectState projectState) {
 
-        ResourceUtils.copy("distribution-pom.xml", pomFile);
+        FileIOUtils.sysRes2file("distribution-pom.xml", pomFile.toPath());
 
         if (pomFile.exists()) {
 
@@ -88,19 +86,15 @@ public class ProjectService {
 
     private void unpackResources(File pomFile, File projectDir) {
 
-        ResourceUtils.copy("site.xml", new File(projectDir, "src/site/site.xml"));
+        Path siteXml = Paths.get(projectDir.getAbsolutePath(), "src/site/site.xml");
+        FileIOUtils.sysRes2file("site.xml", siteXml);
 
-        ProcessParams params = new ProcessParams();
-        params.setDirectory(projectDir);
+        Path sitwtProperties = Paths.get(projectDir.getAbsolutePath(), "src/main/resources/sit-wt.properties");
+        FileIOUtils.sysRes2file("sit-wt-default.properties", sitwtProperties);
 
-        params.getExitClallbacks().add(exitCode -> {
-            File f = new File(projectDir, "src/main/resources/sit-wt-default.properties");
-            f.renameTo(new File(f.getParentFile(), "sit-wt.properties"));
-        });
-
-        ExecutorContainer.get().execute(() -> {
-            client.unpack(pomFile, params);
-        });
+        Path capabilitiesProperties = Paths.get(projectDir.getAbsolutePath(),
+                "src/main/resources/capabilities.properties");
+        FileIOUtils.sysRes2file("capabilities.properties", capabilitiesProperties);
 
     }
 }
