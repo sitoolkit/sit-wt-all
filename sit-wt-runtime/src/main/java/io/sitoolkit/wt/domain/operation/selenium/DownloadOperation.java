@@ -24,13 +24,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import io.sitoolkit.util.buidtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.domain.evidence.EvidenceManager;
 import io.sitoolkit.wt.domain.evidence.MessagePattern;
 import io.sitoolkit.wt.domain.tester.TestContext;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.infra.TestException;
 import io.sitoolkit.wt.infra.resource.MessageManager;
-import io.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 
 /**
  *

@@ -32,11 +32,13 @@ public class MavenVersionsPluginStdoutListener implements StdoutListener {
             update = true;
         }
 
-        if (update) {
-            if (line.contains(versionPrefix)) {
+        if (line.contains(versionPrefix)) {
+            if (update) {
                 int idx = line.indexOf(" -> ");
                 currentVersion = line.substring(line.indexOf("... ") + 4, idx);
                 newVersion = line.substring(idx + 4);
+            } else {
+                currentVersion = line.substring(line.indexOf("... ") + 4);
             }
         }
     }

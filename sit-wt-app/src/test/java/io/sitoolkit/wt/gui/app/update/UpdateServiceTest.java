@@ -1,7 +1,7 @@
 package io.sitoolkit.wt.gui.app.update;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -9,9 +9,8 @@ import java.net.URISyntaxException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.sitoolkit.wt.gui.app.update.UpdateService;
+import io.sitoolkit.util.buidtoolhelper.maven.MavenUtils;
 import io.sitoolkit.wt.gui.testutil.ThreadUtils;
-import io.sitoolkit.wt.util.infra.maven.MavenUtils;
 
 public class UpdateServiceTest {
 

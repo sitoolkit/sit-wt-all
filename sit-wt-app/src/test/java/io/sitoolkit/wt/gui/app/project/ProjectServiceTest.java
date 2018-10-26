@@ -6,10 +6,9 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import io.sitoolkit.wt.gui.app.project.ProjectService;
+import io.sitoolkit.util.buidtoolhelper.maven.MavenUtils;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.testutil.ThreadUtils;
-import io.sitoolkit.wt.util.infra.maven.MavenUtils;
 
 public class ProjectServiceTest {
 

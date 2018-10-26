@@ -1,10 +1,10 @@
 package io.sitoolkit.wt.gui.pres;
 
+import io.sitoolkit.util.buidtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.gui.infra.fx.FxContext;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
-import io.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import io.sitoolkit.wt.util.infra.util.SystemUtils;
 import javafx.application.Application;

@@ -22,6 +22,7 @@ import org.zeroturnaround.zip.ZipUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.sitoolkit.util.buidtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.infra.MultiThreadUtils;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.SitRepository;
@@ -29,7 +30,6 @@ import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.process.ProcessUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
-import io.sitoolkit.wt.util.app.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.util.infra.UnExpectedException;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 
