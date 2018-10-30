@@ -33,7 +33,7 @@ public class VersionUtils {
             }
 
         } catch (IOException e) {
-            LOG.warn("fail to get version", e);
+            LOG.warn("app.getVersionFailed", e);
         }
         return "";
     }
@@ -44,4 +44,5 @@ public class VersionUtils {
         }
         return currentVer.compareTo(newVer) < 0;
     }
+
 }

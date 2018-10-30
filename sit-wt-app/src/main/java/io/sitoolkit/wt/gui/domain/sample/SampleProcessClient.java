@@ -1,11 +1,11 @@
 package io.sitoolkit.wt.gui.domain.sample;
 
-import java.util.List;
+import java.io.File;
 
-import io.sitoolkit.wt.util.infra.maven.MavenUtils;
-import io.sitoolkit.wt.util.infra.process.ConversationProcess;
-import io.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
-import io.sitoolkit.wt.util.infra.process.ProcessParams;
+import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
+import io.sitoolkit.util.buidtoolhelper.process.ProcessCommand;
+import io.sitoolkit.util.buidtoolhelper.process.ProcessExitCallback;
+import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 
 public class SampleProcessClient {
 
@@ -19,20 +19,19 @@ public class SampleProcessClient {
      * mvn
      * </pre>
      *
-     * @param params
-     *            プロセス実行パラメーター
-     * @return 対話プロセス
      */
-    public ConversationProcess start(ProcessParams params) {
+    public void start(File sampleDir, SampleStartedCallback callback) {
 
-        List<String> command = MavenUtils.getCommand(params);
+        JettyMavenPluginStdoutListener listener = new JettyMavenPluginStdoutListener();
+        MavenProject
+            .load(sampleDir.toPath())
+            .mvnw("")
+            .stdout(listener)
+            .executeAsync();
 
-        params.setCommand(command);
-
-        ConversationProcess process = ConversationProcessContainer.create();
-        process.start(params);
-
-        return process;
+        ExecutorContainer.get().execute(() -> {
+            callback.onStarted(listener.isSuccess());
+        });
     }
 
     /**
@@ -42,18 +41,14 @@ public class SampleProcessClient {
      * mvn jetty:stop
      * </pre>
      *
-     * @param params
-     *            プロセス実行パラメーター
      */
-    public void stop(ProcessParams params) {
+    public void stop(File sampleDir, ProcessExitCallback callback) {
 
-        List<String> command = MavenUtils.getCommand(params);
-        command.add("jetty:stop");
-
-        params.setCommand(command);
-
-        ConversationProcess process = ConversationProcessContainer.create();
-        process.start(params);
-
+        ProcessCommand cmd = MavenProject
+            .load(sampleDir.toPath())
+            .mvnw("jetty:stop");
+        if (callback != null)
+            cmd.getExitCallbacks().add(callback);
+        cmd.executeAsync();
     }
 }

@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import io.sitoolkit.util.buidtoolhelper.process.StdoutListenerContainer;
 import io.sitoolkit.wt.gui.app.diffevidence.DiffEvidenceService;
 import io.sitoolkit.wt.gui.app.project.ProjectService;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
@@ -20,7 +21,6 @@ import io.sitoolkit.wt.infra.log.DelegatingOutputStreamAppender;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 import io.sitoolkit.wt.util.infra.process.ConversationProcess;
 import io.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
-import io.sitoolkit.wt.util.infra.process.StdoutListenerContainer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -123,10 +123,6 @@ public class AppController implements Initializable {
 
         DelegatingOutputStreamAppender.setStaticOutputStream(new TextAreaOutputStream(console));
 
-        if (!Boolean.getBoolean("skipUpdate")) {
-            ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
-        }
-
         FxUtils.bindVisible(projectGroup, projectState.isLocking().not());
         FxUtils.bindVisible(genScriptGroup, projectState.isLoaded());
         FxUtils.bindVisible(browsingGroup, projectState.isBrowsing());
@@ -135,7 +131,8 @@ public class AppController implements Initializable {
         // FxUtils.bindVisible(minimizeButton, windowMaximized);
 
         messageView.setTextArea(console);
-        StdoutListenerContainer.get().getListeners().add(new TextAreaStdoutListener(console));
+        StdoutListenerContainer.getInstance().getStdoutListeners().add(new TextAreaStdoutListener(console));
+        StdoutListenerContainer.getInstance().getStderrListeners().add(new TextAreaStdoutListener(console));
 
         testToolbarController.initialize(messageView, fileTreeController, projectState);
         testToolbarController.testService = testService;
@@ -210,6 +207,11 @@ public class AppController implements Initializable {
             loadProject(pomFile);
 
         }
+
+        if (!Boolean.getBoolean("skipUpdate")) {
+            ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
+        }
+
         System.setProperty("sitwt.projectDirectory", projectDir.getAbsolutePath());
 
     }

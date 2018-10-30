@@ -63,7 +63,6 @@ public class SampleToolbarController implements Initializable {
 
         service.create(projectState.getBaseDir());
         service.start(projectState.getBaseDir(), onStarted());
-
     }
 
     private SampleStartedCallback onStarted() {
@@ -88,7 +87,7 @@ public class SampleToolbarController implements Initializable {
     public void stopSample() {
         messageView.startMsg("サンプルWebサイトを停止します。");
 
-        service.stop(projectState.getBaseDir(), () -> {
+        service.stop(projectState.getBaseDir(), retCode -> {
             running.set(false);
             Platform.runLater(() -> {
                 messageView.addMsg("サンプルWebサイトを停止しました。");

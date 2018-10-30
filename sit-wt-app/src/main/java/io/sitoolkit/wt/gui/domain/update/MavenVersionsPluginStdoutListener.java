@@ -1,6 +1,6 @@
 package io.sitoolkit.wt.gui.domain.update;
 
-import io.sitoolkit.wt.util.infra.process.StdoutListener;
+import io.sitoolkit.util.buidtoolhelper.process.StdoutListener;
 import io.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class MavenVersionsPluginStdoutListener implements StdoutListener {
@@ -32,11 +32,13 @@ public class MavenVersionsPluginStdoutListener implements StdoutListener {
             update = true;
         }
 
-        if (update) {
-            if (line.contains(versionPrefix)) {
+        if (line.contains(versionPrefix)) {
+            if (update) {
                 int idx = line.indexOf(" -> ");
                 currentVersion = line.substring(line.indexOf("... ") + 4, idx);
                 newVersion = line.substring(idx + 4);
+            } else {
+                currentVersion = line.substring(line.indexOf("... ") + 4);
             }
         }
     }

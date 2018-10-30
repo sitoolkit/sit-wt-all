@@ -33,6 +33,7 @@
     <appium.version>6.0.0</appium.version>
     <trimStackTrace>false</trimStackTrace>
     <mpir.skip>true</mpir.skip>
+    <includeProperties>sitwt.version</includeProperties>
   </properties>
 
   <!-- Build Settings -->
