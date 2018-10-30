@@ -1,8 +1,8 @@
 package io.sitoolkit.wt.gui.domain.sample;
 
+import io.sitoolkit.util.buidtoolhelper.process.StdoutListener;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
-import io.sitoolkit.wt.util.infra.process.StdoutListener;
 
 public class JettyMavenPluginStdoutListener implements StdoutListener {
 

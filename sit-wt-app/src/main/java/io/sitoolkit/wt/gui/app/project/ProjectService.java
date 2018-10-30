@@ -5,10 +5,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 
+import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
 import io.sitoolkit.util.buidtoolhelper.maven.MavenUtils;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
-import io.sitoolkit.wt.gui.infra.util.VersionUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.process.ProcessParams;
@@ -51,7 +51,10 @@ public class ProjectService {
 
         if (pomFile.exists()) {
 
-            VersionUtils.setSitWtVersion(pomFile, VersionUtils.get());
+            MavenProject
+                .load(projectDir.getAbsolutePath())
+                .mvnw("versions:update-properties")
+                .execute();
 
             loadProject(pomFile, projectState);
             return pomFile;

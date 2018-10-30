@@ -31,7 +31,7 @@ public class UpdateServiceTest {
 
         service.checkSitWtAppUpdate(pomFile, newVersion -> {
             // TODO newVersionの値をpomから取得
-            assertThat("newVersion", newVersion, is("2.3"));
+            assertThat("newVersion", newVersion, is("3.0.0-alpha.1"));
             tested = true;
         });
 
@@ -41,7 +41,7 @@ public class UpdateServiceTest {
     @Test
     public void testDownload() {
 
-        service.downloadSitWtApp(new File("target"), "2.0", downloadedFile -> {
+        service.downloadSitWtApp(new File("target"), "3.0.0-alpha.1", downloadedFile -> {
             downloadedFile.deleteOnExit();
             assertThat("file downloaded", downloadedFile.exists(), is(true));
             tested = true;
