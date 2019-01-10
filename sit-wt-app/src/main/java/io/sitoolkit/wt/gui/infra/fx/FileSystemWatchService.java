@@ -48,8 +48,7 @@ public class FileSystemWatchService {
                     com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
 
             watchKeyPathMap.put(watchKey, path);
-            LOG.info("app.filePathRegistered",
-                    new Object[] { path.toAbsolutePath(), watchKey });
+            LOG.debug("app.filePathRegistered", new Object[] { path.toAbsolutePath(), watchKey });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -98,8 +97,8 @@ public class FileSystemWatchService {
 
             for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
 
-                LOG.debug("app.watchParams", new Object[] { watchKey,
-                        watchEvent.kind(), watchEvent.context(), eventSourcePath });
+                LOG.debug("app.watchParams", new Object[] { watchKey, watchEvent.kind(),
+                        watchEvent.context(), eventSourcePath });
 
                 Object context = watchEvent.context();
                 if (context == null || !(context instanceof Path)) {
@@ -139,7 +138,7 @@ public class FileSystemWatchService {
     void create(Path eventSourcePath, Path eventTargetPath, FileTreeItem eventSourceItem) {
 
         FileTreeItem childItem = eventSourceItem.addChild(eventTargetPath.toFile());
-        LOG.info("app.createPath", new Object[] { eventTargetPath, childItem });
+        LOG.debug("app.createPath", new Object[] { eventTargetPath, childItem });
         register(childItem);
     }
 
@@ -157,7 +156,7 @@ public class FileSystemWatchService {
         }
         watchKeyPathMap.remove(removingWatchKey);
 
-        LOG.info("app.deletePath",
+        LOG.debug("app.deletePath",
                 new Object[] { eventTargetPath, eventTargetItem, removingWatchKey });
     }
 }
