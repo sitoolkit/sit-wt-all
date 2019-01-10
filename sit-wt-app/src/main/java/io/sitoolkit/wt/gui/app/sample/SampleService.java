@@ -1,6 +1,7 @@
 package io.sitoolkit.wt.gui.app.sample;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import io.sitoolkit.util.buidtoolhelper.process.ProcessExitCallback;
 import io.sitoolkit.wt.app.sample.SampleManager;
@@ -30,26 +31,26 @@ public class SampleService {
      *            サンプルを展開するディレクトリ
      */
     public void create(File destDir) {
-        File sampledir = getSampleDir(destDir);
-        if (!sampledir.exists()) {
-            sampledir.mkdirs();
+        Path sampledir = getSampleDir(destDir.toPath());
+        if (!sampledir.toFile().exists()) {
+            sampledir.toFile().mkdirs();
         }
         sampleManager.unarchiveBasicSample(destDir.getAbsolutePath());
     }
 
     public void start(File baseDir, SampleStartedCallback callback) {
-        client.start(getSampleDir(baseDir), callback);
+        client.start(getSampleDir(baseDir.toPath()), callback);
     }
 
     public void stop(File baseDir) {
-        client.stop(getSampleDir(baseDir), null);
+        client.stop(getSampleDir(baseDir.toPath()), null);
     }
 
     public void stop(File baseDir, ProcessExitCallback callback) {
-        client.stop(getSampleDir(baseDir), callback);
+        client.stop(getSampleDir(baseDir.toPath()), callback);
     }
 
-    private File getSampleDir(File baseDir) {
-        return new File(baseDir, "sample");
+    private Path getSampleDir(Path baseDir) {
+        return baseDir.resolve(baseDir);
     }
 }

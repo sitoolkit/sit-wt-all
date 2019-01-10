@@ -1,6 +1,6 @@
 package io.sitoolkit.wt.gui.domain.sample;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
 import io.sitoolkit.util.buidtoolhelper.process.ProcessCommand;
@@ -20,10 +20,10 @@ public class SampleProcessClient {
      * </pre>
      *
      */
-    public void start(File sampleDir, SampleStartedCallback callback) {
+    public void start(Path sampleDir, SampleStartedCallback callback) {
 
         JettyMavenPluginStdoutListener listener = new JettyMavenPluginStdoutListener();
-        MavenProject.load(sampleDir.toPath()).mvnw().stdout(listener).executeAsync();
+        MavenProject.load(sampleDir).mvnw().stdout(listener).executeAsync();
 
         ExecutorContainer.get().execute(() -> {
             callback.onStarted(listener.isSuccess());
@@ -38,9 +38,12 @@ public class SampleProcessClient {
      * </pre>
      *
      */
-    public void stop(File sampleDir, ProcessExitCallback callback) {
+    public void stop(Path sampleDir, ProcessExitCallback callback) {
+        if (!sampleDir.toFile().exists()) {
+            callback.callback(0);
+        }
 
-        ProcessCommand cmd = MavenProject.load(sampleDir.toPath()).mvnw("jetty:stop");
+        ProcessCommand cmd = MavenProject.load(sampleDir).mvnw("jetty:stop");
         if (callback != null)
             cmd.getExitCallbacks().add(callback);
         cmd.executeAsync();
