@@ -23,11 +23,7 @@ public class SampleProcessClient {
     public void start(File sampleDir, SampleStartedCallback callback) {
 
         JettyMavenPluginStdoutListener listener = new JettyMavenPluginStdoutListener();
-        MavenProject
-            .load(sampleDir.toPath())
-            .mvnw("")
-            .stdout(listener)
-            .executeAsync();
+        MavenProject.load(sampleDir.toPath()).mvnw().stdout(listener).executeAsync();
 
         ExecutorContainer.get().execute(() -> {
             callback.onStarted(listener.isSuccess());
@@ -44,9 +40,7 @@ public class SampleProcessClient {
      */
     public void stop(File sampleDir, ProcessExitCallback callback) {
 
-        ProcessCommand cmd = MavenProject
-            .load(sampleDir.toPath())
-            .mvnw("jetty:stop");
+        ProcessCommand cmd = MavenProject.load(sampleDir.toPath()).mvnw("jetty:stop");
         if (callback != null)
             cmd.getExitCallbacks().add(callback);
         cmd.executeAsync();
