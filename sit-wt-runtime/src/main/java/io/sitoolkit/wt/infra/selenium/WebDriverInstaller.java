@@ -22,7 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
-import io.sitoolkit.util.buidtoolhelper.proxysetting.ProxySettingService;
+import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.infra.ConfigurationException;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.SitRepository;

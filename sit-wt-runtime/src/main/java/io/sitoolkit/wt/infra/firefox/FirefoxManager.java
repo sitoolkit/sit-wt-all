@@ -22,7 +22,7 @@ import org.zeroturnaround.zip.ZipUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.sitoolkit.util.buidtoolhelper.proxysetting.ProxySettingService;
+import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.infra.MultiThreadUtils;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.SitRepository;

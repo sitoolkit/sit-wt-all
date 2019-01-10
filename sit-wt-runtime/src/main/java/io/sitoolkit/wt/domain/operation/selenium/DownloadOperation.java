@@ -24,7 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import io.sitoolkit.util.buidtoolhelper.proxysetting.ProxySettingService;
+import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.domain.evidence.EvidenceManager;
 import io.sitoolkit.wt.domain.evidence.MessagePattern;
 import io.sitoolkit.wt.domain.tester.TestContext;
