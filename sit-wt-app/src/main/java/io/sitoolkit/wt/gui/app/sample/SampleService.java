@@ -28,8 +28,6 @@ public class SampleService {
      *
      * @param destDir
      *            サンプルを展開するディレクトリ
-     * @param callback
-     *            サンプル展開後に実行されるCallback
      */
     public void create(File destDir) {
         File sampledir = getSampleDir(destDir);
