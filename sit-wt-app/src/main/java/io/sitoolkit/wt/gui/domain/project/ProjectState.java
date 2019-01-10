@@ -1,6 +1,7 @@
 package io.sitoolkit.wt.gui.domain.project;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -89,4 +90,7 @@ public class ProjectState {
         return baseDir;
     }
 
+    public Path getBaseDirPath() {
+        return getBaseDir().toPath();
+    }
 }

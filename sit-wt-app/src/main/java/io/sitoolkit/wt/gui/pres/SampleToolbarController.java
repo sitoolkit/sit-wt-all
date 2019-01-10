@@ -62,7 +62,7 @@ public class SampleToolbarController implements Initializable {
         messageView.startMsg("サンプルWebサイトを起動します。");
 
         service.create(projectState.getBaseDir());
-        service.start(projectState.getBaseDir(), onStarted());
+        service.start(projectState.getBaseDirPath(), onStarted());
     }
 
     private SampleStartedCallback onStarted() {
@@ -70,8 +70,7 @@ public class SampleToolbarController implements Initializable {
             if (success) {
                 String sampleBaseUrl = "http://localhost:8280";
                 messageView.addMsg("サンプルWebサイトを起動しました。" + sampleBaseUrl + "/input.html");
-                messageView
-                        .addMsg("サンプルテストスクリプトtestscript/SampleTestScript.csvを左のツリーで選択して実行できます。");
+                messageView.addMsg("サンプルテストスクリプトtestscript/SampleTestScript.csvを左のツリーで選択して実行できます。");
                 // TODO サンプルURLの動的取得
                 testToolbarController.setBaseUrl(sampleBaseUrl);
                 running.set(true);
@@ -87,7 +86,7 @@ public class SampleToolbarController implements Initializable {
     public void stopSample() {
         messageView.startMsg("サンプルWebサイトを停止します。");
 
-        service.stop(projectState.getBaseDir(), retCode -> {
+        service.stop(projectState.getBaseDirPath(), retCode -> {
             running.set(false);
             Platform.runLater(() -> {
                 messageView.addMsg("サンプルWebサイトを停止しました。");
@@ -96,7 +95,7 @@ public class SampleToolbarController implements Initializable {
     }
 
     public void destroy() {
-        service.stop(projectState.getBaseDir());
+        service.stop(projectState.getBaseDirPath());
     }
 
 }

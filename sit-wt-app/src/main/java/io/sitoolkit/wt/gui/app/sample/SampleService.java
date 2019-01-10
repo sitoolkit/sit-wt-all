@@ -38,19 +38,19 @@ public class SampleService {
         sampleManager.unarchiveBasicSample(destDir.getAbsolutePath());
     }
 
-    public void start(File baseDir, SampleStartedCallback callback) {
-        client.start(getSampleDir(baseDir.toPath()), callback);
+    public void start(Path baseDir, SampleStartedCallback callback) {
+        client.start(baseDir, getSampleDir(baseDir), callback);
     }
 
-    public void stop(File baseDir) {
-        client.stop(getSampleDir(baseDir.toPath()), null);
+    public void stop(Path baseDir) {
+        stop(baseDir, null);
     }
 
-    public void stop(File baseDir, ProcessExitCallback callback) {
-        client.stop(getSampleDir(baseDir.toPath()), callback);
+    public void stop(Path baseDir, ProcessExitCallback callback) {
+        client.stop(baseDir, getSampleDir(baseDir), callback);
     }
 
     private Path getSampleDir(Path baseDir) {
-        return baseDir.resolve(baseDir);
+        return baseDir.resolve("sample");
     }
 }
