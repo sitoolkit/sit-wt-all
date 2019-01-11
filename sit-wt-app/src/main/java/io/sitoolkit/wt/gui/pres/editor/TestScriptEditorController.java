@@ -1,28 +1,33 @@
 package io.sitoolkit.wt.gui.pres.editor;
 
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.controlsfx.control.spreadsheet.GridChange;
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
+import io.sitoolkit.wt.domain.debug.DebugListener;
+import io.sitoolkit.wt.domain.testscript.TestScript;
+import io.sitoolkit.wt.gui.app.script.ScriptService;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
-import javafx.stage.WindowEvent;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-public class TestScriptEditorController {
+@RequiredArgsConstructor
+public class TestScriptEditorController implements EditorController, DebugListener {
 
-    static final DataFormat DATAFORMAT_SPREADSHEET;
+    private static final DataFormat DATAFORMAT_SPREADSHEET;
+
     static {
         DataFormat fmt;
         if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
@@ -30,36 +35,70 @@ public class TestScriptEditorController {
         }
         DATAFORMAT_SPREADSHEET = fmt;
     }
-    static TestScriptEditor editor = new TestScriptEditor();
-    final SpreadsheetView spreadSheet;
-    final List<EditorMenuItem> myItems = new ArrayList<EditorMenuItem>();
 
-    public TestScriptEditorController(SpreadsheetView spreadSheet) {
-        this.spreadSheet = spreadSheet;
+    private TestScriptEditor editor = new TestScriptEditor();
 
-        spreadSheet.getContextMenu().getItems().addAll(createMenuItems());
+    private MenuState menuState = new MenuState();
 
-        EventHandler<WindowEvent> defaultHandler = spreadSheet.getContextMenu().getOnShowing();
-        spreadSheet.getContextMenu().setOnShowing(e -> {
-            onContextMenuShowing(e);
-            defaultHandler.handle(e);
-        });
+    @NonNull
+    private ScriptService scriptService;
+
+    @Override
+    public void open(Path file) {
+        TestScript testScript = scriptService.read(file.toFile());
+        editor.load(testScript);
+        editor.getContextMenu().getItems().addAll(createMenuItems());
+        editor.getContextMenu().setOnShowing(e -> updateManuState());
+
+    }
+
+    @Override
+    public void save() {
+        TestScript testScript = editor.buildTestscript();
+        scriptService.write(testScript);
+    }
+
+    @Override
+    public Node getEditorContent() {
+        return editor.getSpreadSheet();
+    }
+
+    @Override
+    public void saveAs(Path file) {
+        TestScript testScript = editor.buildTestscript();
+        testScript.setScriptFile(file.toFile());
+        scriptService.write(testScript);
+    }
+
+    @Override
+    public void onDebugging(Path scriptPath, int nextStepIndex, int caseIndex) {
+        editor.setDebugStyle(nextStepIndex, caseIndex);
+    }
+
+    @Override
+    public void onCaseEnd(Path scriptPath, int caseIndex) {
+        editor.removeDebugStyle();
+    }
+
+    @Override
+    public void onClose() {
+        editor.removeDebugStyle();
     }
 
     public void newTestCase(ActionEvent e) {
-        editor.insertTestCase(spreadSheet);
+        editor.insertTestCase();
     }
 
     public void newTestStep(ActionEvent e) {
-        editor.insertTestStep(spreadSheet);
+        editor.insertTestStep();
     }
 
     public void newTestCaseTail(ActionEvent e) {
-        editor.appendTestCase(spreadSheet);
+        editor.appendTestCase();
     }
 
     public void newTestStepTail(ActionEvent e) {
-        editor.appendTestStep(spreadSheet);
+        editor.appendTestStep();
     }
 
     public void pasteCase(ActionEvent e) {
@@ -69,10 +108,10 @@ public class TestScriptEditorController {
 
             @SuppressWarnings("unchecked")
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-            int count = editor.getCaseCount(spreadSheet, changeList);
+            int count = editor.getCaseCount(changeList);
             if (count > 0) {
-                if (editor.insertTestCases(spreadSheet, count)) {
-                    spreadSheet.pasteClipboard();
+                if (editor.insertTestCases(count)) {
+                    editor.pasteClipboard();
                 }
             }
         }
@@ -84,10 +123,10 @@ public class TestScriptEditorController {
 
             @SuppressWarnings("unchecked")
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-            int count = editor.getStepCount(spreadSheet, changeList);
+            int count = editor.getStepCount(changeList);
             if (count > 0) {
-                if (editor.insertTestSteps(spreadSheet, count)) {
-                    spreadSheet.pasteClipboard();
+                if (editor.insertTestSteps(count)) {
+                    editor.pasteClipboard();
                 }
             }
         }
@@ -99,10 +138,10 @@ public class TestScriptEditorController {
 
             @SuppressWarnings("unchecked")
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-            int count = editor.getCaseCount(spreadSheet, changeList);
+            int count = editor.getCaseCount(changeList);
             if (count > 0) {
-                editor.appendTestCases(spreadSheet, count);
-                spreadSheet.pasteClipboard();
+                editor.appendTestCases(count);
+                editor.pasteClipboard();
             }
         }
     }
@@ -113,115 +152,108 @@ public class TestScriptEditorController {
 
             @SuppressWarnings("unchecked")
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-            int count = editor.getStepCount(spreadSheet, changeList);
+            int count = editor.getStepCount(changeList);
             if (count > 0) {
-                editor.appendTestSteps(spreadSheet, count);
-                spreadSheet.pasteClipboard();
+                editor.appendTestSteps(count);
+                editor.pasteClipboard();
             }
         }
     }
 
-
     public void deleteCase(ActionEvent e) {
-        editor.deleteTestCase(spreadSheet);
+        editor.deleteTestCase();
     }
 
     public void deleteStep(ActionEvent e) {
-        editor.deleteTestStep(spreadSheet);
+        editor.deleteTestStep();
     }
 
-
-    public void onContextMenuShowing(WindowEvent e) {
-        myItems.stream().forEach(item -> item.refreshDisable(spreadSheet));
+    private void updateManuState() {
+        menuState.getClipboardHasCase().set(hasClipboardCases());
+        menuState.getClipboardHasStep().set(hasClipboardSteps());
+        menuState.getCaseSelected().set(editor.isCaseSelected());
+        menuState.getStepSelected().set(editor.isStepSelected());
+        menuState.getCaseInsertable().set(editor.isCaseInsertable());
+        menuState.getStepInsertable().set(editor.isStepInsertable());
     }
 
     private ObservableList<MenuItem> createMenuItems() {
         ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
-        EditorMenuItem item;
+        MenuItem item;
         Menu menu;
 
         menuItems.add(new SeparatorMenuItem());
 
         menu = new Menu("挿入");
-        item = new EditorMenuItem("新規ケースの挿入");
+        item = new MenuItem("新規ケースの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(this::newTestCase);
-        item.setExcutableTest(editor::isCaseInsertable);
+        item.disableProperty().bind(menuState.getStepInsertable().not());
         menu.getItems().add(item);
-        myItems.add(item);
 
-        item = new EditorMenuItem("コピーしたケースの挿入");
+        item = new MenuItem("コピーしたケースの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(this::pasteCase);
-        item.setExcutableTest(spreadSheet -> editor.isCaseInsertable(spreadSheet) && hasClipboardCases());
+        item.disableProperty()
+                .bind(menuState.getCaseInsertable().and(menuState.getClipboardHasCase()).not());
         menu.getItems().add(item);
-        myItems.add(item);
 
-        item = new EditorMenuItem("新規ステップの挿入");
+        item = new MenuItem("新規ステップの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(this::newTestStep);
-        item.setExcutableTest(editor::isStepInsertable);
+        item.disableProperty().bind(menuState.getStepInsertable().not());
         menu.getItems().add(item);
-        myItems.add(item);
 
-        item = new EditorMenuItem("コピーしたステップの挿入");
+        item = new MenuItem("コピーしたステップの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(this::pasteStep);
-        item.setExcutableTest(spreadSheet -> editor.isStepInsertable(spreadSheet) && hasClipboardSteps());
+        item.disableProperty()
+                .bind(menuState.getStepInsertable().and(menuState.getClipboardHasStep()).not());
         menu.getItems().add(item);
-        myItems.add(item);
 
         menuItems.add(menu);
 
         menu = new Menu("追加");
 
-        item = new EditorMenuItem("新規ステップを末尾に追加");
+        item = new MenuItem("新規ステップを末尾に追加");
         item.setMnemonicParsing(false);
         item.setOnAction(this::newTestStepTail);
         menu.getItems().add(item);
-        myItems.add(item);
 
-        item = new EditorMenuItem("新規ケースを末尾に追加");
+        item = new MenuItem("新規ケースを末尾に追加");
         item.setMnemonicParsing(false);
         item.setOnAction(this::newTestCaseTail);
         menu.getItems().add(item);
-        myItems.add(item);
 
-        item = new EditorMenuItem("コピーしたケースを末尾に追加");
+        item = new MenuItem("コピーしたケースを末尾に追加");
         item.setMnemonicParsing(false);
         item.setOnAction(this::pasteCaseTail);
-        item.setExcutableTest(spreadSheet -> hasClipboardCases());
+        item.disableProperty().bind(menuState.getClipboardHasCase().not());
         menu.getItems().add(item);
-        myItems.add(item);
 
-        item = new EditorMenuItem("コピーしたステップを末尾に追加");
+        item = new MenuItem("コピーしたステップを末尾に追加");
         item.setMnemonicParsing(false);
         item.setOnAction(this::pasteStepTail);
-        item.setExcutableTest(spreadSheet -> hasClipboardSteps());
+        item.disableProperty().bind(menuState.getClipboardHasStep().not());
         menu.getItems().add(item);
-        myItems.add(item);
 
         menuItems.add(menu);
-
 
         menu = new Menu("削除");
 
-        item = new EditorMenuItem("ステップを削除");
+        item = new MenuItem("ステップを削除");
         item.setMnemonicParsing(false);
         item.setOnAction(this::deleteStep);
-        item.setExcutableTest(editor::isStepSelected);
+        item.disableProperty().bind(menuState.getStepSelected().not());
         menu.getItems().add(item);
-        myItems.add(item);
 
-        item = new EditorMenuItem("ケースを削除");
+        item = new MenuItem("ケースを削除");
         item.setMnemonicParsing(false);
         item.setOnAction(this::deleteCase);
-        item.setExcutableTest(editor::isCaseSelected);
+        item.disableProperty().bind(menuState.getCaseSelected().not());
         menu.getItems().add(item);
-        myItems.add(item);
 
         menuItems.add(menu);
-
 
         return menuItems;
     }
@@ -231,7 +263,7 @@ public class TestScriptEditorController {
         if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
             @SuppressWarnings("unchecked")
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-            return editor.getStepCount(spreadSheet, changeList) > 0;
+            return editor.getStepCount(changeList) > 0;
 
         } else {
             return false;
@@ -243,37 +275,21 @@ public class TestScriptEditorController {
         if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
             @SuppressWarnings("unchecked")
             List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-            return editor.getCaseCount(spreadSheet, changeList) > 0;
+            return editor.getCaseCount(changeList) > 0;
 
         } else {
             return false;
         }
     }
 
-}
-
-class EditorMenuItem extends MenuItem {
-
-    public EditorMenuItem() {
-        super();
-    }
-
-    public EditorMenuItem(String text, Node graphic) {
-        super(text, graphic);
-    }
-
-    public EditorMenuItem(String text) {
-        super(text);
-    }
-
-    Optional<Predicate<SpreadsheetView>> excutableTest = Optional.empty();
-
-    public void setExcutableTest(Predicate<SpreadsheetView> excutableTest) {
-        this.excutableTest = Optional.ofNullable(excutableTest);
-    }
-
-    public void refreshDisable(SpreadsheetView spreadSheet) {
-        excutableTest.ifPresent(tester -> setDisable(!tester.test(spreadSheet)));
+    @Getter
+    private class MenuState {
+        private BooleanProperty clipboardHasCase = new SimpleBooleanProperty(false);
+        private BooleanProperty clipboardHasStep = new SimpleBooleanProperty(false);
+        private BooleanProperty caseSelected = new SimpleBooleanProperty(false);
+        private BooleanProperty stepSelected = new SimpleBooleanProperty(false);
+        private BooleanProperty caseInsertable = new SimpleBooleanProperty(false);
+        private BooleanProperty stepInsertable = new SimpleBooleanProperty(false);
     }
 
 }

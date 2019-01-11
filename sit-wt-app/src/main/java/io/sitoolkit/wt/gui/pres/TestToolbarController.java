@@ -2,13 +2,14 @@ package io.sitoolkit.wt.gui.pres;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import io.sitoolkit.wt.gui.app.test.TestService;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.domain.project.ProjectState.State;
-import io.sitoolkit.wt.gui.domain.test.SitWtDebugStdoutListener;
+import io.sitoolkit.wt.gui.domain.test.DebugListenerFinder;
 import io.sitoolkit.wt.gui.domain.test.SitWtRuntimeUtils;
 import io.sitoolkit.wt.gui.domain.test.TestRunParams;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
@@ -76,7 +77,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     private ProjectState projectState;
 
-    private SitWtDebugStdoutListener debugStdoutListener = new SitWtDebugStdoutListener();
+    private DebugListenerFinder debugListenerFinder;
 
     TestService testService;
 
@@ -93,10 +94,11 @@ public class TestToolbarController implements Initializable, TestRunnable {
     }
 
     public void initialize(MessageView messageView, FileTreeController fileTreeController,
-            ProjectState projectState) {
+            ProjectState projectState, DebugListenerFinder debugListenerFinder) {
         this.projectState = projectState;
         this.fileTreeController = fileTreeController;
         this.messageView = messageView;
+        this.debugListenerFinder = debugListenerFinder;
 
         FxUtils.bindVisible(startGroup, projectState.isLoaded());
         FxUtils.bindVisible(runningGroup, projectState.isRunning());
@@ -155,13 +157,20 @@ public class TestToolbarController implements Initializable, TestRunnable {
         projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
 
         TestRunParams params = new TestRunParams();
-        params.setTargetScriptsStr(targetScriptStr);
+        params.setTargetScripts(targetScriptStr);
         params.setBaseDir(projectState.getBaseDir());
         params.setDebug(isDebug);
         params.setParallel(isParallel);
         params.setCompareScreenshot(compareToggle.isSelected());
         params.setDriverType(getDriverType());
         params.setBaseUrl(getBaseUrl());
+
+        if (isDebug && !isParallel) {
+            List<Path> scriptPaths = SitWtRuntimeUtils.decodeScrintStr(targetScriptStr);
+            if (scriptPaths.size() == 1) {
+                debugListenerFinder.find(scriptPaths.get(0)).ifPresent(params::setDebugListener);
+            }
+        }
 
         addBaseUrl(params.getBaseUrl());
 

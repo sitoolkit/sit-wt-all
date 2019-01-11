@@ -1,11 +1,16 @@
 package io.sitoolkit.wt.gui.domain.test;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.wt.gui.infra.UnInitializedException;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -20,8 +25,12 @@ public class SitWtRuntimeUtils {
 
     private static String javaHome;
 
-    private static final Pattern SCRIPT_FILE_PATTERN = Pattern
-            .compile(".*\\.csv$|.*\\.html$");
+    private static final Pattern SCRIPT_FILE_PATTERN = Pattern.compile(".*\\.csv$|.*\\.html$");
+
+    public static List<Path> decodeScrintStr(String scriptStr) {
+        return Stream.of(scriptStr.split(",")).map(str -> StringUtils.substringBefore(str, "#"))
+                .map(Paths::get).collect(Collectors.toList());
+    }
 
     public static String buildScriptStr(List<File> selectedFiles) {
         return StrUtils.join(filterTestScripts(selectedFiles));

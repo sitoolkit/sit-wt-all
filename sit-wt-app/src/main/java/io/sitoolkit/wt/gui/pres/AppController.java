@@ -131,10 +131,13 @@ public class AppController implements Initializable {
         // FxUtils.bindVisible(minimizeButton, windowMaximized);
 
         messageView.setTextArea(console);
-        StdoutListenerContainer.getInstance().getStdoutListeners().add(new TextAreaStdoutListener(console));
-        StdoutListenerContainer.getInstance().getStderrListeners().add(new TextAreaStdoutListener(console));
+        StdoutListenerContainer.getInstance().getStdoutListeners()
+                .add(new TextAreaStdoutListener(console));
+        StdoutListenerContainer.getInstance().getStderrListeners()
+                .add(new TextAreaStdoutListener(console));
 
-        testToolbarController.initialize(messageView, fileTreeController, projectState);
+        testToolbarController.initialize(messageView, fileTreeController, projectState,
+                editorTabController);
         testToolbarController.testService = testService;
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
         diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
@@ -143,13 +146,11 @@ public class AppController implements Initializable {
         fileTreeController.fileOpenable = editorTabController;
         fileTreeController.scriptService = scriptService;
 
-        editorTabController.tabs = editorTab;
-        editorTabController.scriptService = scriptService;
+        editorTabController.setTabs(editorTab);
+        editorTabController.setScriptService(scriptService);
         editorTabController.initialize();
-        FxUtils.bindDisable(saveButton, editorTabController.isEmpty());
-        FxUtils.bindDisable(saveAsButton, editorTabController.isEmpty());
-
-        testService.setDebugListener(editorTabController);
+        FxUtils.bindDisable(saveButton, editorTabController.getEmpty());
+        FxUtils.bindDisable(saveAsButton, editorTabController.getEmpty());
 
         menuBarController.setProjectState(projectState);
         menuBarController.setAppController(this);
@@ -227,17 +228,17 @@ public class AppController implements Initializable {
 
     @FXML
     public void editScript() {
-        editorTabController.open();
+        menuBarController.open();
     }
 
     @FXML
     public void editor2script() {
-        editorTabController.save();
+        menuBarController.save();
     }
 
     @FXML
     public void editor2scriptAs() {
-        editorTabController.saveAs();
+        menuBarController.saveAs();
     }
 
     @FXML
@@ -246,7 +247,8 @@ public class AppController implements Initializable {
 
         projectState.setState(State.BROWSING);
 
-        scriptService.page2script(testToolbarController.getDriverType(), testToolbarController.getBaseUrl());
+        scriptService.page2script(testToolbarController.getDriverType(),
+                testToolbarController.getBaseUrl());
     }
 
     @FXML
@@ -267,7 +269,7 @@ public class AppController implements Initializable {
     @FXML
     public void export() {
         Path exportScript = scriptService.export();
-        editorTabController.open(exportScript.toFile());
+        editorTabController.open(exportScript);
     }
 
     @FXML

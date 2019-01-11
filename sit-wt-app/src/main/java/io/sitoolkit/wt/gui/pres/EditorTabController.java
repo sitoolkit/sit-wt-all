@@ -4,36 +4,30 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
-
 import io.sitoolkit.wt.domain.debug.DebugListener;
-import io.sitoolkit.wt.domain.testscript.TestScript;
-import io.sitoolkit.wt.gui.app.script.ScriptFileType;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
-import io.sitoolkit.wt.gui.infra.fx.FxContext;
-import io.sitoolkit.wt.gui.infra.fx.ScriptDialog;
-import io.sitoolkit.wt.gui.pres.editor.TestScriptEditor;
-import javafx.application.Platform;
+import io.sitoolkit.wt.gui.domain.test.DebugListenerFinder;
+import io.sitoolkit.wt.gui.pres.editor.EditorController;
+import io.sitoolkit.wt.gui.pres.editor.TestScriptEditorController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
+import lombok.Getter;
 import lombok.Setter;
 
-public class EditorTabController implements FileOpenable, DebugListener {
+public class EditorTabController implements FileOpenable, DebugListenerFinder {
 
     @Setter
-    TabPane tabs;
+    private TabPane tabs;
 
-    ScriptService scriptService;
-
-    TestScriptEditor testScriptEditor = new TestScriptEditor();
-
-    ScriptDialog scriptDialog = new ScriptDialog();
-
+    @Getter
     private BooleanProperty empty = new SimpleBooleanProperty(true);
+
+    @Setter
+    private ScriptService scriptService;
 
     public void initialize() {
         tabs.getSelectionModel().selectedItemProperty()
@@ -48,108 +42,69 @@ public class EditorTabController implements FileOpenable, DebugListener {
 
     @Override
     public void open(File file) {
-        open(file, Optional.empty());
+        open(file.toPath());
     }
 
-    private void open(File file, Optional<ScriptFileType> fileType) {
-        Optional<Tab> scriptTab = tabs.getTabs().stream()
-                .filter(tab -> tab.getTooltip().getText().equals(file.getAbsolutePath())).findFirst();
+    public void open(Path file) {
+        Optional<Tab> editorTab = findTabByFile(file);
 
-        if (scriptTab.isPresent()) {
+        if (editorTab.isPresent()) {
             SingleSelectionModel<Tab> selectionModel = tabs.getSelectionModel();
-            selectionModel.select(scriptTab.get());
+            selectionModel.select(editorTab.get());
 
         } else {
-            TestScript testScript = scriptService.read(file, fileType);
-            Tab tab = new Tab(file.getName());
-            SpreadsheetView spreadSheet = testScriptEditor.buildSpreadsheet(testScript);
-            tab.setContent(spreadSheet);
-            tabs.getSelectionModel().select(tab);
+            EditorController editorContoroller = getEditorController(file);
+            editorContoroller.open(file);
 
-            Tooltip tooltip = new Tooltip();
-            tooltip.setText(file.getAbsolutePath());
-            tab.setTooltip(tooltip);
+            Tab tab = new Tab();
+            tab.setUserData(editorContoroller);
+            setFileInfo(tab, file);
+            tab.setContent(editorContoroller.getEditorContent());
             tabs.getTabs().add(tab);
+
         }
     }
 
     public void save() {
-        Optional<Tab> selectedTab = tabs.getTabs().stream().filter(Tab::isSelected).findFirst();
-
-        SpreadsheetView spreadSheet = (SpreadsheetView) selectedTab.get().getContent();
-        TestScript testScript = testScriptEditor.buildTestscript(spreadSheet);
-        scriptService.write(testScript);
+        getSelectedEditorController().save();
     }
 
-    public void open() {
-        File file = scriptDialog.showOpenDialog(FxContext.getPrimaryStage());
-        if (file != null) {
-            Optional<ScriptFileType> fileType = scriptDialog.getSelectedFileType();
-            open(file, fileType);
-        }
+    public void saveAs(Path file) {
+        getSelectedEditorController().saveAs(file);
+        setFileInfo(tabs.getSelectionModel().getSelectedItem(), file);
     }
 
-    public void saveAs() {
-        File file = scriptDialog.showSaveDialog(FxContext.getPrimaryStage());
-        if (file != null) {
-
-            Optional<ScriptFileType> fileType = scriptDialog.getSelectedFileType();
-            Tab selectedTab = tabs.getTabs().stream().filter(Tab::isSelected).findFirst().get();
-
-            SpreadsheetView spreadSheet = (SpreadsheetView) selectedTab.getContent();
-            TestScript testScript = testScriptEditor.buildTestscript(spreadSheet);
-            testScript.setScriptFile(file);
-            scriptService.write(testScript, fileType);
-            selectedTab.setText(file.getName());
-            selectedTab.getTooltip().setText(file.getAbsolutePath());
-            spreadSheet.setId(file.getAbsolutePath());
-        }
-
-    }
-
-    public BooleanProperty isEmpty() {
-        return this.empty;
-    }
-
-
-    @Override
-    public void onDebugging(Path scriptPath, int stepIndex, int caseIndex) {
-        Platform.runLater(() -> {
-            Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
-            targetView.ifPresent(view -> {
-                testScriptEditor.setDebugStyle(view, stepIndex, caseIndex);
-            });
-        });
-    }
-
-    @Override
-    public void onCaseEnd(Path scriptPath, int caseIndex) {
-        Platform.runLater(() -> {
-            Optional<SpreadsheetView> targetView = getSpreadSheet(scriptPath);
-            targetView.ifPresent(view -> {
-                testScriptEditor.removeDebugStyle(view);
-            });
-        });
-    }
-
-    @Override
-    public void onClose() {
-        Platform.runLater(() -> {
-            tabs.getTabs().stream().map(Tab::getContent).map(content -> (SpreadsheetView) content)
-                    .forEach(testScriptEditor::removeDebugStyle);
-        });
-    }
-
-    private Optional<Tab> getTab(Path scriptPath) {
-        String absolutePath = scriptPath.toAbsolutePath().toString();
+    private Optional<Tab> findTabByFile(Path file) {
         return tabs.getTabs().stream()
-                .filter(tab -> tab.getTooltip().getText().equals(absolutePath)).findFirst();
+                .filter(tab -> tab.getTooltip().getText().equals(file.toAbsolutePath().toString()))
+                .findFirst();
     }
 
-    private Optional<SpreadsheetView> getSpreadSheet(Path scriptPath) {
-        return getTab(scriptPath)
-                .map(Tab::getContent)
-                .map(content -> (SpreadsheetView) content);
+    private EditorController getEditorController(Path file) {
+        String pathStr = file.toString();
+        if (pathStr.endsWith(".csv")) {
+            return new TestScriptEditorController(scriptService);
+        } else if (pathStr.endsWith(".html")) {
+
+        }
+        throw new UnsupportedOperationException("File type is not supported : " + file);
+    }
+
+    private EditorController getSelectedEditorController() {
+        return (EditorController) tabs.getSelectionModel().getSelectedItem().getUserData();
+    }
+
+    private void setFileInfo(Tab tab, Path file) {
+        tab.setText(file.getFileName().toString());
+        tab.setTooltip(new Tooltip(file.toAbsolutePath().toString()));
+    }
+
+    @Override
+    public Optional<DebugListener> find(Path path) {
+        return tabs.getTabs().stream()
+                .filter(tab -> tab.getTooltip().getText().equals(path.toAbsolutePath().toString()))
+                .filter(tab -> DebugListener.class.isInstance(tab.getUserData()))
+                .map(tab -> DebugListener.class.cast(tab.getUserData())).findFirst();
     }
 
 }

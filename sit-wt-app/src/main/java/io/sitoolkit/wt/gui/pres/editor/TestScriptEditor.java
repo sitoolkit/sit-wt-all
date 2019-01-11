@@ -30,14 +30,19 @@ import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TablePosition;
+import lombok.Getter;
 
 public class TestScriptEditor {
 
     private static final int COLUMN_INDEX_FIRST_CASE = 8;
     private static final int ROW_INDEX_FIRST_STEP = 1;
 
-    public SpreadsheetView buildSpreadsheet(TestScript testScript) {
+    @Getter
+    private SpreadsheetView spreadSheet = new SpreadsheetView();
+
+    public void load(TestScript testScript) {
 
         Collection<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
@@ -81,19 +86,16 @@ public class TestScriptEditor {
         Grid grid = new GridBase(10, 10);
         grid.setRows(rows);
 
-        SpreadsheetView spreadSheet = new SpreadsheetView(grid);
+        spreadSheet.setGrid(grid);
         spreadSheet.setShowColumnHeader(true);
         spreadSheet.setShowRowHeader(true);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
-        spreadSheet.getStylesheets().add(
-                getClass().getResource("/testScriptEditor.css").toExternalForm());
+        spreadSheet.getStylesheets()
+                .add(getClass().getResource("/testScriptEditor.css").toExternalForm());
 
-        new TestScriptEditorController(spreadSheet);
-
-        return spreadSheet;
     }
 
-    public TestScript buildTestscript(SpreadsheetView spreadSheet) {
+    public TestScript buildTestscript() {
         TestScript testScript = new TestScript();
         testScript.setScriptFile(new File(spreadSheet.getId()));
 
@@ -119,8 +121,9 @@ public class TestScriptEditor {
 
             Map<String, String> testData = new LinkedHashMap<String, String>();
             for (int idx = 8; idx < row.size(); idx++) {
-                String caseNo = (headers.get(idx).startsWith(testScript.getCaseNoPrefix())) ?
-                        StringUtils.substringAfter(headers.get(idx), testScript.getCaseNoPrefix()) : headers.get(idx);
+                String caseNo = (headers.get(idx).startsWith(testScript.getCaseNoPrefix()))
+                        ? StringUtils.substringAfter(headers.get(idx), testScript.getCaseNoPrefix())
+                        : headers.get(idx);
                 testData.put(caseNo, row.get(idx).getText());
             }
             testStep.setTestData(testData);
@@ -132,61 +135,56 @@ public class TestScriptEditor {
         return testScript;
     }
 
-    public void appendTestCase(SpreadsheetView spreadSheet) {
-        appendTestCases(spreadSheet, 1);
+    public void appendTestCase() {
+        appendTestCases(1);
     }
 
-    public void appendTestCases(SpreadsheetView spreadSheet, int count) {
-        insertTestCases(spreadSheet, spreadSheet.getGrid().getColumnCount(), count);
+    public void appendTestCases(int count) {
+        insertTestCases(spreadSheet.getGrid().getColumnCount(), count);
     }
 
-    public void appendTestStep(SpreadsheetView spreadSheet) {
-        appendTestSteps(spreadSheet, 1);
+    public void appendTestStep() {
+        appendTestSteps(1);
     }
 
-    public void appendTestSteps(SpreadsheetView spreadSheet, int count) {
-        insertTestSteps(spreadSheet, spreadSheet.getGrid().getRowCount(), count);
+    public void appendTestSteps(int count) {
+        insertTestSteps(spreadSheet.getGrid().getRowCount(), count);
     }
 
-    public boolean insertTestCase(SpreadsheetView spreadSheet) {
-        return insertTestCases(spreadSheet, getSelectedColumnCount(spreadSheet));
+    public boolean insertTestCase() {
+        return insertTestCases(getSelectedColumnCount());
     }
 
-    public boolean insertTestCases(SpreadsheetView spreadSheet, int count) {
-        Optional<Integer> insertPosition = getInsertColumnPosition(spreadSheet);
-        insertPosition.ifPresent(colPosition -> insertTestCases(spreadSheet, colPosition, count));
+    public boolean insertTestCases(int count) {
+        Optional<Integer> insertPosition = getInsertColumnPosition();
+        insertPosition.ifPresent(colPosition -> insertTestCases(colPosition, count));
         return insertPosition.isPresent();
     }
 
-    public boolean insertTestStep(SpreadsheetView spreadSheet) {
-        return insertTestSteps(spreadSheet, getSelectedRowCount(spreadSheet));
+    public boolean insertTestStep() {
+        return insertTestSteps(getSelectedRowCount());
     }
 
-    public boolean insertTestSteps(SpreadsheetView spreadSheet, int count) {
-        Optional<Integer> insertPosition = getInsertRowPosition(spreadSheet);
-        insertPosition.ifPresent(rowPosition -> insertTestSteps(spreadSheet, rowPosition, count));
+    public boolean insertTestSteps(int count) {
+        Optional<Integer> insertPosition = getInsertRowPosition();
+        insertPosition.ifPresent(rowPosition -> insertTestSteps(rowPosition, count));
         return insertPosition.isPresent();
 
     }
 
-    public void deleteTestCase(SpreadsheetView spreadSheet) {
-        Set<Integer> deleteColumns = getSelectedCase(spreadSheet);
+    public void deleteTestCase() {
+        Set<Integer> deleteColumns = getSelectedCase();
 
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
         ObservableList<SpreadsheetColumn> columns = spreadSheet.getColumns();
-        List<Double> widths = columns.stream()
-                .map(SpreadsheetColumn::getWidth)
+        List<Double> widths = columns.stream().map(SpreadsheetColumn::getWidth)
                 .collect(Collectors.toCollection(LinkedList::new));
 
         rows.stream().forEach(row -> {
-            deleteColumns.stream()
-                    .sorted(Comparator.reverseOrder())
-                    .mapToInt(Integer::intValue)
+            deleteColumns.stream().sorted(Comparator.reverseOrder()).mapToInt(Integer::intValue)
                     .forEachOrdered(row::remove);
         });
-        deleteColumns.stream()
-                .sorted(Comparator.reverseOrder())
-                .mapToInt(Integer::intValue)
+        deleteColumns.stream().sorted(Comparator.reverseOrder()).mapToInt(Integer::intValue)
                 .forEachOrdered(widths::remove);
 
         Grid newGrid = new GridBase(10, 10);
@@ -196,13 +194,11 @@ public class TestScriptEditor {
         IntStream.range(0, widths.size()).forEach(i -> columns.get(i).setPrefWidth(widths.get(i)));
     }
 
-    public void deleteTestStep(SpreadsheetView spreadSheet) {
-        Set<Integer> deleteRows = getSelectedStep(spreadSheet);
+    public void deleteTestStep() {
+        Set<Integer> deleteRows = getSelectedStep();
 
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
-        deleteRows.stream()
-                .sorted(Comparator.reverseOrder())
-                .mapToInt(Integer::intValue)
+        deleteRows.stream().sorted(Comparator.reverseOrder()).mapToInt(Integer::intValue)
                 .forEachOrdered(rows::remove);
 
         Grid newGrid = new GridBase(10, 10);
@@ -211,41 +207,43 @@ public class TestScriptEditor {
 
     }
 
-    public boolean isCaseInsertable(SpreadsheetView spreadSheet) {
-        return getInsertColumnPosition(spreadSheet).isPresent();
+    public boolean isCaseInsertable() {
+        return getInsertColumnPosition().isPresent();
     }
 
-    public boolean isStepInsertable(SpreadsheetView spreadSheet) {
-        return getInsertRowPosition(spreadSheet).isPresent();
+    public boolean isStepInsertable() {
+        return getInsertRowPosition().isPresent();
     }
 
-    public boolean isCaseSelected(SpreadsheetView spreadSheet) {
-        return !getSelectedCase(spreadSheet).isEmpty();
+    public boolean isCaseSelected() {
+        return !getSelectedCase().isEmpty();
     }
 
-    public boolean isStepSelected(SpreadsheetView spreadSheet) {
-        return !getSelectedStep(spreadSheet).isEmpty();
+    public boolean isStepSelected() {
+        return !getSelectedStep().isEmpty();
     }
 
-    public int getCaseCount(SpreadsheetView spreadSheet, List<GridChange> changeList) {
+    public int getCaseCount(List<GridChange> changeList) {
         int columnCount = getColumnCount(changeList);
         int rowCount = getRowCount(changeList);
         return spreadSheet.getGrid().getRowCount() == rowCount ? columnCount : 0;
     }
 
-    public int getStepCount(SpreadsheetView spreadSheet, List<GridChange> changeList) {
+    public int getStepCount(List<GridChange> changeList) {
         int columnCount = getColumnCount(changeList);
         int rowCount = getRowCount(changeList);
         return spreadSheet.getGrid().getColumnCount() == columnCount ? rowCount : 0;
     }
 
     private int getColumnCount(List<GridChange> changeList) {
-        Set<Integer> colSet = changeList.stream().map(change -> change.getColumn()).collect(Collectors.toSet());
+        Set<Integer> colSet = changeList.stream().map(change -> change.getColumn())
+                .collect(Collectors.toSet());
         return countMinToMax(colSet);
     }
 
     private int getRowCount(List<GridChange> changeList) {
-        Set<Integer> rowSet = changeList.stream().map(change -> change.getRow()).collect(Collectors.toSet());
+        Set<Integer> rowSet = changeList.stream().map(change -> change.getRow())
+                .collect(Collectors.toSet());
         return countMinToMax(rowSet);
     }
 
@@ -255,21 +253,23 @@ public class TestScriptEditor {
 
     }
 
-    private Optional<Integer> getInsertColumnPosition(SpreadsheetView spreadSheet) {
+    private Optional<Integer> getInsertColumnPosition() {
 
         @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel()
+                .getSelectedCells();
 
-        Optional<Integer> selectedMin = selectedCells.stream().map(TablePosition::getColumn).distinct()
-                .min(Comparator.naturalOrder());
+        Optional<Integer> selectedMin = selectedCells.stream().map(TablePosition::getColumn)
+                .distinct().min(Comparator.naturalOrder());
 
         return selectedMin.filter(this::isCaseColumn);
     }
 
-    private Optional<Integer> getInsertRowPosition(SpreadsheetView spreadSheet) {
+    private Optional<Integer> getInsertRowPosition() {
 
         @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel()
+                .getSelectedCells();
 
         Optional<Integer> selectedMin = selectedCells.stream().map(TablePosition::getRow).distinct()
                 .min(Comparator.naturalOrder());
@@ -277,26 +277,29 @@ public class TestScriptEditor {
         return selectedMin.filter(this::isStepRow);
     }
 
-    private int getSelectedRowCount(SpreadsheetView spreadSheet) {
+    private int getSelectedRowCount() {
 
         @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel()
+                .getSelectedCells();
 
         return (int) selectedCells.stream().map(TablePosition::getRow).distinct().count();
     }
 
-    private int getSelectedColumnCount(SpreadsheetView spreadSheet) {
+    private int getSelectedColumnCount() {
 
         @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel()
+                .getSelectedCells();
 
         return (int) selectedCells.stream().map(TablePosition::getColumn).distinct().count();
     }
 
-    private Set<Integer> getSelectedCase(SpreadsheetView spreadSheet) {
+    private Set<Integer> getSelectedCase() {
 
         @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel()
+                .getSelectedCells();
 
         Map<Integer, Integer> map = new HashMap<>();
         selectedCells.stream().forEach(cell -> {
@@ -314,10 +317,11 @@ public class TestScriptEditor {
 
     }
 
-    private Set<Integer> getSelectedStep(SpreadsheetView spreadSheet) {
+    private Set<Integer> getSelectedStep() {
 
         @SuppressWarnings("rawtypes")
-        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel().getSelectedCells();
+        ObservableList<TablePosition> selectedCells = spreadSheet.getSelectionModel()
+                .getSelectedCells();
 
         Map<Integer, Integer> map = new HashMap<>();
         selectedCells.stream().forEach(cell -> {
@@ -343,21 +347,19 @@ public class TestScriptEditor {
         return rowPosition >= ROW_INDEX_FIRST_STEP;
     }
 
-    private Optional<Integer> getColumnPosition(SpreadsheetView spreadSheet, int caseIndex) {
+    private Optional<Integer> getColumnPosition(int caseIndex) {
         int columnCount = spreadSheet.getGrid().getColumnCount();
         int position = COLUMN_INDEX_FIRST_CASE + caseIndex;
-        return Optional.of(position)
-                .filter(p -> p >= COLUMN_INDEX_FIRST_CASE && p < columnCount);
+        return Optional.of(position).filter(p -> p >= COLUMN_INDEX_FIRST_CASE && p < columnCount);
     }
 
-    private Optional<Integer> getRowPosition(SpreadsheetView spreadSheet, int stepIndex) {
+    private Optional<Integer> getRowPosition(int stepIndex) {
         int rowCount = spreadSheet.getGrid().getRowCount();
         int position = ROW_INDEX_FIRST_STEP + stepIndex;
-        return Optional.of(position)
-                .filter(p -> p >= ROW_INDEX_FIRST_STEP && p < rowCount);
+        return Optional.of(position).filter(p -> p >= ROW_INDEX_FIRST_STEP && p < rowCount);
     }
 
-    private void insertTestSteps(SpreadsheetView spreadSheet, int rowPosition, int rowCount) {
+    private void insertTestSteps(int rowPosition, int rowCount) {
 
         Grid grid = spreadSheet.getGrid();
         int columnCount = grid.getColumnCount();
@@ -376,10 +378,11 @@ public class TestScriptEditor {
         SpreadsheetViewSelectionModel selection = spreadSheet.getSelectionModel();
         selection.clearSelection();
         selection.selectRange(rowPosition, spreadSheet.getColumns().get(0),
-                rowPosition + rowCount - 1, spreadSheet.getColumns().get(spreadSheet.getColumns().size() - 1));
+                rowPosition + rowCount - 1,
+                spreadSheet.getColumns().get(spreadSheet.getColumns().size() - 1));
     }
 
-    private void insertTestCases(SpreadsheetView spreadSheet, int columnPosition, int columnCount) {
+    private void insertTestCases(int columnPosition, int columnCount) {
 
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
         IntStream.range(0, rows.size()).forEach(i -> {
@@ -389,7 +392,8 @@ public class TestScriptEditor {
             });
         });
         ObservableList<SpreadsheetColumn> columns = spreadSheet.getColumns();
-        List<Double> widths = columns.stream().map(col -> col.getWidth()).collect(Collectors.toList());
+        List<Double> widths = columns.stream().map(col -> col.getWidth())
+                .collect(Collectors.toList());
         IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(j -> {
             widths.add(j, widths.get(j - 1));
         });
@@ -397,7 +401,8 @@ public class TestScriptEditor {
         Grid newGrid = new GridBase(10, 10);
         newGrid.setRows(recreateRows(rows));
         spreadSheet.setGrid(newGrid);
-        IntStream.range(columnPosition, columns.size()).forEach(i -> columns.get(i).setPrefWidth(widths.get(i)));
+        IntStream.range(columnPosition, columns.size())
+                .forEach(i -> columns.get(i).setPrefWidth(widths.get(i)));
 
         SpreadsheetViewSelectionModel selection = spreadSheet.getSelectionModel();
         selection.clearSelection();
@@ -409,62 +414,65 @@ public class TestScriptEditor {
     private ObservableList<ObservableList<SpreadsheetCell>> recreateRows(
             ObservableList<ObservableList<SpreadsheetCell>> original) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
-        rows.addAll(
-                IntStream.range(0, original.size())
-                        .mapToObj(row -> recreateRow(original.get(row), row))
-                        .collect(Collectors.toList()));
+        rows.addAll(IntStream.range(0, original.size())
+                .mapToObj(row -> recreateRow(original.get(row), row)).collect(Collectors.toList()));
         return rows;
 
     }
 
-    private ObservableList<SpreadsheetCell> recreateRow(ObservableList<SpreadsheetCell> original, int row) {
+    private ObservableList<SpreadsheetCell> recreateRow(ObservableList<SpreadsheetCell> original,
+            int row) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
-        cells.addAll(
-                IntStream.range(0, original.size())
-                        .mapToObj(column -> recreateCell(original.get(column), row, column))
-                        .collect(Collectors.toList()));
+        cells.addAll(IntStream.range(0, original.size())
+                .mapToObj(column -> recreateCell(original.get(column), row, column))
+                .collect(Collectors.toList()));
 
         return cells;
     }
 
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
-        SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, original.getRowSpan(),
-                original.getColumnSpan(), original.getText());
+        SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column,
+                original.getRowSpan(), original.getColumnSpan(), original.getText());
         boolean editable = (row == 0 && column < 8) ? false : true;
         cell.setEditable(editable);
         return cell;
     }
 
-    private void setStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex, String stepStyle,
-            String caseStyle) {
+    private void setStyle(int stepIndex, int caseIndex, String stepStyle, String caseStyle) {
 
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
 
-        getRowPosition(spreadSheet, stepIndex).ifPresent(position -> {
+        getRowPosition(stepIndex).ifPresent(position -> {
             rows.get(position).stream().forEach(cell -> {
                 cell.getStyleClass().add(stepStyle);
             });
         });
 
-        getColumnPosition(spreadSheet, caseIndex).ifPresent(position -> {
+        getColumnPosition(caseIndex).ifPresent(position -> {
             rows.stream().forEach(row -> {
                 row.get(position).getStyleClass().add(caseStyle);
             });
         });
     }
 
-    public void setDebugStyle(SpreadsheetView spreadSheet, int stepIndex, int caseIndex) {
-        removeDebugStyle(spreadSheet);
-        setStyle(spreadSheet, stepIndex, caseIndex, "debugStep","debugCase");
+    public void setDebugStyle(int stepIndex, int caseIndex) {
+        removeDebugStyle();
+        setStyle(stepIndex, caseIndex, "debugStep", "debugCase");
     }
 
-    public void removeDebugStyle(SpreadsheetView spreadSheet) {
-        spreadSheet.getGrid().getRows().stream()
-                .flatMap(ObservableList::stream)
-                .forEach(cell -> {
-                    cell.getStyleClass().remove("debugStep");
-                    cell.getStyleClass().remove("debugCase");
-                });
+    public void removeDebugStyle() {
+        spreadSheet.getGrid().getRows().stream().flatMap(ObservableList::stream).forEach(cell -> {
+            cell.getStyleClass().remove("debugStep");
+            cell.getStyleClass().remove("debugCase");
+        });
+    }
+
+    public void pasteClipboard() {
+        spreadSheet.pasteClipboard();
+    }
+
+    public ContextMenu getContextMenu() {
+        return spreadSheet.getContextMenu();
     }
 
 }

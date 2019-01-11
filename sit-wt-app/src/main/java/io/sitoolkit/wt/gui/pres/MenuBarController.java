@@ -1,9 +1,12 @@
 package io.sitoolkit.wt.gui.pres;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
+import io.sitoolkit.wt.gui.infra.fx.FxContext;
+import io.sitoolkit.wt.gui.infra.fx.ScriptDialog;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.MenuItem;
@@ -72,7 +75,7 @@ public class MenuBarController implements Initializable {
     AppController appController;
 
     @Setter
-    EditorTabController editorTabController;
+    private EditorTabController editorTabController;
 
     @Setter
     TestToolbarController testToolbarController;
@@ -86,13 +89,15 @@ public class MenuBarController implements Initializable {
     @Setter
     ProjectState projectState;
 
+    private ScriptDialog scriptDialog = new ScriptDialog();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }
 
     public void initialize() {
-        saveMenu.disableProperty().bind(editorTabController.isEmpty());
-        saveAsMenu.disableProperty().bind(editorTabController.isEmpty());
+        saveMenu.disableProperty().bind(editorTabController.getEmpty());
+        saveAsMenu.disableProperty().bind(editorTabController.getEmpty());
 
         runMenu.visibleProperty().bind(projectState.isLoaded());
         debugMenu.visibleProperty().bind(projectState.isLoaded());
@@ -100,8 +105,10 @@ public class MenuBarController implements Initializable {
 
         quitMenu.visibleProperty().bind(projectState.isRunning());
 
-        pauseMenu.visibleProperty().bind(projectState.isDebugging().and(testToolbarController.getPausing().not()));
-        restartMenu.visibleProperty().bind(projectState.isDebugging().and(testToolbarController.getPausing()));
+        pauseMenu.visibleProperty()
+                .bind(projectState.isDebugging().and(testToolbarController.getPausing().not()));
+        restartMenu.visibleProperty()
+                .bind(projectState.isDebugging().and(testToolbarController.getPausing()));
         backMenu.visibleProperty().bind(projectState.isDebugging());
         forwardMenu.visibleProperty().bind(projectState.isDebugging());
 
@@ -115,8 +122,10 @@ public class MenuBarController implements Initializable {
         exportMenu.visibleProperty().bind(projectState.isBrowsing());
         quitBrowsingMenu.visibleProperty().bind(projectState.isBrowsing());
 
-        runSampleMenu.visibleProperty().bind(sampleToolbarController.getRunning().not().and(projectState.isLoaded()));
-        stopSampleMenu.visibleProperty().bind(sampleToolbarController.getRunning().and(projectState.isLoaded()));
+        runSampleMenu.visibleProperty()
+                .bind(sampleToolbarController.getRunning().not().and(projectState.isLoaded()));
+        stopSampleMenu.visibleProperty()
+                .bind(sampleToolbarController.getRunning().and(projectState.isLoaded()));
     }
 
     @FXML
@@ -126,7 +135,10 @@ public class MenuBarController implements Initializable {
 
     @FXML
     public void open() {
-        editorTabController.open();
+        File file = scriptDialog.showOpenDialog(FxContext.getPrimaryStage());
+        if (file != null) {
+            editorTabController.open(file.toPath());
+        }
     }
 
     @FXML
@@ -136,7 +148,10 @@ public class MenuBarController implements Initializable {
 
     @FXML
     public void saveAs() {
-        editorTabController.saveAs();
+        File file = scriptDialog.showSaveDialog(FxContext.getPrimaryStage());
+        if (file != null) {
+            editorTabController.saveAs(file.toPath());
+        }
     }
 
     @FXML
