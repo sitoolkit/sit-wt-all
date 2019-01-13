@@ -1,6 +1,7 @@
 package io.sitoolkit.wt.gui.app.test;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -17,7 +18,6 @@ import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
-import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 import io.sitoolkit.wt.util.infra.util.SystemUtils;
 
@@ -32,7 +32,7 @@ public class TestService {
 
     private Map<String, ConfigurableApplicationContext> ctxMap = new HashMap<>();
 
-    public String runTest(TestRunParams params, ProcessExitCallback callback) {
+    public String runTest(TestRunParams params, TestExitCallback callback) {
 
         if (params.getTargetScripts() == null) {
             return null;
@@ -56,18 +56,18 @@ public class TestService {
                     runtimePm.setDebug(params.isDebug());
                     DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
                     debugSupport.setListener(params.getDebugListener());
-                    runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), true);
-                    callback.callback(0);
+                    callback.callback(runner.runScript(appCtx, params.getTargetScripts(),
+                            params.isParallel(), false));
                 } catch (Exception e) {
                     LOG.error("app.unexpectedException", e);
-                    callback.callback(1);
+                    callback.callback(Collections.emptyList());
                 } finally {
                     appCtx.close();
                     ctxMap.remove(sessionId);
                 }
             } catch (Exception e) {
                 LOG.error("app.unexpectedException", e);
-                callback.callback(1);
+                callback.callback(Collections.emptyList());
             }
         });
 

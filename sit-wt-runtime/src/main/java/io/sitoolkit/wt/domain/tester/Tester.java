@@ -208,7 +208,7 @@ public class Tester {
             }
             result.setErrorCause(e);
         } finally {
-            em.flushEvidence(evidence);
+            result.setEvidenceFile(em.flushEvidence(evidence));
         }
 
         return result;

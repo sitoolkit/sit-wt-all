@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -172,7 +173,7 @@ public class EvidenceManager implements ApplicationContextAware {
      * @param evidence
      *            エビデンス
      */
-    public void flushEvidence(Evidence evidence) {
+    public Path flushEvidence(Evidence evidence) {
         String html = build(evidence);
 
         File htmlFile = new File(evidenceDir, buildEvidenceFileName(evidence.getScriptName(),
@@ -187,6 +188,7 @@ public class EvidenceManager implements ApplicationContextAware {
 
         try {
             FileUtils.write(htmlFile, html, "UTF-8");
+            return htmlFile.toPath();
         } catch (Exception e) {
             throw new TestException("エビデンスの出力に失敗しました", e);
         }

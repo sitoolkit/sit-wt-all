@@ -7,8 +7,11 @@ import java.util.Optional;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
 import io.sitoolkit.wt.gui.domain.test.DebugListenerFinder;
+import io.sitoolkit.wt.gui.pres.editor.DefaultEditorController;
 import io.sitoolkit.wt.gui.pres.editor.EditorController;
 import io.sitoolkit.wt.gui.pres.editor.TestScriptEditorController;
+import io.sitoolkit.wt.gui.pres.editor.WebViewController;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.SingleSelectionModel;
@@ -53,15 +56,18 @@ public class EditorTabController implements FileOpenable, DebugListenerFinder {
             selectionModel.select(editorTab.get());
 
         } else {
-            EditorController editorContoroller = getEditorController(file);
-            editorContoroller.open(file);
+            Platform.runLater(() -> {
+                EditorController editorContoroller = getEditorController(file);
+                editorContoroller.open(file);
 
-            Tab tab = new Tab();
-            tab.setUserData(editorContoroller);
-            setFileInfo(tab, file);
-            tab.setContent(editorContoroller.getEditorContent());
-            tabs.getTabs().add(tab);
-
+                editorContoroller.getEditorContent().ifPresent(content -> {
+                    Tab tab = new Tab();
+                    tab.setUserData(editorContoroller);
+                    setFileInfo(tab, file);
+                    tab.setContent(content);
+                    tabs.getTabs().add(tab);
+                });
+            });
         }
     }
 
@@ -85,9 +91,9 @@ public class EditorTabController implements FileOpenable, DebugListenerFinder {
         if (pathStr.endsWith(".csv")) {
             return new TestScriptEditorController(scriptService);
         } else if (pathStr.endsWith(".html")) {
-
+            return new WebViewController();
         }
-        throw new UnsupportedOperationException("File type is not supported : " + file);
+        return new DefaultEditorController();
     }
 
     private EditorController getSelectedEditorController() {

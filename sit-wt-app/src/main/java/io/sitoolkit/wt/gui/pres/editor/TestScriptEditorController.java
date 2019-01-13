@@ -2,6 +2,7 @@ package io.sitoolkit.wt.gui.pres.editor;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.controlsfx.control.spreadsheet.GridChange;
 
@@ -59,8 +60,8 @@ public class TestScriptEditorController implements EditorController, DebugListen
     }
 
     @Override
-    public Node getEditorContent() {
-        return editor.getSpreadSheet();
+    public Optional<Node> getEditorContent() {
+        return Optional.of(editor.getSpreadSheet());
     }
 
     @Override

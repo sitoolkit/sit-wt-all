@@ -1,5 +1,6 @@
 package io.sitoolkit.wt.domain.tester;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.infra.VerifyException;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * テストの"一連"の実行結果を表すエンティティです。 "一連"の範囲は、{@link Tester#operate(String)}
@@ -26,6 +29,10 @@ public class TestResult {
      * テスト実行失敗の原因となった例外
      */
     private Throwable errorCause;
+
+    @Getter
+    @Setter
+    private Path evidenceFile;
 
     /**
      * テスト実行が失敗した理由のメッセージ文字列を構築します。

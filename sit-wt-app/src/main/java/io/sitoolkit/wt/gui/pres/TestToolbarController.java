@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import io.sitoolkit.wt.domain.tester.TestResult;
+import io.sitoolkit.wt.gui.app.test.TestExitCallback;
 import io.sitoolkit.wt.gui.app.test.TestService;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.domain.project.ProjectState.State;
@@ -15,7 +17,6 @@ import io.sitoolkit.wt.gui.domain.test.TestRunParams;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.gui.infra.fx.FxUtils;
 import io.sitoolkit.wt.util.infra.process.ConversationProcess;
-import io.sitoolkit.wt.util.infra.process.ProcessExitCallback;
 import io.sitoolkit.wt.util.infra.util.SystemUtils;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -79,6 +80,8 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     private DebugListenerFinder debugListenerFinder;
 
+    private FileOpenable evidenceOpenable;
+
     TestService testService;
 
     @Override
@@ -94,11 +97,13 @@ public class TestToolbarController implements Initializable, TestRunnable {
     }
 
     public void initialize(MessageView messageView, FileTreeController fileTreeController,
-            ProjectState projectState, DebugListenerFinder debugListenerFinder) {
+            ProjectState projectState, DebugListenerFinder debugListenerFinder,
+            FileOpenable evidenceOpenable) {
         this.projectState = projectState;
         this.fileTreeController = fileTreeController;
         this.messageView = messageView;
         this.debugListenerFinder = debugListenerFinder;
+        this.evidenceOpenable = evidenceOpenable;
 
         FxUtils.bindVisible(startGroup, projectState.isLoaded());
         FxUtils.bindVisible(runningGroup, projectState.isRunning());
@@ -174,17 +179,15 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
         addBaseUrl(params.getBaseUrl());
 
-        ProcessExitCallback callback = exitCode -> {
+        TestExitCallback callback = testResults -> {
             projectState.reset();
+            testResults.stream().map(TestResult::getEvidenceFile).map(Path::toFile)
+                    .forEach(evidenceOpenable::open);
             Platform.runLater(() -> messageView.addMsg("テストを終了します。"));
         };
 
-        // ConversationProcess testProcess = testService.runTest(params,
-        // debugStdoutListener,
-        // callback);
         String sessionId = testService.runTest(params, callback);
 
-        // if (testProcess == null) {
         if (sessionId == null) {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("");
@@ -193,7 +196,6 @@ public class TestToolbarController implements Initializable, TestRunnable {
             alert.show();
             projectState.reset();
         } else {
-            // this.testProcess = testProcess;
             this.sessionId = sessionId;
         }
 
