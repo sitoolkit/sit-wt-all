@@ -68,12 +68,6 @@
               <seleniumOutputDir>target/testscript</seleniumOutputDir>
             </configuration>
           </execution>
-          <execution>
-            <id>open-evidence</id>
-            <goals>
-              <goal>open-evidence</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
       <plugin>
