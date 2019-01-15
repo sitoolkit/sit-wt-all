@@ -17,11 +17,14 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.springframework.context.ApplicationContext;
 
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
+import lombok.Value;
 
 public abstract class ScreenshotTaker {
 
@@ -43,14 +46,15 @@ public abstract class ScreenshotTaker {
 
         String driverType = StringUtils.defaultString(pm.getDriverType());
 
-        if ("chrome".equals(driverType) && !ScreenshotTiming.ON_DIALOG.equals(timing)) {
-            return getChromeScreenshot(timing);
+        if (("chrome".equals(driverType) || "firefox".equals(driverType))
+                && !ScreenshotTiming.ON_DIALOG.equals(timing)) {
+            return getScreenshotWithAdjust(timing);
         } else {
-            return getFireFoxScreenShot(timing);
+            return getScreenShot(timing);
         }
     }
 
-    private Screenshot getFireFoxScreenShot(ScreenshotTiming timing) {
+    private Screenshot getScreenShot(ScreenshotTiming timing) {
         Screenshot screenshot = appCtx.getBean(Screenshot.class);
 
         try {
@@ -73,76 +77,31 @@ public abstract class ScreenshotTaker {
         return screenshot;
     }
 
-    private Screenshot getChromeScreenshot(ScreenshotTiming timing) {
+    private Screenshot getScreenshotWithAdjust(ScreenshotTiming timing) {
         Screenshot screenshot = appCtx.getBean(Screenshot.class);
 
         try {
             File file = File.createTempFile("sit-wt-temp-screenshot", ".png");
 
-            JavascriptExecutor executor = (JavascriptExecutor) driver;
+            WindowSize windowSize = getWihdowSize();
 
-            int pageHeight = Integer.parseInt(
-                    String.valueOf(executor.executeScript("return document.body.scrollHeight")));
-            int pageWidth = Integer.parseInt(
-                    String.valueOf(executor.executeScript("return document.body.scrollWidth")));
-
-            int windowHeight = Integer.parseInt(String.valueOf(
-                    executor.executeScript("return document.documentElement.clientHeight")));
-            int windowWidth = Integer.parseInt(String.valueOf(
-                    executor.executeScript("return document.documentElement.clientWidth")));
-
-            BufferedImage img = new BufferedImage(pageWidth, pageHeight,
-                    BufferedImage.TYPE_INT_ARGB);
+            BufferedImage img = new BufferedImage(windowSize.getPageWidth(),
+                    windowSize.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics graphics = img.getGraphics();
 
-            if ((windowHeight >= pageHeight) && (windowWidth >= pageWidth)) {
+            if ((windowSize.getWindowHeight() >= windowSize.getPageHeight())
+                    && (windowSize.getWindowWidth() >= windowSize.getPageWidth())) {
+
                 BufferedImage imageParts = ImageIO
                         .read(takesScreenshot.getScreenshotAs(OutputType.FILE));
 
-                imageParts = imageSizeChange(imageParts, windowWidth, windowHeight);
+                imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
+                        windowSize.getWindowHeight());
 
                 graphics.drawImage(imageParts, 0, 0, null);
 
             } else {
-                int scrollHeight = 0;
-                int rowCount = 0;
-
-                while (scrollHeight < pageHeight) {
-                    int scrollPosY = windowHeight * rowCount;
-                    int drawPosY = 0;
-
-                    if (windowHeight < pageHeight) {
-                        drawPosY = (scrollHeight + windowHeight >= pageHeight)
-                                ? pageHeight - windowHeight : scrollPosY;
-                    }
-
-                    int scrollWidth = 0;
-                    int colCount = 0;
-
-                    while (scrollWidth < pageWidth) {
-                        int scrollPosX = windowWidth * colCount;
-                        int drawPosX = 0;
-
-                        if (windowWidth < pageWidth) {
-                            drawPosX = (scrollWidth + windowWidth >= pageWidth)
-                                    ? pageWidth - windowWidth : scrollPosX;
-                        }
-                        executor.executeScript(
-                                "window.scrollTo(" + scrollPosX + ", " + scrollPosY + ");");
-                        BufferedImage imageParts = ImageIO
-                                .read(takesScreenshot.getScreenshotAs(OutputType.FILE));
-
-                        imageParts = imageSizeChange(imageParts, windowWidth, windowHeight);
-
-                        graphics.drawImage(imageParts, drawPosX, drawPosY, null);
-
-                        scrollWidth += windowWidth;
-                        colCount++;
-                    }
-
-                    scrollHeight += windowHeight;
-                    rowCount++;
-                }
+                drawWholePageScreenshot(windowSize, graphics);
             }
 
             ImageIO.write(img, "png", file);
@@ -179,7 +138,77 @@ public abstract class ScreenshotTaker {
         return sizeChangeImg;
     }
 
+    private void drawWholePageScreenshot(WindowSize windowSize, Graphics graphics)
+            throws WebDriverException, IOException {
+        int scrollHeight = 0;
+        int rowCount = 0;
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+
+        while (scrollHeight < windowSize.getPageHeight()) {
+            int scrollPosY = windowSize.getWindowHeight() * rowCount;
+            int drawPosY = 0;
+
+            if (windowSize.getWindowHeight() < windowSize.getPageHeight()) {
+                drawPosY = (scrollHeight + windowSize.getWindowHeight() >= windowSize
+                        .getPageHeight())
+                                ? windowSize.getPageHeight() - windowSize.getWindowHeight()
+                                : scrollPosY;
+            }
+
+            int scrollWidth = 0;
+            int colCount = 0;
+
+            while (scrollWidth < windowSize.getPageWidth()) {
+                int scrollPosX = windowSize.getWindowWidth() * colCount;
+                int drawPosX = 0;
+
+                if (windowSize.getWindowWidth() < windowSize.getPageWidth()) {
+                    drawPosX = (scrollWidth + windowSize.getWindowWidth() >= windowSize
+                            .getPageWidth())
+                                    ? windowSize.getPageWidth() - windowSize.getWindowWidth()
+                                    : scrollPosX;
+                }
+                executor.executeScript("window.scrollTo(" + scrollPosX + ", " + scrollPosY + ");");
+                BufferedImage imageParts = ImageIO
+                        .read(takesScreenshot.getScreenshotAs(OutputType.FILE));
+
+                imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
+                        windowSize.getWindowHeight());
+
+                graphics.drawImage(imageParts, drawPosX, drawPosY, null);
+
+                scrollWidth += windowSize.getWindowWidth();
+                colCount++;
+            }
+
+            scrollHeight += windowSize.getWindowHeight();
+            rowCount++;
+        }
+    }
+
+    private WindowSize getWihdowSize() {
+        int pageHeight = Integer.parseInt(String.valueOf(
+                WebDriverUtils.executeScript(driver, "return document.body.scrollHeight")));
+        int pageWidth = Integer.parseInt(String
+                .valueOf(WebDriverUtils.executeScript(driver, "return document.body.scrollWidth")));
+
+        int windowHeight = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
+                "return document.documentElement.clientHeight")));
+        int windowWidth = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
+                "return document.documentElement.clientWidth")));
+
+        return new WindowSize(pageHeight, pageWidth, windowHeight, windowWidth);
+    }
+
     protected abstract String getAsData();
 
     protected abstract String getDialogAsData();
+
+    @Value
+    private class WindowSize {
+        private int pageHeight;
+        private int pageWidth;
+        private int windowHeight;
+        private int windowWidth;
+    }
 }

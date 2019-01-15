@@ -17,4 +17,4 @@ No.,項目名,操作,"ロケーター
 13,親ウィンドウ,switchWindow,title,入力ページ,,,,y,
 14,確定ボタン,click,css,input[value='同意して確定'],,前,,y,y
 15,確認ダイアログ,dialog,,,,前,,OK,OK
-16,名前,verify,xpath,"//*[@id=""confirm""]/tbody/tr[1]/td",,前,,試験太郎,試験花子
+16,名前,verify,xpath,"//*[@id=""confirm""]/tbody/tr[1]/td",,後,,試験太郎,試験花子
