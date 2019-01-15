@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.sitoolkit.util.buidtoolhelper.maven.MavenUtils;
+import io.sitoolkit.util.buildtoolhelper.maven.MavenUtils;
 import io.sitoolkit.wt.gui.testutil.ThreadUtils;
 
 public class UpdateServiceTest {

@@ -5,8 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 
-import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
-import io.sitoolkit.util.buidtoolhelper.maven.MavenUtils;
+import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
+import io.sitoolkit.util.buildtoolhelper.maven.MavenUtils;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -51,10 +51,8 @@ public class ProjectService {
 
         if (pomFile.exists()) {
 
-            MavenProject
-                .load(projectDir.getAbsolutePath())
-                .mvnw("versions:update-properties")
-                .execute();
+            MavenProject.load(projectDir.getAbsolutePath()).mvnw("versions:update-properties")
+                    .execute();
 
             loadProject(pomFile, projectState);
             return pomFile;
@@ -92,7 +90,8 @@ public class ProjectService {
         Path siteXml = Paths.get(projectDir.getAbsolutePath(), "src/site/site.xml");
         FileIOUtils.sysRes2file("site.xml", siteXml);
 
-        Path sitwtProperties = Paths.get(projectDir.getAbsolutePath(), "src/main/resources/sit-wt.properties");
+        Path sitwtProperties = Paths.get(projectDir.getAbsolutePath(),
+                "src/main/resources/sit-wt.properties");
         FileIOUtils.sysRes2file("sit-wt-default.properties", sitwtProperties);
 
         Path capabilitiesProperties = Paths.get(projectDir.getAbsolutePath(),

@@ -1,6 +1,6 @@
 package io.sitoolkit.wt.gui.domain.sample;
 
-import io.sitoolkit.util.buidtoolhelper.process.StdoutListener;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 

@@ -1,6 +1,6 @@
 package io.sitoolkit.wt.gui.pres;
 
-import io.sitoolkit.util.buidtoolhelper.proxysetting.ProxySettingService;
+import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.gui.infra.fx.FxContext;
 import io.sitoolkit.wt.infra.log.SitLogger;

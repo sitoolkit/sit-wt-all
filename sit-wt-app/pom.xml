@@ -50,11 +50,6 @@
       <artifactId>spring-context</artifactId>
       <version>${spring.version}</version>
     </dependency>
-    <dependency>
-      <groupId>io.sitoolkit.util.bth</groupId>
-      <artifactId>sit-util-bth</artifactId>
-      <version>1.0.0-alpha.5</version>
-    </dependency>
   </dependencies>
   <parent>
     <groupId>io.sitoolkit.wt</groupId>

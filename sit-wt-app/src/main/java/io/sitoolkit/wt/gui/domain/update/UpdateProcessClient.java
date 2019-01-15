@@ -2,8 +2,8 @@ package io.sitoolkit.wt.gui.domain.update;
 
 import java.io.File;
 
-import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
-import io.sitoolkit.util.buidtoolhelper.process.ProcessCommand;
+import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
+import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 import io.sitoolkit.wt.gui.infra.util.VersionUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;

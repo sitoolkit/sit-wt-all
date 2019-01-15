@@ -3,7 +3,7 @@ package io.sitoolkit.wt.gui.app.sample;
 import java.io.File;
 import java.nio.file.Path;
 
-import io.sitoolkit.util.buidtoolhelper.process.ProcessExitCallback;
+import io.sitoolkit.util.buildtoolhelper.process.ProcessExitCallback;
 import io.sitoolkit.wt.app.sample.SampleManager;
 import io.sitoolkit.wt.gui.domain.sample.SampleProcessClient;
 import io.sitoolkit.wt.gui.domain.sample.SampleStartedCallback;
