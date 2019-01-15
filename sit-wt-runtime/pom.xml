@@ -166,7 +166,7 @@
     <dependency>
       <groupId>io.sitoolkit.util.bth</groupId>
       <artifactId>sit-util-bth</artifactId>
-      <version>1.0.0-alpha.7</version>
+      <version>1.0.0-alpha.8</version>
     </dependency>
   </dependencies>
   <parent>
