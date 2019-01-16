@@ -36,7 +36,7 @@
         </tooltip>
       </Label>
       <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
-      <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="firefox" />
+      <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="chrome" />
       <ToggleButton fx:id="compareToggle" styleClass="image-toggle-btn, compare-toggle-btn" >
         <tooltip>
           <Tooltip text="スクリーンショット比較機能のON/OFFを切り替えます" />

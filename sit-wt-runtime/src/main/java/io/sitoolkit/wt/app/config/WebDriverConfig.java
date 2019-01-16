@@ -31,7 +31,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import io.sitoolkit.wt.domain.tester.TestEventListener;
 import io.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import io.sitoolkit.wt.domain.webdriver.MobileWebDriver;
-import io.sitoolkit.wt.domain.webdriver.PCWebDriver;
+import io.sitoolkit.wt.domain.webdriver.PCWebDriverFactory;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.firefox.FirefoxManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -46,6 +46,8 @@ import io.sitoolkit.wt.infra.selenium.WebElementExceptionCheckerImpl;
 public class WebDriverConfig {
 
     private static final SitLogger LOG = SitLoggerFactory.getLogger(WebDriverConfig.class);
+
+    private PCWebDriverFactory pcDriver = new PCWebDriverFactory();
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
@@ -63,8 +65,7 @@ public class WebDriverConfig {
                 break;
 
             default:
-                PCWebDriver pcDriver = new PCWebDriver();
-                webDriver = pcDriver.getPCDriver(pm, closer, webDriverInstaller, firefoxManager);
+                webDriver = pcDriver.createPCDriver(pm, closer, webDriverInstaller, firefoxManager);
         }
 
         return webDriver;

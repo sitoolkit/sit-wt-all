@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -31,18 +32,23 @@ import io.sitoolkit.wt.infra.selenium.WebDriverCloser;
 import io.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 
 @Profile("pc")
-public class PCWebDriver {
+public class PCWebDriverFactory {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(PCWebDriver.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(PCWebDriverFactory.class);
+
+    private static final String DEFAULT_DRIVER_TYPE = "chrome";
+
+    private static final String SECOND_DEFAULT_DRIVER_TYPE = "firefox";
 
     private int windowShiftLeft = 0;
 
     private int windowShiftTop = 0;
 
-    public RemoteWebDriver getPCDriver(PropertyManager pm, WebDriverCloser closer,
+    private String defaultDriverType = DEFAULT_DRIVER_TYPE;
+
+    public RemoteWebDriver createPCDriver(PropertyManager pm, WebDriverCloser closer,
             WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
             throws MalformedURLException {
-        RemoteWebDriver webDriver = null;
 
         String driverType = StringUtils.defaultString(pm.getDriverType());
         DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -55,62 +61,8 @@ public class PCWebDriver {
 
         LOG.info("webdriver.start", driverType, capabilities);
 
-        switch (driverType) {
-
-            case "chrome":
-                webDriverInstaller.installChromeDriver();
-
-                Map<String, Object> prefs = new HashMap<>();
-                prefs.put("credentials_enable_service", false);
-                prefs.put("password_manager_enabled", false);
-                Map<String, Object> options = new HashMap<>();
-                options.put("prefs", prefs);
-                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-
-                ChromeOptions chromeOptions = new ChromeOptions().merge(capabilities);
-                webDriver = new ChromeDriver(chromeOptions);
-                break;
-
-            case "ie":
-            case "internet explorer":
-                webDriverInstaller.installIeDriver();
-                InternetExplorerOptions ieOptions = new InternetExplorerOptions(capabilities);
-                webDriver = new InternetExplorerDriver(ieOptions);
-                break;
-
-            case "edge":
-                webDriverInstaller.installEdgeDriver();
-                EdgeOptions edgeOptions = new EdgeOptions().merge(capabilities);
-                webDriver = new EdgeDriver(edgeOptions);
-                break;
-
-            case "safari":
-                SafariOptions safariOptions = new SafariOptions(capabilities);
-                try {
-                    webDriver = new SafariDriver(safariOptions);
-                } catch (UnreachableBrowserException e) {
-                    if (StringUtils.startsWith(e.getMessage(),
-                            "Failed to connect to SafariDriver")) {
-                        webDriverInstaller.installSafariDriver();
-                        webDriver = new SafariDriver(safariOptions);
-                    }
-                }
-                break;
-
-            case "remote":
-                LOG.info("webdriver.remote", pm.getHubUrl());
-                webDriver = new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
-
-                break;
-
-            default: // include firefox
-                // geckodriver is not stable yet as of 2016/10
-                // so we doesn't support neigther selenium 3 nor firefox 48.x
-                // higher
-                webDriverInstaller.installGeckoDriver();
-
-                webDriver = firefoxManager.startWebDriver(capabilities);
-        }
+        RemoteWebDriver webDriver = selectWebDriver(driverType, pm, webDriverInstaller,
+                firefoxManager, capabilities);
 
         webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
 
@@ -127,6 +79,87 @@ public class PCWebDriver {
         LOG.debug("webdriver.init", webDriver);
 
         return webDriver;
+    }
+
+    private RemoteWebDriver selectWebDriver(String driverType, PropertyManager pm,
+            WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager,
+            DesiredCapabilities capabilities) throws MalformedURLException {
+
+        if (StringUtils.isNotEmpty(driverType)) {
+            return selectWebDriver2(driverType, pm, webDriverInstaller, firefoxManager,
+                    capabilities);
+        }
+
+        try {
+            return selectWebDriver2(defaultDriverType, pm, webDriverInstaller, firefoxManager,
+                    capabilities);
+        } catch (WebDriverException e) {
+            // NOP
+        }
+
+        defaultDriverType = SECOND_DEFAULT_DRIVER_TYPE;
+
+        return selectWebDriver2(defaultDriverType, pm, webDriverInstaller, firefoxManager,
+                capabilities);
+    }
+
+    private RemoteWebDriver selectWebDriver2(String driverType, PropertyManager pm,
+            WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager,
+            DesiredCapabilities capabilities) throws MalformedURLException {
+
+        switch (driverType) {
+
+            case "chrome":
+                webDriverInstaller.installChromeDriver();
+
+                Map<String, Object> prefs = new HashMap<>();
+                prefs.put("credentials_enable_service", false);
+                prefs.put("password_manager_enabled", false);
+                Map<String, Object> options = new HashMap<>();
+                options.put("prefs", prefs);
+                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
+                ChromeOptions chromeOptions = new ChromeOptions().merge(capabilities);
+                return new ChromeDriver(chromeOptions);
+
+            case "ie":
+            case "internet explorer":
+                webDriverInstaller.installIeDriver();
+                InternetExplorerOptions ieOptions = new InternetExplorerOptions(capabilities);
+                return new InternetExplorerDriver(ieOptions);
+
+            case "edge":
+                webDriverInstaller.installEdgeDriver();
+                EdgeOptions edgeOptions = new EdgeOptions().merge(capabilities);
+                return new EdgeDriver(edgeOptions);
+
+            case "safari":
+                SafariOptions safariOptions = new SafariOptions(capabilities);
+                try {
+                    return new SafariDriver(safariOptions);
+                } catch (UnreachableBrowserException e) {
+                    if (StringUtils.startsWith(e.getMessage(),
+                            "Failed to connect to SafariDriver")) {
+                        webDriverInstaller.installSafariDriver();
+                        return new SafariDriver(safariOptions);
+                    }
+                }
+                break;
+
+            case "remote":
+                LOG.info("webdriver.remote", pm.getHubUrl());
+                return new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
+
+            case "firefox":
+            case "ff":
+                webDriverInstaller.installGeckoDriver();
+                return firefoxManager.startWebDriver(capabilities);
+
+            default:
+                return null;
+        }
+
+        return null;
     }
 
 }

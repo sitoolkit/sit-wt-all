@@ -29,8 +29,8 @@ public class SystemUtils {
     public static List<String> getBrowsers() {
         List<String> browsers = new ArrayList<>();
 
-        browsers.add("firefox");
         browsers.add("chrome");
+        browsers.add("firefox");
 
         if (isWindows()) {
             browsers.add("ie");

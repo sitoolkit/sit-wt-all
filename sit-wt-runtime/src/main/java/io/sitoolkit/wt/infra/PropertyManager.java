@@ -64,7 +64,7 @@ public class PropertyManager {
     private String pageScriptDir;
 
     @Setter
-    @Value("${driver.type}")
+    @Value("${driver.type:}")
     private String driverType;
 
     @Value("${appium.address}")

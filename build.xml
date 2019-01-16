@@ -10,7 +10,7 @@
   <property name="testdir" value="${basedir}/${testArtifactId}" />
   <property name="distribution.pom" value="${basedir}/sit-wt-app/src/main/resources/distribution-pom.xml" />
   <property name="file.encoding" value="UTF-8" />
-  <property name="driver.type" value="firefox" unless:blank="${driver.type}"/>
+  <property name="driver.type" value="chrome" unless:blank="${driver.type}"/>
   <condition property="os.windows" value="true" else="false">
     <os family="windows" />
   </condition>
