@@ -316,10 +316,10 @@
       <id>ci</id>
       <properties>
         <file.encoding>UTF-8</file.encoding>
-        <!-- <parallel>classesAndMethods</parallel> -->
-        <!-- <perCoreThreadCount>false</perCoreThreadCount> -->
-        <!-- <threadCountClasses>4</threadCountClasses> -->
-        <!-- <threadCountMethods>2</threadCountMethods> -->
+        <parallel>classesAndMethods</parallel>
+        <perCoreThreadCount>false</perCoreThreadCount>
+        <threadCountClasses>4</threadCountClasses>
+        <threadCountMethods>2</threadCountMethods>
       </properties>
       <build>
         <plugins>
