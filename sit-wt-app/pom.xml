@@ -26,43 +26,18 @@
       <artifactId>sit-wt-runtime</artifactId>
       <version>3.0.0-alpha.2-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>io.appium</groupId>
-      <artifactId>java-client</artifactId>
-      <version>${appium.version}</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <artifactId>gson</artifactId>
-          <groupId>com.google.code.gson</groupId>
-        </exclusion>
-      </exclusions>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
   </dependencies>
+
   <parent>
     <groupId>io.sitoolkit.wt</groupId>
     <artifactId>sit-wt-all</artifactId>
     <version>3.0.0-alpha.2-SNAPSHOT</version>
   </parent>
+
   <properties>
     <parallel>classesAndMethods</parallel>
     <threadCountClasses>1</threadCountClasses>
     <threadCountMethods>1</threadCountMethods>
-    <selenium.version>3.141.59</selenium.version>
-    <appium.version>6.0.0</appium.version>
-    <spring.version>5.0.8.RELEASE</spring.version>
   </properties>
 
   <!-- Build Settings -->
