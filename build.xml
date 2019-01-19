@@ -27,15 +27,13 @@
   <target name="install">
     <antcall target="01_local-install-stage" />
     <antcall target="02_commit-stage" />
-    <antcall target="03_acceptance-stage" />
   </target>
 
 
   <target name="deploy">
     <antcall target="01_local-install-stage" />
     <antcall target="02_commit-stage" />
-    <antcall target="03_acceptance-stage" />
-    <antcall target="04_deploy-stage" />
+    <antcall target="03_deploy-stage" />
   </target>
 
 
@@ -83,103 +81,7 @@
   </target>
 
 
-  <target name="03_acceptance-stage">
-
-    <delete dir="${testdir}" />
-    <copy file="${distribution.pom}" tofile="${testdir}/pom.xml" />
-    <copy file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv"
-          todir="${testdir}/testscript"
-          unless:true="${os.windows}" />
-    <mkdir dir="${testdir}/testscript" if:true="${os.windows}" />
-    <!-- skip until ci server charset problem is soleved
-    <fixcrlf file="${basedir}/sit-wt-runtime/testscript/CsvTestScript.csv" destdir="${testdir}/testscript"
-      encoding="UTF-8" outputencoding="MS932" if:true="${os.windows}" />
-	-->
-
-
-    <echo message="mvn sit-wt:sample"/>
-    <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-e" />
-      <arg value="io.sitoolkit.wt:sit-wt-maven-plugin:sample" />
-    </exec>
-
-    <parallel>
-
-      <echo message="mvn -f sample   (jetty:run)"/>
-      <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
-        <env key="JAVA_HOME" value="${java.home}" />
-        <arg value="-f" />
-        <arg value="sample" />
-      </exec>
-
-
-      <sequential>
-          <echo message="mvn verify -P parallel"/>
-          <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="false" resultproperty="result">
-          <env key="JAVA_HOME" value="${java.home}" />
-          <env key="MAVEN_OPTS" value="-Duser.language=ja -Duser.country=JP"/>
-          <arg value="-e" />
-          <arg value="-P" />
-          <arg value="parallel" />
-          <!--
-                <arg value="-Dmaven.failsafe.debug=true" />
-          -->
-            <arg value="-DbaseUrl=http://localhost:8280" />
-          <arg value="-Devidence.open=false" />
-          <arg value="-Dfile.encoding=${file.encoding}" />
-          <arg value="-DpreCoreThreadCount=false" />
-          <arg value="-DthreadCount=4" />
-          <arg value="-DtrimStackTrace=false" />
-          <arg value="-Ddriver.type=${driver.type}" />
-          <arg value="-Duser.language=ja" />
-          <arg value="-Duser.country=JP" />
-          <arg value="verify" />
-        </exec>
-
-        <echo message="mvn jetty:stop"/>
-        <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="false">
-          <env key="JAVA_HOME" value="${java.home}" />
-          <arg value="-f" />
-          <arg value="sample" />
-          <arg value="jetty:stop" />
-        </exec>
-
-        <fail>
-          <condition>
-            <not><equals arg1="${result}" arg2="0"/></not>
-          </condition>
-        </fail>
-
-      </sequential>
-
-    </parallel>
-
-
-  </target>
-
-  <target name="trial">
-
-    <parallel>
-
-      <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
-        <env key="JAVA_HOME" value="${java.home}" />
-        <arg value="-f" />
-        <arg value="sample" />
-      </exec>
-
-      <exec executable="${mvn.cmd}" dir="${testdir}" failonerror="true">
-        <env key="JAVA_HOME" value="${java.home}" />
-        <arg value="-f" />
-        <arg value="sample" />
-        <arg value="jetty:stop" />
-      </exec>
-
-    </parallel>
-
-  </target>
-
-  <target name="04_deploy-stage">
+  <target name="03_deploy-stage">
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />

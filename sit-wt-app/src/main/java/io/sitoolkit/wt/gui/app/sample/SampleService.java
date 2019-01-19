@@ -1,6 +1,5 @@
 package io.sitoolkit.wt.gui.app.sample;
 
-import java.io.File;
 import java.nio.file.Path;
 
 import io.sitoolkit.util.buildtoolhelper.process.ProcessExitCallback;
@@ -30,12 +29,12 @@ public class SampleService {
      * @param destDir
      *            サンプルを展開するディレクトリ
      */
-    public void create(File destDir) {
-        Path sampledir = getSampleDir(destDir.toPath());
+    public void create(Path destDir) {
+        Path sampledir = getSampleDir(destDir);
         if (!sampledir.toFile().exists()) {
             sampledir.toFile().mkdirs();
         }
-        sampleManager.unarchiveBasicSample(destDir.getAbsolutePath());
+        sampleManager.unarchiveBasicSample(destDir.toString());
     }
 
     public void start(Path baseDir, SampleStartedCallback callback) {

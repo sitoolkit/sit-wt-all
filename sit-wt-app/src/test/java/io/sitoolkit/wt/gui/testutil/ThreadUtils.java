@@ -2,15 +2,21 @@ package io.sitoolkit.wt.gui.testutil;
 
 public class ThreadUtils {
 
+    private static final long DEFAULT_TIMEOUT = 30000;
+
     public static void waitFor(StateChecker checker) {
         waitFor("", checker);
     }
 
     public static void waitFor(String timeoutMessage, StateChecker checker) {
+        waitFor(timeoutMessage, DEFAULT_TIMEOUT, checker);
+    }
+
+    public static void waitFor(String timeoutMessage, long timeout, StateChecker checker) {
 
         long start = System.currentTimeMillis();
 
-        while (System.currentTimeMillis() - start < 30000) {
+        while (System.currentTimeMillis() - start < timeout) {
 
             if (checker.check()) {
                 return;

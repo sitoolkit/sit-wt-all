@@ -61,7 +61,7 @@ public class SampleToolbarController implements Initializable {
         projectState.setState(State.LOCKING);
         messageView.startMsg("サンプルWebサイトを起動します。");
 
-        service.create(projectState.getBaseDir());
+        service.create(projectState.getBaseDirPath());
         service.start(projectState.getBaseDirPath(), onStarted());
     }
 
