@@ -6,11 +6,11 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.JavascriptExecutor;
@@ -62,7 +62,7 @@ public abstract class ScreenshotTaker {
             File file = File.createTempFile("sit-wt-temp-screenshot", ".png");
             String dataStr = ScreenshotTiming.ON_DIALOG.equals(timing) ? getDialogAsData()
                     : getAsData();
-            byte[] data = Base64.decodeBase64(dataStr);
+            byte[] data = Base64.getDecoder().decode(dataStr);
             FileUtils.writeByteArrayToFile(file, data);
 
             screenshot.setFile(file);

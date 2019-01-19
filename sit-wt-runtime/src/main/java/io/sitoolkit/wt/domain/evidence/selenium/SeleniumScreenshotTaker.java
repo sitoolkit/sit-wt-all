@@ -6,12 +6,12 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 
-import org.apache.commons.codec.binary.Base64;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -123,7 +123,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(img, "png", baos);
             current.setWindowRect(null);
-            return Base64.encodeBase64String(baos.toByteArray());
+            return Base64.getEncoder().encodeToString(baos.toByteArray());
         } catch (IOException e) {
             log.warn("screenshot.get.error", e);
             return null;
