@@ -285,6 +285,10 @@ public class DebugSupport {
         setPaused(true);
     }
 
+    public void exit() {
+        cmd = new DebugCommand(CommandKey.EXIT, "");
+    }
+
     private void showUsage() {
         if (pm.isCli()) {
             LOG.info("show.usage", USAGE_DESC);

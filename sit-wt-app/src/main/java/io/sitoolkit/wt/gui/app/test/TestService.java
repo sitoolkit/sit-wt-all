@@ -101,7 +101,15 @@ public class TestService {
 
     public void stopTest(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
-        appCtx.close();
+
+        PropertyManager runtimePm = appCtx.getBean(PropertyManager.class);
+
+        if (runtimePm.isDebug() && getDebugSupport(sessionId).isPaused()) {
+            getDebugSupport(sessionId).exit();
+        } else {
+            appCtx.close();
+        }
+
         ctxMap.remove(sessionId);
     }
 

@@ -1,8 +1,12 @@
 package io.sitoolkit.wt.domain.tester.selenium;
 
+import java.net.ConnectException;
+
 import javax.annotation.Resource;
 
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.springframework.context.support.SimpleThreadScope;
 
 import io.sitoolkit.wt.domain.tester.TestEventListener;
@@ -45,7 +49,16 @@ public class TestEventListenerWebDriverImpl implements TestEventListener {
 
         } else {
             LOG.debug("cookie.delete", driver);
-            driver.manage().deleteAllCookies();
+            try {
+                driver.manage().deleteAllCookies();
+            } catch (NoSuchSessionException e) {
+                // can be ignored
+            } catch (WebDriverException e) {
+                // ConnectException can be ignored
+                if (!ConnectException.class.isInstance(e)) {
+                    throw e;
+                }
+            }
         }
 
     }
