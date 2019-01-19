@@ -168,7 +168,7 @@ public class WebDriverInstaller {
         return installFile;
     }
 
-    protected String install(WebDriverBinaryInfo binaryInfo) {
+    protected synchronized String install(WebDriverBinaryInfo binaryInfo) {
         File installFile = findInstallFile(binaryInfo);
         System.setProperty(binaryInfo.sysPropKey, installFile.getAbsolutePath());
 
