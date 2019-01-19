@@ -69,7 +69,7 @@ public abstract class ScreenshotTaker {
             screenshot.setTiming(timing);
 
         } catch (Exception e) {
-            log.error("screenshot.get.error", e);
+            log.warn("screenshot.get.error", e);
             screenshot.clearElementPosition();
             screenshot.setErrorMesage(e.getLocalizedMessage());
         }
@@ -110,7 +110,7 @@ public abstract class ScreenshotTaker {
             screenshot.setTiming(timing);
 
         } catch (Exception e) {
-            log.error("スクリーンショットの取得に失敗しました {}", e);
+            log.warn("screenshot.get.error", e);
             screenshot.clearElementPosition();
             screenshot.setErrorMesage(e.getLocalizedMessage());
         }
