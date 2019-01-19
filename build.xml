@@ -183,17 +183,23 @@
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-P" />
-      <arg value="release,include" />
-      <arg value="-Dmaven.test.skip=true" />
       <arg value="clean" />
+    </exec>
+
+    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-P" />
+      <arg value="mobile" />
+      <arg value="-f" />
+      <arg value="sit-wt-app" />
+      <arg value="-Dmaven.test.skip=true" />
       <arg value="package" />
     </exec>
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
-      <arg value="release,exclude" />
+      <arg value="release,attach-mobile-artifact" />
       <arg value="-Dmaven.test.skip=true" />
       <arg value="deploy" />
     </exec>

@@ -29,6 +29,21 @@
     <artifactId>oss-parent</artifactId>
     <version>7</version>
   </parent>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.appium</groupId>
+        <artifactId>java-client</artifactId>
+        <version>6.0.0</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>gson</artifactId>
+            <groupId>com.google.code.gson</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <modules>
     <module>sit-wt-util</module>
     <module>sit-wt-app</module>

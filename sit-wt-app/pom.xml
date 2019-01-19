@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -12,16 +13,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.sitoolkit.wt</groupId>
-      <artifactId>sit-wt-util</artifactId>
-      <version>3.0.0-alpha.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>org.controlsfx</groupId>
       <artifactId>controlsfx</artifactId>
       <version>8.40.14</version>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>io.sitoolkit.wt</groupId>
       <artifactId>sit-wt-runtime</artifactId>
       <version>3.0.0-alpha.2-SNAPSHOT</version>
@@ -38,73 +34,63 @@
     <parallel>classesAndMethods</parallel>
     <threadCountClasses>1</threadCountClasses>
     <threadCountMethods>1</threadCountMethods>
+    <finalName.mobile>${project.artifactId}-${project.version}-mobile</finalName.mobile>
   </properties>
 
   <!-- Build Settings -->
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.1.0</version>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>single</goal>
-              </goals>
-              <configuration>
-                <descriptors>
-                  <descriptor>${build.profile}-dependency.xml</descriptor>
-                </descriptors>
-              </configuration>
-            </execution>
-          </executions>
-          <configuration>
-            <archive>
-              <index>true</index>
-              <manifest>
-                <mainClass>io.sitoolkit.wt.gui.pres.App</mainClass>
-                <useUniqueVersions>true</useUniqueVersions>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-            </archive>
-            <appendAssemblyId>false</appendAssemblyId>
-            <finalName>${build.finalName}</finalName>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <appendAssemblyId>false</appendAssemblyId>
+          <archive>
+            <index>true</index>
+            <manifest>
+              <mainClass>io.sitoolkit.wt.gui.pres.App</mainClass>
+              <useUniqueVersions>true</useUniqueVersions>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
   <profiles>
     <profile>
-      <id>include</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
+      <id>mobile</id>
       <properties>
-        <build.profile>include</build.profile>
-        <build.finalName>${project.artifactId}-${project.version}-mobile</build.finalName>
+        <maven.test.skip>true</maven.test.skip>
       </properties>
+      <build>
+        <finalName>${finalName.mobile}</finalName>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>io.appium</groupId>
+          <artifactId>java-client</artifactId>
+        </dependency>
+      </dependencies>
     </profile>
+
     <profile>
-      <id>exclude</id>
+      <id>attach-mobile-artifact</id>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-          </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
@@ -119,7 +105,7 @@
                 <configuration>
                   <artifacts>
                     <artifact>
-                      <file>${project.basedir}/target/${build.mobileArtifact}.jar</file>
+                      <file>${project.build.directory}/${finalName.mobile}.jar</file>
                       <classifier>mobile</classifier>
                     </artifact>
                   </artifacts>
@@ -129,11 +115,7 @@
           </plugin>
         </plugins>
       </build>
-      <properties>
-        <build.profile>exclude</build.profile>
-        <build.mobileArtifact>${project.artifactId}-${project.version}-mobile</build.mobileArtifact>
-        <build.finalName>${project.artifactId}-${project.version}</build.finalName>
-      </properties>
     </profile>
   </profiles>
+  
 </project>
