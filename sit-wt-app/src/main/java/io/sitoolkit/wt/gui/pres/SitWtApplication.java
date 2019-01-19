@@ -17,9 +17,9 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-public class App extends Application {
+public class SitWtApplication extends Application {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(App.class);
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(SitWtApplication.class);
 
     private AppController controller;
 

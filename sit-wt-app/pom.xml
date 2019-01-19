@@ -60,7 +60,7 @@
           <archive>
             <index>true</index>
             <manifest>
-              <mainClass>io.sitoolkit.wt.gui.pres.App</mainClass>
+              <mainClass>io.sitoolkit.wt.gui.pres.SitWtApplication</mainClass>
               <useUniqueVersions>true</useUniqueVersions>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
