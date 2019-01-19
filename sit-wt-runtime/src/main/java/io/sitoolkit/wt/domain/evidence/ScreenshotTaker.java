@@ -109,7 +109,7 @@ public abstract class ScreenshotTaker {
             screenshot.setFile(file);
             screenshot.setTiming(timing);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("スクリーンショットの取得に失敗しました {}", e);
             screenshot.clearElementPosition();
             screenshot.setErrorMesage(e.getLocalizedMessage());
