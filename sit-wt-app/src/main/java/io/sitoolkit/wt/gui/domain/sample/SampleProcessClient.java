@@ -40,7 +40,7 @@ public class SampleProcessClient {
      *
      */
     public void stop(Path baseDir, Path sampleDir, ProcessExitCallback callback) {
-        if (!sampleDir.toFile().exists()) {
+        if (!sampleDir.toFile().exists() && callback != null) {
             callback.callback(0);
         }
 
