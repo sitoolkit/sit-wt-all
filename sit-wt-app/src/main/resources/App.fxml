@@ -21,7 +21,7 @@
 <?import javafx.scene.control.TabPane?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="39.0" minWidth="-Infinity"
-  prefHeight="400.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
+  prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="io.sitoolkit.wt.gui.pres.AppController">
   <center>
     <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
