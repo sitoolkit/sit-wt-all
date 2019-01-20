@@ -3,9 +3,15 @@ package io.sitoolkit.wt.gui.app.sample;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;
 
@@ -53,7 +59,8 @@ public class SampleServiceTest {
         }
 
         public void runTest() {
-            ProjectTestUtils.createProject(projectService, projectDir);
+            Path pom = ProjectTestUtils.createProject(projectService, projectDir);
+            insertParentRelativePath(pom);
             sampleService.create(projectDir);
 
             ProcessExitCallback exitCallback = (exitCode) -> {
@@ -70,4 +77,20 @@ public class SampleServiceTest {
 
         }
     }
+
+    static void insertParentRelativePath(Path pom) {
+        try {
+            List<String> edittedLines = Files.readAllLines(pom).stream().map(line -> {
+                if (StringUtils.contains(line, "</parent>")) {
+                    return "<relativePath>../../../sit-wt-project/pom.xml</relativePath>" + line;
+                }
+                return line;
+            }).collect(Collectors.toList());
+
+            Files.write(pom, edittedLines);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
 }

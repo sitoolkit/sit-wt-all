@@ -16,7 +16,7 @@ public class ProjectTestUtils {
     private ProjectTestUtils() {
     }
 
-    public static void createProject(ProjectService service, Path projectDir) {
+    public static Path createProject(ProjectService service, Path projectDir) {
         MavenUtils.findAndInstall();
 
         if (projectDir.toFile().exists()) {
@@ -37,5 +37,7 @@ public class ProjectTestUtils {
                 .resolve("src/main/resources/capabilities.properties").toFile().exists());
         ThreadUtils.waitFor("sit-wt.properties does not exist",
                 () -> projectDir.resolve("src/main/resources/sit-wt.properties").toFile().exists());
+
+        return pomFile.toPath();
     }
 }
