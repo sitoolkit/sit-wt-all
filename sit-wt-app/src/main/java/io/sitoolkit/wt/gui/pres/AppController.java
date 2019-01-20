@@ -137,7 +137,7 @@ public class AppController implements Initializable {
                 .add(new TextAreaStdoutListener(console));
 
         testToolbarController.initialize(messageView, fileTreeController, projectState,
-                editorTabController, editorTabController);
+                editorTabController, editorTabController, editorTabController);
         testToolbarController.testService = testService;
         sampleToolbarController.initialize(messageView, testToolbarController, projectState);
         diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);

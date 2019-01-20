@@ -82,6 +82,8 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     private FileOpenable evidenceOpenable;
 
+    private FileSaver fileSaver;
+
     TestService testService;
 
     @Override
@@ -98,12 +100,13 @@ public class TestToolbarController implements Initializable, TestRunnable {
 
     public void initialize(MessageView messageView, FileTreeController fileTreeController,
             ProjectState projectState, DebugListenerFinder debugListenerFinder,
-            FileOpenable evidenceOpenable) {
+            FileOpenable evidenceOpenable, FileSaver fileSaver) {
         this.projectState = projectState;
         this.fileTreeController = fileTreeController;
         this.messageView = messageView;
         this.debugListenerFinder = debugListenerFinder;
         this.evidenceOpenable = evidenceOpenable;
+        this.fileSaver = fileSaver;
 
         FxUtils.bindVisible(startGroup, projectState.isLoaded());
         FxUtils.bindVisible(runningGroup, projectState.isRunning());
@@ -159,6 +162,7 @@ public class TestToolbarController implements Initializable, TestRunnable {
     }
 
     private void runTest(boolean isDebug, boolean isParallel, String targetScriptStr) {
+        fileSaver.save();
         projectState.setState(isDebug ? State.DEBUGGING : State.RUNNING);
 
         TestRunParams params = new TestRunParams();

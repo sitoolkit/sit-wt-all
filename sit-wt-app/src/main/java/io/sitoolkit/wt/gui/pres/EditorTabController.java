@@ -21,7 +21,7 @@ import javafx.scene.control.Tooltip;
 import lombok.Getter;
 import lombok.Setter;
 
-public class EditorTabController implements FileOpenable, DebugListenerFinder {
+public class EditorTabController implements FileOpenable, DebugListenerFinder, FileSaver {
 
     @Setter
     private TabPane tabs;
@@ -71,6 +71,7 @@ public class EditorTabController implements FileOpenable, DebugListenerFinder {
         }
     }
 
+    @Override
     public void save() {
         getSelectedEditorController().save();
     }
