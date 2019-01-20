@@ -14,7 +14,6 @@ import io.sitoolkit.wt.gui.pres.editor.WebViewController;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
@@ -52,8 +51,7 @@ public class EditorTabController implements FileOpenable, DebugListenerFinder, F
         Optional<Tab> editorTab = findTabByFile(file);
 
         if (editorTab.isPresent()) {
-            SingleSelectionModel<Tab> selectionModel = tabs.getSelectionModel();
-            selectionModel.select(editorTab.get());
+            tabs.getSelectionModel().select(editorTab.get());
 
         } else {
             Platform.runLater(() -> {
@@ -66,6 +64,7 @@ public class EditorTabController implements FileOpenable, DebugListenerFinder, F
                     setFileInfo(tab, file);
                     tab.setContent(content);
                     tabs.getTabs().add(tab);
+                    tabs.getSelectionModel().select(tab);
                 });
             });
         }

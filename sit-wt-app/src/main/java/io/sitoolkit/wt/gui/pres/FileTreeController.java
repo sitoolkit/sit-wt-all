@@ -26,6 +26,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.input.MouseButton;
 
 public class FileTreeController implements Initializable {
 
@@ -63,6 +64,11 @@ public class FileTreeController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        fileTree.setOnMouseClicked(mouseEvent -> {
+            if (MouseButton.PRIMARY.equals(mouseEvent.getButton()) && mouseEvent.getClickCount() > 1) {
+                fileOpenable.open(getSelectedItem());
+            }
+        });
         fileTree.setEditable(true);
         fileTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         if (mode == Mode.CHECKBOX) {
@@ -75,12 +81,9 @@ public class FileTreeController implements Initializable {
 
                 String selectedFileName = selectedItem.getValue().getFile().getName();
 
-                executeMenuItem.setVisible(
-                        StrUtils.endsWithAny(selectedFileName, ".csv"));
-                executeCaseMenuItem
-                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".csv"));
-                executeDebugCaseMenuItem
-                        .setVisible(StrUtils.endsWithAny(selectedFileName, ".csv"));
+                executeMenuItem.setVisible(StrUtils.endsWithAny(selectedFileName, ".csv"));
+                executeCaseMenuItem.setVisible(StrUtils.endsWithAny(selectedFileName, ".csv"));
+                executeDebugCaseMenuItem.setVisible(StrUtils.endsWithAny(selectedFileName, ".csv"));
             });
         });
 
