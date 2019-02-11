@@ -22,24 +22,24 @@
       <Separator orientation="VERTICAL" />
       <Label onMouseClicked="#run" styleClass="image-btn,run-btn">
         <tooltip>
-          <Tooltip text="テストスクリプトを実行します" />
+          <Tooltip text="%tooltip.runTestScript" />
         </tooltip>
       </Label>
       <Label onMouseClicked="#debug" styleClass="image-btn,debug-btn">
         <tooltip>
-          <Tooltip text="テストスクリプトをデバッグします" />
+          <Tooltip text="%tooltip.debugTestScript" />
         </tooltip>
       </Label>
       <Label onMouseClicked="#runParallel" styleClass="image-btn,parallel-btn">
         <tooltip>
-          <Tooltip text="テストスクリプトを並列実行します" />
+          <Tooltip text="%tooltip.runParallel" />
         </tooltip>
       </Label>
       <ComboBox fx:id="baseUrlCombo" editable="true" promptText="Base URL" />
       <ChoiceBox fx:id="browserChoice" prefWidth="150.0" value="chrome" />
       <ToggleButton fx:id="compareToggle" styleClass="image-toggle-btn, compare-toggle-btn" >
         <tooltip>
-          <Tooltip text="スクリーンショット比較機能のON/OFFを切り替えます" />
+          <Tooltip text="%tooltip.toggleDiffScreenshot" />
         </tooltip>
       </ToggleButton>
     </items>
@@ -53,14 +53,14 @@
   <ToolBar fx:id="debugGroup">
     <items>
       <Separator orientation="VERTICAL" />
-      <TextField fx:id="stepNoText" prefWidth="90.0" promptText="ステップNo" />
+      <TextField fx:id="stepNoText" prefWidth="90.0" promptText="%stepNo" />
       <Label fx:id="pauseButton" onMouseClicked="#pause" styleClass="image-btn,pause-btn" />
       <Label fx:id="restartButton" onMouseClicked="#restart" styleClass="image-btn,run-btn" />
       <Label onMouseClicked="#back" styleClass="image-btn,back-btn" />
       <Label onMouseClicked="#forward" styleClass="image-btn,forward-btn" />
-      <TextField fx:id="locatorText" prefWidth="90.0" promptText="ロケーター" >
+      <TextField fx:id="locatorText" prefWidth="90.0" promptText="%locator" >
         <tooltip>
-          <Tooltip text="[0] [1]と入力するとロケーター書式[0]、値[1]に該当する要素を検出します。"/>
+          <Tooltip text="%tooltip.locator"/>
         </tooltip>
       </TextField>
       <Label onMouseClicked="#checkLocator" styleClass="image-btn,locator-check-btn" />

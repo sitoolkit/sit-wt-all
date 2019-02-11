@@ -15,17 +15,17 @@
       <Separator orientation="VERTICAL" />
       <Label onMouseClicked="#maskEvidence" styleClass="image-btn,mask-btn">
         <tooltip>
-          <Tooltip text="スクリーンショットにマスク処理を施します"/>
+          <Tooltip text="%tooltip.maskScreenshot"/>
         </tooltip>
       </Label>
       <Label onMouseClicked="#setBaseEvidence" styleClass="image-btn,base-btn">
         <tooltip>
-          <Tooltip text="基準エビデンスを確定します"/>
+          <Tooltip text="%tooltip.setBaseEvidence"/>
         </tooltip>
       </Label>
       <Label onMouseClicked="#genDiffEvidence" styleClass="image-btn,diff-btn">
         <tooltip>
-          <Tooltip text="比較エビデンスを生成します"/>
+          <Tooltip text="%tooltip.genDiffEvidence"/>
         </tooltip>
       </Label>
     </items>

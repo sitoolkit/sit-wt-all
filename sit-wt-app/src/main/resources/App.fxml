@@ -42,23 +42,23 @@
           <children>
             <Label onMouseClicked="#openProject" styleClass="image-btn,project-btn">
               <tooltip>
-                <Tooltip text="プロジェクトを作成/開きます" />
+                <Tooltip text="%tooltip.openProject" />
               </tooltip>
             </Label>
             <Separator orientation="VERTICAL" />
             <Label fx:id="openButton" onMouseClicked="#editScript" styleClass="image-btn,open-btn">
               <tooltip>
-                <Tooltip text="テストスクリプトを開きます" />
+                <Tooltip text="%tooltip.file" />
               </tooltip>
             </Label>
             <Label fx:id="saveButton" onMouseClicked="#editor2script" styleClass="image-btn,save-btn">
               <tooltip>
-                <Tooltip text="アクティブタブのテストスクリプトを保存します" />
+                <Tooltip text="%tooltip.save" />
               </tooltip>
             </Label>
             <Label fx:id="saveAsButton" onMouseClicked="#editor2scriptAs" styleClass="image-btn,save-as-btn">
               <tooltip>
-                <Tooltip text="アクティブタブのテストスクリプトを別名で保存します" />
+                <Tooltip text="%tooltip.saveAs" />
               </tooltip>
             </Label>
           </children>
@@ -70,12 +70,12 @@
             <Separator orientation="VERTICAL" />
             <Label onMouseClicked="#ope2script" styleClass="image-btn,record-btn">
               <tooltip>
-                <Tooltip text="ブラウザ操作を記録してテストスクリプトを生成します" />
+                <Tooltip text="%tooltip.recordBrowserOperation" />
               </tooltip>
             </Label>
             <Label onMouseClicked="#page2script" styleClass="image-btn,export-btn">
               <tooltip>
-                <Tooltip text="ブラウザで表示したページのテストスクリプトを生成します" />
+                <Tooltip text="%tooltip.generateFromPage" />
               </tooltip>
             </Label>
           </items>
@@ -103,7 +103,7 @@
             <!-- </Label> -->
             <Label onMouseClicked="#settings" styleClass="image-btn,settings-btn">
               <tooltip>
-                <Tooltip text="設定ファイルのフォルダを開きます" />
+                <Tooltip text="%tooltip.setting" />
               </tooltip>
             </Label>
             <Label onMouseClicked="#help" styleClass="image-btn,help-btn">

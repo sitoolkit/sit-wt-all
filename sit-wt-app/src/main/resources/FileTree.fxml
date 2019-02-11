@@ -11,15 +11,15 @@
     <contextMenu>
       <ContextMenu fx:id="contextMenu">
         <items>
-          <MenuItem mnemonicParsing="false" onAction="#open" text="開く" />
-          <MenuItem fx:id="executeMenuItem" mnemonicParsing="false" onAction="#execute" text="実行" />
-          <MenuItem fx:id="executeCaseMenuItem" mnemonicParsing="false" onAction="#executeCase" text="ケースを選択して実行" />
-          <MenuItem fx:id="executeDebugCaseMenuItem" mnemonicParsing="false" onAction="#executeDebugCase" text="ケースを選択してデバッグ" />
-          <Menu text="新規">
-            <MenuItem mnemonicParsing="false" onAction="#newScript" text="スクリプト" />
-            <MenuItem mnemonicParsing="false" onAction="#newFolder" text="フォルダー" />
+          <MenuItem mnemonicParsing="false" onAction="#open" text="%open" />
+          <MenuItem fx:id="executeMenuItem" mnemonicParsing="false" onAction="#execute" text="%run" />
+          <MenuItem fx:id="executeCaseMenuItem" mnemonicParsing="false" onAction="#executeCase" text="%runCase" />
+          <MenuItem fx:id="executeDebugCaseMenuItem" mnemonicParsing="false" onAction="#executeDebugCase" text="%debugCase" />
+          <Menu text="%new">
+            <MenuItem mnemonicParsing="false" onAction="#newScript" text="%testScript" />
+            <MenuItem mnemonicParsing="false" onAction="#newFolder" text="%folder" />
           </Menu>
-          <MenuItem mnemonicParsing="false" onAction="#rename" text="名称変更" />
+          <MenuItem mnemonicParsing="false" onAction="#rename" text="%rename" />
 <!-- 元に戻す機能を実装するまではコメントアウト
           <MenuItem mnemonicParsing="false" onAction="#delete" text="削除" />
  -->

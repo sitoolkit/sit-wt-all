@@ -13,12 +13,12 @@
   <Separator orientation="VERTICAL" />
   <Label fx:id="runSampleButton" onMouseClicked="#runSample" styleClass="image-btn,run-sample-btn">
     <tooltip>
-      <Tooltip text="サンプルWebサイトを起動します。" />
+      <Tooltip text="%tooltip.startSample" />
     </tooltip>
   </Label>
   <Label fx:id="stopSampleButton" onMouseClicked="#stopSample" styleClass="image-btn,stop-sample-btn">
     <tooltip>
-      <Tooltip text="サンプルWebサイトを停止します。" />
+      <Tooltip text="%tooltip.stopSample" />
     </tooltip>
   </Label>
 </HBox>

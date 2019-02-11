@@ -1,5 +1,7 @@
 package io.sitoolkit.wt.gui.pres;
 
+import java.util.ResourceBundle;
+
 import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.gui.infra.fx.FxContext;
@@ -46,6 +48,7 @@ public class SitWtApplication extends Application {
         primaryStage.setTitle("SI-Toolkit for Web Testing");
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
+        loader.setResources(ResourceBundle.getBundle("message.message"));
         Parent root = loader.load();
         controller = loader.getController();
 
