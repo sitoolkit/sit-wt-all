@@ -46,8 +46,8 @@ public abstract class ScreenshotTaker {
 
         String driverType = StringUtils.defaultString(pm.getDriverType());
 
-        if (("chrome".equals(driverType) || "firefox".equals(driverType))
-                && !ScreenshotTiming.ON_DIALOG.equals(timing)) {
+        if (("chrome".equals(driverType) || "firefox".equals(driverType)
+                || "edge".equals(driverType)) && !ScreenshotTiming.ON_DIALOG.equals(timing)) {
             return getScreenshotWithAdjust(timing);
         } else {
             return getScreenShot(timing);
@@ -169,6 +169,12 @@ public abstract class ScreenshotTaker {
                                     : scrollPosX;
                 }
                 executor.executeScript("window.scrollTo(" + scrollPosX + ", " + scrollPosY + ");");
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+
                 BufferedImage imageParts = ImageIO
                         .read(takesScreenshot.getScreenshotAs(OutputType.FILE));
 
