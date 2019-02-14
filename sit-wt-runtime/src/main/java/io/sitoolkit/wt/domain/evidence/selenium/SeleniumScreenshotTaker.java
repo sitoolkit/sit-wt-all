@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -27,13 +28,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import io.sitoolkit.wt.domain.tester.TestContext;
 import io.sitoolkit.wt.infra.PropertyManager;
-import io.sitoolkit.wt.infra.log.SitLogger;
-import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
 
 public class SeleniumScreenshotTaker extends ScreenshotTaker {
-
-    protected final SitLogger LOG = SitLoggerFactory.getLogger(ScrollCondition.class);
 
     @Resource
     TestContext current;
@@ -52,6 +49,8 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
     private Robot robot;
 
     private long waitTimeout;
+
+    private static final long EDGE_SCROLL_WAIT_MS = 50L;
 
     @PostConstruct
     public void init() {
@@ -153,9 +152,19 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     @Override
     protected void scrollTo(int x, int y) {
-        LOG.infoMsg("0: " + System.currentTimeMillis());
-        ((JavascriptExecutor) driver).executeScript("" + "window.scrollTo(" + x + ", " + y + ");");
-        LOG.infoMsg("1: " + System.currentTimeMillis());
+        ((JavascriptExecutor) driver).executeScript("window.scrollTo(" + x + ", " + y + ");");
+
+        String driverType = StringUtils.defaultString(pm.getDriverType());
+
+        if (!"edge".equals(driverType)) {
+            return;
+        }
+
+        try {
+            Thread.sleep(EDGE_SCROLL_WAIT_MS);
+        } catch (InterruptedException e) {
+            log.warn("thread.sleep.error", e);
+        }
     }
 
     public void setResizeWindow(boolean resizeWindow) {
