@@ -13,7 +13,6 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.WebDriverException;
 import org.springframework.context.ApplicationContext;
 
 import io.sitoolkit.wt.infra.PropertyManager;
@@ -127,7 +126,7 @@ public abstract class ScreenshotTaker {
     }
 
     private void drawWholePageScreenshot(WindowSize windowSize, Graphics graphics)
-            throws WebDriverException, IOException {
+            throws IOException {
         int scrollHeight = 0;
         int rowCount = 0;
 
