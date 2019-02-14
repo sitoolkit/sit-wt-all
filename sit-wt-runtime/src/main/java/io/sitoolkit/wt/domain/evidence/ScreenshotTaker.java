@@ -156,7 +156,7 @@ public abstract class ScreenshotTaker {
                                     : scrollPosX;
                 }
 
-                scrollTo(drawPosX, drawPosY);
+                scrollTo(scrollPosX, scrollPosY);
 
                 BufferedImage imageParts = ImageIO.read(getAsFile());
 
