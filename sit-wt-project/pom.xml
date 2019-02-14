@@ -44,7 +44,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <sitwt.version>3.0.0-alpha.2-SNAPSHOT</sitwt.version>
+    <sitwt.version>3.0.0-beta.1-SNAPSHOT</sitwt.version>
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
     <trimStackTrace>false</trimStackTrace>
     <mpir.skip>true</mpir.skip>

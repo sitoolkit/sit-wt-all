@@ -13,17 +13,12 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.springframework.context.ApplicationContext;
 
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
-import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
 import lombok.Value;
 
 public abstract class ScreenshotTaker {
@@ -34,13 +29,7 @@ public abstract class ScreenshotTaker {
     ApplicationContext appCtx;
 
     @Resource
-    TakesScreenshot takesScreenshot;
-
-    @Resource
     PropertyManager pm;
-
-    @Resource
-    WebDriver driver;
 
     public Screenshot get(ScreenshotTiming timing) {
 
@@ -83,7 +72,7 @@ public abstract class ScreenshotTaker {
         try {
             File file = File.createTempFile("sit-wt-temp-screenshot", ".png");
 
-            WindowSize windowSize = getWihdowSize();
+            WindowSize windowSize = getWindowSize();
 
             BufferedImage img = new BufferedImage(windowSize.getPageWidth(),
                     windowSize.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -92,8 +81,7 @@ public abstract class ScreenshotTaker {
             if ((windowSize.getWindowHeight() >= windowSize.getPageHeight())
                     && (windowSize.getWindowWidth() >= windowSize.getPageWidth())) {
 
-                BufferedImage imageParts = ImageIO
-                        .read(takesScreenshot.getScreenshotAs(OutputType.FILE));
+                BufferedImage imageParts = ImageIO.read(getAsFile());
 
                 imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
                         windowSize.getWindowHeight());
@@ -142,7 +130,6 @@ public abstract class ScreenshotTaker {
             throws WebDriverException, IOException {
         int scrollHeight = 0;
         int rowCount = 0;
-        JavascriptExecutor executor = (JavascriptExecutor) driver;
 
         while (scrollHeight < windowSize.getPageHeight()) {
             int scrollPosY = windowSize.getWindowHeight() * rowCount;
@@ -168,15 +155,10 @@ public abstract class ScreenshotTaker {
                                     ? windowSize.getPageWidth() - windowSize.getWindowWidth()
                                     : scrollPosX;
                 }
-                executor.executeScript("window.scrollTo(" + scrollPosX + ", " + scrollPosY + ");");
 
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                }
+                scrollTo(drawPosX, drawPosY);
 
-                BufferedImage imageParts = ImageIO
-                        .read(takesScreenshot.getScreenshotAs(OutputType.FILE));
+                BufferedImage imageParts = ImageIO.read(getAsFile());
 
                 imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
                         windowSize.getWindowHeight());
@@ -192,26 +174,18 @@ public abstract class ScreenshotTaker {
         }
     }
 
-    private WindowSize getWihdowSize() {
-        int pageHeight = Integer.parseInt(String.valueOf(
-                WebDriverUtils.executeScript(driver, "return document.body.scrollHeight")));
-        int pageWidth = Integer.parseInt(String
-                .valueOf(WebDriverUtils.executeScript(driver, "return document.body.scrollWidth")));
-
-        int windowHeight = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
-                "return document.documentElement.clientHeight")));
-        int windowWidth = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
-                "return document.documentElement.clientWidth")));
-
-        return new WindowSize(pageHeight, pageWidth, windowHeight, windowWidth);
-    }
-
     protected abstract String getAsData();
 
     protected abstract String getDialogAsData();
 
+    protected abstract File getAsFile();
+
+    protected abstract void scrollTo(int x, int y);
+
+    protected abstract WindowSize getWindowSize();
+
     @Value
-    private class WindowSize {
+    protected class WindowSize {
         private int pageHeight;
         private int pageWidth;
         private int windowHeight;

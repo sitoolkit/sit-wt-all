@@ -1,12 +1,16 @@
 package io.sitoolkit.wt.domain.evidence.appium;
 
+import java.io.File;
+
 import javax.annotation.Resource;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
 import io.appium.java_client.AppiumDriver;
 import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
+import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
 
 public class HybridScreenshotTaker extends ScreenshotTaker {
 
@@ -41,6 +45,31 @@ public class HybridScreenshotTaker extends ScreenshotTaker {
     @Override
     public String getDialogAsData() {
         return getAsData();
+    }
+
+    @Override
+    protected WindowSize getWindowSize() {
+        int pageHeight = Integer.parseInt(String.valueOf(
+                WebDriverUtils.executeScript(driver, "return document.body.scrollHeight")));
+        int pageWidth = Integer.parseInt(String
+                .valueOf(WebDriverUtils.executeScript(driver, "return document.body.scrollWidth")));
+
+        int windowHeight = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
+                "return document.documentElement.clientHeight")));
+        int windowWidth = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
+                "return document.documentElement.clientWidth")));
+
+        return new WindowSize(pageHeight, pageWidth, windowHeight, windowWidth);
+    }
+
+    @Override
+    protected File getAsFile() {
+        return takesScreenshot.getScreenshotAs(OutputType.FILE);
+    }
+
+    @Override
+    protected void scrollTo(int x, int y) {
+        ((JavascriptExecutor) driver).executeScript("window.scrollTo(" + x + ", " + y + ");");
     }
 
 }

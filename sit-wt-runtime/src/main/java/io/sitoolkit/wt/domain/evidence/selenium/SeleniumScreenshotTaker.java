@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
@@ -26,8 +27,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import io.sitoolkit.wt.domain.tester.TestContext;
 import io.sitoolkit.wt.infra.PropertyManager;
+import io.sitoolkit.wt.infra.log.SitLogger;
+import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
 
 public class SeleniumScreenshotTaker extends ScreenshotTaker {
+
+    protected final SitLogger LOG = SitLoggerFactory.getLogger(ScrollCondition.class);
 
     @Resource
     TestContext current;
@@ -42,11 +48,6 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
     PropertyManager pm;
 
     private boolean resizeWindow = false;
-
-    /**
-     * ダイアログが表示されるまでの待機時間(ミリ秒)
-     */
-    private int dialogWaitSpan = 500;
 
     private Robot robot;
 
@@ -130,8 +131,31 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         }
     }
 
-    public void setDialogWaitSpan(int dialogWaitSpan) {
-        this.dialogWaitSpan = dialogWaitSpan;
+    @Override
+    protected WindowSize getWindowSize() {
+        int pageHeight = Integer.parseInt(String.valueOf(
+                WebDriverUtils.executeScript(driver, "return document.body.scrollHeight")));
+        int pageWidth = Integer.parseInt(String
+                .valueOf(WebDriverUtils.executeScript(driver, "return document.body.scrollWidth")));
+
+        int windowHeight = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
+                "return document.documentElement.clientHeight")));
+        int windowWidth = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
+                "return document.documentElement.clientWidth")));
+
+        return new WindowSize(pageHeight, pageWidth, windowHeight, windowWidth);
+    }
+
+    @Override
+    protected File getAsFile() {
+        return takesScreenshot.getScreenshotAs(OutputType.FILE);
+    }
+
+    @Override
+    protected void scrollTo(int x, int y) {
+        LOG.infoMsg("0: " + System.currentTimeMillis());
+        ((JavascriptExecutor) driver).executeScript("" + "window.scrollTo(" + x + ", " + y + ");");
+        LOG.infoMsg("1: " + System.currentTimeMillis());
     }
 
     public void setResizeWindow(boolean resizeWindow) {
