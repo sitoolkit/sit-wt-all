@@ -8,6 +8,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -50,7 +53,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     private long waitTimeout;
 
-    private static final long EDGE_SCROLL_WAIT_MS = 50L;
+    private String windowSizeMapScript;
 
     @PostConstruct
     public void init() {
@@ -61,6 +64,15 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         }
 
         waitTimeout = pm.getImplicitlyWait() / 1000;
+
+        Map<String, String> sizeMap = new HashMap<>();
+        sizeMap.put("pageHeight", "document.body.scrollHeight");
+        sizeMap.put("pageWidth", "document.body.scrollWidth");
+        sizeMap.put("windowHeight", "document.documentElement.clientHeight");
+        sizeMap.put("windowWidth", "document.documentElement.clientWidth");
+        windowSizeMapScript = sizeMap.entrySet().stream()
+                .map((e) -> e.getKey() + ":" + e.getValue())
+                .collect(Collectors.joining(",", "{", "}"));
     }
 
     @Override
@@ -132,17 +144,17 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     @Override
     protected WindowSize getWindowSize() {
-        int pageHeight = Integer.parseInt(String.valueOf(
-                WebDriverUtils.executeScript(driver, "return document.body.scrollHeight")));
-        int pageWidth = Integer.parseInt(String
-                .valueOf(WebDriverUtils.executeScript(driver, "return document.body.scrollWidth")));
 
-        int windowHeight = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
-                "return document.documentElement.clientHeight")));
-        int windowWidth = Integer.parseInt(String.valueOf(WebDriverUtils.executeScript(driver,
-                "return document.documentElement.clientWidth")));
+        // In the Edge browser, since size values such as scrollHeight may be invalid
+        // immediately after loading the page, refer to scrollHeight before return.
+        // See also https://stackoverflow.com/a/3485654/10162817
+        @SuppressWarnings("unchecked")
+        Map<String, Long> sizeMap = (Map<String, Long>) WebDriverUtils.executeScript(driver,
+                "document.body.scrollHeight; return " + windowSizeMapScript + ";");
 
-        return new WindowSize(pageHeight, pageWidth, windowHeight, windowWidth);
+        return new WindowSize(sizeMap.get("pageHeight").intValue(),
+                sizeMap.get("pageWidth").intValue(), sizeMap.get("windowHeight").intValue(),
+                sizeMap.get("windowWidth").intValue());
     }
 
     @Override
@@ -152,18 +164,14 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     @Override
     protected void scrollTo(int x, int y) {
-        ((JavascriptExecutor) driver).executeScript("window.scrollTo(" + x + ", " + y + ");");
+        JavascriptExecutor executor = ((JavascriptExecutor) driver);
 
         String driverType = StringUtils.defaultString(pm.getDriverType());
-
-        if (!"edge".equals(driverType)) {
-            return;
-        }
-
-        try {
-            Thread.sleep(EDGE_SCROLL_WAIT_MS);
-        } catch (InterruptedException e) {
-            log.warn("thread.sleep.error", e);
+        if ("edge".equals(driverType)) {
+            executor.executeAsyncScript("window.scrollTo(" + x + ", " + y + ");"
+                    + "window.requestAnimationFrame(() => { arguments[arguments.length - 1](); });");
+        } else {
+            executor.executeScript("window.scrollTo(" + x + ", " + y + ");");
         }
     }
 
