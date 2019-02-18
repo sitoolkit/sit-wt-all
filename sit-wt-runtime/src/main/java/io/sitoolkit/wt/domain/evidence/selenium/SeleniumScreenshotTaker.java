@@ -1,12 +1,16 @@
 package io.sitoolkit.wt.domain.evidence.selenium;
 
 import java.awt.AWTException;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,13 +31,20 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.context.ApplicationContext;
 
+import io.sitoolkit.wt.domain.evidence.Screenshot;
 import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
+import io.sitoolkit.wt.domain.evidence.ScreenshotTiming;
 import io.sitoolkit.wt.domain.tester.TestContext;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
+import lombok.Value;
 
 public class SeleniumScreenshotTaker extends ScreenshotTaker {
+
+    @Resource
+    ApplicationContext appCtx;
 
     @Resource
     TestContext current;
@@ -73,6 +84,20 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         windowSizeMapScript = sizeMap.entrySet().stream()
                 .map((e) -> e.getKey() + ":" + e.getValue())
                 .collect(Collectors.joining(",", "{", "}"));
+    }
+
+    @Override
+    public Screenshot get(ScreenshotTiming timing) {
+
+        if (ScreenshotTiming.ON_DIALOG.equals(timing)) {
+            return getScreenShot(timing);
+        }
+
+        if (Arrays.asList("chrome", "firefox", "edge").contains(pm.getDriverType())) {
+            return getScreenshotWithAdjust(timing);
+        } else {
+            return getScreenShot(timing);
+        }
     }
 
     @Override
@@ -142,8 +167,106 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         }
     }
 
-    @Override
-    protected WindowSize getWindowSize() {
+    private Screenshot getScreenshotWithAdjust(ScreenshotTiming timing) {
+        Screenshot screenshot = appCtx.getBean(Screenshot.class);
+
+        try {
+            File file = File.createTempFile("sit-wt-temp-screenshot", ".png");
+
+            WindowSize windowSize = getWindowSize();
+
+            BufferedImage img = new BufferedImage(windowSize.getPageWidth(),
+                    windowSize.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics graphics = img.getGraphics();
+
+            if ((windowSize.getWindowHeight() >= windowSize.getPageHeight())
+                    && (windowSize.getWindowWidth() >= windowSize.getPageWidth())) {
+
+                BufferedImage imageParts = ImageIO.read(getAsFile());
+
+                imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
+                        windowSize.getWindowHeight());
+
+                graphics.drawImage(imageParts, 0, 0, null);
+
+            } else {
+                drawWholePageScreenshot(windowSize, graphics);
+            }
+
+            ImageIO.write(img, "png", file);
+
+            screenshot.setFile(file);
+            screenshot.setTiming(timing);
+
+        } catch (Exception e) {
+            log.warn("screenshot.get.error", e);
+            screenshot.clearElementPosition();
+            screenshot.setErrorMesage(e.getLocalizedMessage());
+        }
+
+        return screenshot;
+
+    }
+
+    private BufferedImage imageSizeChange(BufferedImage imageParts, int windowWidth,
+            int windowHeight) {
+
+        int width = imageParts.getWidth();
+        int height = imageParts.getHeight();
+
+        int newHeight = windowWidth * height / width;
+
+        AffineTransformOp xform = new AffineTransformOp(AffineTransform
+                .getScaleInstance((double) windowWidth / width, (double) newHeight / height),
+                AffineTransformOp.TYPE_BILINEAR);
+
+        BufferedImage sizeChangeImg = new BufferedImage(windowWidth, newHeight,
+                imageParts.getType());
+
+        xform.filter(imageParts, sizeChangeImg);
+        return sizeChangeImg;
+    }
+
+    private void drawWholePageScreenshot(WindowSize windowSize, Graphics graphics)
+            throws IOException {
+
+        for (int scrollPosY = 0; scrollPosY < windowSize.getPageHeight(); scrollPosY += windowSize
+                .getWindowHeight()) {
+
+            int drawPosY = calcDrawPos(windowSize.getWindowHeight(), windowSize.getPageHeight(),
+                    scrollPosY);
+
+            for (int scrollPosX = 0; scrollPosX < windowSize
+                    .getPageWidth(); scrollPosX += windowSize.getWindowWidth()) {
+
+                int drawPosX = calcDrawPos(windowSize.getWindowWidth(), windowSize.getPageWidth(),
+                        scrollPosX);
+
+                scrollTo(scrollPosX, scrollPosY);
+
+                BufferedImage imageParts = ImageIO.read(getAsFile());
+
+                imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
+                        windowSize.getWindowHeight());
+
+                graphics.drawImage(imageParts, drawPosX, drawPosY, null);
+            }
+        }
+    }
+
+    private int calcDrawPos(int windowLength, int pageLength, int scrollPos) {
+        if (windowLength >= pageLength) {
+            return 0;
+        }
+
+        if (scrollPos + windowLength >= pageLength) {
+            return pageLength - windowLength;
+        } else {
+            return scrollPos;
+        }
+    }
+
+    private WindowSize getWindowSize() {
 
         // In the Edge browser, since size values such as scrollHeight may be invalid
         // immediately after loading the page, refer to scrollHeight before return.
@@ -157,13 +280,11 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
                 sizeMap.get("windowWidth").intValue());
     }
 
-    @Override
-    protected File getAsFile() {
+    private File getAsFile() {
         return takesScreenshot.getScreenshotAs(OutputType.FILE);
     }
 
-    @Override
-    protected void scrollTo(int x, int y) {
+    private void scrollTo(int x, int y) {
         JavascriptExecutor executor = ((JavascriptExecutor) driver);
 
         String driverType = StringUtils.defaultString(pm.getDriverType());
@@ -179,4 +300,11 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         this.resizeWindow = resizeWindow;
     }
 
+    @Value
+    private class WindowSize {
+        private int pageHeight;
+        private int pageWidth;
+        private int windowHeight;
+        private int windowWidth;
+    }
 }
