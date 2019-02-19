@@ -1,20 +1,48 @@
-# SIToolkit for Web Testing
+# Web Tester
 
-SIToolkit for Web Testing (SIT-WT) はWebアプリケーションの自動テストツールです。作成されたテストスクリプトに従いブラウザを自動操作します。SIT-WTには以下の特徴があります。
+Web Tester is an automatic test tool for web applications. Automatically operate the browser according to the created test script. 
 
-* テストスクリプトをExcelまたはCSVで作成できます。
-* Selenium IDEで記録したテストスクリプトも使用できます。
-* 実行した画面操作に対して自動でエビデンス（スクリーンショットと操作ログ)が取得できます。
-* スマートフォン、タブレットの自動テストにも対応しています。
-* ブラウザの操作にはSelenium WebDriver、Appiumを使用しています。
-
-詳しい使い方などはこちらを参照してください。
-
-* サンプルを動かしてみる => [クイックスタート](http://www.sitoolkit.org/sit-wt.html)
-* 使い方 => [Wiki](../../wiki)
+* You can create test scripts **with non-programming**.
+* You can also use test scripts recorded with **Selenium IDE**.
+* **Evidence** (screenshot and operation log) is **created automatically** for the screen operation executed.
+* Selenium and Appium are used for browser operation.
 
 
+## Quick Start
 
-# ライセンス
+### GUI 
 
-SIT-WT、及びSIToolkitのすべてのモジュールは[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)で提供しています。
+Use GUI tools to create test projects and test scripts.
+You can immediately try the included sample website and test script.
+
+1. [Download](https://repo.maven.apache.org/maven2/io/sitoolkit/wt/sit-wt-app/3.0.0-alpha.2/sit-wt-app-3.0.0-alpha.2.jar) jar file.
+1. Execute it by double clicking.
+1. Select a directory to create your test project.
+1. Select **Sample** Menu > **Start** to start sample web site and get sample test script.
+1. Select **Test** Menu > **Run** / **Debug** to start test.
+
+
+### CLI
+
+To run test scripts in the test project at once, use the CLI tool (Maven Plugin).
+
+#### Windows
+
+```
+cd \path\to\testproject
+mvnw verify
+start target\site\surefure-report.html
+```
+
+#### MacOS
+
+```
+cd /path/to/testproject
+./mvnw verify
+open target/site/surefure-report.html
+```
+
+
+## Lisence
+
+Web Tester is released under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
