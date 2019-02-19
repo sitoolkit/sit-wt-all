@@ -2,7 +2,8 @@ package io.sitoolkit.wt.domain.evidence;
 
 public abstract class DefaultScreenshotTaker extends ScreenshotTaker {
 
-    public Screenshot get(ScreenshotTiming timing) {
+    @Override
+    protected Screenshot getScreenshot(ScreenshotTiming timing) {
         String dataStr = ScreenshotTiming.ON_DIALOG.equals(timing) ? getDialogAsData()
                 : getAsData();
 

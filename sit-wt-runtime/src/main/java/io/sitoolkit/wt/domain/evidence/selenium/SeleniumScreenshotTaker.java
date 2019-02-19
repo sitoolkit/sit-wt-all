@@ -36,6 +36,7 @@ import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import io.sitoolkit.wt.domain.evidence.ScreenshotTiming;
 import io.sitoolkit.wt.domain.tester.TestContext;
 import io.sitoolkit.wt.infra.PropertyManager;
+import io.sitoolkit.wt.infra.TestException;
 import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
 import lombok.Value;
 
@@ -74,7 +75,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
     }
 
     @Override
-    public Screenshot get(ScreenshotTiming timing) {
+    protected Screenshot getScreenshot(ScreenshotTiming timing) {
 
         if (ScreenshotTiming.ON_DIALOG.equals(timing)) {
             return createScreenshot(timing, getDialogAsData());
@@ -147,8 +148,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             current.setWindowRect(null);
             return Base64.getEncoder().encodeToString(baos.toByteArray());
         } catch (IOException e) {
-            log.warn("screenshot.get.error", e);
-            return null;
+            throw new TestException(e);
         }
     }
 
@@ -184,9 +184,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             screenshot.setTiming(timing);
 
         } catch (Exception e) {
-            log.warn("screenshot.get.error", e);
-            screenshot.clearElementPosition();
-            screenshot.setErrorMesage(e.getLocalizedMessage());
+            throw new TestException(e);
         }
 
         return screenshot;
