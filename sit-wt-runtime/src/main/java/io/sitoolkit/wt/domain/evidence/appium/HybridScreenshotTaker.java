@@ -6,9 +6,9 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
 import io.appium.java_client.AppiumDriver;
-import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
+import io.sitoolkit.wt.domain.evidence.DefaultScreenshotTaker;
 
-public class HybridScreenshotTaker extends ScreenshotTaker {
+public class HybridScreenshotTaker extends DefaultScreenshotTaker {
 
     private static final String CONTEXT_NATIVE_APP = "NATIVE_APP";
 

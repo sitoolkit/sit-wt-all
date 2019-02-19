@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -64,8 +62,6 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     private long waitTimeout;
 
-    private String windowSizeMapScript;
-
     @PostConstruct
     public void init() {
         try {
@@ -75,32 +71,22 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         }
 
         waitTimeout = pm.getImplicitlyWait() / 1000;
-
-        Map<String, String> sizeMap = new HashMap<>();
-        sizeMap.put("pageHeight", "document.body.scrollHeight");
-        sizeMap.put("pageWidth", "document.body.scrollWidth");
-        sizeMap.put("windowHeight", "document.documentElement.clientHeight");
-        sizeMap.put("windowWidth", "document.documentElement.clientWidth");
-        windowSizeMapScript = sizeMap.entrySet().stream()
-                .map((e) -> e.getKey() + ":" + e.getValue())
-                .collect(Collectors.joining(",", "{", "}"));
     }
 
     @Override
     public Screenshot get(ScreenshotTiming timing) {
 
         if (ScreenshotTiming.ON_DIALOG.equals(timing)) {
-            return getScreenShot(timing);
+            return createScreenshot(timing, getDialogAsData());
         }
 
         if (Arrays.asList("chrome", "firefox", "edge").contains(pm.getDriverType())) {
             return getScreenshotWithAdjust(timing);
         } else {
-            return getScreenShot(timing);
+            return createScreenshot(timing, getAsData());
         }
     }
 
-    @Override
     protected String getAsData() {
 
         Dimension orgSize = null;
@@ -141,7 +127,6 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         return data;
     }
 
-    @Override
     protected String getDialogAsData() {
         if (robot == null) {
             return null;
@@ -268,12 +253,19 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     private WindowSize getWindowSize() {
 
+        String sizeScript = "{";
+        sizeScript += "pageHeight: document.body.scrollHeight,";
+        sizeScript += "pageWidth: document.body.scrollWidth,";
+        sizeScript += "windowHeight: document.documentElement.clientHeight,";
+        sizeScript += "windowWidth: document.documentElement.clientWidth,";
+        sizeScript += "}";
+
         // In the Edge browser, since size values such as scrollHeight may be invalid
         // immediately after loading the page, refer to scrollHeight before return.
         // See also https://stackoverflow.com/a/3485654/10162817
         @SuppressWarnings("unchecked")
         Map<String, Long> sizeMap = (Map<String, Long>) WebDriverUtils.executeScript(driver,
-                "document.body.scrollHeight; return " + windowSizeMapScript + ";");
+                "document.body.scrollHeight; return " + sizeScript + ";");
 
         return new WindowSize(sizeMap.get("pageHeight").intValue(),
                 sizeMap.get("pageWidth").intValue(), sizeMap.get("windowHeight").intValue(),

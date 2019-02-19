@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.ApplicationContext;
 
-import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
@@ -19,21 +18,12 @@ public abstract class ScreenshotTaker {
     @Resource
     ApplicationContext appCtx;
 
-    @Resource
-    PropertyManager pm;
-
-    public Screenshot get(ScreenshotTiming timing) {
-        return getScreenShot(timing);
-    }
-
-    protected Screenshot getScreenShot(ScreenshotTiming timing) {
+    protected Screenshot createScreenshot(ScreenshotTiming timing, String dataStr) {
         Screenshot screenshot = appCtx.getBean(Screenshot.class);
 
         try {
 
             File file = File.createTempFile("sit-wt-temp-screenshot", ".png");
-            String dataStr = ScreenshotTiming.ON_DIALOG.equals(timing) ? getDialogAsData()
-                    : getAsData();
             byte[] data = Base64.getDecoder().decode(dataStr);
             FileUtils.writeByteArrayToFile(file, data);
 
@@ -49,7 +39,6 @@ public abstract class ScreenshotTaker {
         return screenshot;
     }
 
-    protected abstract String getAsData();
+    public abstract Screenshot get(ScreenshotTiming timing);
 
-    protected abstract String getDialogAsData();
 }
