@@ -8,7 +8,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -29,9 +28,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.context.ApplicationContext;
 
-import io.sitoolkit.wt.domain.evidence.Screenshot;
 import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
 import io.sitoolkit.wt.domain.evidence.ScreenshotTiming;
 import io.sitoolkit.wt.domain.tester.TestContext;
@@ -41,9 +38,6 @@ import io.sitoolkit.wt.infra.selenium.WebDriverUtils;
 import lombok.Value;
 
 public class SeleniumScreenshotTaker extends ScreenshotTaker {
-
-    @Resource
-    ApplicationContext appCtx;
 
     @Resource
     TestContext current;
@@ -63,6 +57,25 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
     private long waitTimeout;
 
+    private static final String WINDOW_SIZE_GET_SCRIPT;
+    static {
+        StringBuilder sb = new StringBuilder();
+
+        // In the Edge browser, since size values such as scrollHeight may be invalid
+        // immediately after loading the page, refer to scrollHeight before return.
+        // See also https://stackoverflow.com/a/3485654/10162817
+        sb.append("document.body.scrollHeight;");
+
+        sb.append("return {");
+        sb.append("pageHeight: document.body.scrollHeight,");
+        sb.append("pageWidth: document.body.scrollWidth,");
+        sb.append("windowHeight: document.documentElement.clientHeight,");
+        sb.append("windowWidth: document.documentElement.clientWidth,");
+        sb.append("};");
+
+        WINDOW_SIZE_GET_SCRIPT = sb.toString();
+    }
+
     @PostConstruct
     public void init() {
         try {
@@ -75,20 +88,20 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
     }
 
     @Override
-    protected Screenshot getScreenshot(ScreenshotTiming timing) {
+    protected byte[] getAsData(ScreenshotTiming timing) {
 
         if (ScreenshotTiming.ON_DIALOG.equals(timing)) {
-            return createScreenshot(timing, getDialogAsData());
+            return getDialogScreenshot();
         }
 
         if (Arrays.asList("chrome", "firefox", "edge").contains(pm.getDriverType())) {
-            return getScreenshotWithAdjust(timing);
+            return getScreenshotWithAdjust();
         } else {
-            return createScreenshot(timing, getAsData());
+            return getScreenshot();
         }
     }
 
-    protected String getAsData() {
+    protected byte[] getScreenshot() {
 
         Dimension orgSize = null;
 
@@ -125,10 +138,10 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
             driver.manage().window().setSize(orgSize);
         }
 
-        return data;
+        return Base64.getDecoder().decode(data);
     }
 
-    protected String getDialogAsData() {
+    protected byte[] getDialogScreenshot() {
         if (robot == null) {
             return null;
         }
@@ -141,77 +154,36 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         new WebDriverWait(driver, pm.getDialogWaitInSecond())
                 .until(ExpectedConditions.alertIsPresent());
 
-        try {
-            BufferedImage img = robot.createScreenCapture(windowRect);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(img, "png", baos);
-            current.setWindowRect(null);
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
-        } catch (IOException e) {
-            throw new TestException(e);
-        }
+        BufferedImage img = robot.createScreenCapture(windowRect);
+
+        current.setWindowRect(null);
+
+        return image2byteArray(img);
     }
 
-    private Screenshot getScreenshotWithAdjust(ScreenshotTiming timing) {
-        Screenshot screenshot = appCtx.getBean(Screenshot.class);
+    private byte[] getScreenshotWithAdjust() {
+        WindowSize windowSize = getWindowSize();
 
-        try {
-            File file = File.createTempFile("sit-wt-temp-screenshot", ".png");
+        BufferedImage img = new BufferedImage(windowSize.getPageWidth(), windowSize.getPageHeight(),
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics graphics = img.getGraphics();
 
-            WindowSize windowSize = getWindowSize();
+        if ((windowSize.getWindowHeight() >= windowSize.getPageHeight())
+                && (windowSize.getWindowWidth() >= windowSize.getPageWidth())) {
 
-            BufferedImage img = new BufferedImage(windowSize.getPageWidth(),
-                    windowSize.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics graphics = img.getGraphics();
+            BufferedImage imageParts = getSizedScreenshot(windowSize.getWindowWidth(),
+                    windowSize.getWindowHeight());
 
-            if ((windowSize.getWindowHeight() >= windowSize.getPageHeight())
-                    && (windowSize.getWindowWidth() >= windowSize.getPageWidth())) {
+            graphics.drawImage(imageParts, 0, 0, null);
 
-                BufferedImage imageParts = ImageIO.read(getAsFile());
-
-                imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
-                        windowSize.getWindowHeight());
-
-                graphics.drawImage(imageParts, 0, 0, null);
-
-            } else {
-                drawWholePageScreenshot(windowSize, graphics);
-            }
-
-            ImageIO.write(img, "png", file);
-
-            screenshot.setFile(file);
-            screenshot.setTiming(timing);
-
-        } catch (Exception e) {
-            throw new TestException(e);
+        } else {
+            drawWholePageScreenshot(windowSize, graphics);
         }
 
-        return screenshot;
-
+        return image2byteArray(img);
     }
 
-    private BufferedImage imageSizeChange(BufferedImage imageParts, int windowWidth,
-            int windowHeight) {
-
-        int width = imageParts.getWidth();
-        int height = imageParts.getHeight();
-
-        int newHeight = windowWidth * height / width;
-
-        AffineTransformOp xform = new AffineTransformOp(AffineTransform
-                .getScaleInstance((double) windowWidth / width, (double) newHeight / height),
-                AffineTransformOp.TYPE_BILINEAR);
-
-        BufferedImage sizeChangeImg = new BufferedImage(windowWidth, newHeight,
-                imageParts.getType());
-
-        xform.filter(imageParts, sizeChangeImg);
-        return sizeChangeImg;
-    }
-
-    private void drawWholePageScreenshot(WindowSize windowSize, Graphics graphics)
-            throws IOException {
+    private void drawWholePageScreenshot(WindowSize windowSize, Graphics graphics) {
 
         for (int scrollPosY = 0; scrollPosY < windowSize.getPageHeight(); scrollPosY += windowSize
                 .getWindowHeight()) {
@@ -227,9 +199,7 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
 
                 scrollTo(scrollPosX, scrollPosY);
 
-                BufferedImage imageParts = ImageIO.read(getAsFile());
-
-                imageParts = imageSizeChange(imageParts, windowSize.getWindowWidth(),
+                BufferedImage imageParts = getSizedScreenshot(windowSize.getWindowWidth(),
                         windowSize.getWindowHeight());
 
                 graphics.drawImage(imageParts, drawPosX, drawPosY, null);
@@ -249,29 +219,44 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
         }
     }
 
+    private BufferedImage getSizedScreenshot(int windowWidth, int windowHeight) {
+        try {
+            BufferedImage imageParts = ImageIO
+                    .read(takesScreenshot.getScreenshotAs(OutputType.FILE));
+            return changeImageSize(imageParts, windowWidth, windowHeight);
+        } catch (Exception e) {
+            throw new TestException(e);
+        }
+    }
+
+    private BufferedImage changeImageSize(BufferedImage imageParts, int windowWidth,
+            int windowHeight) {
+
+        int width = imageParts.getWidth();
+        int height = imageParts.getHeight();
+
+        int newHeight = windowWidth * height / width;
+
+        AffineTransformOp xform = new AffineTransformOp(AffineTransform
+                .getScaleInstance((double) windowWidth / width, (double) newHeight / height),
+                AffineTransformOp.TYPE_BILINEAR);
+
+        BufferedImage sizeChangeImg = new BufferedImage(windowWidth, newHeight,
+                imageParts.getType());
+
+        xform.filter(imageParts, sizeChangeImg);
+        return sizeChangeImg;
+    }
+
     private WindowSize getWindowSize() {
 
-        String sizeScript = "{";
-        sizeScript += "pageHeight: document.body.scrollHeight,";
-        sizeScript += "pageWidth: document.body.scrollWidth,";
-        sizeScript += "windowHeight: document.documentElement.clientHeight,";
-        sizeScript += "windowWidth: document.documentElement.clientWidth,";
-        sizeScript += "}";
-
-        // In the Edge browser, since size values such as scrollHeight may be invalid
-        // immediately after loading the page, refer to scrollHeight before return.
-        // See also https://stackoverflow.com/a/3485654/10162817
         @SuppressWarnings("unchecked")
         Map<String, Long> sizeMap = (Map<String, Long>) WebDriverUtils.executeScript(driver,
-                "document.body.scrollHeight; return " + sizeScript + ";");
+                WINDOW_SIZE_GET_SCRIPT);
 
         return new WindowSize(sizeMap.get("pageHeight").intValue(),
                 sizeMap.get("pageWidth").intValue(), sizeMap.get("windowHeight").intValue(),
                 sizeMap.get("windowWidth").intValue());
-    }
-
-    private File getAsFile() {
-        return takesScreenshot.getScreenshotAs(OutputType.FILE);
     }
 
     private void scrollTo(int x, int y) {
@@ -283,6 +268,17 @@ public class SeleniumScreenshotTaker extends ScreenshotTaker {
                     + "window.requestAnimationFrame(() => { arguments[arguments.length - 1](); });");
         } else {
             executor.executeScript("window.scrollTo(" + x + ", " + y + ");");
+        }
+    }
+
+    private byte[] image2byteArray(BufferedImage img) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(img, "png", baos);
+
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new TestException(e);
         }
     }
 

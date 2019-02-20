@@ -1,14 +1,17 @@
 package io.sitoolkit.wt.domain.evidence.appium;
 
+import java.util.Base64;
+
 import javax.annotation.Resource;
 
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
 import io.appium.java_client.AppiumDriver;
-import io.sitoolkit.wt.domain.evidence.DefaultScreenshotTaker;
+import io.sitoolkit.wt.domain.evidence.ScreenshotTaker;
+import io.sitoolkit.wt.domain.evidence.ScreenshotTiming;
 
-public class HybridScreenshotTaker extends DefaultScreenshotTaker {
+public class HybridScreenshotTaker extends ScreenshotTaker {
 
     private static final String CONTEXT_NATIVE_APP = "NATIVE_APP";
 
@@ -19,7 +22,7 @@ public class HybridScreenshotTaker extends DefaultScreenshotTaker {
     TakesScreenshot takesScreenshot;
 
     @Override
-    public String getAsData() {
+    protected byte[] getAsData(ScreenshotTiming timing) {
         String context = driver.getContext();
         if (CONTEXT_NATIVE_APP.equals(context)) {
             context = null;
@@ -35,12 +38,7 @@ public class HybridScreenshotTaker extends DefaultScreenshotTaker {
             driver.context(context);
         }
 
-        return data;
-    }
-
-    @Override
-    public String getDialogAsData() {
-        return getAsData();
+        return Base64.getDecoder().decode(data);
     }
 
 }
