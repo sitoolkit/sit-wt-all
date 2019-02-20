@@ -47,7 +47,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
     @Override
     public void open(Path file) {
         TestScript testScript = scriptService.read(file.toFile());
-        editor.load(testScript);
+        editor.load(testScript, scriptService.getOperationNames());
         editor.getContextMenu().getItems().addAll(createMenuItems());
         editor.getContextMenu().setOnShowing(e -> updateManuState());
 

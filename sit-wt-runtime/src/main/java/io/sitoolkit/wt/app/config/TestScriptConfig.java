@@ -1,5 +1,7 @@
 package io.sitoolkit.wt.app.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -7,10 +9,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
 import io.sitoolkit.wt.domain.operation.Operation;
+import io.sitoolkit.wt.domain.operation.OperationConverter;
 import io.sitoolkit.wt.domain.operation.OperationResult;
 import io.sitoolkit.wt.domain.tester.TestContext;
 import io.sitoolkit.wt.domain.testscript.Locator;
-import io.sitoolkit.wt.domain.testscript.OperationConverter;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.infra.ELSupport;
@@ -53,7 +55,7 @@ public class TestScriptConfig {
         return new OperationConverter() {
 
             @Override
-            public Object convert(Class type, Object o) {
+            public Operation convert(String name) {
                 return new Operation() {
 
                     @Override
@@ -62,6 +64,12 @@ public class TestScriptConfig {
                     }
                 };
             }
+
+            @Override
+            public List<String> getOperationNames() {
+                return null;
+            }
+
         };
     }
 

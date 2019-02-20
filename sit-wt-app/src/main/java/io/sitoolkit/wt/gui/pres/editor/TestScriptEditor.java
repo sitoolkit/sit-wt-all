@@ -2,6 +2,7 @@ package io.sitoolkit.wt.gui.pres.editor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +31,8 @@ import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TablePosition;
 import lombok.Getter;
@@ -42,7 +45,7 @@ public class TestScriptEditor {
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
 
-    public void load(TestScript testScript) {
+    public void load(TestScript testScript, List<String> operationNames) {
 
         Collection<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
@@ -63,8 +66,10 @@ public class TestScriptEditor {
                     testStep.getNo()));
             cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), cells.size(), 1, 1,
                     testStep.getItemName()));
-            cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), cells.size(), 1, 1,
-                    testStep.getOperationName()));
+//            cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), cells.size(), 1, 1,
+//                    testStep.getOperationName()));
+            cells.add(SpreadsheetCellType.LIST(operationNames).createCell(rows.size(), cells.size(),
+                    1, 1, testStep.getOperationName()));
             cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), cells.size(), 1, 1,
                     testStep.getLocator().getType()));
             cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), cells.size(), 1, 1,
@@ -75,6 +80,10 @@ public class TestScriptEditor {
                     testStep.getScreenshotTiming()));
             cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), cells.size(), 1, 1,
                     testStep.getBreakPoint()));
+//            cells.add(SpreadsheetCellType.LIST(Arrays.asList("a", "b")).createCell(rows.size(), cells.size(), 1, 1,
+//                    "a"));
+//            SpreadsheetCellType.LIST(Arrays.asList("a", "b"));
+//            cells.get(0).setGraphic(new ComboBox<String>());
 
             testStep.getTestData().values().stream().forEach(testData -> {
                 cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), cells.size(), 1, 1,
