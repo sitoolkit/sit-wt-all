@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -19,10 +21,12 @@ import org.springframework.core.type.filter.TypeFilter;
 
 public class OperationCatalog {
 
+    private static final String DEFAULT_PKG = "default";
+
     /**
      * { key: packageName => { key: operationName => beanName } }
      */
-    private static Map<String, Map<String, String>> beanMap;
+    private static final Map<String, Map<String, String>> packageBeanMap;
 
     static {
         Map<String, Map<String, String>> map = new HashMap<>();
@@ -38,7 +42,7 @@ public class OperationCatalog {
         scanner.scan(rootPackage);
         String[] beans = registry.getBeanDefinitionNames();
 
-        Pattern pattern = Pattern.compile(rootPackage + "(\\.(.*)|)\\..*Operation");
+        Pattern pattern = Pattern.compile(rootPackage + "(\\.(.*)|)\\..*");
 
         for (String beanName : beans) {
             BeanDefinition definition = registry.getBeanDefinition(beanName);
@@ -47,7 +51,7 @@ public class OperationCatalog {
             String pkg = matcher.group(2);
 
             if (pkg == null) {
-                pkg = "default";
+                pkg = DEFAULT_PKG;
             }
 
             String operationName = beanName.substring(0, beanName.length() - "Operation".length());
@@ -57,16 +61,21 @@ public class OperationCatalog {
             nameMap.put(operationName, beanName);
         }
 
-        beanMap = Collections.unmodifiableMap(map);
+        packageBeanMap = Collections.unmodifiableMap(map);
     }
 
-    public static String get(String pkg, String beanName) {
-        return beanMap.get(pkg).get(beanName);
+    public static String getBeanName(String operationName, String... packages) {
+        return buildPackagesStream(packages).map(p -> packageBeanMap.get(p).get(operationName))
+                .filter(Objects::nonNull).findFirst().get();
     }
 
     public static List<String> getOperationNames(String... packages) {
-        return Arrays.asList(packages).stream().map(beanMap::get).map(Map::keySet)
+        return buildPackagesStream(packages).map(packageBeanMap::get).map(Map::keySet)
                 .flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    private static Stream<String> buildPackagesStream(String... packages) {
+        return Stream.concat(Arrays.asList(packages).stream(), Stream.of(DEFAULT_PKG));
     }
 
 }

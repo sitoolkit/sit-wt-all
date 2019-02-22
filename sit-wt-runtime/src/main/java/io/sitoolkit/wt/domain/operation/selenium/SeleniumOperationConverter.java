@@ -2,28 +2,21 @@ package io.sitoolkit.wt.domain.operation.selenium;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
-import org.springframework.context.ApplicationContext;
-
 import io.sitoolkit.wt.domain.operation.Operation;
 import io.sitoolkit.wt.domain.operation.OperationConverter;
 
 public class SeleniumOperationConverter extends OperationConverter {
 
-    private static String[] OPERATION_PACKAGES = new String[] { "selenium", "default" };
-
-    @Resource
-    ApplicationContext appCtx;
+    private static final String OPERATION_PACKAGE = "selenium";
 
     @Override
     public Operation convert(String operationName) {
-        return convertByPackage(operationName, OPERATION_PACKAGES);
+        return convertByPackage(operationName, OPERATION_PACKAGE);
     }
 
     @Override
     public List<String> getOperationNames() {
-        return getOperationNamesByPackage(OPERATION_PACKAGES);
+        return getOperationNamesByPackage(OPERATION_PACKAGE);
     }
 
 }

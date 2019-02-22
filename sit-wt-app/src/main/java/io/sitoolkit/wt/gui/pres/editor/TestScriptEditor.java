@@ -41,7 +41,10 @@ public class TestScriptEditor {
     private static final int COLUMN_INDEX_FIRST_CASE = 8;
     private static final int ROW_INDEX_FIRST_STEP = 1;
 
-    private List<String> SCREENSHOT_TIMING_VALUES = Arrays.asList("", "前", "後");
+    private static final List<String> SCREENSHOT_TIMING_VALUES;
+    static {
+        SCREENSHOT_TIMING_VALUES = Arrays.asList("", "前", "後");
+    }
 
     private List<String> operationNames;
 
@@ -58,7 +61,7 @@ public class TestScriptEditor {
         testScript.getHeaders().forEach(header -> {
             SpreadsheetCell headerCell = SpreadsheetCellType.STRING.createCell(rows.size(),
                     headerCells.size(), 1, 1, header);
-            boolean editable = (headerCells.size() < 8) ? false : true;
+            boolean editable = (headerCells.size() < COLUMN_INDEX_FIRST_CASE) ? false : true;
             headerCell.setEditable(editable);
             headerCells.add(headerCell);
         });
@@ -453,7 +456,7 @@ public class TestScriptEditor {
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
         SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column,
                 original.getRowSpan(), original.getColumnSpan(), original.getText());
-        boolean editable = (row == 0 && column < 8) ? false : true;
+        boolean editable = (row == 0 && column < COLUMN_INDEX_FIRST_CASE) ? false : true;
         cell.setEditable(editable);
         return cell;
     }
