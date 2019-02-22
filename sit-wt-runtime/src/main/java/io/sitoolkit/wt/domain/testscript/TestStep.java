@@ -15,8 +15,10 @@
  */
 package io.sitoolkit.wt.domain.testscript;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +34,8 @@ import io.sitoolkit.wt.infra.ELSupport;
  * @author yuichi.kuwahara
  */
 public class TestStep {
+
+    public static final List<String> SCREENSHOT_TIMING_VALUES = Arrays.asList("前", "後");
 
     @Resource
     ELSupport el;

@@ -22,9 +22,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class TestScriptEditorController implements EditorController, DebugListener {
 
     private static final DataFormat DATAFORMAT_SPREADSHEET;
@@ -44,13 +42,17 @@ public class TestScriptEditorController implements EditorController, DebugListen
     @NonNull
     private ScriptService scriptService;
 
+    public TestScriptEditorController(ScriptService scriptService) {
+        this.scriptService = scriptService;
+        editor.init(scriptService.getOperationNames());
+    }
+
     @Override
     public void open(Path file) {
         TestScript testScript = scriptService.read(file.toFile());
-        editor.load(testScript, scriptService.getOperationNames());
+        editor.load(testScript);
         editor.getContextMenu().getItems().addAll(createMenuItems());
         editor.getContextMenu().setOnShowing(e -> updateManuState());
-
     }
 
     @Override

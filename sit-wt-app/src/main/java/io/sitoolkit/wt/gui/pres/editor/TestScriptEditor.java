@@ -2,7 +2,6 @@ package io.sitoolkit.wt.gui.pres.editor;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +31,7 @@ import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TablePosition;
 import lombok.Getter;
@@ -41,26 +41,23 @@ public class TestScriptEditor {
     private static final int COLUMN_INDEX_FIRST_CASE = 8;
     private static final int ROW_INDEX_FIRST_STEP = 1;
 
-    private static final List<String> SCREENSHOT_TIMING_VALUES;
-    static {
-        SCREENSHOT_TIMING_VALUES = Arrays.asList("", "前", "後");
-    }
-
     private List<String> operationNames;
 
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
 
-    public void load(TestScript testScript, List<String> operationNames) {
+    public void init(List<String> operationNames) {
         this.operationNames = operationNames;
         this.operationNames.add(0, "");
+    }
 
+    public void load(TestScript testScript) {
         Collection<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
         ObservableList<SpreadsheetCell> headerCells = FXCollections.observableArrayList();
         testScript.getHeaders().forEach(header -> {
-            SpreadsheetCell headerCell = SpreadsheetCellType.STRING.createCell(rows.size(),
-                    headerCells.size(), 1, 1, header);
+            SpreadsheetCell headerCell = buildStringCell(rows.size(),
+                    headerCells.size(), header);
             boolean editable = (headerCells.size() < COLUMN_INDEX_FIRST_CASE) ? false : true;
             headerCell.setEditable(editable);
             headerCells.add(headerCell);
@@ -86,39 +83,58 @@ public class TestScriptEditor {
     private ObservableList<SpreadsheetCell> createStepRow(TestStep testStep, int rowNum) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        cells.add(SpreadsheetCellType.STRING.createCell(rowNum, cells.size(), 1, 1,
-                testStep.getNo()));
-        cells.add(SpreadsheetCellType.STRING.createCell(rowNum, cells.size(), 1, 1,
-                testStep.getItemName()));
-        cells.add(SpreadsheetCellType.LIST(operationNames).createCell(rowNum, cells.size(),
-                1, 1, testStep.getOperationName()));
-        cells.add(SpreadsheetCellType.STRING.createCell(rowNum, cells.size(), 1, 1,
-                testStep.getLocator().getType()));
-        cells.add(SpreadsheetCellType.STRING.createCell(rowNum, cells.size(), 1, 1,
-                testStep.getLocator().getValue()));
-        cells.add(SpreadsheetCellType.STRING.createCell(rowNum, cells.size(), 1, 1,
-                testStep.getDataType()));
-        cells.add(SpreadsheetCellType.LIST(SCREENSHOT_TIMING_VALUES).createCell(rowNum, cells.size(),
-                1, 1, testStep.getScreenshotTiming()));
-        SpreadsheetCell breakPointCell = SpreadsheetCellType.STRING.createCell(rowNum, cells.size(), 1, 1,
-                null);
-        CheckBox breakPointCheck = new CheckBox();
-        breakPointCheck.setSelected(StringUtils.isEmpty(testStep.getBreakPoint()) ? false : true);
-        breakPointCell.setGraphic(breakPointCheck);
-        breakPointCell.setEditable(false);
-        cells.add(breakPointCell);
+        cells.add(buildStringCell(rowNum, cells.size(), testStep.getNo()));
+        cells.add(buildStringCell(rowNum, cells.size(), testStep.getItemName()));
+        cells.add(buildListCell(rowNum, cells.size(), testStep.getOperationName(), operationNames));
+        cells.add(buildStringCell(rowNum, cells.size(), testStep.getLocator().getType()));
+        cells.add(buildStringCell(rowNum, cells.size(), testStep.getLocator().getValue()));
+        cells.add(buildStringCell(rowNum, cells.size(), testStep.getDataType()));
+        cells.add(buildListCell(rowNum, cells.size(), testStep.getScreenshotTiming(),
+                TestStep.SCREENSHOT_TIMING_VALUES));
+        cells.add(buildCheckBoxCell(rowNum, cells.size(),
+                !StringUtils.isEmpty(testStep.getBreakPoint())));
 
         testStep.getTestData().values().stream().forEach(testData -> {
-            cells.add(SpreadsheetCellType.STRING.createCell(rowNum, cells.size(), 1, 1,
+            cells.add(buildStringCell(rowNum, cells.size(),
                     testData));
         });
 
         return cells;
     }
 
-    public TestScript buildTestscript() {
-        spreadSheet.requestFocus();
+    private SpreadsheetCell buildStringCell(int rowNum, int colNum, String value) {
+        return SpreadsheetCellType.STRING.createCell(rowNum, colNum, 1, 1, value);
+    }
 
+    private SpreadsheetCell buildStringCell(int rowNum, int colNum, int rowSpan, int colSpan,
+            String value) {
+        return SpreadsheetCellType.STRING.createCell(rowNum, colNum, rowSpan, colSpan, value);
+    }
+
+    private SpreadsheetCell buildListCell(int rowNum, int colNum, String value, List<String> list) {
+        SpreadsheetCell cell = buildStringCell(rowNum, colNum, null);
+        cell.setEditable(false);
+
+        ComboBox<String> comboBox = new ComboBox<>(FXCollections.observableArrayList(list));
+        comboBox.setValue(value);
+        cell.setGraphic(comboBox);
+
+        return cell;
+//        return SpreadsheetCellType.LIST(list).createCell(rowNum, colNum, 1, 1, value);
+    }
+
+    private SpreadsheetCell buildCheckBoxCell(int rowNum, int colNum, boolean isSelected) {
+        SpreadsheetCell cell = buildStringCell(rowNum, colNum, null);
+        cell.setEditable(false);
+
+        CheckBox checkBox = new CheckBox();
+        checkBox.setSelected(isSelected);
+        cell.setGraphic(checkBox);
+
+        return cell;
+    }
+
+    public TestScript buildTestscript() {
         TestScript testScript = new TestScript();
         testScript.setScriptFile(new File(spreadSheet.getId()));
 
@@ -133,17 +149,17 @@ public class TestScriptEditor {
             TestStep testStep = new TestStep();
             testStep.setNo(row.get(0).getText());
             testStep.setItemName(row.get(1).getText());
-            testStep.setOperationName(row.get(2).getText());
+            testStep.setOperationName(getListCellValue(row.get(2)));
             Locator locator = new Locator();
             locator.setType(row.get(3).getText());
             locator.setValue(row.get(4).getText());
             testStep.setLocator(locator);
             testStep.setDataType(row.get(5).getText());
-            testStep.setScreenshotTiming(row.get(6).getText());
-            testStep.setBreakPoint(((CheckBox)row.get(7).getGraphic()).isSelected() ? "y" : "");
+            testStep.setScreenshotTiming(getListCellValue(row.get(6)));
+            testStep.setBreakPoint(getCheckBoxValue(row.get(7)));
 
             Map<String, String> testData = new LinkedHashMap<String, String>();
-            for (int idx = 8; idx < row.size(); idx++) {
+            for (int idx = COLUMN_INDEX_FIRST_CASE; idx < row.size(); idx++) {
                 String caseNo = (headers.get(idx).startsWith(testScript.getCaseNoPrefix()))
                         ? StringUtils.substringAfter(headers.get(idx), testScript.getCaseNoPrefix())
                         : headers.get(idx);
@@ -156,6 +172,14 @@ public class TestScriptEditor {
         testScript.setTestStepList(testStepList);
 
         return testScript;
+    }
+
+    private String getListCellValue(SpreadsheetCell cell) {
+        return (String) ((ComboBox<?>)cell.getGraphic()).getValue();
+    }
+
+    private String getCheckBoxValue(SpreadsheetCell cell) {
+        return ((CheckBox)cell.getGraphic()).isSelected() ? "y" : "";
     }
 
     public void appendTestCase() {
@@ -392,7 +416,7 @@ public class TestScriptEditor {
 
         IntStream.range(0, rowCount).forEachOrdered(i -> {
             IntStream.range(0, columnCount).forEachOrdered(j -> {
-                cells.add(SpreadsheetCellType.STRING.createCell(rows.size(), j, 1, 1, ""));
+                cells.add(buildStringCell(rows.size(), j, ""));
             });
             rows.add(rowPosition, cells);
         });
@@ -410,7 +434,7 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
         IntStream.range(0, rows.size()).forEach(i -> {
             IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(j -> {
-                SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(i, j, 1, 1, "");
+                SpreadsheetCell cell = buildStringCell(i, j, "");
                 rows.get(i).add(j, cell);
             });
         });
@@ -454,7 +478,7 @@ public class TestScriptEditor {
     }
 
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
-        SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column,
+        SpreadsheetCell cell = buildStringCell(row, column,
                 original.getRowSpan(), original.getColumnSpan(), original.getText());
         boolean editable = (row == 0 && column < COLUMN_INDEX_FIRST_CASE) ? false : true;
         cell.setEditable(editable);
