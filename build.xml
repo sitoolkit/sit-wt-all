@@ -117,6 +117,10 @@
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
                    replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
 
+    <replaceregexp file="${basedir}/sit-wt-project/pom.xml"
+                   match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
+                   replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
+
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />
       <arg value="versions:set" />
