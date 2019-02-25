@@ -2,6 +2,7 @@ package io.sitoolkit.wt.gui.pres.editor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TablePosition;
+import javafx.util.Pair;
 import lombok.Getter;
 
 public class TestScriptEditor {
@@ -100,44 +102,41 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
         testSteps.forEach(testStep -> {
-            int rowNum = ROW_INDEX_FIRST_STEP + rows.size();
-            spreadSheet.getRowPickers().put(rowNum, new TestStepRowPicker(testStep));
-            rows.add(createTestStepRow(testStep, rowNum));
+            int rowIndex = ROW_INDEX_FIRST_STEP + rows.size();
+            spreadSheet.getRowPickers().put(rowIndex, new TestStepRowPicker(testStep));
+            rows.add(createTestStepRow(rowIndex, testStep));
         });
 
         return rows;
     }
 
-    private ObservableList<SpreadsheetCell> createTestStepRow(TestStep testStep, int rowNum) {
+    private ObservableList<SpreadsheetCell> createTestStepRow(int rowIndex, TestStep testStep) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        cells.add(buildStringCell(rowNum, cells.size(), testStep.getNo()));
-        cells.add(buildStringCell(rowNum, cells.size(), testStep.getItemName()));
-        cells.add(buildListCell(rowNum, cells.size(), testStep.getOperationName(), operationNames));
-        cells.add(buildStringCell(rowNum, cells.size(), testStep.getLocator().getType()));
-        cells.add(buildStringCell(rowNum, cells.size(), testStep.getLocator().getValue()));
-        cells.add(buildStringCell(rowNum, cells.size(), testStep.getDataType()));
-        cells.add(buildListCell(rowNum, cells.size(), testStep.getScreenshotTiming(),
+        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getNo()));
+        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getItemName()));
+        cells.add(
+                buildListCell(rowIndex, cells.size(), testStep.getOperationName(), operationNames));
+        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getLocator().getType()));
+        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getLocator().getValue()));
+        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getDataType()));
+        cells.add(buildListCell(rowIndex, cells.size(), testStep.getScreenshotTiming(),
                 screenshotTimingValues));
 
         testStep.getTestData().values().stream().forEach(testData -> {
-            cells.add(buildStringCell(rowNum, cells.size(), testData));
+            cells.add(buildStringCell(rowIndex, cells.size(), testData));
         });
 
         return cells;
     }
 
-    private SpreadsheetCell buildStringCell(int rowNum, int colNum, String value) {
-        return SpreadsheetCellType.STRING.createCell(rowNum, colNum, 1, 1, value);
+    private SpreadsheetCell buildStringCell(int rowIndex, int colIndex, String value) {
+        return SpreadsheetCellType.STRING.createCell(rowIndex, colIndex, 1, 1, value);
     }
 
-    private SpreadsheetCell buildStringCell(int rowNum, int colNum, int rowSpan, int colSpan,
-            String value) {
-        return SpreadsheetCellType.STRING.createCell(rowNum, colNum, rowSpan, colSpan, value);
-    }
-
-    private SpreadsheetCell buildListCell(int rowNum, int colNum, String value, List<String> list) {
-        return SpreadsheetCellType.LIST(list).createCell(rowNum, colNum, 1, 1, value);
+    private SpreadsheetCell buildListCell(int rowIndex, int colIndex, String value,
+            List<String> list) {
+        return SpreadsheetCellType.LIST(list).createCell(rowIndex, colIndex, 1, 1, value);
     }
 
     public TestScript buildTestscript() {
@@ -162,7 +161,7 @@ public class TestScriptEditor {
             testStep.setLocator(locator);
             testStep.setDataType(row.get(5).getText());
             testStep.setScreenshotTiming(row.get(6).getText());
-            testStep.setBreakPoint(getBreakpointValue(row));
+            testStep.setBreakPoint(getBreakPointValue(rows.indexOf(row)));
 
             Map<String, String> testData = new LinkedHashMap<String, String>();
             for (int idx = COLUMN_INDEX_FIRST_CASE; idx < row.size(); idx++) {
@@ -180,11 +179,10 @@ public class TestScriptEditor {
         return testScript;
     }
 
-    private String getBreakpointValue(ObservableList<SpreadsheetCell> row) {
-        int rowIndex = spreadSheet.getGrid().getRows().indexOf(row);
+    private String getBreakPointValue(int rowIndex) {
         boolean isBreakpointEnabled = ((TestStepRowPicker) spreadSheet.getRowPickers()
                 .get(rowIndex)).isBreakpointEnabled();
-        return isBreakpointEnabled ? "y" : "";
+        return isBreakpointEnabled ? "y" : null;
     }
 
     public void appendTestCase() {
@@ -483,8 +481,7 @@ public class TestScriptEditor {
     }
 
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
-        SpreadsheetCell cell = buildStringCell(row, column, original.getRowSpan(),
-                original.getColumnSpan(), original.getText());
+        SpreadsheetCell cell = buildStringCell(row, column, original.getText());
         boolean editable = (row == 0 && column < COLUMN_INDEX_FIRST_CASE) ? false : true;
         cell.setEditable(editable);
         return cell;
@@ -527,7 +524,27 @@ public class TestScriptEditor {
         return spreadSheet.getContextMenu();
     }
 
+    private void forceRedraw() {
+        SpreadsheetViewSelectionModel selectionModel = spreadSheet.getSelectionModel();
+        List<Pair<Integer, Integer>> selectedCells = selectionModel.getSelectedCells().stream()
+                .map((cell) -> {
+                    return new Pair<>(cell.getRow(), cell.getColumn());
+                }).collect(Collectors.toList());
+        if (selectedCells.isEmpty()) {
+            selectionModel.selectCells(Arrays.asList(new Pair<>(0, 0)));
+            selectionModel.clearSelection();
+        } else {
+            int focusedRow = selectionModel.getFocusedCell().getRow();
+            SpreadsheetColumn focusedCol = spreadSheet.getColumns()
+                    .get(selectionModel.getFocusedCell().getColumn());
+            selectionModel.selectCells(selectedCells);
+            selectionModel.focus(focusedRow, focusedCol);
+        }
+    }
+
     private class TestStepRowPicker extends Picker {
+        private static final String ENABLE_CLASS = "enabled";
+
         @Getter
         private boolean isBreakpointEnabled;
 
@@ -539,9 +556,9 @@ public class TestScriptEditor {
         private void refreshStyleClasses() {
             ObservableList<String> styles = getStyleClass();
             if (isBreakpointEnabled) {
-                styles.add("enabled");
+                styles.add(ENABLE_CLASS);
             } else {
-                styles.remove("enabled");
+                styles.remove(ENABLE_CLASS);
             }
         }
 
@@ -549,9 +566,7 @@ public class TestScriptEditor {
         public void onClick() {
             isBreakpointEnabled = !isBreakpointEnabled;
             refreshStyleClasses();
-
-            spreadSheet.getSelectionModel().selectAll();
-            spreadSheet.getSelectionModel().clearSelection();
+            forceRedraw();
         }
     }
 }

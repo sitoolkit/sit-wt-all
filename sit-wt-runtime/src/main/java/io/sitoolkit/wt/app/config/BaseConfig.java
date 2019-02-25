@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.SimpleThreadScope;
 
 import io.sitoolkit.wt.domain.operation.OperationConverter;
-import io.sitoolkit.wt.domain.operation.selenium.SeleniumOperationConverter;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.csv.CsvFileReader;
@@ -49,7 +48,7 @@ public class BaseConfig {
 
     @Bean
     public OperationConverter getOperationConverter() {
-        return new SeleniumOperationConverter();
+        return new OperationConverter();
     }
 
     @Bean

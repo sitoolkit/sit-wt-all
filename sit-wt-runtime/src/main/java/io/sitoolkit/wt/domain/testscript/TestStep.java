@@ -16,6 +16,7 @@
 package io.sitoolkit.wt.domain.testscript;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,8 @@ import io.sitoolkit.wt.infra.ELSupport;
  */
 public class TestStep {
 
-    public static final List<String> SCREENSHOT_TIMING_VALUES = Arrays.asList("前", "後");
+    public static final List<String> SCREENSHOT_TIMING_VALUES = Collections
+            .unmodifiableList(Arrays.asList("前", "後"));
 
     @Resource
     ELSupport el;
@@ -254,6 +256,6 @@ public class TestStep {
     }
 
     public boolean isBreakPointEnabled() {
-        return !StringUtils.isEmpty(getBreakPoint());
+        return StringUtils.isNotEmpty(getBreakPoint());
     }
 }

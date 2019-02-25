@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.springframework.context.ApplicationContext;
@@ -20,7 +19,6 @@ import io.sitoolkit.wt.app.page2script.Page2Script;
 import io.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import io.sitoolkit.wt.app.test.TestCaseReader;
 import io.sitoolkit.wt.domain.operation.OperationConverter;
-import io.sitoolkit.wt.domain.operation.selenium.SeleniumOperationConverter;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.gui.domain.script.CaseNoCache;
@@ -45,7 +43,7 @@ public class ScriptService {
 
     TestCaseReader testCaseReader = new TestCaseReader();
 
-    OperationConverter operationConverter = new SeleniumOperationConverter();
+    OperationConverter operationConverter = new OperationConverter();
 
     public ScriptService() {
         initialize();

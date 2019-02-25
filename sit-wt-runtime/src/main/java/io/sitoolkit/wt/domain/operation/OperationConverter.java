@@ -1,51 +1,64 @@
-/*
- * Copyright 2013 Monocrea Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package io.sitoolkit.wt.domain.operation;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+import org.springframework.core.type.filter.AssignableTypeFilter;
+import org.springframework.core.type.filter.TypeFilter;
 
-/**
- *
- * @author yuichi.kuwahara
- */
-public abstract class OperationConverter {
+public class OperationConverter {
 
     @Resource
     ApplicationContext appCtx;
 
-    public abstract Optional<Operation> convert(String name);
+    /**
+     * key: operationName, value: beanName
+     */
+    private static final Map<String, String> beanMap;
 
-    public abstract List<String> getOperationNames();
+    static {
+        Map<String, String> map = new HashMap<>();
 
-    protected Optional<Operation> convertByPackage(String operationName, String... packages) {
-        if (StringUtils.isEmpty(operationName)) {
-            return Optional.empty();
+        BeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(registry);
+
+        TypeFilter tf = new AssignableTypeFilter(Operation.class);
+        scanner.setIncludeAnnotationConfig(false);
+        scanner.addIncludeFilter(tf);
+        scanner.scan(OperationConverter.class.getPackage().getName());
+        String[] beanNames = registry.getBeanDefinitionNames();
+
+        final int suffixLength = "Operation".length();
+        for (String beanName : beanNames) {
+            String operationName = beanName.substring(0, beanName.length() - suffixLength);
+            map.put(operationName, beanName);
         }
-        String beanName = OperationCatalog.getBeanName(operationName, packages);
-        return Optional.of((Operation) appCtx.getBean(beanName));
+
+        beanMap = Collections.unmodifiableMap(map);
     }
 
-    protected List<String> getOperationNamesByPackage(String... packages) {
-        return OperationCatalog.getOperationNames(packages);
+    public Optional<Operation> convert(String operationName) {
+        String beanName = beanMap.get(operationName);
+        if (StringUtils.isEmpty(beanName)) {
+            return Optional.empty();
+        }
+
+        return Optional.of((Operation) appCtx.getBean(beanMap.get(operationName)));
+    }
+
+    public List<String> getOperationNames() {
+        return beanMap.keySet().stream().sorted().collect(Collectors.toList());
     }
 
 }
