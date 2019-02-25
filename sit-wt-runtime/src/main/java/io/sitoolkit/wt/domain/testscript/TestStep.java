@@ -252,4 +252,8 @@ public class TestStep {
     public void setBreakPoint(String breakPoint) {
         this.breakPoint = breakPoint;
     }
+
+    public boolean isBreakPointEnabled() {
+        return !StringUtils.isEmpty(getBreakPoint());
+    }
 }

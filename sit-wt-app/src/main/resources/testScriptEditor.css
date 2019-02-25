@@ -14,3 +14,18 @@
 .spreadsheet-cell.debugCase.debugStep{
     -fx-background-color: yellowgreen;
 }
+
+.picker-label {
+	-fx-graphic: none;
+	-fx-background-image: url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
+	-fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 80% auto;
+	-fx-cursor: hand;
+	-fx-opacity: 0.05;
+}
+
+.picker-label.enabled {
+	-fx-background-image: url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
+	-fx-opacity: 1;	
+}

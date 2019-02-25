@@ -1,6 +1,7 @@
 package io.sitoolkit.wt.app.config;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,14 +56,13 @@ public class TestScriptConfig {
         return new OperationConverter() {
 
             @Override
-            public Operation convert(String name) {
-                return new Operation() {
-
+            public Optional<Operation> convert(String name) {
+                return Optional.of(new Operation() {
                     @Override
                     public OperationResult operate(TestStep testStep) {
                         return null;
                     }
-                };
+                });
             }
 
             @Override

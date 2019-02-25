@@ -15,7 +15,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
-import io.sitoolkit.wt.domain.operation.Operation;
 import io.sitoolkit.wt.domain.operation.OperationConverter;
 import io.sitoolkit.wt.infra.csv.CsvFileReader;
 import io.sitoolkit.wt.infra.csv.CsvFileWriter;
@@ -86,8 +85,8 @@ public class TestScriptDao {
         TestStep testStep = appCtx.getBean(TestStep.class);
 
         TestScriptConvertUtils.loadStep(testStep, row, caseNoList);
-        Operation operation = operationConverter.convert(testStep.getOperationName());
-        testStep.setOperation(operation);
+        operationConverter.convert(testStep.getOperationName())
+                .ifPresent(operation -> testStep.setOperation(operation));
         return testStep;
 
     }

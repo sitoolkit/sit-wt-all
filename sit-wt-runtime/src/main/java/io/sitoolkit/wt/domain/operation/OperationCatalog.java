@@ -71,7 +71,7 @@ public class OperationCatalog {
 
     public static List<String> getOperationNames(String... packages) {
         return buildPackagesStream(packages).map(packageBeanMap::get).map(Map::keySet)
-                .flatMap(Collection::stream).collect(Collectors.toList());
+                .flatMap(Collection::stream).sorted().collect(Collectors.toList());
     }
 
     private static Stream<String> buildPackagesStream(String... packages) {

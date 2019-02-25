@@ -89,9 +89,9 @@ public class DebugSupport {
 
                 LOG.debug("debug.index", currentIndex, testScript.getTestStepCount());
 
-                TestStep nexttStep = testScript.getTestStep(nextIndex);
+                TestStep nextStep = testScript.getTestStep(nextIndex);
 
-                if (nexttStep != null && StringUtils.isNotEmpty(nexttStep.getBreakPoint())) {
+                if (nextStep != null && nextStep.isBreakPointEnabled()) {
                     LOG.info("debug.break.point");
                     pause();
                 }

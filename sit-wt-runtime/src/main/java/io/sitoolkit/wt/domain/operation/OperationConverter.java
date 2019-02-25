@@ -16,9 +16,11 @@
 package io.sitoolkit.wt.domain.operation;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -30,13 +32,16 @@ public abstract class OperationConverter {
     @Resource
     ApplicationContext appCtx;
 
-    public abstract Operation convert(String name);
+    public abstract Optional<Operation> convert(String name);
 
     public abstract List<String> getOperationNames();
 
-    protected Operation convertByPackage(String operationName, String... packages) {
+    protected Optional<Operation> convertByPackage(String operationName, String... packages) {
+        if (StringUtils.isEmpty(operationName)) {
+            return Optional.empty();
+        }
         String beanName = OperationCatalog.getBeanName(operationName, packages);
-        return (Operation) appCtx.getBean(beanName);
+        return Optional.of((Operation) appCtx.getBean(beanName));
     }
 
     protected List<String> getOperationNamesByPackage(String... packages) {
