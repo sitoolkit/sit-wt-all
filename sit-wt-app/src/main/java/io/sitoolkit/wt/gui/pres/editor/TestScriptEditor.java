@@ -22,7 +22,6 @@ import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.SpreadsheetViewSelectionModel;
@@ -47,18 +46,20 @@ public class TestScriptEditor {
     private List<String> operationNames;
     private List<String> screenshotTimingValues;
 
+    private TestScriptEditorCellBuilder cellBuilder = new TestScriptEditorCellBuilder();
+
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
 
-    public void init(List<String> operationNames) {
-        this.operationNames = withBlank(operationNames);
-        this.screenshotTimingValues = withBlank(TestStep.SCREENSHOT_TIMING_VALUES);
+    public void init(List<String> operationNames, List<String> screenshotTimingValues) {
+        this.operationNames = includeBlank(operationNames);
+        this.screenshotTimingValues = includeBlank(screenshotTimingValues);
     }
 
-    private List<String> withBlank(List<String> values) {
+    private List<String> includeBlank(List<String> values) {
         List<String> result = new ArrayList<>(values);
         result.add(0, "");
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     public void load(TestScript testScript) {
@@ -72,6 +73,7 @@ public class TestScriptEditor {
         grid.setRows(rows);
 
         spreadSheet.setGrid(grid);
+        spreadSheet.getFixedRows().add(0);
         spreadSheet.setShowColumnHeader(true);
         spreadSheet.setShowRowHeader(true);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
@@ -88,7 +90,7 @@ public class TestScriptEditor {
                 return;
             }
 
-            SpreadsheetCell headerCell = buildStringCell(0, headerCells.size(), header);
+            SpreadsheetCell headerCell = cellBuilder.buildStringCell(0, headerCells.size(), header);
             boolean editable = (headerCells.size() < COLUMN_INDEX_FIRST_CASE) ? false : true;
             headerCell.setEditable(editable);
             headerCells.add(headerCell);
@@ -113,30 +115,23 @@ public class TestScriptEditor {
     private ObservableList<SpreadsheetCell> createTestStepRow(int rowIndex, TestStep testStep) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getNo()));
-        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getItemName()));
-        cells.add(
-                buildListCell(rowIndex, cells.size(), testStep.getOperationName(), operationNames));
-        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getLocator().getType()));
-        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getLocator().getValue()));
-        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getDataType()));
-        cells.add(buildListCell(rowIndex, cells.size(), testStep.getScreenshotTiming(),
+        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testStep.getNo()));
+        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testStep.getItemName()));
+        cells.add(cellBuilder.buildListCell(rowIndex, cells.size(), testStep.getOperationName(),
+                operationNames));
+        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(),
+                testStep.getLocator().getType()));
+        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(),
+                testStep.getLocator().getValue()));
+        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testStep.getDataType()));
+        cells.add(cellBuilder.buildListCell(rowIndex, cells.size(), testStep.getScreenshotTiming(),
                 screenshotTimingValues));
 
         testStep.getTestData().values().stream().forEach(testData -> {
-            cells.add(buildStringCell(rowIndex, cells.size(), testData));
+            cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testData));
         });
 
         return cells;
-    }
-
-    private SpreadsheetCell buildStringCell(int rowIndex, int colIndex, String value) {
-        return SpreadsheetCellType.STRING.createCell(rowIndex, colIndex, 1, 1, value);
-    }
-
-    private SpreadsheetCell buildListCell(int rowIndex, int colIndex, String value,
-            List<String> list) {
-        return SpreadsheetCellType.LIST(list).createCell(rowIndex, colIndex, 1, 1, value);
     }
 
     public TestScript buildTestscript() {
@@ -419,7 +414,7 @@ public class TestScriptEditor {
 
         IntStream.range(0, rowCount).forEachOrdered(i -> {
             IntStream.range(0, columnCount).forEachOrdered(j -> {
-                cells.add(buildStringCell(rows.size(), j, ""));
+                cells.add(cellBuilder.buildStringCell(rows.size(), j, ""));
             });
             rows.add(rowPosition, cells);
         });
@@ -437,7 +432,7 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
         IntStream.range(0, rows.size()).forEach(i -> {
             IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(j -> {
-                SpreadsheetCell cell = buildStringCell(i, j, "");
+                SpreadsheetCell cell = cellBuilder.buildStringCell(i, j, "");
                 rows.get(i).add(j, cell);
             });
         });
@@ -481,7 +476,7 @@ public class TestScriptEditor {
     }
 
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
-        SpreadsheetCell cell = buildStringCell(row, column, original.getText());
+        SpreadsheetCell cell = cellBuilder.buildStringCell(row, column, original.getText());
         boolean editable = (row == 0 && column < COLUMN_INDEX_FIRST_CASE) ? false : true;
         cell.setEditable(editable);
         return cell;

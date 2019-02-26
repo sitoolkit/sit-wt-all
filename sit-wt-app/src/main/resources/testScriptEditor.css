@@ -26,6 +26,5 @@
 }
 
 .picker-label.enabled {
-	-fx-background-image: url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
 	-fx-opacity: 1;	
 }
