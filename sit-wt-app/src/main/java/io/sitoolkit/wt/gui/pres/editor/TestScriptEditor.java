@@ -31,6 +31,7 @@ import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TablePosition;
@@ -42,7 +43,7 @@ public class TestScriptEditor {
     private static final int COLUMN_INDEX_FIRST_CASE = 7;
     private static final int ROW_INDEX_FIRST_STEP = 1;
 
-    private static final String BREAK_POINT_HEADER = "ブレークポイント";
+    private static final int BREAK_POINT_HEADER_INDEX = 7;
 
     private List<String> operationNames;
     private List<String> screenshotTimingValues;
@@ -70,19 +71,10 @@ public class TestScriptEditor {
         rows.add(headerCells);
         rows.addAll(createTestStepRows(testScript.getTestStepList()));
 
+        setRowPickers(testScript.getTestStepList());
+
         Grid grid = new GridBase(rows.size(), headerCells.size());
         grid.setRows(rows);
-
-        spreadSheet.getRowPickers().put(0, new Picker("test-step-picker-info") {
-            @Override
-            public void onClick() {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("");
-                alert.setContentText("");
-                alert.setHeaderText("Check this column to enable breakpoints.");
-                alert.show();
-            }
-        });
 
         spreadSheet.setGrid(grid);
         spreadSheet.getFixedRows().add(0);
@@ -97,12 +89,13 @@ public class TestScriptEditor {
     private ObservableList<SpreadsheetCell> createHeaderRow(List<String> headers) {
         ObservableList<SpreadsheetCell> headerCells = FXCollections.observableArrayList();
 
-        headers.forEach(header -> {
-            if (header.equals(BREAK_POINT_HEADER)) {
+        IntStream.range(0, headers.size()).forEach((i) -> {
+            if (i == BREAK_POINT_HEADER_INDEX) {
                 return;
             }
 
-            SpreadsheetCell headerCell = cellBuilder.buildStringCell(0, headerCells.size(), header);
+            SpreadsheetCell headerCell = cellBuilder.buildStringCell(0, headerCells.size(),
+                    headers.get(i));
             boolean editable = (headerCells.size() < COLUMN_INDEX_FIRST_CASE) ? false : true;
             headerCell.setEditable(editable);
             headerCells.add(headerCell);
@@ -116,9 +109,7 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
         testSteps.forEach(testStep -> {
-            int rowIndex = ROW_INDEX_FIRST_STEP + rows.size();
-            spreadSheet.getRowPickers().put(rowIndex, new TestStepRowPicker(testStep));
-            rows.add(createTestStepRow(rowIndex, testStep));
+            rows.add(createTestStepRow(ROW_INDEX_FIRST_STEP + rows.size(), testStep));
         });
 
         return rows;
@@ -146,6 +137,16 @@ public class TestScriptEditor {
         return cells;
     }
 
+    private void setRowPickers(List<TestStep> testSteps) {
+        ObservableMap<Integer, Picker> pickers = spreadSheet.getRowPickers();
+
+        pickers.put(0, buildRowPickerInfoPicker());
+
+        IntStream.range(0, testSteps.size()).forEach(i -> {
+            pickers.put(ROW_INDEX_FIRST_STEP + i, new TestStepRowPicker(testSteps.get(i)));
+        });
+    }
+
     public TestScript buildTestscript() {
         TestScript testScript = new TestScript();
         testScript.setScriptFile(new File(spreadSheet.getId()));
@@ -157,7 +158,10 @@ public class TestScriptEditor {
         headers.stream().forEach(header -> testScript.addHeader(header));
 
         List<TestStep> testStepList = new ArrayList<TestStep>();
-        rows.stream().skip(1L).forEach(row -> {
+
+        IntStream.range(ROW_INDEX_FIRST_STEP, rows.size()).forEach(rowIndex -> {
+            ObservableList<SpreadsheetCell> row = rows.get(rowIndex);
+
             TestStep testStep = new TestStep();
             testStep.setNo(row.get(0).getText());
             testStep.setItemName(row.get(1).getText());
@@ -168,7 +172,7 @@ public class TestScriptEditor {
             testStep.setLocator(locator);
             testStep.setDataType(row.get(5).getText());
             testStep.setScreenshotTiming(row.get(6).getText());
-            testStep.setBreakPoint(getBreakPointValue(rows.indexOf(row)));
+            testStep.setBreakPoint(getBreakPointValue(rowIndex));
 
             Map<String, String> testData = new LinkedHashMap<String, String>();
             for (int idx = COLUMN_INDEX_FIRST_CASE; idx < row.size(); idx++) {
@@ -547,6 +551,19 @@ public class TestScriptEditor {
             selectionModel.selectCells(selectedCells);
             selectionModel.focus(focusedRow, focusedCol);
         }
+    }
+
+    private Picker buildRowPickerInfoPicker() {
+        return new Picker("test-step-picker-info") {
+            @Override
+            public void onClick() {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("");
+                alert.setContentText("");
+                alert.setHeaderText("Check this column to enable breakpoints.");
+                alert.show();
+            }
+        };
     }
 
     private class TestStepRowPicker extends Picker {
