@@ -15,16 +15,25 @@
     -fx-background-color: yellowgreen;
 }
 
-.picker-label {
+.test-step-picker, .test-step-picker-info {
 	-fx-graphic: none;
-	-fx-background-image: url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
+	-fx-background-color: transparent;
 	-fx-background-repeat: no-repeat;
     -fx-background-position: center;
     -fx-background-size: 80% auto;
 	-fx-cursor: hand;
-	-fx-opacity: 0.05;
 }
 
-.picker-label.enabled {
+.test-step-picker {
+	-fx-opacity: 0.05;
+	-fx-background-image: url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
+}
+
+.test-step-picker.enabled {
 	-fx-opacity: 1;	
+}
+
+.test-step-picker-info {
+	-fx-background-size: 100% auto;
+	-fx-background-image: url('/icon/ic_help_outline_black_18dp_1x.png');
 }

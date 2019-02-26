@@ -31,6 +31,7 @@ import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TablePosition;
 import javafx.util.Pair;
@@ -71,6 +72,17 @@ public class TestScriptEditor {
 
         Grid grid = new GridBase(rows.size(), headerCells.size());
         grid.setRows(rows);
+
+        spreadSheet.getRowPickers().put(0, new Picker("test-step-picker-info") {
+            @Override
+            public void onClick() {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("");
+                alert.setContentText("");
+                alert.setHeaderText("Check this column to enable breakpoints.");
+                alert.show();
+            }
+        });
 
         spreadSheet.setGrid(grid);
         spreadSheet.getFixedRows().add(0);
@@ -544,6 +556,7 @@ public class TestScriptEditor {
         private boolean isBreakpointEnabled;
 
         public TestStepRowPicker(TestStep testStep) {
+            super("test-step-picker");
             isBreakpointEnabled = testStep.isBreakPointEnabled();
             refreshStyleClasses();
         }
