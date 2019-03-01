@@ -23,6 +23,7 @@ import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.SpreadsheetViewSelectionModel;
@@ -49,8 +50,8 @@ public class TestScriptEditor {
 
     private static final int BREAK_POINT_HEADER_INDEX = 7;
 
-    private List<String> operationNames;
-    private List<String> screenshotTimingValues;
+    private SpreadsheetCellType<String> defaultCellType = SpreadsheetCellType.STRING;
+    private List<SpreadsheetCellType<?>> defaultCellTypes = new ArrayList<>();
 
     private TestScriptEditorCellBuilder cellBuilder = new TestScriptEditorCellBuilder();
 
@@ -61,8 +62,13 @@ public class TestScriptEditor {
     private int lastContextMenuRequestedRowIndex = -1;
 
     public void init(List<String> operationNames, List<String> screenshotTimingValues) {
-        this.operationNames = includeBlank(operationNames);
-        this.screenshotTimingValues = includeBlank(screenshotTimingValues);
+        defaultCellTypes.add(SpreadsheetCellType.STRING);
+        defaultCellTypes.add(SpreadsheetCellType.STRING);
+        defaultCellTypes.add(SpreadsheetCellType.LIST(includeBlank(operationNames)));
+        defaultCellTypes.add(SpreadsheetCellType.STRING);
+        defaultCellTypes.add(SpreadsheetCellType.STRING);
+        defaultCellTypes.add(SpreadsheetCellType.STRING);
+        defaultCellTypes.add(SpreadsheetCellType.LIST(includeBlank(screenshotTimingValues)));
     }
 
     private List<String> includeBlank(List<String> values) {
@@ -102,8 +108,7 @@ public class TestScriptEditor {
                 return;
             }
 
-            SpreadsheetCell headerCell = cellBuilder.buildStringCell(0, headerCells.size(),
-                    headers.get(i));
+            SpreadsheetCell headerCell = buildCell(0, headerCells.size(), headers.get(i));
             boolean editable = (headerCells.size() < COLUMN_INDEX_FIRST_CASE) ? false : true;
             headerCell.setEditable(editable);
             headerCells.add(headerCell);
@@ -123,23 +128,30 @@ public class TestScriptEditor {
         return rows;
     }
 
+    private SpreadsheetCell buildCell(int rowIndex, int colIndex, String value) {
+        SpreadsheetCellType<?> type;
+        if (rowIndex >= ROW_INDEX_FIRST_STEP && colIndex < defaultCellTypes.size()) {
+            type = defaultCellTypes.get(colIndex);
+        } else {
+            type = defaultCellType;
+        }
+
+        return cellBuilder.build(type, rowIndex, colIndex, value);
+    }
+
     private ObservableList<SpreadsheetCell> createTestStepRow(int rowIndex, TestStep testStep) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testStep.getNo()));
-        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testStep.getItemName()));
-        cells.add(cellBuilder.buildListCell(rowIndex, cells.size(), testStep.getOperationName(),
-                operationNames));
-        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(),
-                testStep.getLocator().getType()));
-        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(),
-                testStep.getLocator().getValue()));
-        cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testStep.getDataType()));
-        cells.add(cellBuilder.buildListCell(rowIndex, cells.size(), testStep.getScreenshotTiming(),
-                screenshotTimingValues));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getNo()));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getItemName()));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getOperationName()));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getLocator().getType()));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getLocator().getValue()));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getDataType()));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getScreenshotTiming()));
 
         testStep.getTestData().values().stream().forEach(testData -> {
-            cells.add(cellBuilder.buildStringCell(rowIndex, cells.size(), testData));
+            cells.add(buildCell(rowIndex, cells.size(), testData));
         });
 
         return cells;
@@ -149,7 +161,8 @@ public class TestScriptEditor {
         ObservableMap<Integer, Picker> pickers = spreadSheet.getRowPickers();
 
         IntStream.range(0, testSteps.size()).forEach(i -> {
-            pickers.put(ROW_INDEX_FIRST_STEP + i, new TestStepRowPicker(testSteps.get(i)));
+            pickers.put(ROW_INDEX_FIRST_STEP + i,
+                    new TestStepRowPicker(testSteps.get(i).isBreakPointEnabled()));
         });
     }
 
@@ -268,10 +281,23 @@ public class TestScriptEditor {
         deleteRows.stream().sorted(Comparator.reverseOrder()).mapToInt(Integer::intValue)
                 .forEachOrdered(rows::remove);
 
+        deleteRowPickers(deleteRows);
+
         Grid newGrid = new GridBase(10, 10);
         newGrid.setRows(recreateRows(rows));
         spreadSheet.setGrid(newGrid);
 
+    }
+
+    private void deleteRowPickers(Set<Integer> deleteRows) {
+        ObservableMap<Integer, Picker> pickers = spreadSheet.getRowPickers();
+
+        deleteRows.forEach(pickers::remove);
+
+        List<Integer> oldKeys = pickers.keySet().stream().collect(Collectors.toList());
+        IntStream.range(0, pickers.size()).forEach((newIndex) -> {
+            pickers.put(newIndex, pickers.get(oldKeys.get(newIndex)));
+        });
     }
 
     public boolean isCaseInsertable() {
@@ -432,15 +458,17 @@ public class TestScriptEditor {
         int columnCount = grid.getColumnCount();
 
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
-        ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
         IntStream.range(0, rowCount).forEachOrdered(i -> {
+            ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
             IntStream.range(0, columnCount).forEachOrdered(j -> {
-                cells.add(cellBuilder.buildStringCell(rows.size(), j, ""));
+                cells.add(buildCell(rows.size(), j, ""));
             });
             rows.add(rowPosition, cells);
         });
         grid.setRows(recreateRows(rows));
+
+        insertRowPickers(rowPosition, rowCount);
 
         SpreadsheetViewSelectionModel selection = spreadSheet.getSelectionModel();
         selection.clearSelection();
@@ -454,7 +482,7 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
         IntStream.range(0, rows.size()).forEach(i -> {
             IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(j -> {
-                SpreadsheetCell cell = cellBuilder.buildStringCell(i, j, "");
+                SpreadsheetCell cell = buildCell(i, j, "");
                 rows.get(i).add(j, cell);
             });
         });
@@ -465,17 +493,33 @@ public class TestScriptEditor {
             widths.add(j, widths.get(j - 1));
         });
 
-        Grid newGrid = new GridBase(10, 10);
+        Grid newGrid = new GridBase(rows.size(), columns.size() + columnCount);
         newGrid.setRows(recreateRows(rows));
         spreadSheet.setGrid(newGrid);
         IntStream.range(columnPosition, columns.size())
                 .forEach(i -> columns.get(i).setPrefWidth(widths.get(i)));
+
+        spreadSheet.getFixedRows().clear();
+        spreadSheet.getFixedRows().add(0);
 
         SpreadsheetViewSelectionModel selection = spreadSheet.getSelectionModel();
         selection.clearSelection();
         selection.selectRange(0, spreadSheet.getColumns().get(columnPosition),
                 spreadSheet.getGrid().getRowCount() - 1,
                 spreadSheet.getColumns().get(columnPosition + columnCount - 1));
+    }
+
+    private void insertRowPickers(int rowPosition, int rowCount) {
+        ObservableMap<Integer, Picker> pickers = spreadSheet.getRowPickers();
+
+        IntStream.range(rowPosition, pickers.size()).boxed().sorted(Comparator.reverseOrder())
+                .forEach(i -> {
+                    pickers.put(i + rowCount, pickers.get(i));
+                });
+
+        IntStream.range(0, rowCount).forEach(i -> {
+            pickers.put(rowPosition + i, new TestStepRowPicker(false));
+        });
     }
 
     private ObservableList<ObservableList<SpreadsheetCell>> recreateRows(
@@ -498,7 +542,7 @@ public class TestScriptEditor {
     }
 
     private SpreadsheetCell recreateCell(SpreadsheetCell original, int row, int column) {
-        SpreadsheetCell cell = cellBuilder.buildStringCell(row, column, original.getText());
+        SpreadsheetCell cell = buildCell(row, column, original.getText());
         boolean editable = (row == 0 && column < COLUMN_INDEX_FIRST_CASE) ? false : true;
         cell.setEditable(editable);
         return cell;
@@ -578,9 +622,9 @@ public class TestScriptEditor {
         @Getter
         private boolean isBreakpointEnabled;
 
-        public TestStepRowPicker(TestStep testStep) {
+        public TestStepRowPicker(boolean isBreakpointEnabled) {
             super("test-step-picker");
-            isBreakpointEnabled = testStep.isBreakPointEnabled();
+            this.isBreakpointEnabled = isBreakpointEnabled;
             refreshStyleClasses();
         }
 
