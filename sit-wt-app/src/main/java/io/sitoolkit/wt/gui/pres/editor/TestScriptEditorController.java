@@ -58,7 +58,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     @Override
     public void save() {
-        TestScript testScript = editor.buildTestscript();
+        TestScript testScript = editor.buildTestScript();
         scriptService.write(testScript);
     }
 
@@ -69,7 +69,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     @Override
     public void saveAs(Path file) {
-        TestScript testScript = editor.buildTestscript();
+        TestScript testScript = editor.buildTestScript();
         testScript.setScriptFile(file.toFile());
         scriptService.write(testScript);
     }
