@@ -35,7 +35,6 @@
     <threadCountClasses>1</threadCountClasses>
     <threadCountMethods>1</threadCountMethods>
     <finalName.mobile>${project.artifactId}-${project.version}-mobile</finalName.mobile>
-    <maven.antrun.skip>true</maven.antrun.skip>
   </properties>
 
   <!-- Build Settings -->
@@ -118,5 +117,5 @@
       </build>
     </profile>
   </profiles>
-
+  
 </project>

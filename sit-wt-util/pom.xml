@@ -41,6 +41,5 @@
     <parallel>classesAndMethods</parallel>
     <threadCountClasses>1</threadCountClasses>
     <threadCountMethods>1</threadCountMethods>
-    <maven.antrun.skip>true</maven.antrun.skip>
   </properties>
 </project>

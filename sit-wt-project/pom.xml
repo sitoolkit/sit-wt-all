@@ -13,7 +13,7 @@
       <artifactId>sit-wt-runtime</artifactId>
       <version>${sitwt.version}</version>
     </dependency>
-
+    
     <dependency>
       <groupId>io.appium</groupId>
       <artifactId>java-client</artifactId>
@@ -32,7 +32,7 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-
+   
   </dependencies>
 
   <parent>
@@ -49,7 +49,6 @@
     <trimStackTrace>false</trimStackTrace>
     <mpir.skip>true</mpir.skip>
     <includeProperties>sitwt.version</includeProperties>
-    <maven.antrun.skip>true</maven.antrun.skip>
   </properties>
 
   <!-- Build Settings -->

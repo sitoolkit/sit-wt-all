@@ -175,7 +175,6 @@
     <checkstyle.skip>false</checkstyle.skip>
     <trimStackTrace>false</trimStackTrace>
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
-    <maven.antrun.skip>true</maven.antrun.skip>
   </properties>
 
   <build>
