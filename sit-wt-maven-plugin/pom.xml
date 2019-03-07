@@ -58,6 +58,7 @@
   </dependencies>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
+    <maven.antrun.skip>true</maven.antrun.skip>
   </properties>
   <parent>
     <groupId>io.sitoolkit.wt</groupId>
@@ -65,7 +66,6 @@
     <version>3.0.0-beta.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-
   <!-- Build Settings -->
   <build>
     <pluginManagement>
