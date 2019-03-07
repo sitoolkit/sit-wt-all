@@ -165,6 +165,7 @@
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.8</version>
+        <inherited>false</inherited>
         <dependencies>
           <dependency>
             <groupId>org.apache.ant</groupId>
