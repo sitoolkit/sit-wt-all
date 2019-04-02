@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,9 +33,12 @@ import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.scene.control.Alert;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TablePosition;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.util.Pair;
 import lombok.Getter;
 
@@ -52,6 +56,9 @@ public class TestScriptEditor {
 
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
+
+    @Getter
+    private int lastContextMenuRequestedRowIndex = -1;
 
     public void init(List<String> operationNames, List<String> screenshotTimingValues) {
         this.operationNames = includeBlank(operationNames);
@@ -83,6 +90,7 @@ public class TestScriptEditor {
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
         spreadSheet.getStylesheets()
                 .add(getClass().getResource("/testScriptEditor.css").toExternalForm());
+        spreadSheet.setOnContextMenuRequested(new ContextMenuEventHandler());
 
     }
 
@@ -139,8 +147,6 @@ public class TestScriptEditor {
 
     private void setRowPickers(List<TestStep> testSteps) {
         ObservableMap<Integer, Picker> pickers = spreadSheet.getRowPickers();
-
-        pickers.put(0, buildRowPickerInfoPicker());
 
         IntStream.range(0, testSteps.size()).forEach(i -> {
             pickers.put(ROW_INDEX_FIRST_STEP + i, new TestStepRowPicker(testSteps.get(i)));
@@ -535,6 +541,10 @@ public class TestScriptEditor {
         return spreadSheet.getContextMenu();
     }
 
+    /**
+     * On Windows 10, changing the picker class may not rewrite the display,
+     * so call selectCells to force a redraw.
+     */
     private void forceRedraw() {
         SpreadsheetViewSelectionModel selectionModel = spreadSheet.getSelectionModel();
         List<Pair<Integer, Integer>> selectedCells = selectionModel.getSelectedCells().stream()
@@ -553,17 +563,13 @@ public class TestScriptEditor {
         }
     }
 
-    private Picker buildRowPickerInfoPicker() {
-        return new Picker("test-step-picker-info") {
-            @Override
-            public void onClick() {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("");
-                alert.setContentText("");
-                alert.setHeaderText("Check this column to enable breakpoints.");
-                alert.show();
-            }
-        };
+    public void toggleBreakpoint() {
+        if (!spreadSheet.getRowPickers().containsKey(lastContextMenuRequestedRowIndex)) {
+            return;
+        }
+
+        ((TestStepRowPicker) spreadSheet.getRowPickers().get(lastContextMenuRequestedRowIndex))
+                .toggleBreakpoint();
     }
 
     private class TestStepRowPicker extends Picker {
@@ -578,6 +584,12 @@ public class TestScriptEditor {
             refreshStyleClasses();
         }
 
+        public void toggleBreakpoint() {
+            isBreakpointEnabled = !isBreakpointEnabled;
+            refreshStyleClasses();
+            forceRedraw();
+        }
+
         private void refreshStyleClasses() {
             ObservableList<String> styles = getStyleClass();
             if (isBreakpointEnabled) {
@@ -589,9 +601,29 @@ public class TestScriptEditor {
 
         @Override
         public void onClick() {
-            isBreakpointEnabled = !isBreakpointEnabled;
-            refreshStyleClasses();
-            forceRedraw();
+            lastContextMenuRequestedRowIndex = spreadSheet.getRowPickers().entrySet().stream()
+                    .filter((entry) -> entry.getValue().equals(this)).map(Entry::getKey).findFirst()
+                    .get();
+        }
+    }
+
+    private class ContextMenuEventHandler implements EventHandler<ContextMenuEvent> {
+        @Override
+        public void handle(ContextMenuEvent event) {
+            if (isClickedOnCell(event)) {
+                lastContextMenuRequestedRowIndex = ((IndexedCell<?>) event.getTarget()).getIndex();
+            } else if (isClickedOnCellText(event)) {
+                lastContextMenuRequestedRowIndex = ((IndexedCell<?>) ((Node) event.getTarget())
+                        .getParent()).getIndex();
+            }
+        }
+
+        private boolean isClickedOnCell(ContextMenuEvent event) {
+            return event.getTarget() instanceof IndexedCell;
+        }
+
+        private boolean isClickedOnCellText(ContextMenuEvent event) {
+            return ((Node) event.getTarget()).getParent() instanceof IndexedCell;
         }
     }
 }

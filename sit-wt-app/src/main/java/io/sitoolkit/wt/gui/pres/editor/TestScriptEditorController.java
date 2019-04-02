@@ -181,6 +181,10 @@ public class TestScriptEditorController implements EditorController, DebugListen
         menuState.getStepInsertable().set(editor.isStepInsertable());
     }
 
+    public void toggleBreakpoint(ActionEvent e) {
+        editor.toggleBreakpoint();
+    }
+
     private ObservableList<MenuItem> createMenuItems() {
         ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
         MenuItem item;
@@ -258,6 +262,12 @@ public class TestScriptEditorController implements EditorController, DebugListen
         menu.getItems().add(item);
 
         menuItems.add(menu);
+
+        menuItems.add(new SeparatorMenuItem());
+
+        item = new MenuItem("ブレークポイント有効化/無効化");
+        item.setOnAction(this::toggleBreakpoint);
+        menuItems.add(item);
 
         return menuItems;
     }

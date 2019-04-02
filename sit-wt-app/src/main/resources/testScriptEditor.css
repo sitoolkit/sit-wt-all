@@ -21,19 +21,13 @@
 	-fx-background-repeat: no-repeat;
     -fx-background-position: center;
     -fx-background-size: 80% auto;
-	-fx-cursor: hand;
 }
 
 .test-step-picker {
-	-fx-opacity: 0.05;
+	-fx-opacity: 0;
 	-fx-background-image: url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
 }
 
 .test-step-picker.enabled {
 	-fx-opacity: 1;	
-}
-
-.test-step-picker-info {
-	-fx-background-size: 100% auto;
-	-fx-background-image: url('/icon/ic_help_outline_black_18dp_1x.png');
 }
