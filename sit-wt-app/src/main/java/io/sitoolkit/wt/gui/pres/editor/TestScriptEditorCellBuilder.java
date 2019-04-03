@@ -1,19 +1,27 @@
 package io.sitoolkit.wt.gui.pres.editor;
 
-import java.util.List;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
+import io.sitoolkit.wt.infra.log.SitLogger;
+import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+
 public class TestScriptEditorCellBuilder {
 
-    public SpreadsheetCell buildStringCell(int rowIndex, int colIndex, String value) {
-        return SpreadsheetCellType.STRING.createCell(rowIndex, colIndex, 1, 1, value);
-    }
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestScriptEditorCellBuilder.class);
 
-    public SpreadsheetCell buildListCell(int rowIndex, int colIndex, String value,
-            List<String> list) {
-        return SpreadsheetCellType.LIST(list).createCell(rowIndex, colIndex, 1, 1, value);
+    public SpreadsheetCell build(SpreadsheetCellType<?> type, int rowIndex, int colIndex,
+            String value) {
+        if (type instanceof SpreadsheetCellType.StringType) {
+            return ((SpreadsheetCellType.StringType) type).createCell(rowIndex, colIndex, 1, 1,
+                    value);
+        } else if (type instanceof SpreadsheetCellType.ListType) {
+            return ((SpreadsheetCellType.ListType) type).createCell(rowIndex, colIndex, 1, 1,
+                    value);
+        } else {
+            LOG.warn("Illegal operation for {}", type);
+            return null;
+        }
     }
 
 }

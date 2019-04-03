@@ -37,7 +37,7 @@ import io.sitoolkit.wt.infra.ELSupport;
 public class TestStep {
 
     public static final List<String> SCREENSHOT_TIMING_VALUES = Collections
-            .unmodifiableList(Arrays.asList("前", "後"));
+            .unmodifiableList(Arrays.asList("前", "後", "前後"));
 
     @Resource
     ELSupport el;
