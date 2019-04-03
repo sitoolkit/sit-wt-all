@@ -18,6 +18,7 @@ import io.sitoolkit.wt.app.ope2script.FirefoxOpener;
 import io.sitoolkit.wt.app.page2script.Page2Script;
 import io.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import io.sitoolkit.wt.app.test.TestCaseReader;
+import io.sitoolkit.wt.domain.operation.OperationConverter;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.gui.domain.script.CaseNoCache;
@@ -41,6 +42,8 @@ public class ScriptService {
     ConfigurableApplicationContext pageCtx;
 
     TestCaseReader testCaseReader = new TestCaseReader();
+
+    OperationConverter operationConverter = new OperationConverter();
 
     public ScriptService() {
         initialize();
@@ -141,5 +144,9 @@ public class ScriptService {
 
     public void quitBrowsing() {
         pageCtx.close();
+    }
+
+    public List<String> getOperationNames() {
+        return operationConverter.getOperationNames();
     }
 }

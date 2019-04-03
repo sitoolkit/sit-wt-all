@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.SimpleThreadScope;
 
-import io.sitoolkit.wt.domain.testscript.OperationConverter;
+import io.sitoolkit.wt.domain.operation.OperationConverter;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.csv.CsvFileReader;

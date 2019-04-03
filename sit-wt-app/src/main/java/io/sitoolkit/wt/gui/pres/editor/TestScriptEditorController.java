@@ -8,6 +8,7 @@ import org.controlsfx.control.spreadsheet.GridChange;
 
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.testscript.TestScript;
+import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -22,9 +23,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class TestScriptEditorController implements EditorController, DebugListener {
 
     private static final DataFormat DATAFORMAT_SPREADSHEET;
@@ -44,13 +43,17 @@ public class TestScriptEditorController implements EditorController, DebugListen
     @NonNull
     private ScriptService scriptService;
 
+    public TestScriptEditorController(ScriptService scriptService) {
+        this.scriptService = scriptService;
+        editor.init(scriptService.getOperationNames(), TestStep.SCREENSHOT_TIMING_VALUES);
+    }
+
     @Override
     public void open(Path file) {
         TestScript testScript = scriptService.read(file.toFile());
         editor.load(testScript);
         editor.getContextMenu().getItems().addAll(createMenuItems());
         editor.getContextMenu().setOnShowing(e -> updateManuState());
-
     }
 
     @Override
@@ -178,6 +181,10 @@ public class TestScriptEditorController implements EditorController, DebugListen
         menuState.getStepInsertable().set(editor.isStepInsertable());
     }
 
+    public void toggleBreakpoint(ActionEvent e) {
+        editor.toggleBreakpoint();
+    }
+
     private ObservableList<MenuItem> createMenuItems() {
         ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
         MenuItem item;
@@ -255,6 +262,12 @@ public class TestScriptEditorController implements EditorController, DebugListen
         menu.getItems().add(item);
 
         menuItems.add(menu);
+
+        menuItems.add(new SeparatorMenuItem());
+
+        item = new MenuItem("ブレークポイント有効化/無効化");
+        item.setOnAction(this::toggleBreakpoint);
+        menuItems.add(item);
 
         return menuItems;
     }
