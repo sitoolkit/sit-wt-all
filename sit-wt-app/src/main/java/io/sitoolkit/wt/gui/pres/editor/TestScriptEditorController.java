@@ -196,7 +196,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
         item = new MenuItem("新規ケースの挿入");
         item.setMnemonicParsing(false);
         item.setOnAction(this::newTestCase);
-        item.disableProperty().bind(menuState.getStepInsertable().not());
+        item.disableProperty().bind(menuState.getCaseInsertable().not());
         menu.getItems().add(item);
 
         item = new MenuItem("コピーしたケースの挿入");
