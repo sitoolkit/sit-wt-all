@@ -50,7 +50,7 @@ public class TestScriptEditor {
     private static final int BREAK_POINT_HEADER_INDEX = 7;
 
     private SpreadsheetCellType<String> defaultCellType = SpreadsheetCellType.STRING;
-    private List<SpreadsheetCellType<?>> settingValueCellTypes = new ArrayList<>();
+    private List<SpreadsheetCellType<?>> stepSettingCellTypes = new ArrayList<>();
 
     private TestScriptEditorCellBuilder cellBuilder = new TestScriptEditorCellBuilder();
 
@@ -61,13 +61,13 @@ public class TestScriptEditor {
     private int lastContextMenuRequestedRowIndex = -1;
 
     public void init(List<String> operationNames, List<String> screenshotTimingValues) {
-        settingValueCellTypes.add(SpreadsheetCellType.STRING);
-        settingValueCellTypes.add(SpreadsheetCellType.STRING);
-        settingValueCellTypes.add(SpreadsheetCellType.LIST(includeBlank(operationNames)));
-        settingValueCellTypes.add(SpreadsheetCellType.STRING);
-        settingValueCellTypes.add(SpreadsheetCellType.STRING);
-        settingValueCellTypes.add(SpreadsheetCellType.STRING);
-        settingValueCellTypes.add(SpreadsheetCellType.LIST(includeBlank(screenshotTimingValues)));
+        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
+        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
+        stepSettingCellTypes.add(SpreadsheetCellType.LIST(includeBlank(operationNames)));
+        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
+        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
+        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
+        stepSettingCellTypes.add(SpreadsheetCellType.LIST(includeBlank(screenshotTimingValues)));
     }
 
     private List<String> includeBlank(List<String> values) {
@@ -89,7 +89,6 @@ public class TestScriptEditor {
         grid.setRows(rows);
 
         spreadSheet.setGrid(grid);
-        spreadSheet.getFixedRows().add(0);
         spreadSheet.setShowColumnHeader(true);
         spreadSheet.setShowRowHeader(true);
         spreadSheet.setId(testScript.getScriptFile().getAbsolutePath());
@@ -145,8 +144,8 @@ public class TestScriptEditor {
 
     private SpreadsheetCell buildCell(int rowIndex, int colIndex, String value) {
         SpreadsheetCellType<?> type;
-        if (isSettingValueCell(rowIndex, colIndex)) {
-            type = settingValueCellTypes.get(colIndex);
+        if (isStepSettingCell(rowIndex, colIndex)) {
+            type = stepSettingCellTypes.get(colIndex);
         } else {
             type = defaultCellType;
         }
@@ -305,9 +304,10 @@ public class TestScriptEditor {
 
         deleteRows.forEach(pickers::remove);
 
-        List<Integer> oldKeys = pickers.keySet().stream().collect(Collectors.toList());
-        IntStream.range(0, pickers.size()).forEach((newIndex) -> {
-            pickers.put(newIndex, pickers.get(oldKeys.get(newIndex)));
+        List<Integer> oldKeys = pickers.keySet().stream().sorted().collect(Collectors.toList());
+        IntStream.range(0, pickers.size()).forEach((i) -> {
+            int newIndex = ROW_INDEX_FIRST_STEP + i;
+            pickers.put(newIndex, pickers.get(oldKeys.get(i)));
         });
     }
 
@@ -463,17 +463,17 @@ public class TestScriptEditor {
         return isHeaderRow(rowPosition) && isSettingColumn(columnPosition);
     }
 
-    private boolean isSettingValueCell(int rowPosition, int columnPosition) {
-        return !isHeaderRow(rowPosition) && isSettingColumn(columnPosition);
+    private boolean isStepSettingCell(int rowPosition, int columnPosition) {
+        return isStepRow(rowPosition) && isSettingColumn(columnPosition);
     }
 
-    private Optional<Integer> getColumnPosition(int caseIndex) {
+    private Optional<Integer> getCaseColumnPosition(int caseIndex) {
         int columnCount = spreadSheet.getGrid().getColumnCount();
         int position = COLUMN_INDEX_FIRST_CASE + caseIndex;
         return Optional.of(position).filter(p -> isCaseColumn(p) && p < columnCount);
     }
 
-    private Optional<Integer> getRowPosition(int stepIndex) {
+    private Optional<Integer> getStepRowPosition(int stepIndex) {
         int rowCount = spreadSheet.getGrid().getRowCount();
         int position = ROW_INDEX_FIRST_STEP + stepIndex;
         return Optional.of(position).filter(p -> isStepRow(p) && p < rowCount);
@@ -498,7 +498,7 @@ public class TestScriptEditor {
 
         insertRowPickers(rowPosition, rowCount);
 
-        reselectRange(rowPosition, 0, rowPosition + rowCount, spreadSheet.getColumns().size());
+        reselectRange(rowPosition, 0, rowPosition + rowCount, columnCount);
     }
 
     private void insertTestCases(int columnPosition, int columnCount) {
@@ -522,11 +522,7 @@ public class TestScriptEditor {
 
         setColumnWidths(widths);
 
-        spreadSheet.getFixedRows().clear();
-        spreadSheet.getFixedRows().add(0);
-
-        reselectRange(0, columnPosition, spreadSheet.getGrid().getRowCount(),
-                columnPosition + columnCount);
+        reselectRange(0, columnPosition, rows.size(), columnPosition + columnCount);
     }
 
     private List<Double> getColumnWidths() {
@@ -542,8 +538,8 @@ public class TestScriptEditor {
     private void insertRowPickers(int rowPosition, int rowCount) {
         ObservableMap<Integer, Picker> pickers = spreadSheet.getRowPickers();
 
-        IntStream.range(rowPosition, pickers.size()).boxed().sorted(Comparator.reverseOrder())
-                .forEach(i -> {
+        IntStream.range(rowPosition, ROW_INDEX_FIRST_STEP + pickers.size()).boxed()
+                .sorted(Comparator.reverseOrder()).forEach(i -> {
                     pickers.put(i + rowCount, pickers.get(i));
                 });
 
@@ -565,8 +561,6 @@ public class TestScriptEditor {
         SpreadsheetViewSelectionModel selection = spreadSheet.getSelectionModel();
         selection.selectRange(minRowInclude, spreadSheet.getColumns().get(minColInclude),
                 maxRowExclude - 1, spreadSheet.getColumns().get(maxColExclude - 1));
-
-        forceRedraw();
     }
 
     private void resetGrid(ObservableList<ObservableList<SpreadsheetCell>> rows, int columnCount) {
@@ -599,13 +593,13 @@ public class TestScriptEditor {
 
         ObservableList<ObservableList<SpreadsheetCell>> rows = spreadSheet.getGrid().getRows();
 
-        getRowPosition(stepIndex).ifPresent(position -> {
+        getStepRowPosition(stepIndex).ifPresent(position -> {
             rows.get(position).stream().forEach(cell -> {
                 cell.getStyleClass().add(stepStyle);
             });
         });
 
-        getColumnPosition(caseIndex).ifPresent(position -> {
+        getCaseColumnPosition(caseIndex).ifPresent(position -> {
             rows.stream().forEach(row -> {
                 row.get(position).getStyleClass().add(caseStyle);
             });
