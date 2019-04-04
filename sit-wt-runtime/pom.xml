@@ -186,6 +186,8 @@
         <directory>${project.basedir}/src/main/webapp</directory>
         <includes>
           <include>input.html</include>
+          <include>input_language*.js</include>
+          <include>vue.min.js</include>
           <include>terms.html</include>
           <include>done.html</include>
           <include>bootstrap.min.css</include>
