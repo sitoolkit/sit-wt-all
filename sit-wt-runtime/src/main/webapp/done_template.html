@@ -17,7 +17,7 @@ limitations under the License.
 <!DOCTYPE html>
 <html>
 <head>
-<title>完了ページ</title>
+<title>${done-page-title}</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,21 +46,21 @@ limitations under the License.
 <body onload="init();">
   <div class="container">
     <div class="page-header">
-      <h1>完了ページ</h1>
+      <h1>${done-page-title}</h1>
     </div>
-    <p>このページでは表示されている内容に対する検証操作を確認します。</p>
+    <p>${done-message-operation}</p>
     <table id="confirm" class="table table-striped">
       <col style="width: 50%;" />
       <col style="width: 50%;" />
       <thead>
         <tr>
-          <th>項目名</th>
-          <th>入力値</th>
+          <th>${done-input-header-name}</th>
+          <th>${done-input-header-value}</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-    <a href="#" onclick="window.location.href='input.html'">戻る</a>
+    <a href="#" onclick="window.location.href='input.html'">${done-page-back}</a>
     <footer class="text-muted">Copyright 2013 Monocrea Inc.</footer>
   </div>
 </body>

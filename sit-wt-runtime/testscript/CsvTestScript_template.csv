@@ -1,0 +1,17 @@
+No.,${testScript-header-itemName},${testScript-header-operation},${testScript-header-locatorStyle},${testScript-header-locator},${testScript-header-dataStyle},${testScript-header-screenshot},${testScript-header-breakpoint},${testScript-header-casePrefix}_001,${testScript-header-casePrefix}_002
+1,${testScript-step1-itemName},open,,input.html,,${testScript-screenshot-after},,y,y
+2,${input-form-type-text-name},input,id,name,,,,${testScript-step2-case1},${testScript-step2-case2}
+3,${input-form-type-text-name},input,,,,,,,${testScript-step3-case2}
+4,${input-form-type-radio-name},choose,name,${input-form-type-radio-name},label,,,${input-form-type-radio-male},${input-form-type-radio-female}
+5,${input-form-type-select-prefecture},select,id,${input-form-type-select-address-name},label,,,${input-form-type-select-address1},${input-form-type-select-address2}
+6,${input-form-type-select-city},select,id,city,label,,,${input-form-type-select-address1_3},${input-form-type-select-address2_1}
+7,${input-form-type-check-name},choose,css,input[id^='hobby-'],label,,,${input-form-type-check-hobby1};${input-form-type-check-hobby3},${input-form-type-check-hobby2}
+8,${input-form-type-textarea-name},input,id,remark,,,,${testScript-step8-case1},${testScript-step8-case2}
+9,${testScript-step9-itemName},,,,,,,,
+10,${testScript-step10-itemName},click,link,${input-message-term-link},,${testScript-screenshot-before},,y,
+11,${testScript-step11-itemName},switchWindow,title,${terms-page-title},,,,y,
+12,${testScript-step12-itemName},click,link,${terms-page-close},,${testScript-screenshot-before},,y,
+13,${testScript-step13-itemName},switchWindow,title,${input-page-title},,,,y,
+14,${testScript-step14-itemName},click,css,input[value='${input-message-term-submit}'],,${testScript-screenshot-before},,y,y
+15,${testScript-step15-itemName},dialog,,,,${testScript-screenshot-before},,OK,OK
+16,${input-form-type-text-name},verify,xpath,"//*[@id=""confirm""]/tbody/tr[1]/td",,${testScript-screenshot-after},,${testScript-step16-case1},${testScript-step16-case2}

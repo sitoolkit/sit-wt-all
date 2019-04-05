@@ -17,7 +17,7 @@ limitations under the License.
 <!DOCTYPE html>
 <html>
 <head>
-<title>利用規約ページ</title>
+<title>${terms-page-title}</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,11 +26,11 @@ limitations under the License.
 <body>
   <div class="container">
     <div class="page-header">
-      <h1>利用規約ページ</h1>
+      <h1>${terms-page-title}</h1>
     </div>
-    <p>このページでは別ウィンドウで表示されるページの動作を確認します。 「閉じる」リンクをクリックするとこのウィンドウが閉じます。</p>
+    <p>${terms-message}</p>
     <div style="margin-top: 10rem; margin-bottom: 10rem; text-align: center;">
-      <a id="close" href="#" onclick="window.open('about:blank','_top').close();">閉じる</a>
+      <a id="close" href="#" onclick="window.open('about:blank','_top').close();">${terms-page-close}</a>
     </div>
     <footer class="text-muted">Copyright 2013 Monocrea Inc.</footer>
   </div>

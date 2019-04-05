@@ -185,11 +185,10 @@
       <resource>
         <directory>${project.basedir}/src/main/webapp</directory>
         <includes>
-          <include>input.html</include>
-          <include>input_language*.js</include>
-          <include>vue.min.js</include>
-          <include>terms.html</include>
-          <include>done.html</include>
+          <include>input_template.html</include>
+          <include>terms_template.html</include>
+          <include>done_template.html</include>
+          <include>*.properties</include>
           <include>bootstrap.min.css</include>
         </includes>
         <targetPath>${project.build.outputDirectory}/sample</targetPath>
@@ -197,7 +196,7 @@
       <resource>
         <directory>${project.basedir}/testscript</directory>
         <includes>
-          <include>CsvTestScript.csv</include>
+          <include>CsvTestScript*</include>
         </includes>
         <targetPath>${project.build.outputDirectory}/sample</targetPath>
       </resource>
