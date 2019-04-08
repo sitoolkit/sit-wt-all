@@ -1,6 +1,9 @@
 package io.sitoolkit.wt.infra.resource;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -42,6 +45,16 @@ public class MessageManager {
         }
         return "!! messing resource !!";
 
+    }
+
+    public static Map<String, String> getMessageMap(String keyPrefix) {
+        Map<String, String> messageMap = new HashMap<>();
+        for (String key : Collections.list(getResource().getKeys())) {
+            if (key.startsWith(keyPrefix)) {
+                messageMap.put(key, getResource().getString(key));
+            }
+        }
+        return messageMap;
     }
 
 }

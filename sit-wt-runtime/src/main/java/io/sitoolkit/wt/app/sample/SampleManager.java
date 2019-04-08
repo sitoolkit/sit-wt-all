@@ -20,6 +20,8 @@ import org.apache.velocity.app.VelocityEngine;
 import org.springframework.util.ResourceUtils;
 
 import io.sitoolkit.wt.infra.ConfigurationException;
+import io.sitoolkit.wt.infra.SitLocaleUtils;
+import io.sitoolkit.wt.infra.resource.MessageManager;
 
 public class SampleManager {
 
@@ -39,6 +41,7 @@ public class SampleManager {
         scriptProperties.putAll(inputProperties);
         scriptProperties.putAll(termsProperties);
         scriptProperties.putAll(doneProperties);
+        scriptProperties.putAll(MessageManager.getMessageMap("testScript-"));
 
         File scriptTemplateDest = new File(getDestDir("testscript"), "SampleTestScript.csv");
         applyProperties(resource2str("sample/CsvTestScript.csv"), scriptTemplateDest.toString(),
@@ -101,8 +104,8 @@ public class SampleManager {
 
     private String getPropertiesFileName(String name) {
         String fileName;
-        if (Locale.getDefault().equals(Locale.JAPAN)) {
-            fileName = name + "_" + Locale.JAPAN.getLanguage();
+        if (SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
+            fileName = name + "_" + Locale.JAPANESE.getLanguage();
         } else {
             fileName = name;
         }

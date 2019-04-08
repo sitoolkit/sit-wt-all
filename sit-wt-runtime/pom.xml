@@ -196,7 +196,8 @@
       <resource>
         <directory>${project.basedir}/testscript</directory>
         <includes>
-          <include>CsvTestScript*</include>
+          <include>CsvTestScript.csv</include>
+          <include>*.properties</include>
         </includes>
         <targetPath>${project.build.outputDirectory}/sample</targetPath>
       </resource>

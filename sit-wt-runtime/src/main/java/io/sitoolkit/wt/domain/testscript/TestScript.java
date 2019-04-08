@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import io.sitoolkit.wt.infra.resource.MessageManager;
 
 /**
  *
@@ -87,11 +87,7 @@ public class TestScript {
     }
 
     private void setCaseNoPrefix() {
-        if (Locale.getDefault().getLanguage() == "ja") {
-            this.caseNoPrefix = "ケース_";
-        } else {
-            this.caseNoPrefix = "Case_";
-        }
+        this.caseNoPrefix = MessageManager.getMessage("testScript-header-caseNoPrefix");
     }
 
     public List<TestStep> getTestStepList() {

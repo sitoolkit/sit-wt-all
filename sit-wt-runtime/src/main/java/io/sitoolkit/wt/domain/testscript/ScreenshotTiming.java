@@ -3,6 +3,7 @@ package io.sitoolkit.wt.domain.testscript;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,7 +16,7 @@ public enum ScreenshotTiming {
     /**
      * key: label
      */
-    private static LinkedHashMap<String, ScreenshotTiming> timingMap = new LinkedHashMap<>();
+    private static Map<String, ScreenshotTiming> timingMap = new LinkedHashMap<>();
 
     @Getter
     private String label;
@@ -26,12 +27,12 @@ public enum ScreenshotTiming {
         }
     }
 
-    private ScreenshotTiming() {
-        this.label = MessageManager.getMessage("testscript.screenshot." + name().toLowerCase());
-    }
-
     private ScreenshotTiming(String label) {
         this.label = label;
+    }
+
+    private ScreenshotTiming() {
+        this.label = MessageManager.getMessage("testScript-screenshot-" + name().toLowerCase());
     }
 
     public static ScreenshotTiming getTiming(String value) {

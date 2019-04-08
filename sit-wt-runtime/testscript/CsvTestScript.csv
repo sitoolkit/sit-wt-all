@@ -1,4 +1,4 @@
-No.,${testScript-header-itemName},${testScript-header-operation},${testScript-header-locatorStyle},${testScript-header-locator},${testScript-header-dataStyle},${testScript-header-screenshot},${testScript-header-breakpoint},${testScript-header-casePrefix}_001,${testScript-header-casePrefix}_002
+${testScript-header-stepNo},${testScript-header-itemName},${testScript-header-operation},${testScript-header-locatorStyle},${testScript-header-locator},${testScript-header-dataStyle},${testScript-header-screenshot},${testScript-header-breakPoint},${testScript-header-caseNoPrefix}001,${testScript-header-caseNoPrefix}002
 1,${testScript-step1-itemName},open,,input.html,,${testScript-screenshot-after},,y,y
 2,${input-form-type-text-name},input,id,name,,,,${testScript-step2-case1},${testScript-step2-case2}
 3,${input-form-type-text-name},input,,,,,,,${testScript-step3-case2}
