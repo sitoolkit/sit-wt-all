@@ -32,11 +32,10 @@ limitations under the License.
       var month = toDoubleDigits(currentDate.getMonth() + 1);
       var date = toDoubleDigits(currentDate.getDate());
       var hours = toDoubleDigits(currentDate.getHours());
-      var day = '日月火水木金土'[currentDate.getDay()];
       var minutes = toDoubleDigits(currentDate.getMinutes());
       var seconds = toDoubleDigits(currentDate.getSeconds());
 
-      var timestamp = year + "年" + month + "月" + date + "日" + "(" + day + ") " + hours + ":" + minutes + ":" + seconds;
+      var timestamp = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
       document.getElementById("timestamp").innerHTML = timestamp;
     }
     window.onload = function () {
@@ -100,8 +99,6 @@ limitations under the License.
                   <li>${input-form-type-text-desc1_2}</li>
                 </ul>
               </li>
-              <li>${input-form-type-text-desc2}
-              </li>
             </ul>
           </div>
         </div>
@@ -126,7 +123,7 @@ limitations under the License.
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label">住所</label>
+          <label class="col-sm-2 control-label">${input-form-type-select-name}</label>
           <div class="col-sm-4">
             <label for="${input-form-type-select-address-name}"
               class="control-label">${input-form-type-select-prefecture}：</label><select id="${input-form-type-select-address-name}"
