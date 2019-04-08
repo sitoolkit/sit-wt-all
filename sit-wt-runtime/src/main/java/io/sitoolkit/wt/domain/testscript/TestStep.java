@@ -15,11 +15,8 @@
  */
 package io.sitoolkit.wt.domain.testscript;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,9 +32,6 @@ import io.sitoolkit.wt.infra.ELSupport;
  * @author yuichi.kuwahara
  */
 public class TestStep {
-
-    public static final List<String> SCREENSHOT_TIMING_VALUES = Collections
-            .unmodifiableList(Arrays.asList("前", "後", "前後"));
 
     @Resource
     ELSupport el;
@@ -65,7 +59,7 @@ public class TestStep {
     /**
      * スクリーンショットを撮るタイミング
      */
-    private String screenshotTiming;
+    private ScreenshotTiming screenshotTiming = ScreenshotTiming.NONE;
     /**
      * テストデータの形式
      */
@@ -179,12 +173,12 @@ public class TestStep {
         this.testData.put(caseNo, testData);
     }
 
-    public String getScreenshotTiming() {
+    public ScreenshotTiming getScreenshotTiming() {
         return screenshotTiming;
     }
 
     public void setScreenshotTiming(String screenshotTiming) {
-        this.screenshotTiming = screenshotTiming;
+        this.screenshotTiming = ScreenshotTiming.getTiming(screenshotTiming);
     }
 
     /**
@@ -193,7 +187,8 @@ public class TestStep {
      * @return 操作実行前にスクリーンショットが必要な場合にtrue
      */
     public boolean beforeScreenshot() {
-        return StringUtils.contains(getScreenshotTiming(), "前");
+        return getScreenshotTiming().equals(ScreenshotTiming.BEFORE)
+                || getScreenshotTiming().equals(ScreenshotTiming.AROUND);
     }
 
     /**
@@ -202,7 +197,8 @@ public class TestStep {
      * @return 操作実行後にスクリーンショットが必要な場合にtrue
      */
     public boolean afterScreenshot() {
-        return StringUtils.contains(getScreenshotTiming(), "後");
+        return getScreenshotTiming().equals(ScreenshotTiming.AFTER)
+                || getScreenshotTiming().equals(ScreenshotTiming.AROUND);
     }
 
     /**

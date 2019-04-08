@@ -67,7 +67,7 @@ public class TestScriptEditor {
         stepSettingCellTypes.add(SpreadsheetCellType.STRING);
         stepSettingCellTypes.add(SpreadsheetCellType.STRING);
         stepSettingCellTypes.add(SpreadsheetCellType.STRING);
-        stepSettingCellTypes.add(SpreadsheetCellType.LIST(includeBlank(screenshotTimingValues)));
+        stepSettingCellTypes.add(SpreadsheetCellType.LIST(screenshotTimingValues));
     }
 
     private List<String> includeBlank(List<String> values) {
@@ -133,7 +133,7 @@ public class TestScriptEditor {
         cells.add(buildCell(rowIndex, cells.size(), testStep.getLocator().getType()));
         cells.add(buildCell(rowIndex, cells.size(), testStep.getLocator().getValue()));
         cells.add(buildCell(rowIndex, cells.size(), testStep.getDataType()));
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getScreenshotTiming()));
+        cells.add(buildCell(rowIndex, cells.size(), testStep.getScreenshotTiming().getLabel()));
 
         testStep.getTestData().values().stream().forEach(testData -> {
             cells.add(buildCell(rowIndex, cells.size(), testData));

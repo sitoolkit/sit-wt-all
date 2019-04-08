@@ -136,7 +136,7 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         row.add(testStep.getLocator().getType());
         row.add(testStep.getLocator().getValue());
         row.add(testStep.getDataType());
-        row.add(testStep.getScreenshotTiming());
+        row.add(testStep.getScreenshotTiming().getLabel());
         row.add(testStep.getBreakPoint());
         caseNoList.stream().map(testStep.getTestData()::get).forEachOrdered(row::add);
         return row;

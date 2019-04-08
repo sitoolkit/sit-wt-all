@@ -199,7 +199,7 @@ public class TestContext {
     }
 
     public String getScreenshotTiming() {
-        return testStep == null ? "noScreenshotTiming" : testStep.getScreenshotTiming();
+        return testStep == null ? "noScreenshotTiming" : testStep.getScreenshotTiming().getLabel();
     }
 
     public int getCurrentIndex() {
