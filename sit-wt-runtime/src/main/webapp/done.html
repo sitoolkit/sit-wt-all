@@ -24,7 +24,7 @@ limitations under the License.
 <script>
 	function init() {
 		var qpos = location.href.indexOf("?") + 1;
-		var params = location.href.slice(qpos).split("&");
+		var params = window.decodeURIComponent(location.href.slice(qpos).replace(/\+/g, '%20')).split("&");
 		var conftab = document.getElementById("confirm").getElementsByTagName(
 				"tbody").item(0);
 		for (var i = 0; i < params.length; i++) {
@@ -34,10 +34,10 @@ limitations under the License.
 			conftab.appendChild(tr);
 			var th = document.createElement("th");
 			tr.appendChild(th);
-			th.innerHTML = window.decodeURI(pair[0]);
+			th.innerHTML = pair[0];
 			var td = document.createElement("td");
 			tr.appendChild(td);
-			td.innerHTML = window.decodeURI(pair[1]);
+			td.innerHTML = pair[1];
 		}
 	}
 </script>
