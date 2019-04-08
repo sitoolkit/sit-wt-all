@@ -185,9 +185,9 @@
       <resource>
         <directory>${project.basedir}/src/main/webapp</directory>
         <includes>
-          <include>input_template.html</include>
-          <include>terms_template.html</include>
-          <include>done_template.html</include>
+          <include>input.html</include>
+          <include>terms.html</include>
+          <include>done.html</include>
           <include>*.properties</include>
           <include>bootstrap.min.css</include>
         </includes>
