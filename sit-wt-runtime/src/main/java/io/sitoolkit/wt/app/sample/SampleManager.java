@@ -1,30 +1,33 @@
 package io.sitoolkit.wt.app.sample;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.springframework.util.ResourceUtils;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.SitLocaleUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
 import io.sitoolkit.wt.infra.resource.SitResourceUtils;
+import io.sitoolkit.wt.infra.template.TemplateEngine;
+import io.sitoolkit.wt.infra.template.TemplateModel;
 
 public class SampleManager {
 
     private String projectDir = null;
 
     private static final String RESOURCE_DIR = "sample/";
+
+    private TemplateEngine templateEngine;
+
+    public SampleManager() {
+        try (AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext(
+                SampleConfig.class)) {
+            templateEngine = appCtx.getBean(TemplateEngine.class);
+        }
+    }
 
     public void unarchiveBasicSample(String projectDir) {
         this.projectDir = projectDir;
@@ -35,9 +38,9 @@ public class SampleManager {
         unarchive("bootstrap.min.css");
         unarchive("pom.xml");
 
-        Properties inputProperties = createLocalizedFile("input.html");
-        Properties termsProperties = createLocalizedFile("terms.html");
-        Properties doneProperties = createLocalizedFile("done.html");
+        Properties inputProperties = generateLocalizedHtml("input");
+        Properties termsProperties = generateLocalizedHtml("terms");
+        Properties doneProperties = generateLocalizedHtml("done");
 
         Properties scriptProperties = loadProperties("CsvTestScript");
         scriptProperties.putAll(inputProperties);
@@ -45,9 +48,8 @@ public class SampleManager {
         scriptProperties.putAll(doneProperties);
         scriptProperties.putAll(MessageManager.getMessageMap("testScript-"));
 
-        Path scriptTemplate = getDestPath("testscript/SampleTestScript.csv");
-        createLocalizedFile(SitResourceUtils.res2str(RESOURCE_DIR + "CsvTestScript.csv"),
-                scriptTemplate, scriptProperties);
+        generateLocalizedFile("CsvTestScript.vm", "testscript", "SampleTestScript", "csv",
+                scriptProperties);
     }
 
     private void unarchive(String resource) {
@@ -55,40 +57,30 @@ public class SampleManager {
         SitResourceUtils.res2file(path, getDestPath(path));
     }
 
-    private Properties createLocalizedFile(String filename) {
-        String name = FilenameUtils.removeExtension(filename);
-        String template = RESOURCE_DIR + filename;
-        Path dest = getDestPath(template);
+    private Properties generateLocalizedHtml(String fileBase) {
+        Properties properties = loadProperties(fileBase);
+        generateLocalizedFile(fileBase + ".vm", fileBase, "html", RESOURCE_DIR, properties);
 
-        Properties properties = loadProperties(name);
-        createLocalizedFile(SitResourceUtils.res2str(template), dest, properties);
         return properties;
     }
 
-    private void createLocalizedFile(String template, Path dest, Properties properties) {
-        VelocityContext context = new VelocityContext(properties);
+    private Properties generateLocalizedFile(String template, String destDir, String destFileBase,
+            String destFileExt, Properties properties) {
+        TemplateModel model = new TemplateModel();
+        model.setTemplate(RESOURCE_DIR + template);
+        model.setFileBase(destFileBase);
+        model.setFileExt(destFileExt);
+        model.setOutDir(getDestPath(destDir).toString());
+        model.setProperties(properties);
 
-        try (FileOutputStream fos = new FileOutputStream(dest.toFile());
-                OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-                BufferedWriter bw = new BufferedWriter(osw);) {
+        templateEngine.write(model);
 
-            Velocity.evaluate(context, bw, template, template);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return properties;
     }
 
-    private Properties loadProperties(String name) {
-        try {
-            URL url = ResourceUtils
-                    .getURL("classpath:" + RESOURCE_DIR + getPropertiesFileName(name));
-            Properties properties = new Properties();
-            properties.load(url.openStream());
-            return properties;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private Properties loadProperties(String fileBase) {
+        String resourcePath = "/" + RESOURCE_DIR + getPropertiesFileName(fileBase);
+        return PropertyUtils.load(resourcePath, false);
     }
 
     private String getPropertiesFileName(String name) {

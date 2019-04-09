@@ -185,9 +185,7 @@
       <resource>
         <directory>${project.basedir}/src/main/webapp</directory>
         <includes>
-          <include>input.html</include>
-          <include>terms.html</include>
-          <include>done.html</include>
+          <include>*.vm</include>
           <include>*.properties</include>
           <include>bootstrap.min.css</include>
         </includes>
@@ -196,7 +194,7 @@
       <resource>
         <directory>${project.basedir}/testscript</directory>
         <includes>
-          <include>CsvTestScript.csv</include>
+          <include>*.vm</include>
           <include>*.properties</include>
         </includes>
         <targetPath>${project.build.outputDirectory}/sample</targetPath>

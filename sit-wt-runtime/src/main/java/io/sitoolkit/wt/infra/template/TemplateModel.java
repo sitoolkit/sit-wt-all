@@ -1,5 +1,7 @@
 package io.sitoolkit.wt.infra.template;
 
+import java.util.Properties;
+
 public class TemplateModel {
 
     /**
@@ -21,9 +23,13 @@ public class TemplateModel {
      */
     private String template;
     /**
-     * テンプレート内で参照する変数名
+     * テンプレート内でこのオブジェクトを参照する変数名
      */
     private String var;
+    /**
+     * テンプレート内で参照するプロパティ
+     */
+    private Properties properties;
 
     public String getOutDir() {
         return outDir;
@@ -47,6 +53,14 @@ public class TemplateModel {
 
     public void setVar(String var) {
         this.var = var;
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
     }
 
     public String getFileExt() {

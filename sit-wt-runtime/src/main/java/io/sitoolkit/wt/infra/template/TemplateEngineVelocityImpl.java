@@ -60,8 +60,16 @@ public class TemplateEngineVelocityImpl implements TemplateEngine {
             template = Velocity.getTemplate(model.getTemplate());
         }
 
-        VelocityContext context = new VelocityContext();
-        context.put(model.getVar(), model);
+        VelocityContext context;
+        if (model.getProperties() == null) {
+            context = new VelocityContext();
+        } else {
+            context = new VelocityContext(model.getProperties());
+        }
+
+        if (model.getVar() != null) {
+            context.put(model.getVar(), model);
+        }
 
         StringWriter writer = new StringWriter();
         template.merge(context, writer);
