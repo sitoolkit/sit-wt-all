@@ -216,7 +216,7 @@ public class FileTreeController implements Initializable {
                     return;
                 }
 
-                testService.createNewScript(fileTree.getRoot().getValue().getFile(), newTestScript);
+                testService.createNewScript(newTestScript);
             });
 
         });

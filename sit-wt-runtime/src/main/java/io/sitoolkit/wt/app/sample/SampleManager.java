@@ -10,9 +10,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.SitLocaleUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
-import io.sitoolkit.wt.infra.resource.SitResourceUtils;
 import io.sitoolkit.wt.infra.template.TemplateEngine;
 import io.sitoolkit.wt.infra.template.TemplateModel;
+import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 
 public class SampleManager {
 
@@ -42,40 +42,38 @@ public class SampleManager {
         Properties termsProperties = generateLocalizedHtml("terms");
         Properties doneProperties = generateLocalizedHtml("done");
 
-        Properties scriptProperties = loadProperties("CsvTestScript");
+        Properties scriptProperties = loadProperties("SampleTestScript");
         scriptProperties.putAll(inputProperties);
         scriptProperties.putAll(termsProperties);
         scriptProperties.putAll(doneProperties);
         scriptProperties.putAll(MessageManager.getMessageMap("testScript-"));
 
-        generateLocalizedFile("CsvTestScript.vm", "testscript", "SampleTestScript", "csv",
+        generateLocalizedFile("SampleTestScript.vm", "testscript", "SampleTestScript", "csv",
                 scriptProperties);
     }
 
-    private void unarchive(String resource) {
-        String path = RESOURCE_DIR + resource;
-        SitResourceUtils.res2file(path, getDestPath(path));
+    private void unarchive(String filename) {
+        String resource = RESOURCE_DIR + filename;
+        FileIOUtils.sysRes2file(resource, getDestPath(resource));
     }
 
     private Properties generateLocalizedHtml(String fileBase) {
         Properties properties = loadProperties(fileBase);
-        generateLocalizedFile(fileBase + ".vm", fileBase, "html", RESOURCE_DIR, properties);
+        generateLocalizedFile(fileBase + ".vm", RESOURCE_DIR, fileBase, "html", properties);
 
         return properties;
     }
 
-    private Properties generateLocalizedFile(String template, String destDir, String destFileBase,
+    private void generateLocalizedFile(String template, String destDir, String destFileBase,
             String destFileExt, Properties properties) {
         TemplateModel model = new TemplateModel();
         model.setTemplate(RESOURCE_DIR + template);
+        model.setOutDir(getDestPath(destDir).toString());
         model.setFileBase(destFileBase);
         model.setFileExt(destFileExt);
-        model.setOutDir(getDestPath(destDir).toString());
         model.setProperties(properties);
 
         templateEngine.write(model);
-
-        return properties;
     }
 
     private Properties loadProperties(String fileBase) {
