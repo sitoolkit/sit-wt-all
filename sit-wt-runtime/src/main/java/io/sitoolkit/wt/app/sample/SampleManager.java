@@ -11,20 +11,20 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.app.Velocity;
 import org.springframework.util.ResourceUtils;
 
-import io.sitoolkit.wt.infra.ConfigurationException;
 import io.sitoolkit.wt.infra.SitLocaleUtils;
-import io.sitoolkit.wt.infra.SitResourceUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
+import io.sitoolkit.wt.infra.resource.SitResourceUtils;
 
 public class SampleManager {
 
     private String projectDir = null;
+
+    private static final String RESOURCE_DIR = "sample/";
 
     public void unarchiveBasicSample(String projectDir) {
         this.projectDir = projectDir;
@@ -32,8 +32,8 @@ public class SampleManager {
     }
 
     public void unarchiveBasicSample() {
-        unarchive("sample/bootstrap.min.css");
-        unarchive("sample/pom.xml");
+        unarchive("bootstrap.min.css");
+        unarchive("pom.xml");
 
         Properties inputProperties = createLocalizedFile("input.html");
         Properties termsProperties = createLocalizedFile("terms.html");
@@ -46,22 +46,18 @@ public class SampleManager {
         scriptProperties.putAll(MessageManager.getMessageMap("testScript-"));
 
         Path scriptTemplate = getDestPath("testscript/SampleTestScript.csv");
-        createLocalizedFile(SitResourceUtils.res2str("sample/CsvTestScript.csv"), scriptTemplate,
-                scriptProperties);
+        createLocalizedFile(SitResourceUtils.res2str(RESOURCE_DIR + "CsvTestScript.csv"),
+                scriptTemplate, scriptProperties);
     }
 
     private void unarchive(String resource) {
-        try {
-            URL url = ResourceUtils.getURL("classpath:" + resource);
-            FileUtils.copyInputStreamToFile(url.openStream(), getDestPath(resource).toFile());
-        } catch (IOException e) {
-            throw new ConfigurationException(e);
-        }
+        String path = RESOURCE_DIR + resource;
+        SitResourceUtils.res2file(path, getDestPath(path));
     }
 
     private Properties createLocalizedFile(String filename) {
         String name = FilenameUtils.removeExtension(filename);
-        String template = "sample/" + filename;
+        String template = RESOURCE_DIR + filename;
         Path dest = getDestPath(template);
 
         Properties properties = loadProperties(name);
@@ -76,7 +72,7 @@ public class SampleManager {
                 OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                 BufferedWriter bw = new BufferedWriter(osw);) {
 
-            new VelocityEngine().evaluate(context, bw, template, template);
+            Velocity.evaluate(context, bw, template, template);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -85,7 +81,8 @@ public class SampleManager {
 
     private Properties loadProperties(String name) {
         try {
-            URL url = ResourceUtils.getURL("classpath:sample/" + getPropertiesFileName(name));
+            URL url = ResourceUtils
+                    .getURL("classpath:" + RESOURCE_DIR + getPropertiesFileName(name));
             Properties properties = new Properties();
             properties.load(url.openStream());
             return properties;
