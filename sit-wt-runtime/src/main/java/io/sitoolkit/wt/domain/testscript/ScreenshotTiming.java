@@ -35,8 +35,8 @@ public enum ScreenshotTiming {
         this.label = MessageManager.getMessage("testScript-screenshot-" + name().toLowerCase());
     }
 
-    public static ScreenshotTiming getTiming(String value) {
-        return timingMap.get(StringUtils.defaultIfBlank(value, NONE.getLabel()));
+    public static ScreenshotTiming getTiming(String label) {
+        return timingMap.get(StringUtils.defaultIfBlank(label, NONE.getLabel()));
     }
 
     public static List<String> getLabels() {
