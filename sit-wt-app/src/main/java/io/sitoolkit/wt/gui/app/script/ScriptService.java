@@ -154,7 +154,7 @@ public class ScriptService {
         return operationConverter.getOperationNames();
     }
     
-    public void generateNewScript(File destFile) {
+    public void generateNewScript(Path destFile) {
         testScriptGenerator.generateNewScript(destFile);
     }
 

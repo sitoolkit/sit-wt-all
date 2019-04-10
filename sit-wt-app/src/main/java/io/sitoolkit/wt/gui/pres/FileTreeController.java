@@ -3,6 +3,7 @@ package io.sitoolkit.wt.gui.pres;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -206,9 +207,9 @@ public class FileTreeController implements Initializable {
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(name -> {
                 name = name.endsWith(".csv") ? name : name + ".csv";
-                File newTestScript = new File(selectedItem.getValue().getFile(), name);
+                Path newTestScript = selectedItem.getValue().getFile().toPath().resolve(name);
 
-                if (newTestScript.exists()) {
+                if (newTestScript.toFile().exists()) {
                     // TODO ファイル名重複
                     return;
                 }

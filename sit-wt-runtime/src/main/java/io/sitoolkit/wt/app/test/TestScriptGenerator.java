@@ -1,6 +1,6 @@
 package io.sitoolkit.wt.app.test;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -16,13 +16,14 @@ public class TestScriptGenerator {
     @Resource
     private TemplateEngine templateEngine;
 
-    public void generateNewScript(File destFile) {
-        String destFileBase = FilenameUtils.getBaseName(destFile.getName());
-        String destFileExt = FilenameUtils.getExtension(destFile.getName());
+    public void generateNewScript(Path destFile) {
+        String filename = destFile.getFileName().toString();
+        String destFileBase = FilenameUtils.getBaseName(filename);
+        String destFileExt = FilenameUtils.getExtension(filename);
 
         TemplateModel model = new TemplateModel();
         model.setTemplate("EmptyTestScript.vm");
-        model.setOutDir(destFile.getParent());
+        model.setOutDir(destFile.getParent().toString());
         model.setFileBase(destFileBase);
         model.setFileExt(destFileExt);
 
