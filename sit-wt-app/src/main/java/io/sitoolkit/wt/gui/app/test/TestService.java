@@ -1,9 +1,7 @@
 package io.sitoolkit.wt.gui.app.test;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,15 +16,10 @@ import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
-import io.sitoolkit.wt.util.infra.util.FileIOUtils;
-import io.sitoolkit.wt.util.infra.util.SystemUtils;
 
 public class TestService {
 
     private static final SitLogger LOG = SitLoggerFactory.getLogger(TestService.class);
-
-    private static final String SCRIPT_TEMPLATE = "TestScriptTemplate_"
-            + Locale.getDefault().getLanguage() + ".csv";
 
     private TestRunner runner = new TestRunner();
 
@@ -120,27 +113,6 @@ public class TestService {
     private DebugSupport getDebugSupport(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
         return appCtx.getBean(DebugSupport.class);
-    }
-
-    public void createNewScript(File baseDir, File destFile) {
-
-        File dir = new File(SystemUtils.getSitRepository(), "sit-wt");
-        if (!dir.exists()) {
-            LOG.info("app.makeSitwtDir", dir.getAbsolutePath());
-            dir.mkdir();
-        }
-
-        File template = new File(dir, SCRIPT_TEMPLATE);
-
-        if (template.exists()) {
-
-            FileIOUtils.copy(template, destFile);
-
-        } else {
-            FileIOUtils.sysRes2file(SCRIPT_TEMPLATE, destFile.toPath());
-
-        }
-
     }
 
 }

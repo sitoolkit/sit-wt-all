@@ -40,28 +40,23 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
 
     private static Map<String, String> cellNameMap;
 
-    /**
-     * テストスクリプトが定義されたシート名
-     */
-    private static String sheetName = "TestScript";
+    private static String stepNo = "stepNo";
 
-    private static String stepNo = "StepNo";
+    private static String itemName = "itemName";
 
-    private static String itemName = "ItemName";
+    private static String operation = "operation";
 
-    private static String operation = "Operation";
+    private static String locatorStyle = "locatorStyle";
 
-    private static String locatorStyle = "LocatorStyle";
+    private static String locator = "locator";
 
-    private static String locator = "Locator";
+    private static String dataStyle = "dataStyle";
 
-    private static String dataStyle = "DataStyle";
+    private static String screenshot = "screenshot";
 
-    private static String screenshot = "Screenshot";
+    private static String breakPoint = "breakPoint";
 
-    private static String breakpoint = "Breakpoint";
-
-    private static String case_ = "Case";
+    private static String caseNoPrefix = "caseNoPrefix";
 
     public TestScriptConvertUtils() {
     }
@@ -74,15 +69,19 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
     private static void initCellNameMap() {
         cellNameMap = new HashMap<String, String>();
 
-        cellNameMap.put(stepNo, MessageManager.getMessage(stepNo));
-        cellNameMap.put(itemName, MessageManager.getMessage(itemName));
-        cellNameMap.put(operation, MessageManager.getMessage(operation));
-        cellNameMap.put(locatorStyle, MessageManager.getMessage(locatorStyle));
-        cellNameMap.put(locator, MessageManager.getMessage(locator));
-        cellNameMap.put(dataStyle, MessageManager.getMessage(dataStyle));
-        cellNameMap.put(screenshot, MessageManager.getMessage(screenshot));
-        cellNameMap.put(breakpoint, MessageManager.getMessage(breakpoint));
-        cellNameMap.put(case_, MessageManager.getMessage(case_));
+        cellNameMap.put(stepNo, getCellName(stepNo));
+        cellNameMap.put(itemName, getCellName(itemName));
+        cellNameMap.put(operation, getCellName(operation));
+        cellNameMap.put(locatorStyle, getCellName(locatorStyle));
+        cellNameMap.put(locator, getCellName(locator));
+        cellNameMap.put(dataStyle, getCellName(dataStyle));
+        cellNameMap.put(screenshot, getCellName(screenshot));
+        cellNameMap.put(breakPoint, getCellName(breakPoint));
+        cellNameMap.put(caseNoPrefix, getCellName(caseNoPrefix));
+    }
+
+    private static String getCellName(String name) {
+        return MessageManager.getMessage("testScript-header-" + name);
     }
 
     private static String getValue(Map<String, String> row, String key) {
@@ -102,7 +101,7 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         testStep.getLocator().setValue(getValue(row, locator));
         testStep.setDataType(getValue(row, dataStyle));
         testStep.setScreenshotTiming(getValue(row, screenshot));
-        testStep.setBreakPoint(getValue(row, breakpoint));
+        testStep.setBreakPoint(getValue(row, breakPoint));
         Map<String, String> testData = new HashMap<String, String>();
 
         String casePrefix = (new TestScript()).getCaseNoPrefix();
@@ -120,7 +119,7 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         String casePrefix = (new TestScript()).getCaseNoPrefix();
 
         Stream<String> itemStream = Stream.of(stepNo, itemName, operation, locatorStyle, locator,
-                dataStyle, screenshot, breakpoint).map(cellNameMap::get);
+                dataStyle, screenshot, breakPoint).map(cellNameMap::get);
         Stream<String> caseStream = caseNoList.stream().map(caseNo -> casePrefix + caseNo);
 
         return Stream.concat(itemStream, caseStream).collect(Collectors.toList());
@@ -136,7 +135,7 @@ public class TestScriptConvertUtils implements ApplicationContextAware {
         row.add(testStep.getLocator().getType());
         row.add(testStep.getLocator().getValue());
         row.add(testStep.getDataType());
-        row.add(testStep.getScreenshotTiming());
+        row.add(testStep.getScreenshotTiming().getLabel());
         row.add(testStep.getBreakPoint());
         caseNoList.stream().map(testStep.getTestData()::get).forEachOrdered(row::add);
         return row;

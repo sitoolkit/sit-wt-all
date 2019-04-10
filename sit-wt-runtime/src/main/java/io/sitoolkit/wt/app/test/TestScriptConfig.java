@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.app.config;
+package io.sitoolkit.wt.app.test;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +17,8 @@ import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.infra.ELSupport;
+import io.sitoolkit.wt.infra.template.TemplateEngine;
+import io.sitoolkit.wt.infra.template.TemplateEngineVelocityImpl;
 
 @Configuration
 public class TestScriptConfig {
@@ -71,6 +73,16 @@ public class TestScriptConfig {
             }
 
         };
+    }
+
+    @Bean
+    public TestScriptGenerator testScriptGenerator() {
+        return new TestScriptGenerator();
+    }
+
+    @Bean
+    public TemplateEngine templateEngine() {
+        return new TemplateEngineVelocityImpl();
     }
 
 }

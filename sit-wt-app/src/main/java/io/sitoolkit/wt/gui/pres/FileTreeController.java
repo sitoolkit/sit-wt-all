@@ -3,13 +3,13 @@ package io.sitoolkit.wt.gui.pres;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 import io.sitoolkit.wt.gui.app.script.ScriptService;
-import io.sitoolkit.wt.gui.app.test.TestService;
 import io.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import io.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import io.sitoolkit.wt.gui.infra.fx.FileWrapper;
@@ -46,8 +46,6 @@ public class FileTreeController implements Initializable {
     private MenuItem executeDebugCaseMenuItem;
 
     private Mode mode = Mode.NORMAL;
-
-    TestService testService = new TestService();
 
     FileSystemWatchService fileSystemWatchService = new FileSystemWatchService();
 
@@ -209,14 +207,14 @@ public class FileTreeController implements Initializable {
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(name -> {
                 name = name.endsWith(".csv") ? name : name + ".csv";
-                File newTestScript = new File(selectedItem.getValue().getFile(), name);
+                Path newTestScript = selectedItem.getValue().getFile().toPath().resolve(name);
 
-                if (newTestScript.exists()) {
+                if (newTestScript.toFile().exists()) {
                     // TODO ファイル名重複
                     return;
                 }
 
-                testService.createNewScript(fileTree.getRoot().getValue().getFile(), newTestScript);
+                scriptService.generateNewScript(newTestScript);
             });
 
         });

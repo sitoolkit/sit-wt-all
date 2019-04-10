@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.controlsfx.control.spreadsheet.GridChange;
 
 import io.sitoolkit.wt.domain.debug.DebugListener;
+import io.sitoolkit.wt.domain.testscript.ScreenshotTiming;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
@@ -45,7 +46,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     public TestScriptEditorController(ScriptService scriptService) {
         this.scriptService = scriptService;
-        editor.init(scriptService.getOperationNames(), TestStep.SCREENSHOT_TIMING_VALUES);
+        editor.init(scriptService.getOperationNames(), ScreenshotTiming.getLabels());
     }
 
     @Override
