@@ -1,27 +1,20 @@
 package io.sitoolkit.wt.gui.app.test;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import io.sitoolkit.wt.app.config.RuntimeConfig;
-import io.sitoolkit.wt.app.test.TestConfig;
 import io.sitoolkit.wt.app.test.TestRunner;
 import io.sitoolkit.wt.domain.debug.DebugSupport;
 import io.sitoolkit.wt.gui.domain.test.TestRunParams;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
-import io.sitoolkit.wt.infra.resource.MessageManager;
-import io.sitoolkit.wt.infra.template.TemplateEngine;
-import io.sitoolkit.wt.infra.template.TemplateModel;
 import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
 
 public class TestService {
@@ -32,15 +25,6 @@ public class TestService {
 
     private Map<String, ConfigurableApplicationContext> ctxMap = new HashMap<>();
 
-    private TemplateEngine templateEngine;
-    
-    public TestService() {
-        try (AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext(
-                TestConfig.class)) {
-            templateEngine = appCtx.getBean(TemplateEngine.class);
-        }
-    }
-    
     public String runTest(TestRunParams params, TestExitCallback callback) {
 
         if (params.getTargetScripts() == null) {
@@ -129,24 +113,6 @@ public class TestService {
     private DebugSupport getDebugSupport(String sessionId) {
         ConfigurableApplicationContext appCtx = ctxMap.get(sessionId);
         return appCtx.getBean(DebugSupport.class);
-    }
-
-    public void createNewScript(File destFile) {
-
-        String destFileBase = FilenameUtils.getBaseName(destFile.getName());
-        String destFileExt = FilenameUtils.getExtension(destFile.getName());
-
-        TemplateModel model = new TemplateModel();
-        model.setTemplate("EmptyTestScript.vm");
-        model.setOutDir(destFile.getParent());
-        model.setFileBase(destFileBase);
-        model.setFileExt(destFileExt);
-        
-        Properties properties = new Properties();
-        properties.putAll(MessageManager.getMessageMap("testScript-"));
-        model.setProperties(properties);
-
-        templateEngine.write(model);
     }
 
 }

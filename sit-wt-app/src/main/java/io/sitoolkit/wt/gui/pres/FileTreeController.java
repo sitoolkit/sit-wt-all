@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import io.sitoolkit.wt.gui.app.script.ScriptService;
-import io.sitoolkit.wt.gui.app.test.TestService;
 import io.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import io.sitoolkit.wt.gui.infra.fx.FileTreeItem;
 import io.sitoolkit.wt.gui.infra.fx.FileWrapper;
@@ -46,8 +45,6 @@ public class FileTreeController implements Initializable {
     private MenuItem executeDebugCaseMenuItem;
 
     private Mode mode = Mode.NORMAL;
-
-    TestService testService = new TestService();
 
     FileSystemWatchService fileSystemWatchService = new FileSystemWatchService();
 
@@ -216,7 +213,7 @@ public class FileTreeController implements Initializable {
                     return;
                 }
 
-                testService.createNewScript(newTestScript);
+                scriptService.generateNewScript(newTestScript);
             });
 
         });

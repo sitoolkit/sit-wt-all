@@ -13,11 +13,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import io.sitoolkit.wt.app.config.BaseConfig;
 import io.sitoolkit.wt.app.config.ExtConfig;
-import io.sitoolkit.wt.app.config.TestScriptConfig;
 import io.sitoolkit.wt.app.ope2script.FirefoxOpener;
 import io.sitoolkit.wt.app.page2script.Page2Script;
 import io.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import io.sitoolkit.wt.app.test.TestCaseReader;
+import io.sitoolkit.wt.app.test.TestScriptConfig;
+import io.sitoolkit.wt.app.test.TestScriptGenerator;
 import io.sitoolkit.wt.domain.operation.OperationConverter;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
@@ -45,6 +46,8 @@ public class ScriptService {
 
     OperationConverter operationConverter = new OperationConverter();
 
+    TestScriptGenerator testScriptGenerator;
+    
     public ScriptService() {
         initialize();
     }
@@ -55,6 +58,7 @@ public class ScriptService {
                     TestScriptConfig.class);
             dao = appCtx.getBean(TestScriptDao.class);
             runtimePm  = appCtx.getBean(io.sitoolkit.wt.infra.PropertyManager.class);
+            testScriptGenerator = appCtx.getBean(TestScriptGenerator.class);
         });
     }
 
@@ -149,4 +153,9 @@ public class ScriptService {
     public List<String> getOperationNames() {
         return operationConverter.getOperationNames();
     }
+    
+    public void generateNewScript(File destFile) {
+        testScriptGenerator.generateNewScript(destFile);
+    }
+
 }
