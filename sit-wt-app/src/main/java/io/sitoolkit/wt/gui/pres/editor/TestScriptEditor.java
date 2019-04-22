@@ -2,7 +2,6 @@ package io.sitoolkit.wt.gui.pres.editor;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,7 +38,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.util.Pair;
 import lombok.Getter;
 
 public class TestScriptEditor {
@@ -49,10 +47,8 @@ public class TestScriptEditor {
 
     private static final int BREAK_POINT_HEADER_INDEX = 7;
 
-    private SpreadsheetCellType<String> defaultCellType = SpreadsheetCellType.STRING;
-    private List<SpreadsheetCellType<?>> stepSettingCellTypes = new ArrayList<>();
-
     private TestScriptEditorCellBuilder cellBuilder = new TestScriptEditorCellBuilder();
+    private TestScriptInputHelper inputHelper;
 
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
@@ -61,19 +57,7 @@ public class TestScriptEditor {
     private int lastContextMenuRequestedRowIndex = -1;
 
     public void init(List<String> operationNames, List<String> screenshotTimingValues) {
-        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
-        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
-        stepSettingCellTypes.add(SpreadsheetCellType.LIST(includeBlank(operationNames)));
-        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
-        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
-        stepSettingCellTypes.add(SpreadsheetCellType.STRING);
-        stepSettingCellTypes.add(SpreadsheetCellType.LIST(screenshotTimingValues));
-    }
-
-    private List<String> includeBlank(List<String> values) {
-        List<String> result = new ArrayList<>(values);
-        result.add(0, "");
-        return Collections.unmodifiableList(result);
+        inputHelper = new TestScriptInputHelper(spreadSheet, operationNames, screenshotTimingValues);
     }
 
     public void load(TestScript testScript) {
@@ -98,15 +82,20 @@ public class TestScriptEditor {
 
     }
 
-    private ObservableList<SpreadsheetCell> buildHeaderRow(List<String> headers) {
+    private ObservableList<SpreadsheetCell> buildHeaderRow(List<String> scriptHeaders) {
         ObservableList<SpreadsheetCell> headerCells = FXCollections.observableArrayList();
 
-        IntStream.range(0, headers.size()).forEach((i) -> {
-            if (i == BREAK_POINT_HEADER_INDEX) {
-                return;
-            }
+        List<String> headers = new ArrayList<>(scriptHeaders);
+        headers.remove(BREAK_POINT_HEADER_INDEX);
 
-            headerCells.add(buildCell(0, headerCells.size(), headers.get(i)));
+        headers.stream().forEach((header) -> {
+            int colIndex = headerCells.size();
+            SpreadsheetCell cell = cellBuilder.build(SpreadsheetCellType.STRING, 0, colIndex,
+                    header);
+            if (!isCaseColumn(colIndex)) {
+                cell.setEditable(false);
+            }
+            headerCells.add(cell);
         });
 
         return headerCells;
@@ -127,33 +116,23 @@ public class TestScriptEditor {
     private ObservableList<SpreadsheetCell> buildTestStepRow(int rowIndex, TestStep testStep) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getNo()));
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getItemName()));
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getOperationName()));
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getLocator().getType()));
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getLocator().getValue()));
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getDataType()));
-        cells.add(buildCell(rowIndex, cells.size(), testStep.getScreenshotTiming().getLabel()));
+        cells.add(inputHelper.buildDefaultCell(rowIndex, cells.size(), testStep.getNo()));
+        cells.add(inputHelper.buildDefaultCell(rowIndex, cells.size(), testStep.getItemName()));
+        String operationName = testStep.getOperationName();
+        cells.add(inputHelper.buildOperationCell(rowIndex, cells.size(), operationName));
+        cells.add(inputHelper.buildLocatorStyleCell(operationName, rowIndex, cells.size(),
+                testStep.getLocator().getType()));
+        cells.add(inputHelper.buildLocatorCell(operationName, rowIndex, cells.size(),
+                testStep.getLocator().getValue()));
+        cells.add(inputHelper.buildDataTypeCell(operationName, rowIndex, cells.size(), testStep.getDataType()));
+        cells.add(inputHelper.buildScreenshotCell(rowIndex, cells.size(),
+                testStep.getScreenshotTiming().getLabel()));
 
         testStep.getTestData().values().stream().forEach(testData -> {
-            cells.add(buildCell(rowIndex, cells.size(), testData));
+            cells.add(inputHelper.buildDataCell(operationName, rowIndex, cells.size(), testData));
         });
 
         return cells;
-    }
-
-    private SpreadsheetCell buildCell(int rowIndex, int colIndex, String value) {
-        SpreadsheetCellType<?> type;
-        if (isStepSettingCell(rowIndex, colIndex)) {
-            type = stepSettingCellTypes.get(colIndex);
-        } else {
-            type = defaultCellType;
-        }
-
-        SpreadsheetCell cell = cellBuilder.build(type, rowIndex, colIndex, value);
-        cell.setEditable(!isSettingHeaderCell(rowIndex, colIndex));
-
-        return cell;
     }
 
     private void initRowPickers(List<TestStep> testSteps) {
@@ -451,22 +430,6 @@ public class TestScriptEditor {
         return rowPosition >= ROW_INDEX_FIRST_STEP;
     }
 
-    private boolean isSettingColumn(int columnPosition) {
-        return !isCaseColumn(columnPosition);
-    }
-
-    private boolean isHeaderRow(int rowPosition) {
-        return !isStepRow(rowPosition);
-    }
-
-    private boolean isSettingHeaderCell(int rowPosition, int columnPosition) {
-        return isHeaderRow(rowPosition) && isSettingColumn(columnPosition);
-    }
-
-    private boolean isStepSettingCell(int rowPosition, int columnPosition) {
-        return isStepRow(rowPosition) && isSettingColumn(columnPosition);
-    }
-
     private Optional<Integer> getCaseColumnPosition(int caseIndex) {
         int columnCount = spreadSheet.getGrid().getColumnCount();
         int position = COLUMN_INDEX_FIRST_CASE + caseIndex;
@@ -487,11 +450,7 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
 
         IntStream.range(0, rowCount).forEachOrdered(i -> {
-            ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
-            IntStream.range(0, columnCount).forEachOrdered(j -> {
-                cells.add(buildCell(rows.size(), j, ""));
-            });
-            rows.add(rowPosition, cells);
+            rows.add(rowPosition, inputHelper.buildTestStepRow(i, columnCount));
         });
 
         resetGrid(rows, columnCount);
@@ -507,10 +466,11 @@ public class TestScriptEditor {
         ObservableList<SpreadsheetColumn> columns = spreadSheet.getColumns();
         List<Double> widths = getColumnWidths();
 
-        IntStream.range(0, rows.size()).forEach(i -> {
-            IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(j -> {
-                SpreadsheetCell cell = buildCell(i, j, "");
-                rows.get(i).add(j, cell);
+        IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(col -> {
+            rows.get(0).add(col, cellBuilder.build(SpreadsheetCellType.STRING, 0, col, ""));
+
+            IntStream.range(ROW_INDEX_FIRST_STEP, rows.size()).forEach(row -> {
+                rows.get(row).add(col, inputHelper.buildTestDataCell(rows.get(row), row, col));
             });
         });
 
@@ -583,9 +543,11 @@ public class TestScriptEditor {
             int row) {
 
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
-        cells.addAll(IntStream.range(0, original.size())
-                .mapToObj(column -> buildCell(row, column, original.get(column).getText()))
-                .collect(Collectors.toList()));
+        cells.addAll(IntStream.range(0, original.size()).mapToObj(column -> {
+            SpreadsheetCell originalCell = original.get(column);
+            return cellBuilder.build(originalCell.getCellType(), row, column,
+                    originalCell.getText());
+        }).collect(Collectors.toList()));
         return cells;
     }
 
@@ -626,28 +588,6 @@ public class TestScriptEditor {
         return spreadSheet.getContextMenu();
     }
 
-    /**
-     * On Windows 10, changing the picker class may not rewrite the display,
-     * so call selectCells to force a redraw.
-     */
-    private void forceRedraw() {
-        SpreadsheetViewSelectionModel selectionModel = spreadSheet.getSelectionModel();
-        List<Pair<Integer, Integer>> selectedCells = selectionModel.getSelectedCells().stream()
-                .map((cell) -> {
-                    return new Pair<>(cell.getRow(), cell.getColumn());
-                }).collect(Collectors.toList());
-        if (selectedCells.isEmpty()) {
-            selectionModel.selectCells(Arrays.asList(new Pair<>(0, 0)));
-            selectionModel.clearSelection();
-        } else {
-            int focusedRow = selectionModel.getFocusedCell().getRow();
-            SpreadsheetColumn focusedCol = spreadSheet.getColumns()
-                    .get(selectionModel.getFocusedCell().getColumn());
-            selectionModel.selectCells(selectedCells);
-            selectionModel.focus(focusedRow, focusedCol);
-        }
-    }
-
     public void toggleBreakpoint() {
         if (!spreadSheet.getRowPickers().containsKey(lastContextMenuRequestedRowIndex)) {
             return;
@@ -672,7 +612,7 @@ public class TestScriptEditor {
         public void toggleBreakpoint() {
             isBreakpointEnabled = !isBreakpointEnabled;
             refreshStyleClasses();
-            forceRedraw();
+            SpreadsheetUtils.forceRedraw(spreadSheet);
         }
 
         private void refreshStyleClasses() {
@@ -711,4 +651,5 @@ public class TestScriptEditor {
             return ((Node) event.getTarget()).getParent() instanceof IndexedCell;
         }
     }
+
 }
