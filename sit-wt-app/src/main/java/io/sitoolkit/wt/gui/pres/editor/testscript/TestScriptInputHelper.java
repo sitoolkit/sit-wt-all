@@ -19,9 +19,10 @@ public class TestScriptInputHelper {
     private static final int COLUMN_INDEX_FIRST_CASE = 7;
 
     private static final int COL_INDEX_OPERATION = 2;
-    private static final int COL_INDEX_LOCATOR_STYLE = 3;
+    private static final int COL_INDEX_LOCATOR_TYPE = 3;
     private static final int COL_INDEX_LOCATOR = 4;
-    private static final int COL_INDEX_DATA_STYLE = 5;
+    private static final int COL_INDEX_DATA_TYPE = 5;
+    private static final int COL_INDEX_SCREENSHOT = 6;
 
     private static final SpreadsheetCellType<?> UNUSED_TYPE = new UnusedCellType();
     private static final SpreadsheetCellType<?> OK_CANCEL_DATA_TYPE = new OkCancelDataCellType();
@@ -48,14 +49,11 @@ public class TestScriptInputHelper {
         cells.add(buildDefaultCell(rowIndex, cells.size(), testStep.getNo()));
         cells.add(buildDefaultCell(rowIndex, cells.size(), testStep.getItemName()));
         String operationName = testStep.getOperationName();
-        cells.add(buildOperationCell(rowIndex, cells.size(), operationName));
-        cells.add(buildLocatorTypeCell(operationName, rowIndex, cells.size(),
-                testStep.getLocator().getType()));
-        cells.add(buildLocatorCell(operationName, rowIndex, cells.size(),
-                testStep.getLocator().getValue()));
-        cells.add(buildDataTypeCell(operationName, rowIndex, cells.size(), testStep.getDataType()));
-        cells.add(buildScreenshotCell(rowIndex, cells.size(),
-                testStep.getScreenshotTiming().getLabel()));
+        cells.add(buildOperationCell(rowIndex, operationName));
+        cells.add(buildLocatorTypeCell(operationName, rowIndex, testStep.getLocator().getType()));
+        cells.add(buildLocatorCell(operationName, rowIndex, testStep.getLocator().getValue()));
+        cells.add(buildDataTypeCell(operationName, rowIndex, testStep.getDataType()));
+        cells.add(buildScreenshotCell(rowIndex, testStep.getScreenshotTiming().getLabel()));
 
         testStep.getTestData().values().stream().forEach(testData -> {
             cells.add(buildDataCell(operationName, rowIndex, cells.size(), testData));
@@ -68,14 +66,14 @@ public class TestScriptInputHelper {
         return cellBuilder.build(SpreadsheetCellType.STRING, rowIndex, colIndex, value);
     }
 
-    private SpreadsheetCell buildOperationCell(int rowIndex, int colIndex, String value) {
-        return cellBuilder.build(operationCellType, rowIndex, colIndex, value);
+    private SpreadsheetCell buildOperationCell(int rowIndex, String value) {
+        return cellBuilder.build(operationCellType, rowIndex, COL_INDEX_OPERATION, value);
     }
 
-    private SpreadsheetCell buildLocatorTypeCell(String operationName, int rowIndex, int colIndex,
-            String value) {
+    private SpreadsheetCell buildLocatorTypeCell(String operationName, int rowIndex, String value) {
 
-        return cellBuilder.build(getLocatorTypeCellType(operationName), rowIndex, colIndex, value);
+        return cellBuilder.build(getLocatorTypeCellType(operationName), rowIndex,
+                COL_INDEX_LOCATOR_TYPE, value);
     }
 
     private SpreadsheetCellType<?> getLocatorTypeCellType(String operationName) {
@@ -87,10 +85,10 @@ public class TestScriptInputHelper {
         }
     }
 
-    private SpreadsheetCell buildLocatorCell(String operationName, int rowIndex, int colIndex,
-            String value) {
+    private SpreadsheetCell buildLocatorCell(String operationName, int rowIndex, String value) {
 
-        return cellBuilder.build(getLocatorCellType(operationName), rowIndex, colIndex, value);
+        return cellBuilder.build(getLocatorCellType(operationName), rowIndex, COL_INDEX_LOCATOR,
+                value);
     }
 
     private SpreadsheetCellType<?> getLocatorCellType(String operationName) {
@@ -102,10 +100,10 @@ public class TestScriptInputHelper {
         }
     }
 
-    private SpreadsheetCell buildDataTypeCell(String operationName, int rowIndex, int colIndex,
-            String value) {
+    private SpreadsheetCell buildDataTypeCell(String operationName, int rowIndex, String value) {
 
-        return cellBuilder.build(getDataTypeCellType(operationName), rowIndex, colIndex, value);
+        return cellBuilder.build(getDataTypeCellType(operationName), rowIndex, COL_INDEX_DATA_TYPE,
+                value);
     }
 
     private SpreadsheetCellType<?> getDataTypeCellType(String operationName) {
@@ -117,8 +115,8 @@ public class TestScriptInputHelper {
         }
     }
 
-    private SpreadsheetCell buildScreenshotCell(int rowIndex, int colIndex, String value) {
-        return cellBuilder.build(screenshotCellType, rowIndex, colIndex, value);
+    private SpreadsheetCell buildScreenshotCell(int rowIndex, String value) {
+        return cellBuilder.build(screenshotCellType, rowIndex, COL_INDEX_SCREENSHOT, value);
     }
 
     private SpreadsheetCell buildDataCell(String operationName, int rowIndex, int colIndex,
@@ -140,17 +138,14 @@ public class TestScriptInputHelper {
     }
 
     public void updateStepOperation(int rowIndex, String operationName) {
-        ObservableList<SpreadsheetCell> row = spreadSheet.getGrid().getRows().get(rowIndex);
+        ObservableList<SpreadsheetCell> cells = spreadSheet.getGrid().getRows().get(rowIndex);
 
-        row.set(COL_INDEX_LOCATOR_STYLE,
-                buildLocatorTypeCell(operationName, rowIndex, COL_INDEX_LOCATOR_STYLE, null));
-        row.set(COL_INDEX_LOCATOR,
-                buildLocatorCell(operationName, rowIndex, COL_INDEX_LOCATOR, null));
-        row.set(COL_INDEX_DATA_STYLE,
-                buildDataTypeCell(operationName, rowIndex, COL_INDEX_DATA_STYLE, null));
+        cells.set(COL_INDEX_LOCATOR_TYPE, buildLocatorTypeCell(operationName, rowIndex, null));
+        cells.set(COL_INDEX_LOCATOR, buildLocatorCell(operationName, rowIndex, null));
+        cells.set(COL_INDEX_DATA_TYPE, buildDataTypeCell(operationName, rowIndex, null));
 
-        IntStream.range(COLUMN_INDEX_FIRST_CASE, row.size()).forEach((colIndex) -> {
-            row.set(colIndex, buildDataCell(operationName, rowIndex, colIndex, null));
+        IntStream.range(COLUMN_INDEX_FIRST_CASE, cells.size()).forEach((colIndex) -> {
+            cells.set(colIndex, buildDataCell(operationName, rowIndex, colIndex, null));
         });
 
         SpreadsheetUtils.forceRedraw(spreadSheet);
@@ -162,11 +157,11 @@ public class TestScriptInputHelper {
 
         cells.add(buildDefaultCell(rowIndex, cells.size(), null));
         cells.add(buildDefaultCell(rowIndex, cells.size(), null));
-        cells.add(buildOperationCell(rowIndex, cells.size(), operationName));
-        cells.add(buildLocatorTypeCell(operationName, rowIndex, cells.size(), null));
-        cells.add(buildLocatorCell(operationName, rowIndex, cells.size(), null));
-        cells.add(buildDataTypeCell(operationName, rowIndex, cells.size(), null));
-        cells.add(buildScreenshotCell(rowIndex, cells.size(), null));
+        cells.add(buildOperationCell(rowIndex, operationName));
+        cells.add(buildLocatorTypeCell(operationName, rowIndex, null));
+        cells.add(buildLocatorCell(operationName, rowIndex, null));
+        cells.add(buildDataTypeCell(operationName, rowIndex, null));
+        cells.add(buildScreenshotCell(rowIndex, null));
 
         IntStream.range(COLUMN_INDEX_FIRST_CASE, columnCount).forEach(colIndex -> {
             cells.add(buildDataCell(operationName, rowIndex, cells.size(), null));
