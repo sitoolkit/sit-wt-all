@@ -113,33 +113,10 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
         testSteps.forEach(testStep -> {
-            rows.add(buildTestStepRow(ROW_INDEX_FIRST_STEP + rows.size(), testStep));
+            rows.add(inputHelper.buildTestStepRow(ROW_INDEX_FIRST_STEP + rows.size(), testStep));
         });
 
         return rows;
-    }
-
-    private ObservableList<SpreadsheetCell> buildTestStepRow(int rowIndex, TestStep testStep) {
-        ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
-
-        cells.add(inputHelper.buildDefaultCell(rowIndex, cells.size(), testStep.getNo()));
-        cells.add(inputHelper.buildDefaultCell(rowIndex, cells.size(), testStep.getItemName()));
-        String operationName = testStep.getOperationName();
-        cells.add(inputHelper.buildOperationCell(rowIndex, cells.size(), operationName));
-        cells.add(inputHelper.buildLocatorStyleCell(operationName, rowIndex, cells.size(),
-                testStep.getLocator().getType()));
-        cells.add(inputHelper.buildLocatorCell(operationName, rowIndex, cells.size(),
-                testStep.getLocator().getValue()));
-        cells.add(inputHelper.buildDataTypeCell(operationName, rowIndex, cells.size(),
-                testStep.getDataType()));
-        cells.add(inputHelper.buildScreenshotCell(rowIndex, cells.size(),
-                testStep.getScreenshotTiming().getLabel()));
-
-        testStep.getTestData().values().stream().forEach(testData -> {
-            cells.add(inputHelper.buildDataCell(operationName, rowIndex, cells.size(), testData));
-        });
-
-        return cells;
     }
 
     private void initRowPickers(List<TestStep> testSteps) {

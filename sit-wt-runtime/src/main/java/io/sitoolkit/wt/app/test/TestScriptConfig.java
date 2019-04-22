@@ -1,6 +1,5 @@
 package io.sitoolkit.wt.app.test;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
@@ -65,11 +64,6 @@ public class TestScriptConfig {
                         return null;
                     }
                 });
-            }
-
-            @Override
-            public List<String> getOperationNames() {
-                return null;
             }
 
         };

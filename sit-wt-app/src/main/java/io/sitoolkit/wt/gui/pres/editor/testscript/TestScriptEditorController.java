@@ -9,7 +9,6 @@ import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.testscript.ScreenshotTiming;
 import io.sitoolkit.wt.domain.testscript.TestScript;
-import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.domain.testscript.TestStepInputType;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
 import io.sitoolkit.wt.gui.pres.editor.EditorController;
