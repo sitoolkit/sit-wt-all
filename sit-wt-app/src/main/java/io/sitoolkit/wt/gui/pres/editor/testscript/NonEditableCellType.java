@@ -1,9 +1,8 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
-public class NonEditableCellType extends SpreadsheetCellType.StringType {
+public class NonEditableCellType extends DefaultStringCellType {
 
     @Override
     public SpreadsheetCell createCell(int row, int column, int rowSpan, int columnSpan,

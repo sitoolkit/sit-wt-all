@@ -98,7 +98,7 @@ public class TestScriptInputHelper {
         if (locatorTypes.get(0).equals("na")) {
             return UNUSED_TYPE;
         } else {
-            return SpreadsheetCellType.LIST(locatorTypes);
+            return SpreadsheetCellType.STRING;
         }
     }
 
@@ -177,7 +177,7 @@ public class TestScriptInputHelper {
 
     public SpreadsheetCell buildEmptyDataCell(ObservableList<SpreadsheetCell> row, int rowIndex,
             int colIndex) {
-        
+
         String operationName = row.get(COL_INDEX_OPERATION).getText();
         return buildDataCell(operationName, rowIndex, colIndex, null);
     }

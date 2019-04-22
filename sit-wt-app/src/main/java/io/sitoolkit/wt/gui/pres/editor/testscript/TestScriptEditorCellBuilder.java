@@ -8,7 +8,8 @@ import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class TestScriptEditorCellBuilder {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestScriptEditorCellBuilder.class);
+    private static final SitLogger LOG = SitLoggerFactory
+            .getLogger(TestScriptEditorCellBuilder.class);
 
     public SpreadsheetCell build(SpreadsheetCellType<?> type, int rowIndex, int colIndex,
             String value) {
@@ -18,8 +19,10 @@ public class TestScriptEditorCellBuilder {
         } else if (type instanceof SpreadsheetCellType.ListType) {
             return ((SpreadsheetCellType.ListType) type).createCell(rowIndex, colIndex, 1, 1,
                     value);
+        } else if (type instanceof DefaultStringCellType) {
+            return ((DefaultStringCellType) type).createCell(rowIndex, colIndex, 1, 1, value);
         } else {
-            LOG.warn("Illegal operation for {}", type);
+            LOG.warnMsg("Illegal operation for " + type);
             return null;
         }
     }

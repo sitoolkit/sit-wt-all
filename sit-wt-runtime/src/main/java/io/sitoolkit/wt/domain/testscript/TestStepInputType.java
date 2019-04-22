@@ -29,7 +29,7 @@ public enum TestStepInputType {
     storeElementIndex(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.variable_name),
     storeElementValue(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.variable_name),
     switchFrame(Locator.Type.SELECTOR_TYPES, DataType.execution),
-    switchWindow(Locator.Type.title, DataType.execution),
+    switchWindow(Locator.Type.TITLE_TYPES, DataType.execution),
     verify(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.verification_value),
     verifyAttribute(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.verification_value),
     verifySelect(Locator.Type.SELECTOR_TYPES, DataType.verification_value),
@@ -45,19 +45,19 @@ public enum TestStepInputType {
     List<String> dataTypes;
 
     private TestStepInputType(List<Locator.Type> locatorTypes, List<DataType> dataTypes) {
-        this.locatorTypes = locatorTypes.stream().map(Locator.Type::name)
+        this.locatorTypes = locatorTypes.stream().map(Locator.Type::getLabel)
                 .collect(Collectors.toList());
         this.dataTypes = dataTypes.stream().map(DataType::name).collect(Collectors.toList());
     }
     
     private TestStepInputType(List<Locator.Type> locatorTypes, DataType dataType) {
-        this.locatorTypes = locatorTypes.stream().map(Locator.Type::name)
+        this.locatorTypes = locatorTypes.stream().map(Locator.Type::getLabel)
                 .collect(Collectors.toList());
         this.dataTypes = Arrays.asList(dataType.name());
     }
     
     private TestStepInputType(Locator.Type locatorType, DataType dataType) {
-        this.locatorTypes = Arrays.asList(locatorType.name());
+        this.locatorTypes = Arrays.asList(locatorType.getLabel());
         this.dataTypes = Arrays.asList(dataType.name());
     }
     

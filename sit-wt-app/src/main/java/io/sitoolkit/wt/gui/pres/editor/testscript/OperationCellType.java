@@ -5,20 +5,22 @@ import java.util.function.BiConsumer;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-public class OperationCellType extends SpreadsheetCellType.ListType
+public class OperationCellType extends DefaultStringCellType
         implements ChangeListener<Object> {
 
-    private BiConsumer<Integer, String> changeConsumer;
+    private List<String> items;
+    private BiConsumer<Integer, String> changeCallback;
 
-    public OperationCellType(List<String> items, BiConsumer<Integer, String> changeConsumer) {
-        super(items);
-        this.changeConsumer = changeConsumer;
+    public OperationCellType(List<String> items, BiConsumer<Integer, String> changeCallback) {
+        this.items = items;
+        this.changeCallback = changeCallback;
     }
 
     @Override
@@ -31,11 +33,16 @@ public class OperationCellType extends SpreadsheetCellType.ListType
     }
 
     @Override
+    public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
+        return new SpreadsheetCellEditor.ListEditor<>(view, items);
+    }
+    
+    @Override
     public void changed(ObservableValue<? extends Object> observable, Object oldValue,
             Object newValue) {
-        SpreadsheetCellBase base = (SpreadsheetCellBase) ((ObjectProperty<?>) observable).getBean();
 
-        changeConsumer.accept(base.getRow(), (String) newValue);
+        SpreadsheetCellBase base = (SpreadsheetCellBase) ((ObjectProperty<?>) observable).getBean();
+        changeCallback.accept(base.getRow(), (String) newValue);
     }
 
 }
