@@ -15,6 +15,9 @@
  */
 package io.sitoolkit.wt.domain.testscript;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -105,7 +108,11 @@ public class Locator {
     }
 
     public enum Type {
-        id, css, name, xpath, link, tag, title, na;
+        id, css, name, xpath, link, tag, title, url, case_no, os_command, variable, testscript_file, sql_file, na;
+
+        public static List<Type> SELECTOR_TYPES = Arrays.asList(id, name, tag, css, xpath);
+        public static List<Type> SELECTOR_WITH_LINK_TYPES = Arrays.asList(id, name, tag, link, css,
+                xpath);
 
         public static Type decode(String code) {
             for (Type type : values()) {

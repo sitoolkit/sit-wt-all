@@ -3,6 +3,10 @@
     -fx-alignment: center;
 }
 
+.spreadsheet-cell.non-editable {
+    -fx-background-color: #f3f3f3;
+}
+
 .spreadsheet-cell.debugStep {
     -fx-background-color: lightgreen;
 }

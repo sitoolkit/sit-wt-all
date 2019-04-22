@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.gui.pres.editor;
+package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetViewSelectionModel;
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
+import io.sitoolkit.wt.domain.testscript.TestStepInputType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -47,6 +48,8 @@ public class TestScriptEditor {
 
     private static final int BREAK_POINT_HEADER_INDEX = 7;
 
+    private static final SpreadsheetCellType<String> NON_EDITABLE_TYPE = new NonEditableCellType();
+
     private TestScriptEditorCellBuilder cellBuilder = new TestScriptEditorCellBuilder();
     private TestScriptInputHelper inputHelper;
 
@@ -56,8 +59,8 @@ public class TestScriptEditor {
     @Getter
     private int lastContextMenuRequestedRowIndex = -1;
 
-    public void init(List<String> operationNames, List<String> screenshotTimingValues) {
-        inputHelper = new TestScriptInputHelper(spreadSheet, operationNames, screenshotTimingValues);
+    public void init(TestStepInputType[] inputTypes, List<String> screenshotTimings) {
+        inputHelper = new TestScriptInputHelper(spreadSheet, inputTypes, screenshotTimings);
     }
 
     public void load(TestScript testScript) {
@@ -90,12 +93,15 @@ public class TestScriptEditor {
 
         headers.stream().forEach((header) -> {
             int colIndex = headerCells.size();
-            SpreadsheetCell cell = cellBuilder.build(SpreadsheetCellType.STRING, 0, colIndex,
-                    header);
-            if (!isCaseColumn(colIndex)) {
-                cell.setEditable(false);
+            
+            SpreadsheetCellType<?> cellType;
+            if (isCaseColumn(colIndex)) {
+                cellType = SpreadsheetCellType.STRING;
+            } else {
+                cellType = NON_EDITABLE_TYPE;
             }
-            headerCells.add(cell);
+
+            headerCells.add(cellBuilder.build(cellType, 0, colIndex, header));
         });
 
         return headerCells;
@@ -124,7 +130,8 @@ public class TestScriptEditor {
                 testStep.getLocator().getType()));
         cells.add(inputHelper.buildLocatorCell(operationName, rowIndex, cells.size(),
                 testStep.getLocator().getValue()));
-        cells.add(inputHelper.buildDataTypeCell(operationName, rowIndex, cells.size(), testStep.getDataType()));
+        cells.add(inputHelper.buildDataTypeCell(operationName, rowIndex, cells.size(),
+                testStep.getDataType()));
         cells.add(inputHelper.buildScreenshotCell(rowIndex, cells.size(),
                 testStep.getScreenshotTiming().getLabel()));
 
@@ -450,7 +457,7 @@ public class TestScriptEditor {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
 
         IntStream.range(0, rowCount).forEachOrdered(i -> {
-            rows.add(rowPosition, inputHelper.buildTestStepRow(i, columnCount));
+            rows.add(rowPosition, inputHelper.buildEmptyRow(i, columnCount));
         });
 
         resetGrid(rows, columnCount);
@@ -470,7 +477,7 @@ public class TestScriptEditor {
             rows.get(0).add(col, cellBuilder.build(SpreadsheetCellType.STRING, 0, col, ""));
 
             IntStream.range(ROW_INDEX_FIRST_STEP, rows.size()).forEach(row -> {
-                rows.get(row).add(col, inputHelper.buildTestDataCell(rows.get(row), row, col));
+                rows.get(row).add(col, inputHelper.buildEmptyDataCell(rows.get(row), row, col));
             });
         });
 

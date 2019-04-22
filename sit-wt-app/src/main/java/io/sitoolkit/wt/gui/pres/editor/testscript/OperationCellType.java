@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.gui.pres.editor;
+package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import java.util.List;
 import java.util.function.BiConsumer;

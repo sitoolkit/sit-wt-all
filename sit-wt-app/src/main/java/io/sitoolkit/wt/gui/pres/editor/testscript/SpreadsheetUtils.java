@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.gui.pres.editor;
+package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
