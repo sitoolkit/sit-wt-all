@@ -25,7 +25,8 @@ public class TestScriptInputHelper {
     private static final int COL_INDEX_SCREENSHOT = 6;
 
     private static final SpreadsheetCellType<?> UNUSED_TYPE = new UnusedCellType();
-    private static final SpreadsheetCellType<?> OK_CANCEL_DATA_TYPE = new OkCancelDataCellType();
+    private static final TestScriptCellType OK_CANCEL_DATA_TYPE = new OkCancelDataCellType();
+    private static final TestScriptCellType STRING_TYPE = new StringCellType();
 
     private SpreadsheetCellType<?> operationCellType;
     private SpreadsheetCellType<?> screenshotCellType;
@@ -122,18 +123,16 @@ public class TestScriptInputHelper {
     private SpreadsheetCell buildDataCell(String operationName, int rowIndex, int colIndex,
             String value) {
 
-        return cellBuilder.build(getDataCellType(operationName), rowIndex, colIndex, value);
+        return getDataCellType(operationName).createCell(rowIndex, colIndex, value);
     }
 
-    private SpreadsheetCellType<?> getDataCellType(String operationName) {
+    private TestScriptCellType getDataCellType(String operationName) {
         List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
         switch (dataTypes.get(0)) {
             case "ok_cancel":
                 return OK_CANCEL_DATA_TYPE;
-            case "na":
-                return UNUSED_TYPE;
             default:
-                return SpreadsheetCellType.STRING;
+                return STRING_TYPE;
         }
     }
 

@@ -6,11 +6,11 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-public abstract class DefaultStringCellType extends SpreadsheetCellType<String> {
-    
-    public SpreadsheetCell createCell(int row, int column, int rowSpan, int columnSpan,
-            String value) {
-        SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
+public abstract class DefaultStringCellType extends SpreadsheetCellType<String>
+        implements TestScriptCellType {
+
+    public SpreadsheetCell createCell(int row, int column, String value) {
+        SpreadsheetCell cell = new SpreadsheetCellBase(row, column, ROW_SPAN, COL_SPAN, this);
         cell.setItem(convertValue(value));
         return cell;
     }
@@ -29,7 +29,7 @@ public abstract class DefaultStringCellType extends SpreadsheetCellType<String> 
     public boolean match(Object value) {
         return true;
     }
-    
+
     @Override
     public String convertValue(Object value) {
         return (String) value;

@@ -12,8 +12,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-public class OperationCellType extends DefaultStringCellType
-        implements ChangeListener<Object> {
+public class OperationCellType extends DefaultStringCellType implements ChangeListener<Object> {
 
     private List<String> items;
     private BiConsumer<Integer, String> changeCallback;
@@ -24,9 +23,8 @@ public class OperationCellType extends DefaultStringCellType
     }
 
     @Override
-    public SpreadsheetCell createCell(int row, int column, int rowSpan, int columnSpan,
-            String value) {
-        SpreadsheetCell cell = super.createCell(row, column, rowSpan, columnSpan, value);
+    public SpreadsheetCell createCell(int row, int column, String value) {
+        SpreadsheetCell cell = super.createCell(row, column, value);
         cell.itemProperty().addListener(this);
 
         return cell;
@@ -36,7 +34,7 @@ public class OperationCellType extends DefaultStringCellType
     public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
         return new SpreadsheetCellEditor.ListEditor<>(view, items);
     }
-    
+
     @Override
     public void changed(ObservableValue<? extends Object> observable, Object oldValue,
             Object newValue) {

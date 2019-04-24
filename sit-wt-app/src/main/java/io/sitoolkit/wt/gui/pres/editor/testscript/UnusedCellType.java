@@ -7,9 +7,8 @@ public class UnusedCellType extends NonEditableCellType {
     public static final String LABEL = "";
 
     @Override
-    public SpreadsheetCell createCell(int row, int column, int rowSpan, int columnSpan,
-            String value) {
-        return super.createCell(row, column, rowSpan, columnSpan, LABEL);
+    public SpreadsheetCell createCell(int row, int column, String value) {
+        return super.createCell(row, column, LABEL);
     }
 
 }

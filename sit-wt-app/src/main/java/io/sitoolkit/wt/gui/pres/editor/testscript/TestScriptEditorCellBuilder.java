@@ -20,7 +20,7 @@ public class TestScriptEditorCellBuilder {
             return ((SpreadsheetCellType.ListType) type).createCell(rowIndex, colIndex, 1, 1,
                     value);
         } else if (type instanceof DefaultStringCellType) {
-            return ((DefaultStringCellType) type).createCell(rowIndex, colIndex, 1, 1, value);
+            return ((DefaultStringCellType) type).createCell(rowIndex, colIndex, value);
         } else {
             LOG.warnMsg("Illegal operation for " + type);
             return null;
