@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-public class OkCancelCellType extends DefaultStringCellType {
+public class OkCancelCellType extends NormalStringCellType {
 
     private static final String BLANK = "";
     private static final String OK = "ok";

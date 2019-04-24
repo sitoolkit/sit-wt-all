@@ -176,8 +176,8 @@ public class TestScriptInputHelper {
         } else if (type instanceof SpreadsheetCellType.ListType) {
             return ((SpreadsheetCellType.ListType) type).createCell(rowIndex, colIndex, ROW_SPAN,
                     COL_SPAN, value);
-        } else if (type instanceof DefaultStringCellType) {
-            return ((DefaultStringCellType) type).createCell(rowIndex, colIndex, ROW_SPAN, COL_SPAN,
+        } else if (type instanceof NormalStringCellType) {
+            return ((NormalStringCellType) type).createCell(rowIndex, colIndex, ROW_SPAN, COL_SPAN,
                     value);
         } else {
             LOG.warnMsg("Illegal operation for " + type);

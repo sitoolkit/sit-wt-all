@@ -4,7 +4,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-public class ReadOnlyCellType extends DefaultStringCellType {
+public class ReadOnlyCellType extends NormalStringCellType {
 
     @Override
     public SpreadsheetCell createCell(int row, int column, int rowSpan, int columnSpan,

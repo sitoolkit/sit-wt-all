@@ -15,7 +15,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-public class OperationCellType extends DefaultStringCellType implements ChangeListener<Object> {
+public class OperationCellType extends NormalStringCellType implements ChangeListener<Object> {
 
     private List<String> operationNames;
     private BiConsumer<Integer, String> changeCallback;

@@ -4,7 +4,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
-public abstract class DefaultStringCellType extends SpreadsheetCellType<String> {
+public abstract class NormalStringCellType extends SpreadsheetCellType<String> {
 
     public SpreadsheetCell createCell(int row, int column, int rowSpan, int columnSpan,
             String value) {
