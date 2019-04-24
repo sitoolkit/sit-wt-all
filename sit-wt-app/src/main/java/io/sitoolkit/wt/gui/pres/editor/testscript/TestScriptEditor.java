@@ -21,7 +21,6 @@ import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.SpreadsheetViewSelectionModel;
@@ -48,9 +47,9 @@ public class TestScriptEditor {
 
     private static final int BREAK_POINT_HEADER_INDEX = 7;
 
-    private static final SpreadsheetCellType<String> NON_EDITABLE_TYPE = new NonEditableCellType();
+    private static final TestScriptCellType STRING_TYPE = new StringCellType();
+    private static final TestScriptCellType NON_EDITABLE_TYPE = new NonEditableCellType();
 
-    private TestScriptEditorCellBuilder cellBuilder = new TestScriptEditorCellBuilder();
     private TestScriptInputHelper inputHelper;
 
     @Getter
@@ -93,15 +92,15 @@ public class TestScriptEditor {
 
         headers.stream().forEach((header) -> {
             int colIndex = headerCells.size();
-            
-            SpreadsheetCellType<?> cellType;
+
+            TestScriptCellType cellType;
             if (isCaseColumn(colIndex)) {
-                cellType = SpreadsheetCellType.STRING;
+                cellType = STRING_TYPE;
             } else {
                 cellType = NON_EDITABLE_TYPE;
             }
 
-            headerCells.add(cellBuilder.build(cellType, 0, colIndex, header));
+            headerCells.add(cellType.createCell(0, colIndex, header));
         });
 
         return headerCells;
@@ -451,7 +450,7 @@ public class TestScriptEditor {
         List<Double> widths = getColumnWidths();
 
         IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(col -> {
-            rows.get(0).add(col, cellBuilder.build(SpreadsheetCellType.STRING, 0, col, ""));
+            rows.get(0).add(col, STRING_TYPE.createCell(0, col, ""));
 
             IntStream.range(ROW_INDEX_FIRST_STEP, rows.size()).forEach(row -> {
                 rows.get(row).add(col, inputHelper.buildEmptyDataCell(rows.get(row), row, col));
@@ -529,8 +528,8 @@ public class TestScriptEditor {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
         cells.addAll(IntStream.range(0, original.size()).mapToObj(column -> {
             SpreadsheetCell originalCell = original.get(column);
-            return cellBuilder.build(originalCell.getCellType(), row, column,
-                    originalCell.getText());
+            TestScriptCellType cellType = (TestScriptCellType) originalCell.getCellType();
+            return cellType.createCell(row, column, originalCell.getText());
         }).collect(Collectors.toList()));
         return cells;
     }

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import io.sitoolkit.wt.domain.testscript.TestStep;
@@ -24,16 +23,14 @@ public class TestScriptInputHelper {
     private static final int COL_INDEX_DATA_TYPE = 5;
     private static final int COL_INDEX_SCREENSHOT = 6;
 
-    private static final SpreadsheetCellType<?> UNUSED_TYPE = new UnusedCellType();
+    private static final TestScriptCellType UNUSED_TYPE = new UnusedCellType();
     private static final TestScriptCellType OK_CANCEL_DATA_TYPE = new OkCancelDataCellType();
     private static final TestScriptCellType STRING_TYPE = new StringCellType();
 
-    private SpreadsheetCellType<?> operationCellType;
-    private SpreadsheetCellType<?> screenshotCellType;
+    private TestScriptCellType operationCellType;
+    private TestScriptCellType screenshotCellType;
 
     private SpreadsheetView spreadSheet;
-
-    private TestScriptEditorCellBuilder cellBuilder = new TestScriptEditorCellBuilder();
 
     public TestScriptInputHelper(SpreadsheetView spreadSheet, TestStepInputType[] inputTypes,
             List<String> screenshotTimingValues) {
@@ -41,14 +38,14 @@ public class TestScriptInputHelper {
         List<String> operationNames = Arrays.asList(inputTypes).stream()
                 .map(TestStepInputType::getOperationName).collect(Collectors.toList());
         operationCellType = new OperationCellType(operationNames, this::updateStepOperation);
-        screenshotCellType = SpreadsheetCellType.LIST(screenshotTimingValues);
+        screenshotCellType = new ListCellType(screenshotTimingValues);
     }
 
     public ObservableList<SpreadsheetCell> buildTestStepRow(int rowIndex, TestStep testStep) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        cells.add(buildDefaultCell(rowIndex, cells.size(), testStep.getNo()));
-        cells.add(buildDefaultCell(rowIndex, cells.size(), testStep.getItemName()));
+        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), testStep.getNo()));
+        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), testStep.getItemName()));
         String operationName = testStep.getOperationName();
         cells.add(buildOperationCell(rowIndex, operationName));
         cells.add(buildLocatorTypeCell(operationName, rowIndex, testStep.getLocator().getType()));
@@ -63,61 +60,55 @@ public class TestScriptInputHelper {
         return cells;
     }
 
-    private SpreadsheetCell buildDefaultCell(int rowIndex, int colIndex, String value) {
-        return cellBuilder.build(SpreadsheetCellType.STRING, rowIndex, colIndex, value);
-    }
-
     private SpreadsheetCell buildOperationCell(int rowIndex, String value) {
-        return cellBuilder.build(operationCellType, rowIndex, COL_INDEX_OPERATION, value);
+        return operationCellType.createCell(rowIndex, COL_INDEX_OPERATION, value);
     }
 
     private SpreadsheetCell buildLocatorTypeCell(String operationName, int rowIndex, String value) {
 
-        return cellBuilder.build(getLocatorTypeCellType(operationName), rowIndex,
-                COL_INDEX_LOCATOR_TYPE, value);
+        return getLocatorTypeCellType(operationName).createCell(rowIndex, COL_INDEX_LOCATOR_TYPE,
+                value);
     }
 
-    private SpreadsheetCellType<?> getLocatorTypeCellType(String operationName) {
+    private TestScriptCellType getLocatorTypeCellType(String operationName) {
         List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
         if (locatorTypes.size() <= 1) {
             return UNUSED_TYPE;
         } else {
-            return SpreadsheetCellType.LIST(locatorTypes);
+            return new ListCellType(locatorTypes);
         }
     }
 
     private SpreadsheetCell buildLocatorCell(String operationName, int rowIndex, String value) {
 
-        return cellBuilder.build(getLocatorCellType(operationName), rowIndex, COL_INDEX_LOCATOR,
-                value);
+        return getLocatorCellType(operationName).createCell(rowIndex, COL_INDEX_LOCATOR, value);
     }
 
-    private SpreadsheetCellType<?> getLocatorCellType(String operationName) {
+    private TestScriptCellType getLocatorCellType(String operationName) {
         List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
-        if (locatorTypes.get(0).equals("na")) {
+        if (locatorTypes.get(0).equals("")) {
             return UNUSED_TYPE;
         } else {
-            return SpreadsheetCellType.STRING;
+            return STRING_TYPE;
         }
     }
 
     private SpreadsheetCell buildDataTypeCell(String operationName, int rowIndex, String value) {
 
-        return cellBuilder.build(getDataTypeCellType(operationName), rowIndex, COL_INDEX_DATA_TYPE,
-                value);
+        return getDataTypeCellType(operationName).createCell(rowIndex, COL_INDEX_DATA_TYPE, value);
     }
 
-    private SpreadsheetCellType<?> getDataTypeCellType(String operationName) {
+    private TestScriptCellType getDataTypeCellType(String operationName) {
         List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
         if (dataTypes.size() <= 1) {
             return UNUSED_TYPE;
         } else {
-            return SpreadsheetCellType.LIST(dataTypes);
+            return new ListCellType(dataTypes);
         }
     }
 
     private SpreadsheetCell buildScreenshotCell(int rowIndex, String value) {
-        return cellBuilder.build(screenshotCellType, rowIndex, COL_INDEX_SCREENSHOT, value);
+        return screenshotCellType.createCell(rowIndex, COL_INDEX_SCREENSHOT, value);
     }
 
     private SpreadsheetCell buildDataCell(String operationName, int rowIndex, int colIndex,
@@ -131,6 +122,8 @@ public class TestScriptInputHelper {
         switch (dataTypes.get(0)) {
             case "ok_cancel":
                 return OK_CANCEL_DATA_TYPE;
+            case "na":
+                return UNUSED_TYPE;
             default:
                 return STRING_TYPE;
         }
@@ -154,8 +147,8 @@ public class TestScriptInputHelper {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
         String operationName = "";
 
-        cells.add(buildDefaultCell(rowIndex, cells.size(), null));
-        cells.add(buildDefaultCell(rowIndex, cells.size(), null));
+        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), null));
+        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), null));
         cells.add(buildOperationCell(rowIndex, operationName));
         cells.add(buildLocatorTypeCell(operationName, rowIndex, null));
         cells.add(buildLocatorCell(operationName, rowIndex, null));
