@@ -47,7 +47,7 @@ public class TestScriptEditor {
     private static final int BREAK_POINT_HEADER_INDEX = 7;
 
     private static final TestScriptCellType STRING_TYPE = new StringCellType();
-    private static final TestScriptCellType NON_EDITABLE_TYPE = new NonEditableCellType();
+    private static final TestScriptCellType READ_ONLY_TYPE = new ReadOnlyCellType();
 
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
@@ -92,7 +92,7 @@ public class TestScriptEditor {
             if (isCaseColumn(colIndex)) {
                 cellType = STRING_TYPE;
             } else {
-                cellType = NON_EDITABLE_TYPE;
+                cellType = READ_ONLY_TYPE;
             }
 
             headerCells.add(cellType.createCell(0, colIndex, header));

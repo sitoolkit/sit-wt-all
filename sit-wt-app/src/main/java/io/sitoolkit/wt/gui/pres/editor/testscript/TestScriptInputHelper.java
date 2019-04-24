@@ -1,8 +1,6 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -24,23 +22,18 @@ public class TestScriptInputHelper {
     private static final int COL_INDEX_DATA_TYPE = 5;
     private static final int COL_INDEX_SCREENSHOT = 6;
 
-    private static final TestScriptCellType UNUSED_TYPE = new UnusedCellType();
-    private static final TestScriptCellType OK_CANCEL_DATA_TYPE = new OkCancelDataCellType();
+    private static final TestScriptCellType DISABLED_TYPE = new DisabledCellType();
+    private static final TestScriptCellType OK_CANCEL_TYPE = new OkCancelCellType();
     private static final TestScriptCellType STRING_TYPE = new StringCellType();
+    private static final TestScriptCellType SCREENSHOT_TYPE = new ListCellType(
+            ScreenshotTiming.getLabels());
 
-    private TestScriptCellType operationCellType;
-    private TestScriptCellType screenshotCellType;
+    private TestScriptCellType OPERATION_TYPE = new OperationCellType(this::updateStepOperation);
 
     private SpreadsheetView spreadSheet;
 
     public TestScriptInputHelper(SpreadsheetView spreadSheet) {
         this.spreadSheet = spreadSheet;
-
-        List<TestStepInputType> inputTypes = Arrays.asList(TestStepInputType.values());
-        List<String> operationNames = inputTypes.stream().map(TestStepInputType::getOperationName)
-                .collect(Collectors.toList());
-        operationCellType = new OperationCellType(operationNames, this::updateStepOperation);
-        screenshotCellType = new ListCellType(ScreenshotTiming.getLabels());
     }
 
     public ObservableList<SpreadsheetCell> buildTestStepRow(int rowIndex, TestStep testStep) {
@@ -63,7 +56,7 @@ public class TestScriptInputHelper {
     }
 
     private SpreadsheetCell buildOperationCell(int rowIndex, String value) {
-        return operationCellType.createCell(rowIndex, COL_INDEX_OPERATION, value);
+        return OPERATION_TYPE.createCell(rowIndex, COL_INDEX_OPERATION, value);
     }
 
     private SpreadsheetCell buildLocatorTypeCell(String operationName, int rowIndex, String value) {
@@ -75,7 +68,7 @@ public class TestScriptInputHelper {
     private TestScriptCellType getLocatorTypeCellType(String operationName) {
         List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
         if (locatorTypes.size() <= 1) {
-            return UNUSED_TYPE;
+            return DISABLED_TYPE;
         } else {
             return new ListCellType(locatorTypes);
         }
@@ -89,7 +82,7 @@ public class TestScriptInputHelper {
     private TestScriptCellType getLocatorCellType(String operationName) {
         List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
         if (locatorTypes.get(0).equals("")) {
-            return UNUSED_TYPE;
+            return DISABLED_TYPE;
         } else {
             return STRING_TYPE;
         }
@@ -103,14 +96,14 @@ public class TestScriptInputHelper {
     private TestScriptCellType getDataTypeCellType(String operationName) {
         List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
         if (dataTypes.size() <= 1) {
-            return UNUSED_TYPE;
+            return DISABLED_TYPE;
         } else {
             return new ListCellType(dataTypes);
         }
     }
 
     private SpreadsheetCell buildScreenshotCell(int rowIndex, String value) {
-        return screenshotCellType.createCell(rowIndex, COL_INDEX_SCREENSHOT, value);
+        return SCREENSHOT_TYPE.createCell(rowIndex, COL_INDEX_SCREENSHOT, value);
     }
 
     private SpreadsheetCell buildDataCell(String operationName, int rowIndex, int colIndex,
@@ -123,9 +116,9 @@ public class TestScriptInputHelper {
         List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
         switch (dataTypes.get(0)) {
             case "ok_cancel":
-                return OK_CANCEL_DATA_TYPE;
+                return OK_CANCEL_TYPE;
             case "na":
-                return UNUSED_TYPE;
+                return DISABLED_TYPE;
             default:
                 return STRING_TYPE;
         }

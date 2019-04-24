@@ -2,7 +2,7 @@ package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
-public class UnusedCellType extends NonEditableCellType {
+public class DisabledCellType extends ReadOnlyCellType {
 
     public static final String LABEL = "";
 

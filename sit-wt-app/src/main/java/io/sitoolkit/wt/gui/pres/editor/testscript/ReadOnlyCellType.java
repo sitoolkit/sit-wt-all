@@ -1,8 +1,10 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-public class NonEditableCellType extends DefaultStringCellType {
+public class ReadOnlyCellType extends DefaultStringCellType {
 
     @Override
     public SpreadsheetCell createCell(int row, int column, String value) {
@@ -10,6 +12,11 @@ public class NonEditableCellType extends DefaultStringCellType {
         cell.setEditable(false);
         cell.getStyleClass().add("non-editable");
         return cell;
+    }
+
+    @Override
+    public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
+        return null;
     }
 
 }

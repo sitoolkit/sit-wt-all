@@ -1,24 +1,29 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
+import io.sitoolkit.wt.domain.testscript.TestStepInputType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 public class OperationCellType extends DefaultStringCellType implements ChangeListener<Object> {
 
-    private List<String> items;
+    private List<String> operationNames;
     private BiConsumer<Integer, String> changeCallback;
 
-    public OperationCellType(List<String> items, BiConsumer<Integer, String> changeCallback) {
-        this.items = items;
+    public OperationCellType(BiConsumer<Integer, String> changeCallback) {
+        List<TestStepInputType> inputTypes = Arrays.asList(TestStepInputType.values());
+        this.operationNames = inputTypes.stream().map(TestStepInputType::getOperationName)
+                .collect(Collectors.toList());
         this.changeCallback = changeCallback;
     }
 
@@ -32,7 +37,7 @@ public class OperationCellType extends DefaultStringCellType implements ChangeLi
 
     @Override
     public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
-        return new SpreadsheetCellEditor.ListEditor<>(view, items);
+        return new SpreadsheetCellEditor.ListEditor<>(view, operationNames);
     }
 
     @Override
