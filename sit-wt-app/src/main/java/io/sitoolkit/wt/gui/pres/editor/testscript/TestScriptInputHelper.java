@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
+import io.sitoolkit.wt.domain.testscript.ScreenshotTiming;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.domain.testscript.TestStepInputType;
 import javafx.collections.FXCollections;
@@ -32,13 +33,14 @@ public class TestScriptInputHelper {
 
     private SpreadsheetView spreadSheet;
 
-    public TestScriptInputHelper(SpreadsheetView spreadSheet, TestStepInputType[] inputTypes,
-            List<String> screenshotTimingValues) {
+    public TestScriptInputHelper(SpreadsheetView spreadSheet) {
         this.spreadSheet = spreadSheet;
-        List<String> operationNames = Arrays.asList(inputTypes).stream()
-                .map(TestStepInputType::getOperationName).collect(Collectors.toList());
+
+        List<TestStepInputType> inputTypes = Arrays.asList(TestStepInputType.values());
+        List<String> operationNames = inputTypes.stream().map(TestStepInputType::getOperationName)
+                .collect(Collectors.toList());
         operationCellType = new OperationCellType(operationNames, this::updateStepOperation);
-        screenshotCellType = new ListCellType(screenshotTimingValues);
+        screenshotCellType = new ListCellType(ScreenshotTiming.getLabels());
     }
 
     public ObservableList<SpreadsheetCell> buildTestStepRow(int rowIndex, TestStep testStep) {

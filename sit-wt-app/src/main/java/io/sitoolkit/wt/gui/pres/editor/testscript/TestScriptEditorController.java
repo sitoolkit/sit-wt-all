@@ -7,9 +7,7 @@ import java.util.Optional;
 import org.controlsfx.control.spreadsheet.GridChange;
 
 import io.sitoolkit.wt.domain.debug.DebugListener;
-import io.sitoolkit.wt.domain.testscript.ScreenshotTiming;
 import io.sitoolkit.wt.domain.testscript.TestScript;
-import io.sitoolkit.wt.domain.testscript.TestStepInputType;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
 import io.sitoolkit.wt.gui.pres.editor.EditorController;
 import javafx.beans.property.BooleanProperty;
@@ -47,7 +45,6 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     public TestScriptEditorController(ScriptService scriptService) {
         this.scriptService = scriptService;
-        editor.init(TestStepInputType.values(), ScreenshotTiming.getLabels());
     }
 
     @Override

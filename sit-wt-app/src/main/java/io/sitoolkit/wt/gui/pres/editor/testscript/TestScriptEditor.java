@@ -28,7 +28,6 @@ import org.controlsfx.control.spreadsheet.SpreadsheetViewSelectionModel;
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
-import io.sitoolkit.wt.domain.testscript.TestStepInputType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -50,18 +49,14 @@ public class TestScriptEditor {
     private static final TestScriptCellType STRING_TYPE = new StringCellType();
     private static final TestScriptCellType NON_EDITABLE_TYPE = new NonEditableCellType();
 
-    private TestScriptInputHelper inputHelper;
-
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
 
     @Getter
     private int lastContextMenuRequestedRowIndex = -1;
 
-    public void init(TestStepInputType[] inputTypes, List<String> screenshotTimings) {
-        inputHelper = new TestScriptInputHelper(spreadSheet, inputTypes, screenshotTimings);
-    }
-
+    private TestScriptInputHelper inputHelper = new TestScriptInputHelper(spreadSheet);
+    
     public void load(TestScript testScript) {
         Collection<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
