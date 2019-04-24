@@ -4,11 +4,11 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
-public abstract class DefaultStringCellType extends SpreadsheetCellType<String>
-        implements TestScriptCellType {
+public abstract class DefaultStringCellType extends SpreadsheetCellType<String> {
 
-    public SpreadsheetCell createCell(int row, int column, String value) {
-        SpreadsheetCell cell = new SpreadsheetCellBase(row, column, ROW_SPAN, COL_SPAN, this);
+    public SpreadsheetCell createCell(int row, int column, int rowSpan, int columnSpan,
+            String value) {
+        SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
         cell.setItem(convertValue(value));
         return cell;
     }

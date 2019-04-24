@@ -46,9 +46,6 @@ public class TestScriptEditor {
 
     private static final int BREAK_POINT_HEADER_INDEX = 7;
 
-    private static final TestScriptCellType STRING_TYPE = new StringCellType();
-    private static final TestScriptCellType READ_ONLY_TYPE = new ReadOnlyCellType();
-
     @Getter
     private SpreadsheetView spreadSheet = new SpreadsheetView();
 
@@ -56,7 +53,7 @@ public class TestScriptEditor {
     private int lastContextMenuRequestedRowIndex = -1;
 
     private TestScriptInputHelper inputHelper = new TestScriptInputHelper(spreadSheet);
-    
+
     public void load(TestScript testScript) {
         Collection<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
@@ -88,14 +85,14 @@ public class TestScriptEditor {
         headers.stream().forEach((header) -> {
             int colIndex = headerCells.size();
 
-            TestScriptCellType cellType;
+            SpreadsheetCell cell;
             if (isCaseColumn(colIndex)) {
-                cellType = STRING_TYPE;
+                cell = inputHelper.buildStringCell(0, colIndex, header);
             } else {
-                cellType = READ_ONLY_TYPE;
+                cell = inputHelper.buildReadOnlyCell(0, colIndex, header);
             }
 
-            headerCells.add(cellType.createCell(0, colIndex, header));
+            headerCells.add(cell);
         });
 
         return headerCells;
@@ -445,7 +442,7 @@ public class TestScriptEditor {
         List<Double> widths = getColumnWidths();
 
         IntStream.range(columnPosition, columnPosition + columnCount).forEachOrdered(col -> {
-            rows.get(0).add(col, STRING_TYPE.createCell(0, col, ""));
+            rows.get(0).add(col, inputHelper.buildStringCell(0, col, ""));
 
             IntStream.range(ROW_INDEX_FIRST_STEP, rows.size()).forEach(row -> {
                 rows.get(row).add(col, inputHelper.buildEmptyDataCell(rows.get(row), row, col));
@@ -522,9 +519,7 @@ public class TestScriptEditor {
 
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
         cells.addAll(IntStream.range(0, original.size()).mapToObj(column -> {
-            SpreadsheetCell originalCell = original.get(column);
-            TestScriptCellType cellType = (TestScriptCellType) originalCell.getCellType();
-            return cellType.createCell(row, column, originalCell.getText());
+            return inputHelper.rebuildCell(original.get(column), row, column);
         }).collect(Collectors.toList()));
         return cells;
     }

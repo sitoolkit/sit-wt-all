@@ -4,15 +4,23 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import io.sitoolkit.wt.domain.testscript.ScreenshotTiming;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.domain.testscript.TestStepInputType;
+import io.sitoolkit.wt.infra.log.SitLogger;
+import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class TestScriptInputHelper {
+
+    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestScriptInputHelper.class);
+
+    private static final int ROW_SPAN = 1;
+    private static final int COL_SPAN = 1;
 
     private static final int COLUMN_INDEX_FIRST_CASE = 7;
 
@@ -22,13 +30,13 @@ public class TestScriptInputHelper {
     private static final int COL_INDEX_DATA_TYPE = 5;
     private static final int COL_INDEX_SCREENSHOT = 6;
 
-    private static final TestScriptCellType DISABLED_TYPE = new DisabledCellType();
-    private static final TestScriptCellType OK_CANCEL_TYPE = new OkCancelCellType();
-    private static final TestScriptCellType STRING_TYPE = new StringCellType();
-    private static final TestScriptCellType SCREENSHOT_TYPE = new ListCellType(
-            ScreenshotTiming.getLabels());
+    private static final ReadOnlyCellType READ_ONLY_TYPE = new ReadOnlyCellType();
+    private static final DisabledCellType DISABLED_TYPE = new DisabledCellType();
+    private static final OkCancelCellType OK_CANCEL_TYPE = new OkCancelCellType();
+    private static final SpreadsheetCellType.ListType SCREENSHOT_TYPE = SpreadsheetCellType
+            .LIST(ScreenshotTiming.getLabels());
 
-    private TestScriptCellType OPERATION_TYPE = new OperationCellType(this::updateStepOperation);
+    private OperationCellType OPERATION_TYPE = new OperationCellType(this::updateStepOperation);
 
     private SpreadsheetView spreadSheet;
 
@@ -39,8 +47,8 @@ public class TestScriptInputHelper {
     public ObservableList<SpreadsheetCell> buildTestStepRow(int rowIndex, TestStep testStep) {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
 
-        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), testStep.getNo()));
-        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), testStep.getItemName()));
+        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getNo()));
+        cells.add(buildStringCell(rowIndex, cells.size(), testStep.getItemName()));
         String operationName = testStep.getOperationName();
         cells.add(buildOperationCell(rowIndex, operationName));
         cells.add(buildLocatorTypeCell(operationName, rowIndex, testStep.getLocator().getType()));
@@ -55,72 +63,67 @@ public class TestScriptInputHelper {
         return cells;
     }
 
+    public SpreadsheetCell buildStringCell(int rowIndex, int colIndex, String value) {
+        return SpreadsheetCellType.STRING.createCell(rowIndex, colIndex, ROW_SPAN, COL_SPAN, value);
+    }
+
+    public SpreadsheetCell buildReadOnlyCell(int rowIndex, int colIndex, String value) {
+        return READ_ONLY_TYPE.createCell(rowIndex, colIndex, ROW_SPAN, COL_SPAN, value);
+    }
+
+    private SpreadsheetCell buildDisabledCell(int rowIndex, int colIndex) {
+        return DISABLED_TYPE.createCell(rowIndex, colIndex, ROW_SPAN, COL_SPAN);
+    }
+
     private SpreadsheetCell buildOperationCell(int rowIndex, String value) {
-        return OPERATION_TYPE.createCell(rowIndex, COL_INDEX_OPERATION, value);
+        return OPERATION_TYPE.createCell(rowIndex, COL_INDEX_OPERATION, ROW_SPAN, COL_SPAN, value);
     }
 
     private SpreadsheetCell buildLocatorTypeCell(String operationName, int rowIndex, String value) {
-
-        return getLocatorTypeCellType(operationName).createCell(rowIndex, COL_INDEX_LOCATOR_TYPE,
-                value);
-    }
-
-    private TestScriptCellType getLocatorTypeCellType(String operationName) {
         List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
         if (locatorTypes.size() <= 1) {
-            return DISABLED_TYPE;
+            return buildDisabledCell(rowIndex, COL_INDEX_LOCATOR_TYPE);
         } else {
-            return new ListCellType(locatorTypes);
+            return SpreadsheetCellType.LIST(locatorTypes).createCell(rowIndex,
+                    COL_INDEX_LOCATOR_TYPE, ROW_SPAN, COL_SPAN, value);
         }
     }
 
     private SpreadsheetCell buildLocatorCell(String operationName, int rowIndex, String value) {
-
-        return getLocatorCellType(operationName).createCell(rowIndex, COL_INDEX_LOCATOR, value);
-    }
-
-    private TestScriptCellType getLocatorCellType(String operationName) {
         List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
         if (locatorTypes.get(0).equals("")) {
-            return DISABLED_TYPE;
+            return buildDisabledCell(rowIndex, COL_INDEX_LOCATOR);
         } else {
-            return STRING_TYPE;
+            return buildStringCell(rowIndex, COL_INDEX_LOCATOR, value);
         }
     }
 
     private SpreadsheetCell buildDataTypeCell(String operationName, int rowIndex, String value) {
-
-        return getDataTypeCellType(operationName).createCell(rowIndex, COL_INDEX_DATA_TYPE, value);
-    }
-
-    private TestScriptCellType getDataTypeCellType(String operationName) {
         List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
         if (dataTypes.size() <= 1) {
-            return DISABLED_TYPE;
+            return buildDisabledCell(rowIndex, COL_INDEX_DATA_TYPE);
         } else {
-            return new ListCellType(dataTypes);
+            return SpreadsheetCellType.LIST(dataTypes).createCell(rowIndex, COL_INDEX_DATA_TYPE,
+                    ROW_SPAN, COL_SPAN, value);
         }
     }
 
     private SpreadsheetCell buildScreenshotCell(int rowIndex, String value) {
-        return SCREENSHOT_TYPE.createCell(rowIndex, COL_INDEX_SCREENSHOT, value);
+        return SCREENSHOT_TYPE.createCell(rowIndex, COL_INDEX_SCREENSHOT, ROW_SPAN, COL_SPAN,
+                value);
     }
 
     private SpreadsheetCell buildDataCell(String operationName, int rowIndex, int colIndex,
             String value) {
 
-        return getDataCellType(operationName).createCell(rowIndex, colIndex, value);
-    }
-
-    private TestScriptCellType getDataCellType(String operationName) {
         List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
         switch (dataTypes.get(0)) {
             case "ok_cancel":
-                return OK_CANCEL_TYPE;
+                return OK_CANCEL_TYPE.createCell(rowIndex, colIndex, ROW_SPAN, COL_SPAN, value);
             case "na":
-                return DISABLED_TYPE;
+                return buildDisabledCell(rowIndex, colIndex);
             default:
-                return STRING_TYPE;
+                return buildStringCell(rowIndex, colIndex, value);
         }
     }
 
@@ -142,8 +145,8 @@ public class TestScriptInputHelper {
         ObservableList<SpreadsheetCell> cells = FXCollections.observableArrayList();
         String operationName = "";
 
-        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), null));
-        cells.add(STRING_TYPE.createCell(rowIndex, cells.size(), null));
+        cells.add(buildStringCell(rowIndex, cells.size(), null));
+        cells.add(buildStringCell(rowIndex, cells.size(), null));
         cells.add(buildOperationCell(rowIndex, operationName));
         cells.add(buildLocatorTypeCell(operationName, rowIndex, null));
         cells.add(buildLocatorCell(operationName, rowIndex, null));
@@ -162,5 +165,23 @@ public class TestScriptInputHelper {
 
         String operationName = row.get(COL_INDEX_OPERATION).getText();
         return buildDataCell(operationName, rowIndex, colIndex, null);
+    }
+
+    public SpreadsheetCell rebuildCell(SpreadsheetCell original, int rowIndex, int colIndex) {
+        SpreadsheetCellType<?> type = original.getCellType();
+        String value = original.getText();
+
+        if (type instanceof SpreadsheetCellType.StringType) {
+            return buildStringCell(rowIndex, colIndex, value);
+        } else if (type instanceof SpreadsheetCellType.ListType) {
+            return ((SpreadsheetCellType.ListType) type).createCell(rowIndex, colIndex, ROW_SPAN,
+                    COL_SPAN, value);
+        } else if (type instanceof DefaultStringCellType) {
+            return ((DefaultStringCellType) type).createCell(rowIndex, colIndex, ROW_SPAN, COL_SPAN,
+                    value);
+        } else {
+            LOG.warnMsg("Illegal operation for " + type);
+            return null;
+        }
     }
 }
