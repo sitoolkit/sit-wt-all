@@ -15,11 +15,15 @@
  */
 package io.sitoolkit.wt.domain.testscript;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.wt.infra.ELSupport;
+import lombok.Getter;
 
 /**
  *
@@ -105,7 +109,24 @@ public class Locator {
     }
 
     public enum Type {
-        id, css, name, xpath, link, tag, title, na;
+        id, css, name, xpath, link, tag, title, url, case_no, os_command, variable, testscript_file, sql_file, na(
+                "");
+
+        public static List<Type> SELECTOR_TYPES = Arrays.asList(id, name, tag, css, xpath);
+        public static List<Type> SELECTOR_WITH_LINK_TYPES = Arrays.asList(id, name, tag, link, css,
+                xpath);
+        public static List<Type> TITLE_TYPES = Arrays.asList(na, title);
+
+        @Getter
+        private String label;
+
+        private Type() {
+            this.label = name();
+        }
+
+        private Type(String label) {
+            this.label = label;
+        }
 
         public static Type decode(String code) {
             for (Type type : values()) {

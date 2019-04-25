@@ -149,10 +149,6 @@ public class ScriptService {
     public void quitBrowsing() {
         pageCtx.close();
     }
-
-    public List<String> getOperationNames() {
-        return operationConverter.getOperationNames();
-    }
     
     public void generateNewScript(Path destFile) {
         testScriptGenerator.generateNewScript(destFile);

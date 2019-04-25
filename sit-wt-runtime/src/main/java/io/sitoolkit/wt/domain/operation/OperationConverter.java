@@ -2,10 +2,8 @@ package io.sitoolkit.wt.domain.operation;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -55,10 +53,6 @@ public class OperationConverter {
         }
 
         return Optional.of((Operation) appCtx.getBean(beanMap.get(operationName)));
-    }
-
-    public List<String> getOperationNames() {
-        return beanMap.keySet().stream().sorted().collect(Collectors.toList());
     }
 
 }

@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.gui.pres.editor;
+package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -7,10 +7,9 @@ import java.util.Optional;
 import org.controlsfx.control.spreadsheet.GridChange;
 
 import io.sitoolkit.wt.domain.debug.DebugListener;
-import io.sitoolkit.wt.domain.testscript.ScreenshotTiming;
 import io.sitoolkit.wt.domain.testscript.TestScript;
-import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
+import io.sitoolkit.wt.gui.pres.editor.EditorController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -46,7 +45,6 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     public TestScriptEditorController(ScriptService scriptService) {
         this.scriptService = scriptService;
-        editor.init(scriptService.getOperationNames(), ScreenshotTiming.getLabels());
     }
 
     @Override
