@@ -91,7 +91,7 @@ public class TestScriptInputHelper {
 
     private SpreadsheetCell buildLocatorCell(String operationName, int rowIndex, String value) {
         List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
-        if (locatorTypes.get(0).equals("")) {
+        if (locatorTypes.size() == 1 && locatorTypes.get(0).equals("")) {
             return buildDisabledCell(rowIndex, COL_INDEX_LOCATOR);
         } else {
             return buildStringCell(rowIndex, COL_INDEX_LOCATOR, value);
