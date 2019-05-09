@@ -11,7 +11,8 @@ public class EvidenceNameConverter {
                 TestClassNameConverter.normalizeCaseNo(caseNo));
     }
 
-    public static String buildEvidenceFileName(String sanitizedScriptName, String sanitizedCaseNo) {
+    private static String buildEvidenceFileName(String sanitizedScriptName,
+            String sanitizedCaseNo) {
         return StringUtils.join(new String[] { sanitizedScriptName, sanitizedCaseNo }, "_")
                 + ".html";
 
