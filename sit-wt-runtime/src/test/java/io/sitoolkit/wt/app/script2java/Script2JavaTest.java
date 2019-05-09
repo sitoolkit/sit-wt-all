@@ -12,9 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import io.sitoolkit.wt.app.config.ExtConfig;
-import io.sitoolkit.wt.app.script2java.Script2Java;
-import io.sitoolkit.wt.app.script2java.Script2JavaConfig;
-import io.sitoolkit.wt.app.script2java.TestClass;
+import io.sitoolkit.wt.domain.testclass.TestClass;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.infra.TestException;
 
@@ -47,31 +45,31 @@ public class Script2JavaTest {
 
         String testCaseName = "テストケース名";
         for (String caseNo : actual.getCaseNos()) {
-            String sanitizedCaseNo = actual.sanitizeFunctionName(caseNo);
+            String sanitizedCaseNo = actual.buildMethodName(caseNo);
             switch (caseNo) {
                 case "スラッ/シュ":
-                    assertThat(testCaseName, sanitizedCaseNo, is("スラッ_シュ"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("testスラッ_シュ"));
                     break;
                 case "バック\\スラッシュ":
-                    assertThat(testCaseName, sanitizedCaseNo, is("バック_スラッシュ"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("testバック_スラッシュ"));
                     break;
                 case "コロ:ン":
-                    assertThat(testCaseName, sanitizedCaseNo, is("コロ_ン"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("testコロ_ン"));
                     break;
                 case "アスタ*リスク":
-                    assertThat(testCaseName, sanitizedCaseNo, is("アスタ_リスク"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("testアスタ_リスク"));
                     break;
                 case "ダブル\"クォート":
-                    assertThat(testCaseName, sanitizedCaseNo, is("ダブル_クォート"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("testダブル_クォート"));
                     break;
                 case "大>なり":
-                    assertThat(testCaseName, sanitizedCaseNo, is("大_なり"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("test大_なり"));
                     break;
                 case "小<なり":
-                    assertThat(testCaseName, sanitizedCaseNo, is("小_なり"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("test小_なり"));
                     break;
                 case "パイ|プ":
-                    assertThat(testCaseName, sanitizedCaseNo, is("パイ_プ"));
+                    assertThat(testCaseName, sanitizedCaseNo, is("testパイ_プ"));
                     break;
                 default:
                     throw new TestException("undefined CaseNo found : " + caseNo);

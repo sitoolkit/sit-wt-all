@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 
 import io.sitoolkit.wt.app.config.BaseConfig;
+import io.sitoolkit.wt.domain.testclass.TestClass;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.infra.template.TemplateEngine;

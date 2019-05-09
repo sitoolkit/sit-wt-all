@@ -11,11 +11,11 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 /**
  *
  */
-public class $test.sanitizeFunctionName(${test.fileBase}) extends SitTesterTestBase {
+public class $test.fileBase extends SitTesterTestBase {
 
 #foreach ($caseNo in $test.caseNos)
     @Test
-    public void test$test.sanitizeFunctionName($caseNo)() {
+    public void $test.buildMethodName($caseNo)() {
         test("$test.escape($caseNo)", null);
     }
 #end

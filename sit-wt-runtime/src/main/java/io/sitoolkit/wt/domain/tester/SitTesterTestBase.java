@@ -15,9 +15,8 @@
  */
 package io.sitoolkit.wt.domain.tester;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,6 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import io.sitoolkit.wt.app.config.RuntimeConfig;
+import io.sitoolkit.wt.domain.testclass.TestClassNameConverter;
 import io.sitoolkit.wt.infra.ApplicationContextHelper;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
@@ -47,7 +47,7 @@ public abstract class SitTesterTestBase {
     protected Tester tester;
 
     protected String getCurrentCaseNo() {
-        return StringUtils.substringAfter(testName.getMethodName(), "test");
+        return TestClassNameConverter.method2caseNo(testName.getMethodName());
     }
 
     protected void test() {
