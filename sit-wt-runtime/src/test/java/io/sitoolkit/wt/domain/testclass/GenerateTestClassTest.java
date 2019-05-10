@@ -5,12 +5,10 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.junit.BeforeClass;
@@ -39,10 +37,7 @@ public class GenerateTestClassTest {
 
         Path expectedFile = Paths.get(getClass().getResource("/GeneratedTestClass.java").toURI());
 
-        String expected = null;
-        try (Stream<String> stream = Files.lines(expectedFile, StandardCharsets.UTF_8)) {
-            expected = stream.collect(Collectors.joining("\r\n", "", "\r\n"));
-        }
+        String expected = FileUtils.readFileToString(expectedFile.toFile(), StandardCharsets.UTF_8);
         String result = templateEngine.writeToString(testClass);
 
         assertEquals("出力内容", expected, result);

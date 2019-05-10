@@ -18,7 +18,7 @@ public class AttachEvidenceLinkMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-
+        System.setProperty("sitwt.projectDirectory", ".");
         EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(targetEvidence);
 
         EvidenceReportEditor editor = new EvidenceReportEditor();

@@ -2,6 +2,7 @@ package io.sitoolkit.wt.domain.evidence;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +39,8 @@ public class EvidenceDir {
 
     private static final String PROJECT_REPORTS_NAME = "project-reports.html";
 
+    private static final String REPORT_DIR = "report";
+    
     private static final String IMG_BASE_DIR = "base";
 
     private static final String EVIDENCE_ROOT_DIR = "evidence";
@@ -310,8 +313,12 @@ public class EvidenceDir {
         return dir;
     }
 
-    public File getFailsafeReport() {
-        return new File(dir.getPath(), FAILSAFE_REPORT_NAME);
+    public Path getReportDir() {
+        return dir.toPath().resolve(REPORT_DIR);
+    }
+
+    public Path getFailsafeReport() {
+        return getReportDir().resolve(FAILSAFE_REPORT_NAME);
     }
 
     public File getImgBaseDir() {
