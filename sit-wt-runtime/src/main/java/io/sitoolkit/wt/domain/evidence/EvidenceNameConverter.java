@@ -7,8 +7,8 @@ import io.sitoolkit.wt.domain.testclass.TestClassNameConverter;
 public class EvidenceNameConverter {
 
     public static String caseNo2evidence(String scriptName, String caseNo) {
-        return buildEvidenceFileName(TestClassNameConverter.normalizeScriptName(scriptName),
-                TestClassNameConverter.normalizeCaseNo(caseNo));
+        return buildEvidenceFileName(TestClassNameConverter.script2Class(scriptName),
+                TestClassNameConverter.caseNo2method(caseNo));
     }
 
     private static String buildEvidenceFileName(String sanitizedScriptName,

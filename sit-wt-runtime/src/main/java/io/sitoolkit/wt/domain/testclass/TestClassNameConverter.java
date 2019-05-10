@@ -10,26 +10,15 @@ public class TestClassNameConverter {
     private static final String TEST_CLASS_SUFFIX = "IT";
     private static final String TEST_METHOD_PREFIX = "test";
 
-    public static String normalizeScriptName(String scriptName) {
+    public static String script2Class(String scriptName) {
         String baseName = FilenameUtils.getBaseName(scriptName);
         baseName = StringUtils.capitalize(baseName);
-        return StrUtils.sanitizeMetaCharacter(baseName);
-    }
-
-    public static String normalizeCaseNo(String caseNo) {
-        return StrUtils.sanitizeMetaCharacter(caseNo);
-    }
-
-    public static String script2Class(String scriptName) {
-        return normalizeScriptName(scriptName) + TEST_CLASS_SUFFIX;
+        baseName = StrUtils.sanitizeMetaCharacter(baseName);
+        return baseName + TEST_CLASS_SUFFIX;
     }
 
     public static String caseNo2method(String caseNo) {
-        return TEST_METHOD_PREFIX + normalizeCaseNo(caseNo);
-    }
-
-    public static String class2script(String className) {
-        return StringUtils.removeEnd(className, TEST_CLASS_SUFFIX);
+        return TEST_METHOD_PREFIX + StrUtils.sanitizeMetaCharacter(caseNo);
     }
 
     public static String method2caseNo(String methodName) {
