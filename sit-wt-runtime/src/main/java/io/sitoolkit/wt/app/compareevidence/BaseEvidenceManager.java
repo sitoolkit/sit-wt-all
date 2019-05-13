@@ -33,23 +33,23 @@ public class BaseEvidenceManager {
         } else {
             EvidenceDir baseDir = EvidenceDir.getBase(targetDir.getBrowser());
             LOG.info("base.evidence.set", targetDir.getDir());
-            copy(targetDir.getDir(), baseDir.getDir());
+            copy(targetDir.getDir(), baseDir.getDir(), targetDir);
 
         }
 
     }
 
-    public void copy(File srcDir, File destDir) {
+    public void copy(File srcDir, File destDir, EvidenceDir targetDir) {
 
         for (File f1 : srcDir.listFiles()) {
             try {
 
-                if (!isCopyTarget(f1)) {
+                if (!isCopyTarget(f1, targetDir)) {
                     continue;
                 }
 
                 if (f1.isDirectory()) {
-                    copy(f1, new File(destDir.getPath(), f1.getName()));
+                    copy(f1, new File(destDir.getPath(), f1.getName()), targetDir);
                 } else {
                     FileUtils.copyFileToDirectory(f1, destDir);
                 }
@@ -61,11 +61,10 @@ public class BaseEvidenceManager {
 
     }
 
-    private boolean isCopyTarget(File f1) {
+    private boolean isCopyTarget(File f1, EvidenceDir targetDir) {
         boolean result = true;
         result &= !EvidenceDir.isBaseImgDir(f1);
-        result &= !EvidenceDir.isProjectReport(f1.getName());
-        result &= !EvidenceDir.isFailsafeReport(f1.getName());
+        result &= !targetDir.isReport(f1.toPath());
         result &= !EvidenceDir.isCompareEvidence(f1.getName());
         result &= !EvidenceDir.isCompareNgEvidence(f1.getName());
         result &= !EvidenceDir.isUnmatchScreenshot(f1.getName());

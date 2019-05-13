@@ -47,6 +47,9 @@ public class EvidenceReportEditor {
             } catch (IOException e) {
                 LOG.error("resource.copy.error", e);
                 return;
+            } catch (Exception exp) {
+                LOG.error("proxy.error", exp);
+                return;
             }
 
             addTags(evidenceDir);

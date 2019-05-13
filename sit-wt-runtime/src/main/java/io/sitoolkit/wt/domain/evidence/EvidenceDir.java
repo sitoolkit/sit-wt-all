@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
@@ -124,21 +125,14 @@ public class EvidenceDir {
     }
 
     public List<File> getEvidenceFiles() {
-        List<File> evidenceFiles = new ArrayList<>();
+        return FileUtils.listFiles(dir, new String[] { "html" }, true).stream()
+                .filter(this::isNormalEvidenceFile).collect(Collectors.toList());
+    }
 
-        for (File evidenceFile : FileUtils.listFiles(dir, new String[] { "html" }, true)) {
-
-            String htmlName = evidenceFile.getName();
-            if (isCompareEvidence(htmlName) || isCompareNgEvidence(htmlName)
-                    || isMaskEvidence(htmlName) || isFailsafeReport(htmlName)
-                    || isProjectReport(htmlName)) {
-                continue;
-            }
-
-            evidenceFiles.add(evidenceFile);
-        }
-
-        return evidenceFiles;
+    private boolean isNormalEvidenceFile(File file) {
+        String htmlName = file.getName();
+        return !isReport(file.toPath()) && !isCompareEvidence(htmlName)
+                && !isCompareNgEvidence(htmlName) && !isMaskEvidence(htmlName);
     }
 
     public Collection<File> getScreenshots(String evidenceFileName) {
@@ -318,6 +312,11 @@ public class EvidenceDir {
 
     public Path getReportDir() {
         return dir.toPath().resolve(REPORT_DIR);
+    }
+
+    public boolean isReport(Path path) {
+        return path.toAbsolutePath().normalize()
+                .startsWith(getReportDir().toAbsolutePath().normalize());
     }
 
     public Path getFailsafeReport() {
