@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.app.compareevidence;
+package io.sitoolkit.wt.app.evidence;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,12 +21,10 @@ public class EvidenceReportEditor {
 
     private static final String reportResourcePath = "target/site";
 
-    private static final String[] scriptTags = new String[] {
-            "    <script src=\"../js/jquery.js\"></script>\n",
-            "    <script src=\"js/report.js\"></script>\n" };
+    private static final String scriptTags = "    <script src=\"../js/jquery.js\"></script>\n"
+            + "    <script src=\"" + evidenceRes + "\"></script>\n";
 
     public static void main(String[] args) {
-        System.setProperty("sitwt.projectDirectory", "B:\\tools\\Git\\home\\java\\command");
         new EvidenceReportEditor().edit(EvidenceDir.getLatest());
     }
 
@@ -49,9 +47,6 @@ public class EvidenceReportEditor {
             } catch (IOException e) {
                 LOG.error("resource.copy.error", e);
                 return;
-            } catch (Exception exp) {
-                LOG.error("proxy.error", exp);
-                return;
             }
 
             addTags(evidenceDir);
@@ -67,7 +62,7 @@ public class EvidenceReportEditor {
             String reportHtml = FileUtils.readFileToString(failsafeReport.toFile(),
                     StandardCharsets.UTF_8);
 
-            reportHtml = addScriptTag(reportHtml, scriptTags);
+            reportHtml = addScriptTag(reportHtml);
 
             FileUtils.writeStringToFile(failsafeReport.toFile(), reportHtml,
                     StandardCharsets.UTF_8);
@@ -78,22 +73,8 @@ public class EvidenceReportEditor {
 
     }
 
-    private String addScriptTag(String reportHtml, String... tags) throws IOException {
-
-        String[] lines = reportHtml.split("\n");
-
-        StringBuilder sb = new StringBuilder();
-
-        for (String line : lines) {
-            sb.append(line + "\n");
-            if (line.trim().equals("<head>")) {
-                for (String tag : tags) {
-                    sb.append(tag);
-                }
-            }
-        }
-
-        return sb.toString();
+    private String addScriptTag(String reportHtml) throws IOException {
+        return reportHtml.replaceFirst("<head>", "<head>\n" + scriptTags);
     }
 
 }
