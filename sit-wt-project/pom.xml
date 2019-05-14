@@ -71,6 +71,12 @@
               <seleniumOutputDir>target/testscript</seleniumOutputDir>
             </configuration>
           </execution>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>attach-evidence-link</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
       <plugin>

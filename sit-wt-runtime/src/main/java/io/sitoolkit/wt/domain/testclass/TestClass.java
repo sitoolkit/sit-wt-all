@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.app.script2java;
+package io.sitoolkit.wt.domain.testclass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +61,8 @@ public class TestClass extends TemplateModel {
         this.pkg = pkg;
     }
 
-    public String sanitizeFunctionName(String caseNo) {
-        return StrUtils.sanitizeMetaCharacter(caseNo);
+    public String buildMethodName(String caseNo) {
+        return TestClassNameConverter.caseNo2method(caseNo);
     }
 
     public String escape(String caseNo) {

@@ -2,6 +2,7 @@ package io.sitoolkit.wt.domain.evidence;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
@@ -38,6 +40,8 @@ public class EvidenceDir {
 
     private static final String PROJECT_REPORTS_NAME = "project-reports.html";
 
+    private static final String REPORT_DIR = "report";
+
     private static final String IMG_BASE_DIR = "base";
 
     private static final String EVIDENCE_ROOT_DIR = "evidence";
@@ -60,8 +64,7 @@ public class EvidenceDir {
     }
 
     public static EvidenceDir getBase(String browser) {
-        return getInstance(new File(System.getProperty("sitwt.projectDirectory"),
-                BASE_EVIDENCE_ROOT + "/" + browser));
+        return getInstance(new File(getProjectDirectory(), BASE_EVIDENCE_ROOT + "/" + browser));
     }
 
     public static String getRoot() {
@@ -74,8 +77,7 @@ public class EvidenceDir {
 
     public static File getLatestEvidenceDir() {
 
-        File outputDir = new File(
-                System.getProperty("sitwt.projectDirectory") + "/" + EVIDENCE_ROOT_DIR);
+        File outputDir = new File(getProjectDirectory() + "/" + EVIDENCE_ROOT_DIR);
         List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
                 FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
         evidenceDirs.remove(outputDir);
@@ -117,22 +119,20 @@ public class EvidenceDir {
         return dir == null ? EvidenceDir.getBase(browser) : EvidenceDir.getInstance(dir);
     }
 
+    private static String getProjectDirectory() {
+        String dir = System.getProperty("sitwt.projectDirectory");
+        return StringUtils.isEmpty(dir) ? "." : dir;
+    }
+
     public List<File> getEvidenceFiles() {
-        List<File> evidenceFiles = new ArrayList<>();
+        return FileUtils.listFiles(dir, new String[] { "html" }, true).stream()
+                .filter(this::isNormalEvidenceFile).collect(Collectors.toList());
+    }
 
-        for (File evidenceFile : FileUtils.listFiles(dir, new String[] { "html" }, true)) {
-
-            String htmlName = evidenceFile.getName();
-            if (isCompareEvidence(htmlName) || isCompareNgEvidence(htmlName)
-                    || isMaskEvidence(htmlName) || isFailsafeReport(htmlName)
-                    || isProjectReport(htmlName)) {
-                continue;
-            }
-
-            evidenceFiles.add(evidenceFile);
-        }
-
-        return evidenceFiles;
+    private boolean isNormalEvidenceFile(File file) {
+        String htmlName = file.getName();
+        return !isReport(file.toPath()) && !isCompareEvidence(htmlName)
+                && !isCompareNgEvidence(htmlName) && !isMaskEvidence(htmlName);
     }
 
     public Collection<File> getScreenshots(String evidenceFileName) {
@@ -239,14 +239,6 @@ public class EvidenceDir {
         return withUnmatch ? COMPARE_NG_PREFIX : COMPARE_PREFIX;
     }
 
-    public static boolean isFailsafeReport(String name) {
-        return StringUtils.equals(name, FAILSAFE_REPORT_NAME);
-    }
-
-    public static boolean isProjectReport(String name) {
-        return StringUtils.equals(name, PROJECT_REPORTS_NAME);
-    }
-
     public static boolean isCompareEvidence(String name) {
         return startsWith(name, COMPARE_PREFIX);
     }
@@ -310,8 +302,17 @@ public class EvidenceDir {
         return dir;
     }
 
-    public File getFailsafeReport() {
-        return new File(dir.getPath(), FAILSAFE_REPORT_NAME);
+    public Path getReportDir() {
+        return dir.toPath().resolve(REPORT_DIR);
+    }
+
+    public boolean isReport(Path path) {
+        return path.toAbsolutePath().normalize()
+                .startsWith(getReportDir().toAbsolutePath().normalize());
+    }
+
+    public Path getFailsafeReport() {
+        return getReportDir().resolve(FAILSAFE_REPORT_NAME);
     }
 
     public File getImgBaseDir() {

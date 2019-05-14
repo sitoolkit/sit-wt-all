@@ -1,5 +1,6 @@
 package io.sitoolkit.wt.plugin.maven;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -22,8 +23,16 @@ public class ReportOpenMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (Boolean.parseBoolean(evidenceOpen)) {
+
+            EvidenceDir evidenceDir;
+            if (StringUtils.isEmpty(targetEvidence)) {
+                evidenceDir = EvidenceDir.getLatest();
+            } else {
+                evidenceDir = EvidenceDir.targetEvidenceDir(targetEvidence);
+            }
+
             ReportOpener opener = new ReportOpener();
-            opener.open(EvidenceDir.targetEvidenceDir(targetEvidence));
+            opener.open(evidenceDir);
         }
     }
 

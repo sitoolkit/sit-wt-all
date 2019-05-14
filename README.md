@@ -31,7 +31,7 @@ To run test scripts in the test project at once, use the CLI tool (Maven Plugin)
 ```
 cd \path\to\testproject
 mvnw verify
-start target\site\surefure-report.html
+mvnw sit-wt:open-report
 ```
 
 #### MacOS
@@ -39,7 +39,7 @@ start target\site\surefure-report.html
 ```
 cd /path/to/testproject
 ./mvnw verify
-open target/site/surefure-report.html
+./mvnw sit-wt:open-report
 ```
 
 

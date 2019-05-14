@@ -1,7 +1,3 @@
-#if ($test.pkg)
-package ${test.pkg};
-
-#end
 import org.junit.Test;
 import static org.junit.Assert.*;
 import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
@@ -11,22 +7,24 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 /**
  *
  */
-public class $test.fileBase extends SitTesterTestBase {
+public class GeneratedTestClass extends SitTesterTestBase {
 
-#foreach ($caseNo in $test.caseNos)
     @Test
-    public void $test.buildMethodName($caseNo)() {
-        test("$test.escape($caseNo)", null);
+    public void test001() {
+        test("001", null);
     }
-#end
+    @Test
+    public void test00_2() {
+        test("00.2", null);
+    }
 
     @Override
     protected String getTestScriptPath() {
-        return "$test.scriptPath";
+        return "/path/to/script";
     }
 
     @Override
     protected String getSheetName() {
-        return "$test.sheetName";
+        return "TestScript";
     }
 }
