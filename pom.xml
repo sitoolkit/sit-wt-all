@@ -22,7 +22,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <checkstyle.skip>true</checkstyle.skip>
     <surefire.version>2.22.1</surefire.version>
-    <ant.target>install</ant.target>
+    <run>install</run>
   </properties>
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -54,20 +54,13 @@
 
   <!-- Build Settings -->
   <build>
+    <defaultGoal>antrun:run</defaultGoal>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.7</version>
-          <configuration>
-            <locales>ja,en</locales>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -93,69 +86,6 @@
             </bottom>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jxr-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>taglist-maven-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>cobertura-maven-plugin</artifactId>
-          <version>2.7</version>
-          <configuration>
-            <aggregate>true</aggregate>
-            <instrumentation>
-              <excludes>
-                <exclude>**/*Test.class</exclude>
-              </excludes>
-            </instrumentation>
-            <formats>
-              <format>html</format>
-              <format>xml</format>
-            </formats>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>findbugs-maven-plugin</artifactId>
-          <version>3.0.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.17</version>
-          <configuration>
-            <configLocation>${project.parent.basedir}/config/sit_checks.xml</configLocation>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>post-site</phase>
-              <goals>
-                <goal>checkstyle-aggregate</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>javancss-maven-plugin</artifactId>
-          <version>2.1</version>
-          <configuration>
-            <includes>
-              <include>**/*.java</include>
-            </includes>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.9</version>
-        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -173,7 +103,7 @@
         </dependencies>
         <configuration>
           <target>
-            <ant antfile="build.xml" target="${ant.target}" />
+            <ant antfile="build.xml" target="${run}" />
           </target>
         </configuration>
       </plugin>
@@ -181,43 +111,6 @@
 
   </build>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>${surefire.version}</version>
-      </plugin>
-      <!-- <plugin> -->
-      <!-- <groupId>org.apache.maven.plugins</groupId> -->
-      <!-- <artifactId>maven-jxr-plugin</artifactId> -->
-      <!-- </plugin> -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>taglist-maven-plugin</artifactId> -->
-      <!-- </plugin> -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>cobertura-maven-plugin</artifactId> -->
-      <!-- </plugin> -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>findbugs-maven-plugin</artifactId> -->
-      <!-- </plugin> -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.apache.maven.plugins</groupId> -->
-      <!-- <artifactId>maven-checkstyle-plugin</artifactId> -->
-      <!-- </plugin> -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>javancss-maven-plugin</artifactId> -->
-      <!-- </plugin> -->
-    </plugins>
-  </reporting>
 
   <!-- More Project Information -->
   <name>sit-wt-all</name>
@@ -318,6 +211,29 @@
               </gpgArguments>
             </configuration>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>analyze</id>
+      
+      <build>
+        <plugins>
+        
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.3</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
         </plugins>
       </build>
     </profile>
