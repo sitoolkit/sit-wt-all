@@ -21,7 +21,7 @@ $(function () {
   };
 
   let buildLinkTag = function (href, label) {
-    return $("<a />").attr({
+    return " " + $("<a />").attr({
       href: href,
       target: "_blank",
     }).text("[ " + label + " ]")[0].outerHTML;

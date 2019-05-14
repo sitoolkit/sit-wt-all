@@ -71,13 +71,15 @@ public class EvidenceReportEditor {
 
             for (String line : lines) {
 
-                if (line.trim().equals("</body>")) {
+                String trimmed = line.trim();
+
+                if (trimmed.equals("</body>")) {
                     sb.append(buildInputTags(evidenceDir));
                 }
 
                 sb.append(line + "\n");
 
-                if (line.trim().equals("<head>")) {
+                if (trimmed.equals("<head>")) {
                     sb.append(scriptTags);
                 }
 
@@ -96,15 +98,15 @@ public class EvidenceReportEditor {
         StringBuilder sb = new StringBuilder();
 
         for (File evidenceFile : evidenceDir.getEvidenceFiles()) {
-            sb.append(buildInputTag(evidenceDir, evidenceFile));
+            sb.append(buildInputTag(evidenceDir, evidenceFile.toPath()));
         }
 
         return sb.toString();
     }
 
-    private String buildInputTag(EvidenceDir evidenceDir, File evidenceFile) {
+    private String buildInputTag(EvidenceDir evidenceDir, Path evidenceFile) {
 
-        String evidenceName = evidenceFile.getName();
+        String evidenceName = evidenceFile.getFileName().toString();
         String testMethodFullName = FilenameUtils.getBaseName(evidenceName);
 
         StringBuilder sb = new StringBuilder();
@@ -127,12 +129,12 @@ public class EvidenceReportEditor {
         return name + "='" + value + "' ";
     }
 
-    private String fetchPath(EvidenceDir evidenceDir, File targetFile) {
-        return targetFile.exists() ? relativizePath(evidenceDir, targetFile) : "";
+    private String fetchPath(EvidenceDir evidenceDir, Path target) {
+        return target.toFile().exists() ? relativizePath(evidenceDir, target) : "";
     }
 
-    private String relativizePath(EvidenceDir evidenceDir, File targetFile) {
-        return evidenceDir.getReportDir().relativize(targetFile.toPath()).toString();
+    private String relativizePath(EvidenceDir evidenceDir, Path target) {
+        return evidenceDir.getReportDir().relativize(target).toString();
     }
 
 }

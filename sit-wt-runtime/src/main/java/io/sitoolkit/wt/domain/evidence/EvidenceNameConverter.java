@@ -3,6 +3,7 @@ package io.sitoolkit.wt.domain.evidence;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.wt.domain.testclass.TestClassNameConverter;
+import io.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class EvidenceNameConverter {
 
@@ -16,6 +17,16 @@ public class EvidenceNameConverter {
                 TestClassNameConverter.caseNo2method(caseNo) };
 
         return StringUtils.join(names, ".");
+    }
+
+    public static String buildScreenshotFileName(String scriptName, String caseNo,
+            String testStepNo, String itemName, String timing) {
+
+        String evidenceBase = EvidenceNameConverter.caseNo2evidenceBase(scriptName, caseNo);
+        return evidenceBase + "_"
+                + StrUtils.sanitizeMetaCharacter(
+                        StringUtils.join(new String[] { testStepNo, itemName, timing }, "_"))
+                + ".png";
     }
 
 }

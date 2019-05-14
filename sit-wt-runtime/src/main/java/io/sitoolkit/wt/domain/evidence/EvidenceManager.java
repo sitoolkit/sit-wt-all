@@ -136,8 +136,9 @@ public class EvidenceManager implements ApplicationContextAware {
             return;
         }
 
-        String screenshotFileName = buildScreenshotFileName(evidence.getScriptName(),
-                evidence.getCaseNo(), testStepNo, itemName, screenshot.getTiming().name());
+        String screenshotFileName = EvidenceNameConverter.buildScreenshotFileName(
+                evidence.getScriptName(), evidence.getCaseNo(), testStepNo, itemName,
+                screenshot.getTiming().name());
         File dstFile = new File(imgDir, screenshotFileName);
 
         try {
@@ -156,16 +157,6 @@ public class EvidenceManager implements ApplicationContextAware {
             LOG.warn("screenshot.set.error", e);
         }
 
-    }
-
-    private String buildScreenshotFileName(String scriptName, String caseNo, String testStepNo,
-            String itemName, String timing) {
-
-        String evidenceBase = EvidenceNameConverter.caseNo2evidenceBase(scriptName, caseNo);
-        return evidenceBase + "_"
-                + StrUtils.sanitizeMetaCharacter(
-                        StringUtils.join(new String[] { testStepNo, itemName, timing }, "_"))
-                + ".png";
     }
 
     /**

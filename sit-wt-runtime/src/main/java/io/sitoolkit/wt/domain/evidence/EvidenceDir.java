@@ -38,8 +38,6 @@ public class EvidenceDir {
 
     private static final String FAILSAFE_REPORT_NAME = "failsafe-report.html";
 
-    private static final String PROJECT_REPORTS_NAME = "project-reports.html";
-
     private static final String REPORT_DIR = "report";
 
     private static final String IMG_BASE_DIR = "base";
@@ -319,24 +317,24 @@ public class EvidenceDir {
         return new File(StringUtils.join(new String[] { dir.getPath(), "img", IMG_BASE_DIR }, "/"));
     }
 
-    public File getMaskEvidence(String name) {
+    public Path getMaskEvidence(String name) {
         return getEvidenceWithPrefix(MASK_PREFIX, name);
     }
 
-    public File getCompareEvidence(String name) {
+    public Path getCompareEvidence(String name) {
         return getEvidenceWithPrefix(COMPARE_PREFIX, name);
     }
 
-    public File getCompareMaskEvidence(String name) {
+    public Path getCompareMaskEvidence(String name) {
         return getEvidenceWithPrefix(COMPARE_PREFIX + MASK_PREFIX, name);
     }
 
-    public File getCompareNgEvidence(String name) {
+    public Path getCompareNgEvidence(String name) {
         return getEvidenceWithPrefix(COMPARE_NG_PREFIX, name);
     }
 
-    private File getEvidenceWithPrefix(String prefix, String name) {
-        return new File(dir.getPath(), prefix + name);
+    private Path getEvidenceWithPrefix(String prefix, String name) {
+        return dir.toPath().resolve(prefix + name);
     }
 
 }
