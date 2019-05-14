@@ -239,14 +239,6 @@ public class EvidenceDir {
         return withUnmatch ? COMPARE_NG_PREFIX : COMPARE_PREFIX;
     }
 
-    public static boolean isFailsafeReport(String name) {
-        return StringUtils.equals(name, FAILSAFE_REPORT_NAME);
-    }
-
-    public static boolean isProjectReport(String name) {
-        return StringUtils.equals(name, PROJECT_REPORTS_NAME);
-    }
-
     public static boolean isCompareEvidence(String name) {
         return startsWith(name, COMPARE_PREFIX);
     }
