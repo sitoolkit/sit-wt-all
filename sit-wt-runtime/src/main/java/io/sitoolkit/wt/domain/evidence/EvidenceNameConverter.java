@@ -15,7 +15,7 @@ public class EvidenceNameConverter {
         String[] names = new String[] { TestClassNameConverter.script2Class(scriptName),
                 TestClassNameConverter.caseNo2method(caseNo) };
 
-        return StringUtils.join(names, "_");
+        return StringUtils.join(names, ".");
     }
 
 }

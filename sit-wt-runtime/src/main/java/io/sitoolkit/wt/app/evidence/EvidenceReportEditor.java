@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
 
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
@@ -62,12 +64,26 @@ public class EvidenceReportEditor {
         Path failsafeReport = evidenceDir.getFailsafeReport();
 
         try {
-            String reportHtml = FileUtils.readFileToString(failsafeReport.toFile(),
-                    StandardCharsets.UTF_8);
+            String[] lines = FileUtils
+                    .readFileToString(failsafeReport.toFile(), StandardCharsets.UTF_8).split("\n");
 
-            reportHtml = addScriptTag(reportHtml);
+            StringBuilder sb = new StringBuilder();
 
-            FileUtils.writeStringToFile(failsafeReport.toFile(), reportHtml,
+            for (String line : lines) {
+
+                if (line.trim().equals("</body>")) {
+                    sb.append(buildInputTags(evidenceDir));
+                }
+
+                sb.append(line + "\n");
+
+                if (line.trim().equals("<head>")) {
+                    sb.append(scriptTags);
+                }
+
+            }
+
+            FileUtils.writeStringToFile(failsafeReport.toFile(), sb.toString(),
                     StandardCharsets.UTF_8);
 
         } catch (IOException e) {
@@ -76,8 +92,47 @@ public class EvidenceReportEditor {
 
     }
 
-    private String addScriptTag(String reportHtml) throws IOException {
-        return reportHtml.replaceFirst("<head>", "<head>\n" + scriptTags);
+    private String buildInputTags(EvidenceDir evidenceDir) {
+        StringBuilder sb = new StringBuilder();
+
+        for (File evidenceFile : evidenceDir.getEvidenceFiles()) {
+            sb.append(buildInputTag(evidenceDir, evidenceFile));
+        }
+
+        return sb.toString();
+    }
+
+    private String buildInputTag(EvidenceDir evidenceDir, File evidenceFile) {
+
+        String evidenceName = evidenceFile.getName();
+        String testMethodFullName = FilenameUtils.getBaseName(evidenceName);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(buildAttribute("data-name", testMethodFullName));
+
+        sb.append(buildAttribute("data-evidence", relativizePath(evidenceDir, evidenceFile)));
+        sb.append(buildAttribute("data-mask",
+                fetchPath(evidenceDir, evidenceDir.getMaskEvidence(evidenceName))));
+        sb.append(buildAttribute("data-comp",
+                fetchPath(evidenceDir, evidenceDir.getCompareEvidence(evidenceName))));
+        sb.append(buildAttribute("data-compmask",
+                fetchPath(evidenceDir, evidenceDir.getCompareMaskEvidence(evidenceName))));
+        sb.append(buildAttribute("data-compng",
+                fetchPath(evidenceDir, evidenceDir.getCompareNgEvidence(evidenceName))));
+
+        return StringUtils.join("<input class='evidence' type='hidden' ", sb.toString(), "/>\n");
+    }
+
+    private String buildAttribute(String name, String value) {
+        return name + "='" + value + "' ";
+    }
+
+    private String fetchPath(EvidenceDir evidenceDir, File targetFile) {
+        return targetFile.exists() ? relativizePath(evidenceDir, targetFile) : "";
+    }
+
+    private String relativizePath(EvidenceDir evidenceDir, File targetFile) {
+        return evidenceDir.getReportDir().relativize(targetFile.toPath()).toString();
     }
 
 }

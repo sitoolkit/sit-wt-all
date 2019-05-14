@@ -1,24 +1,38 @@
-$(function() {
-  let buildEvidenceLink = function (caseName) {
-    let evidenceFile = "../" + caseName.replace(/^TC_/, "").replace(".", "_") + ".html";
+$(function () {
 
-    return $("<a />")
-      .attr("href", evidenceFile)
-      .attr("target", "_blank")
-      .css("float", "right")
-      .text("Open evidence");
-  }
+  var typeMap = new Map();
+  typeMap.set("evidence", "通常");
+  typeMap.set("mask", "マスク版");
+  typeMap.set("comp", "比較");
+  typeMap.set("compmask", "比較（マスク版）")
+  typeMap.set("compng", "スクリーンショット比較NG");
 
-  $("h2:contains(Test Cases)").closest(".section").find("tr").each(function (i, trElm) {
-    let tr = $(trElm);
+  var section = $("h2:contains(Test Cases)").closest(".section");
 
-    let testCaseTd = tr.find("td:nth-child(2)");
-    let testCaseLink = testCaseTd.find("> a");
-    if (testCaseLink.length == 0) {
-      return;
-    }
+  var buildEvidenceLinks = function (data) {
+    var links = "";
+    typeMap.forEach(function (label, type) {
+      let path = data[type];
+      if (path.length > 0) {
+        links += buildLinkTag(path, label);
+      }
+    })
+    return links;
+  };
 
-    let caseName = testCaseLink.attr("name");
-    buildEvidenceLink(caseName).appendTo(testCaseTd);
-  })
+  let buildLinkTag = function (href, label) {
+    return $("<a />").attr({
+      href: href,
+      target: "_blank",
+    }).text("[ " + label + " ]")[0].outerHTML;
+  };
+
+  $("input.evidence").each(function () {
+    let input = $(this);
+    section.find("td > a[name='TC_" + input.data("name") + "']").each(function () {
+      let td = $(this).parent();
+      td.append(" ( エビデンス： " + buildEvidenceLinks(input.data()) + " )");
+    });
+  });
+
 });

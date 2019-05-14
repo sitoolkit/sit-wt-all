@@ -162,8 +162,9 @@ public class EvidenceManager implements ApplicationContextAware {
             String itemName, String timing) {
 
         String evidenceBase = EvidenceNameConverter.caseNo2evidenceBase(scriptName, caseNo);
-        return StrUtils.sanitizeMetaCharacter(
-                StringUtils.join(new String[] { evidenceBase, testStepNo, itemName, timing }, "_"))
+        return evidenceBase + "_"
+                + StrUtils.sanitizeMetaCharacter(
+                        StringUtils.join(new String[] { testStepNo, itemName, timing }, "_"))
                 + ".png";
     }
 
