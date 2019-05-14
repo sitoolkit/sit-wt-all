@@ -26,13 +26,13 @@
 
   <target name="install">
     <antcall target="01_local-install-stage" />
-    <antcall target="02_commit-stage" />
+    <antcall target="02_analyze-stage" />
   </target>
 
 
   <target name="deploy">
     <antcall target="01_local-install-stage" />
-    <antcall target="02_commit-stage" />
+    <antcall target="02_analyze-stage" />
     <antcall target="03_deploy-stage" />
   </target>
 
