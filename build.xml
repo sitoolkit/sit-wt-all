@@ -57,7 +57,7 @@
       <arg value="test" />
       <arg value="sonar:sonar" />
       <arg value="--fail-at-end" />
-      <arg value="--active-profiles" />
+      <arg value="--activate-profiles" />
       <arg value="localhost,ci,analyze" />
       <arg value="-Duser.language=ja" />
       <arg value="-Duser.country=JP" />
@@ -78,7 +78,7 @@
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="--active-profiles" />
+      <arg value="--activate-profiles" />
       <arg value="mobile" />
       <arg value="--file" />
       <arg value="sit-wt-app" />
@@ -88,7 +88,7 @@
 
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="--active-profiles" />
+      <arg value="--activate-profiles" />
       <arg value="release,attach-mobile-artifact" />
       <arg value="-Dmaven.test.skip=true" />
       <arg value="deploy" />
