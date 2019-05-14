@@ -1,7 +1,7 @@
 package io.sitoolkit.wt.util.infra.process;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,10 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import io.sitoolkit.wt.util.infra.process.ConversationProcess;
-import io.sitoolkit.wt.util.infra.process.ConversationProcessContainer;
-import io.sitoolkit.wt.util.infra.process.NopProcessExitCallback;
-import io.sitoolkit.wt.util.infra.process.ProcessParams;
+import io.sitoolkit.wt.util.infra.util.SystemUtils;
 
 public class ConversationProcessTest {
 
@@ -77,23 +74,33 @@ public class ConversationProcessTest {
     }
 
     private List<String> testCommand() {
-        File script = new File(getClass().getResource("testScript.cmd").getPath());
+        String scriptFile = "testScript." + (SystemUtils.isWindows() ? "cmd" : "sh");
+        File script = new File(getClass().getResource(scriptFile).getPath());
 
         List<String> command = new ArrayList<>();
-        command.add("cmd");
-        command.add("/c");
+        if (SystemUtils.isWindows()) {
+            command.add("cmd");
+            command.add("/c");
+        } else {
+            command.add("sh");
+        }
         command.add(script.getAbsolutePath());
 
         return command;
     }
 
     private void assertLines(List<String> lines) {
-        String currentDir = System.getProperty("user.dir");
-        assertThat(lines.get(0), is(""));
-        assertThat(lines.get(1), is(currentDir + ">echo test script start "));
-        assertThat(lines.get(2), is("test script start"));
-        assertThat(lines.get(3), is(""));
-        assertThat(lines.get(4), is(currentDir + ">echo test script end "));
-        assertThat(lines.get(5), is("test script end"));
+        if (SystemUtils.isWindows()) {
+            String currentDir = System.getProperty("user.dir");
+            assertThat(lines.get(0), is(""));
+            assertThat(lines.get(1), is(currentDir + ">echo test script start "));
+            assertThat(lines.get(2), is("test script start"));
+            assertThat(lines.get(3), is(""));
+            assertThat(lines.get(4), is(currentDir + ">echo test script end "));
+            assertThat(lines.get(5), is("test script end"));
+        } else {
+            assertThat(lines.get(0), is("test script start"));
+            assertThat(lines.get(1), is("test script end"));
+        }
     }
 }
