@@ -136,8 +136,9 @@ public class EvidenceManager implements ApplicationContextAware {
             return;
         }
 
-        String screenshotFileName = buildScreenshotFileName(evidence.getScriptName(),
-                evidence.getCaseNo(), testStepNo, itemName, screenshot.getTiming().name());
+        String screenshotFileName = EvidenceNameConverter.buildScreenshotFileName(
+                evidence.getScriptName(), evidence.getCaseNo(), testStepNo, itemName,
+                screenshot.getTiming().name());
         File dstFile = new File(imgDir, screenshotFileName);
 
         try {
@@ -158,15 +159,6 @@ public class EvidenceManager implements ApplicationContextAware {
 
     }
 
-    private String buildScreenshotFileName(String scriptName, String caseNo, String testStepNo,
-            String itemName, String timing) {
-
-        return StrUtils
-                .sanitizeMetaCharacter(StringUtils.join(
-                        new String[] { scriptName, caseNo, testStepNo, itemName, timing }, "_"))
-                + ".png";
-    }
-
     /**
      * エビデンスをファイルに書き出します。
      *
@@ -176,8 +168,8 @@ public class EvidenceManager implements ApplicationContextAware {
     public Path flushEvidence(Evidence evidence) {
         String html = build(evidence);
 
-        File htmlFile = new File(evidenceDir, buildEvidenceFileName(evidence.getScriptName(),
-                evidence.getCaseNo(), evidence.hasError()));
+        File htmlFile = new File(evidenceDir, EvidenceNameConverter
+                .caseNo2evidence(evidence.getScriptName(), evidence.getCaseNo()));
 
         if (htmlFile.exists()) {
             htmlFile = new File(htmlFile.getParent(),
@@ -192,18 +184,6 @@ public class EvidenceManager implements ApplicationContextAware {
         } catch (Exception e) {
             throw new TestException("エビデンスの出力に失敗しました", e);
         }
-    }
-
-    private String buildEvidenceFileName(String scriptName, String caseNo, boolean hasError) {
-
-        String resultHtml = ".html";
-        if (hasError) {
-            resultHtml = "_NG.html";
-        }
-
-        return StrUtils.sanitizeMetaCharacter(
-                StringUtils.join(new String[] { scriptName, caseNo }, "_")) + resultHtml;
-
     }
 
     /**

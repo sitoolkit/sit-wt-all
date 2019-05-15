@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import io.sitoolkit.wt.app.config.BaseConfig;
+import io.sitoolkit.wt.app.evidence.EvidenceReportEditor;
 import io.sitoolkit.wt.domain.evidence.DiffEvidence;
 import io.sitoolkit.wt.domain.evidence.ReportOpener;
 import io.sitoolkit.wt.infra.template.TemplateEngine;

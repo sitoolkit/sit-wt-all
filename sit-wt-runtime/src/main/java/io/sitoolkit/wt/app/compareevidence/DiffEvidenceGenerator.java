@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.util.ResourceUtils;
 
+import io.sitoolkit.wt.app.evidence.EvidenceReportEditor;
 import io.sitoolkit.wt.domain.evidence.DiffEvidence;
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
 import io.sitoolkit.wt.domain.evidence.EvidenceOpener;

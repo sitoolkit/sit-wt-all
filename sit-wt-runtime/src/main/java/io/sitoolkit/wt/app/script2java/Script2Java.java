@@ -28,13 +28,14 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import io.sitoolkit.wt.app.config.ExtConfig;
+import io.sitoolkit.wt.domain.testclass.TestClass;
+import io.sitoolkit.wt.domain.testclass.TestClassNameConverter;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.infra.SitPathUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.template.TemplateEngine;
-import io.sitoolkit.wt.util.infra.util.StrUtils;
 
 /**
  * このクラスは、テストスクリプトを実行するためのJUnitテストクラスを生成します。
@@ -198,10 +199,7 @@ public class Script2Java implements ApplicationContextAware {
         testClass.setScriptPath(SitPathUtils.relatvePath(new File("."), scriptFile));
 
         // テストクラスの物理名の設定
-        String baseName = FilenameUtils.getBaseName(testClass.getScriptPath());
-        baseName = StringUtils.capitalize(baseName);
-        baseName = StrUtils.sanitizeMetaCharacter(baseName) + "IT";
-        testClass.setFileBase(baseName);
+        testClass.setFileBase(TestClassNameConverter.script2Class(testClass.getScriptPath()));
 
         // パッケージパス
         String scriptPathFromPkg = SitPathUtils.relatvePath(testScriptDir,
