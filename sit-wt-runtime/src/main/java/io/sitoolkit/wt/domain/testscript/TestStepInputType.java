@@ -7,44 +7,35 @@ import lombok.Getter;
 
 public enum TestStepInputType {
 
-  na("", Locator.Type.na, DataType.na), choose(Locator.Type.SELECTOR_TYPES,
-      DataType.SELECT_TYPES), click(Locator.Type.SELECTOR_WITH_LINK_TYPES,
-          DataType.execution), dbverify(Locator.Type.sql_file, DataType.verification_value), dialog(
-              Locator.Type.na, DataType.ok_cancel), download(Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                  DataType.execution), drawLine(Locator.Type.SELECTOR_TYPES,
-                      DataType.coordinates), exec(Locator.Type.os_command,
-                          DataType.execution), GOTO("goto", Locator.Type.case_no,
-                              DataType.execution), include(Locator.Type.testscript_file,
-                                  DataType.execution), input(Locator.Type.SELECTOR_TYPES,
-                                      DataType.input_value), key(
-                                          Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                                          DataType.key_operation), open(Locator.Type.url,
-                                              DataType.execution), select(
-                                                  Locator.Type.SELECTOR_TYPES,
-                                                  DataType.SELECT_TYPES), setWindowSize(
-                                                      Locator.Type.na, DataType.window_size), spin(
-                                                          Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                                                          DataType.verification_value), startApp(
-                                                              Locator.Type.url,
-                                                              DataType.execution), store(
-                                                                  Locator.Type.variable,
-                                                                  DataType.store_value), storeElementIndex(
-                                                                      Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                                                                      DataType.variable_name), storeElementValue(
-                                                                          Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                                                                          DataType.variable_name), switchFrame(
-                                                                              Locator.Type.SELECTOR_TYPES,
-                                                                              DataType.execution), switchWindow(
-                                                                                  Locator.Type.TITLE_TYPES,
-                                                                                  DataType.execution), verify(
-                                                                                      Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                                                                                      DataType.verification_value), verifyAttribute(
-                                                                                          Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                                                                                          DataType.verification_value), verifySelect(
-                                                                                              Locator.Type.SELECTOR_TYPES,
-                                                                                              DataType.verification_value), wait(
-                                                                                                  Locator.Type.SELECTOR_WITH_LINK_TYPES,
-                                                                                                  DataType.verification_value);
+  //@formatter:off
+  na("", Locator.Type.na, DataType.na),
+  choose(Locator.Type.SELECTOR_TYPES, DataType.SELECT_TYPES),
+  click(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.execution),
+  dbverify(Locator.Type.sql_file, DataType.verification_value),
+  dialog(Locator.Type.na, DataType.ok_cancel),
+  download(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.execution),
+  drawLine(Locator.Type.SELECTOR_TYPES, DataType.coordinates),
+  exec(Locator.Type.os_command, DataType.execution),
+  GOTO("goto", Locator.Type.case_no, DataType.execution),
+  include(Locator.Type.testscript_file, DataType.execution),
+  input(Locator.Type.SELECTOR_TYPES, DataType.input_value),
+  key(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.key_operation),
+  open(Locator.Type.url, DataType.execution),
+  select(Locator.Type.SELECTOR_TYPES, DataType.SELECT_TYPES),
+  setWindowSize(Locator.Type.na, DataType.window_size),
+  spin(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.verification_value),
+  startApp(Locator.Type.url, DataType.execution),
+  store(Locator.Type.variable, DataType.store_value),
+  storeElementIndex(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.variable_name),
+  storeElementValue(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.variable_name),
+  switchFrame(Locator.Type.SELECTOR_TYPES, DataType.execution),
+  switchWindow(Locator.Type.TITLE_TYPES, DataType.execution),
+  verify(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.verification_value),
+  verifyAttribute(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.verification_value),
+  verifySelect(Locator.Type.SELECTOR_TYPES, DataType.verification_value),
+  wait(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.verification_value),
+  ;
+  //@formatter:on
 
   @Getter
   String operationName = name();

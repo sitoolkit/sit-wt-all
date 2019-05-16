@@ -43,8 +43,14 @@ public class OverwriteChecker {
   }
 
   enum Answer {
-    y("上書き", Writable.Yes, Writable.NA), a("以降全て上書き", Writable.Yes, Writable.Yes), n("上書きしない",
-        Writable.No, Writable.NA), q("以降全て上書きしない", Writable.No, Writable.NA),;
+
+    //@formatter:off
+    y("上書き", Writable.Yes, Writable.NA),
+    a("以降全て上書き", Writable.Yes, Writable.Yes),
+    n("上書きしない", Writable.No, Writable.NA),
+    q("以降全て上書きしない", Writable.No, Writable.NA),
+    ;
+    //@formatter:on
 
     final String description;
     final Writable writable;
