@@ -6,12 +6,12 @@ import io.sitoolkit.wt.domain.tester.OperationSupport;
 
 public class DbVerifyOperationSupport implements OperationSupport {
 
-    @Override
-    public boolean isDbVerify(Operation operation) {
-        if (operation instanceof DbVerifyOperation) {
-            return true;
-        }
-        return false;
+  @Override
+  public boolean isDbVerify(Operation operation) {
+    if (operation instanceof DbVerifyOperation) {
+      return true;
     }
+    return false;
+  }
 
 }

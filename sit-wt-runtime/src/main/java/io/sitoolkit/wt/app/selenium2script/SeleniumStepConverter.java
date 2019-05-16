@@ -5,12 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -18,113 +16,110 @@ import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class SeleniumStepConverter implements ApplicationContextAware {
 
-    protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
+  protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
-    protected ApplicationContext appCtx;
+  protected ApplicationContext appCtx;
 
-    private Map<String, String> seleniumIdeCommandMap;
+  private Map<String, String> seleniumIdeCommandMap;
 
-    private Pattern screenshotPattern;
+  private Pattern screenshotPattern;
 
-    public List<TestStep> convertTestScript(SeleniumTestScript seleniumTestScript, String caseNo) {
-        List<TestStep> testStepList = new ArrayList<TestStep>();
+  public List<TestStep> convertTestScript(SeleniumTestScript seleniumTestScript, String caseNo) {
+    List<TestStep> testStepList = new ArrayList<TestStep>();
 
-        int stepNo = 1;
+    int stepNo = 1;
 
-        for (SeleniumTestStep seleniumStep : seleniumTestScript.getTestStepList()) {
-            TestStep sitStep = new TestStep();
-            testStepList.add(sitStep);
+    for (SeleniumTestStep seleniumStep : seleniumTestScript.getTestStepList()) {
+      TestStep sitStep = new TestStep();
+      testStepList.add(sitStep);
 
-            sitStep.setCurrentCaseNo(caseNo);
-            sitStep.setNo(Integer.toString(stepNo++));
+      sitStep.setCurrentCaseNo(caseNo);
+      sitStep.setNo(Integer.toString(stepNo++));
 
-            // 操作
-            sitStep.setOperationName(convertOperationName(seleniumStep));
+      // 操作
+      sitStep.setOperationName(convertOperationName(seleniumStep));
 
-            // ロケーター
-            sitStep.setLocator(convertLocator(seleniumStep));
+      // ロケーター
+      sitStep.setLocator(convertLocator(seleniumStep));
 
-            // テストデータ
-            setTestData(sitStep, caseNo, seleniumStep.getValue());
+      // テストデータ
+      setTestData(sitStep, caseNo, seleniumStep.getValue());
 
-            // open操作の場合はseleniumScriptのbaseUrlを設定
-            if ("open".equals(sitStep.getOperationName())) {
-                String locatorValue = sitStep.getLocator().getValue();
-                sitStep.getLocator().setValue(seleniumTestScript.getBaseUrl() + locatorValue);
-            }
+      // open操作の場合はseleniumScriptのbaseUrlを設定
+      if ("open".equals(sitStep.getOperationName())) {
+        String locatorValue = sitStep.getLocator().getValue();
+        sitStep.getLocator().setValue(seleniumTestScript.getBaseUrl() + locatorValue);
+      }
 
-            // スクリーンショット
-            sitStep.setScreenshotTiming(convertScreenshotTiming(seleniumStep));
-
-        }
-        return testStepList;
-    }
-
-    /**
-     * TestStepのテストデータを設定します。
-     *
-     * @param testStep
-     *            TestStep
-     * @param caseNo
-     *            ケース番号
-     * @param value
-     *            テストデータ
-     */
-    protected void setTestData(TestStep testStep, String caseNo, String value) {
-        Map<String, String> testData = new HashMap<String, String>();
-        String[] pair = StringUtils.split(value, "=");
-        if (pair.length == 2) {
-            testStep.setDataType(pair[0]);
-            testData.put(caseNo, pair[1]);
-        } else {
-            if (StringUtils.isBlank(value)) {
-                testData.put(caseNo, "y");
-            } else {
-                testData.put(caseNo, value);
-            }
-        }
-        testStep.setTestData(testData);
-    }
-
-    protected String convertOperationName(SeleniumTestStep seleniumStep) {
-
-        String operationName = seleniumIdeCommandMap.get(seleniumStep.getCommand());
-
-        if (operationName == null) {
-            if (appCtx.containsBeanDefinition(seleniumStep.getCommand() + "Operation")) {
-                operationName = seleniumStep.getCommand();
-            } else {
-                log.info("selenium.command.unmatched", seleniumStep.getCommand());
-            }
-        }
-
-        return operationName;
+      // スクリーンショット
+      sitStep.setScreenshotTiming(convertScreenshotTiming(seleniumStep));
 
     }
+    return testStepList;
+  }
 
-    protected Locator convertLocator(SeleniumTestStep seleniumStep) {
-        return Locator.build(seleniumStep.getTarget());
+  /**
+   * TestStepのテストデータを設定します。
+   *
+   * @param testStep TestStep
+   * @param caseNo ケース番号
+   * @param value テストデータ
+   */
+  protected void setTestData(TestStep testStep, String caseNo, String value) {
+    Map<String, String> testData = new HashMap<String, String>();
+    String[] pair = StringUtils.split(value, "=");
+    if (pair.length == 2) {
+      testStep.setDataType(pair[0]);
+      testData.put(caseNo, pair[1]);
+    } else {
+      if (StringUtils.isBlank(value)) {
+        testData.put(caseNo, "y");
+      } else {
+        testData.put(caseNo, value);
+      }
+    }
+    testStep.setTestData(testData);
+  }
+
+  protected String convertOperationName(SeleniumTestStep seleniumStep) {
+
+    String operationName = seleniumIdeCommandMap.get(seleniumStep.getCommand());
+
+    if (operationName == null) {
+      if (appCtx.containsBeanDefinition(seleniumStep.getCommand() + "Operation")) {
+        operationName = seleniumStep.getCommand();
+      } else {
+        log.info("selenium.command.unmatched", seleniumStep.getCommand());
+      }
     }
 
-    protected String convertScreenshotTiming(SeleniumTestStep seleniumStep) {
-        String command = StringUtils.defaultString(seleniumStep.getCommand());
-        return screenshotPattern.matcher(command).matches() ? "前" : "";
-    }
+    return operationName;
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.appCtx = applicationContext;
-    }
+  }
 
-    public Map<String, String> getSeleniumIdeCommandMap() {
-        return seleniumIdeCommandMap;
-    }
+  protected Locator convertLocator(SeleniumTestStep seleniumStep) {
+    return Locator.build(seleniumStep.getTarget());
+  }
 
-    public void setSeleniumIdeCommandMap(Map<String, String> seleniumIdeCommandMap) {
-        this.seleniumIdeCommandMap = seleniumIdeCommandMap;
-    }
+  protected String convertScreenshotTiming(SeleniumTestStep seleniumStep) {
+    String command = StringUtils.defaultString(seleniumStep.getCommand());
+    return screenshotPattern.matcher(command).matches() ? "前" : "";
+  }
 
-    public void setScreenshotPattern(Pattern screenshotPattern) {
-        this.screenshotPattern = screenshotPattern;
-    }
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.appCtx = applicationContext;
+  }
+
+  public Map<String, String> getSeleniumIdeCommandMap() {
+    return seleniumIdeCommandMap;
+  }
+
+  public void setSeleniumIdeCommandMap(Map<String, String> seleniumIdeCommandMap) {
+    this.seleniumIdeCommandMap = seleniumIdeCommandMap;
+  }
+
+  public void setScreenshotPattern(Pattern screenshotPattern) {
+    this.screenshotPattern = screenshotPattern;
+  }
 }

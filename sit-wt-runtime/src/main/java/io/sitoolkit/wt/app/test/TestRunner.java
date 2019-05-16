@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
 import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
 import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGeneratorConfig;
 import io.sitoolkit.wt.app.config.RuntimeConfig;
@@ -30,242 +28,232 @@ import io.sitoolkit.wt.infra.resource.MessageManager;
 
 public class TestRunner {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(TestRunner.class);
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(TestRunner.class);
 
-    public static void main(String[] args) {
+  public static void main(String[] args) {
 
-        if (args.length < 1) {
-            LOG.info("test.script.appoint");
-            LOG.info("test.case", TestRunner.class.getName());
-            System.exit(1);
-        }
-
-        boolean isParallel = Boolean.getBoolean("sitwt.parallel");
-        boolean isEvidenceOpen = Boolean.getBoolean("sitwt.open-evidence");
-        boolean isCompareScreenshot = Boolean.getBoolean("sitwt.compare-screenshot");
-
-        TestRunner runner = new TestRunner();
-        List<TestResult> results = runner.runScript(args[0], isParallel, isEvidenceOpen);
-
-        for (TestResult resuls : results) {
-            if (!resuls.isSuccess()) {
-                System.exit(2);
-            }
-        }
-
-        if (isCompareScreenshot) {
-
-            ApplicationContext appCtx = new AnnotationConfigApplicationContext(
-                    DiffEvidenceGeneratorConfig.class);
-            DiffEvidenceGenerator generator = appCtx.getBean(DiffEvidenceGenerator.class);
-
-            EvidenceDir targetDir = EvidenceDir.getLatest();
-            EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(null, targetDir.getBrowser());
-
-            boolean compareSsSuccess = generator.generate(baseDir, targetDir, isCompareScreenshot);
-            LOG.info("base.evidence.compare",
-                    compareSsSuccess ? MessageManager.getMessage("success")
-                            : MessageManager.getMessage("failure"));
-
-            if (!compareSsSuccess) {
-                EvidenceOpener opener = new EvidenceOpener();
-                opener.openCompareNgEvidence(targetDir);
-            }
-
-        }
-
-        System.exit(0);
+    if (args.length < 1) {
+      LOG.info("test.script.appoint");
+      LOG.info("test.case", TestRunner.class.getName());
+      System.exit(1);
     }
 
-    /**
-     * テストスクリプトを実行します。
-     *
-     * @param testCaseStr
-     *            実行するテストケース(scriptPath1,scriptPath2#case_1,scriptPath3!TestScript#case_1)
-     * @param isParallel
-     *            ケースを並列に実行する場合にtrue
-     * @param isEvidenceOpen
-     *            テスト実行後にエビデンスを開く場合にtrue
-     * @return テスト結果
-     */
-    public List<TestResult> runScript(String testCaseStr, boolean isParallel,
-            boolean isEvidenceOpen) {
+    boolean isParallel = Boolean.getBoolean("sitwt.parallel");
+    boolean isEvidenceOpen = Boolean.getBoolean("sitwt.open-evidence");
+    boolean isCompareScreenshot = Boolean.getBoolean("sitwt.compare-screenshot");
 
-        ConfigurableApplicationContext appCtx = new AnnotationConfigApplicationContext(
-                RuntimeConfig.class);
+    TestRunner runner = new TestRunner();
+    List<TestResult> results = runner.runScript(args[0], isParallel, isEvidenceOpen);
 
-        List<TestResult> result = runScript(appCtx, testCaseStr, isParallel, isEvidenceOpen);
+    for (TestResult resuls : results) {
+      if (!resuls.isSuccess()) {
+        System.exit(2);
+      }
+    }
 
-        appCtx.close();
+    if (isCompareScreenshot) {
 
-        return result;
+      ApplicationContext appCtx =
+          new AnnotationConfigApplicationContext(DiffEvidenceGeneratorConfig.class);
+      DiffEvidenceGenerator generator = appCtx.getBean(DiffEvidenceGenerator.class);
+
+      EvidenceDir targetDir = EvidenceDir.getLatest();
+      EvidenceDir baseDir = EvidenceDir.baseEvidenceDir(null, targetDir.getBrowser());
+
+      boolean compareSsSuccess = generator.generate(baseDir, targetDir, isCompareScreenshot);
+      LOG.info("base.evidence.compare", compareSsSuccess ? MessageManager.getMessage("success")
+          : MessageManager.getMessage("failure"));
+
+      if (!compareSsSuccess) {
+        EvidenceOpener opener = new EvidenceOpener();
+        opener.openCompareNgEvidence(targetDir);
+      }
 
     }
 
-    /**
-     * テストスクリプトを実行します。
-     *
-     * @param appCtx
-     *            {@link RuntimeConfig}で構成された {@code ConfigurableApplicationContext}
-     * @param testCaseStr
-     *            実行するテストケース(scriptPath1,scriptPath2#case_1,scriptPath3!TestScript#case_1)
-     * @param isParallel
-     *            ケースを並列に実行する場合にtrue
-     * @param isEvidenceOpen
-     *            テスト実行後にエビデンスを開く場合にtrue
-     * @return テスト結果
-     */
-    public List<TestResult> runScript(ConfigurableApplicationContext appCtx, String testCaseStr,
-            boolean isParallel, boolean isEvidenceOpen) {
+    System.exit(0);
+  }
 
-        List<TestResult> results = new ArrayList<>();
-        List<TestCase> allTestCase = new ArrayList<>();
-        for (String testCondition : testCaseStr.split(",")) {
-            TestCase testCase = TestCase.parse(testCondition);
+  /**
+   * テストスクリプトを実行します。
+   *
+   * @param testCaseStr 実行するテストケース(scriptPath1,scriptPath2#case_1,scriptPath3!TestScript#case_1)
+   * @param isParallel ケースを並列に実行する場合にtrue
+   * @param isEvidenceOpen テスト実行後にエビデンスを開く場合にtrue
+   * @return テスト結果
+   */
+  public List<TestResult> runScript(String testCaseStr, boolean isParallel,
+      boolean isEvidenceOpen) {
 
-            if (testCase.getScriptPath().endsWith(".html")) {
-                testCase.setScriptPath(selenium2script(testCase.getScriptPath()).getAbsolutePath());
-            }
+    ConfigurableApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(RuntimeConfig.class);
 
-            allTestCase.add(testCase);
-        }
+    List<TestResult> result = runScript(appCtx, testCaseStr, isParallel, isEvidenceOpen);
 
-        if (isParallel) {
-            results.addAll(runAllCasesInParallel(allTestCase, isEvidenceOpen));
-        } else {
-            results.addAll(runAllCase(allTestCase, isEvidenceOpen));
-        }
+    appCtx.close();
 
-        return results;
+    return result;
+
+  }
+
+  /**
+   * テストスクリプトを実行します。
+   *
+   * @param appCtx {@link RuntimeConfig}で構成された {@code ConfigurableApplicationContext}
+   * @param testCaseStr 実行するテストケース(scriptPath1,scriptPath2#case_1,scriptPath3!TestScript#case_1)
+   * @param isParallel ケースを並列に実行する場合にtrue
+   * @param isEvidenceOpen テスト実行後にエビデンスを開く場合にtrue
+   * @return テスト結果
+   */
+  public List<TestResult> runScript(ConfigurableApplicationContext appCtx, String testCaseStr,
+      boolean isParallel, boolean isEvidenceOpen) {
+
+    List<TestResult> results = new ArrayList<>();
+    List<TestCase> allTestCase = new ArrayList<>();
+    for (String testCondition : testCaseStr.split(",")) {
+      TestCase testCase = TestCase.parse(testCondition);
+
+      if (testCase.getScriptPath().endsWith(".html")) {
+        testCase.setScriptPath(selenium2script(testCase.getScriptPath()).getAbsolutePath());
+      }
+
+      allTestCase.add(testCase);
     }
 
-    private File selenium2script(String seleniumScriptPath) {
-        Selenium2Script s2s = Selenium2Script.initInstance();
-        s2s.setOpenScript(false);
-        s2s.setOverwriteScript(false);
-
-        File seleniumScript = new File(seleniumScriptPath);
-
-        File script = s2s.convert(seleniumScript);
-        s2s.backup(seleniumScript);
-
-        return script;
+    if (isParallel) {
+      results.addAll(runAllCasesInParallel(allTestCase, isEvidenceOpen));
+    } else {
+      results.addAll(runAllCase(allTestCase, isEvidenceOpen));
     }
 
-    private List<TestResult> runAllCase(List<TestCase> testCases, boolean isEvidenceOpen) {
+    return results;
+  }
 
-        List<TestResult> results = new ArrayList<>();
-        TestScriptCatalog catalog = ApplicationContextHelper.getBean(TestScriptCatalog.class);
+  private File selenium2script(String seleniumScriptPath) {
+    Selenium2Script s2s = Selenium2Script.initInstance();
+    s2s.setOpenScript(false);
+    s2s.setOverwriteScript(false);
 
-        for (TestCase testCase : testCases) {
-            String scriptPath = testCase.getScriptPath();
-            String sheetName = testCase.getSheetName();
-            String caseNo = testCase.getCaseNo();
-            TestScript script = catalog.get(scriptPath, sheetName);
+    File seleniumScript = new File(seleniumScriptPath);
 
-            if (StringUtils.isEmpty(caseNo)) {
-                for (String caseNoInScript : script.getCaseNoMap().keySet()) {
-                    results.add(runCase(scriptPath, sheetName, caseNoInScript));
-                }
+    File script = s2s.convert(seleniumScript);
+    s2s.backup(seleniumScript);
 
-            } else {
-                results.add(runCase(scriptPath, sheetName, caseNo));
+    return script;
+  }
 
-            }
+  private List<TestResult> runAllCase(List<TestCase> testCases, boolean isEvidenceOpen) {
 
-            if (isEvidenceOpen) {
-                EvidenceOpener opener = new EvidenceOpener();
-                opener.openTarget(new File(scriptPath));
-            }
+    List<TestResult> results = new ArrayList<>();
+    TestScriptCatalog catalog = ApplicationContextHelper.getBean(TestScriptCatalog.class);
+
+    for (TestCase testCase : testCases) {
+      String scriptPath = testCase.getScriptPath();
+      String sheetName = testCase.getSheetName();
+      String caseNo = testCase.getCaseNo();
+      TestScript script = catalog.get(scriptPath, sheetName);
+
+      if (StringUtils.isEmpty(caseNo)) {
+        for (String caseNoInScript : script.getCaseNoMap().keySet()) {
+          results.add(runCase(scriptPath, sheetName, caseNoInScript));
         }
 
-        return results;
+      } else {
+        results.add(runCase(scriptPath, sheetName, caseNo));
+
+      }
+
+      if (isEvidenceOpen) {
+        EvidenceOpener opener = new EvidenceOpener();
+        opener.openTarget(new File(scriptPath));
+      }
     }
 
-    private List<TestResult> runAllCasesInParallel(List<TestCase> testCases,
-            boolean isEvidenceOpen) {
+    return results;
+  }
 
-        List<TestResult> results = new ArrayList<>();
-        TestScriptCatalog catalog = ApplicationContextHelper.getBean(TestScriptCatalog.class);
-        ExecutorService executor = Executors.newCachedThreadPool();
+  private List<TestResult> runAllCasesInParallel(List<TestCase> testCases, boolean isEvidenceOpen) {
 
-        for (TestCase testCase : testCases) {
-            String scriptPath = testCase.getScriptPath();
-            String sheetName = testCase.getSheetName();
-            String caseNo = testCase.getCaseNo();
-            TestScript script = catalog.get(scriptPath, sheetName);
+    List<TestResult> results = new ArrayList<>();
+    TestScriptCatalog catalog = ApplicationContextHelper.getBean(TestScriptCatalog.class);
+    ExecutorService executor = Executors.newCachedThreadPool();
 
-            if (StringUtils.isEmpty(caseNo)) {
-                // run last case in current thread to use WebDriver instance
-                // bound
-                // in current thread
-                List<String> caseNoList = new ArrayList<>(script.getCaseNoMap().keySet());
+    for (TestCase testCase : testCases) {
+      String scriptPath = testCase.getScriptPath();
+      String sheetName = testCase.getSheetName();
+      String caseNo = testCase.getCaseNo();
+      TestScript script = catalog.get(scriptPath, sheetName);
 
-                if (caseNoList.isEmpty()) {
-                    LOG.warn("case.empty", scriptPath, sheetName);
-                    continue;
-                }
+      if (StringUtils.isEmpty(caseNo)) {
+        // run last case in current thread to use WebDriver instance
+        // bound
+        // in current thread
+        List<String> caseNoList = new ArrayList<>(script.getCaseNoMap().keySet());
 
-                String lastCaseNo = caseNoList.get(caseNoList.size() - 1);
-                caseNoList.remove(caseNoList.size() - 1);
-
-                for (String caseNoInScript : caseNoList) {
-
-                    executor.execute(() -> {
-                        results.add(runCase(scriptPath, sheetName, caseNoInScript));
-                    });
-
-                }
-
-                results.add(runCase(scriptPath, sheetName, lastCaseNo));
-
-            } else {
-                executor.execute(() -> {
-                    results.add(runCase(scriptPath, sheetName, caseNo));
-                });
-            }
-
-            if (isEvidenceOpen) {
-                EvidenceOpener opener = new EvidenceOpener();
-                opener.openTarget(new File(scriptPath));
-            }
+        if (caseNoList.isEmpty()) {
+          LOG.warn("case.empty", scriptPath, sheetName);
+          continue;
         }
 
-        executor.shutdown();
+        String lastCaseNo = caseNoList.get(caseNoList.size() - 1);
+        caseNoList.remove(caseNoList.size() - 1);
 
-        try {
-            executor.awaitTermination(5, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            LOG.warn("thread.sleep.exception", e);
+        for (String caseNoInScript : caseNoList) {
+
+          executor.execute(() -> {
+            results.add(runCase(scriptPath, sheetName, caseNoInScript));
+          });
+
         }
 
-        return results;
+        results.add(runCase(scriptPath, sheetName, lastCaseNo));
+
+      } else {
+        executor.execute(() -> {
+          results.add(runCase(scriptPath, sheetName, caseNo));
+        });
+      }
+
+      if (isEvidenceOpen) {
+        EvidenceOpener opener = new EvidenceOpener();
+        opener.openTarget(new File(scriptPath));
+      }
     }
 
-    private TestResult runCase(String scriptPath, String sheetName, String caseNo) {
-        LOG.info("run.case", scriptPath, sheetName, caseNo);
+    executor.shutdown();
 
-        Tester tester = ApplicationContextHelper.getBean(Tester.class);
-        TestEventListener listener = ApplicationContextHelper.getBean(TestEventListener.class);
-
-        tester.prepare(scriptPath, sheetName, caseNo);
-        listener.before();
-
-        TestResult result = null;
-
-        try {
-            result = tester.operate(caseNo);
-        } finally {
-            listener.after();
-            tester.tearDown();
-
-            if (result != null) {
-                LOG.info("test.result", caseNo,
-                        result.isSuccess() ? MessageManager.getMessage("success")
-                                : MessageManager.getMessage("failure"));
-            }
-        }
-
-        return result;
+    try {
+      executor.awaitTermination(5, TimeUnit.MINUTES);
+    } catch (InterruptedException e) {
+      LOG.warn("thread.sleep.exception", e);
     }
+
+    return results;
+  }
+
+  private TestResult runCase(String scriptPath, String sheetName, String caseNo) {
+    LOG.info("run.case", scriptPath, sheetName, caseNo);
+
+    Tester tester = ApplicationContextHelper.getBean(Tester.class);
+    TestEventListener listener = ApplicationContextHelper.getBean(TestEventListener.class);
+
+    tester.prepare(scriptPath, sheetName, caseNo);
+    listener.before();
+
+    TestResult result = null;
+
+    try {
+      result = tester.operate(caseNo);
+    } finally {
+      listener.after();
+      tester.tearDown();
+
+      if (result != null) {
+        LOG.info("test.result", caseNo, result.isSuccess() ? MessageManager.getMessage("success")
+            : MessageManager.getMessage("failure"));
+      }
+    }
+
+    return result;
+  }
 }

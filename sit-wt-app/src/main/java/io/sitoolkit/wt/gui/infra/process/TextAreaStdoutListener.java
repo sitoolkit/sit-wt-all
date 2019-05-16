@@ -6,27 +6,26 @@ import javafx.scene.control.TextArea;
 
 public class TextAreaStdoutListener implements StdoutListener {
 
-    private TextArea textArea;
+  private TextArea textArea;
 
-    public TextAreaStdoutListener() {
-    }
+  public TextAreaStdoutListener() {}
 
-    public TextAreaStdoutListener(TextArea textArea) {
-        super();
-        this.textArea = textArea;
-    }
+  public TextAreaStdoutListener(TextArea textArea) {
+    super();
+    this.textArea = textArea;
+  }
 
-    @Override
-    public void nextLine(String line) {
-        Platform.runLater(() -> textArea.appendText(line + System.lineSeparator()));
-    }
+  @Override
+  public void nextLine(String line) {
+    Platform.runLater(() -> textArea.appendText(line + System.lineSeparator()));
+  }
 
-    public TextArea getTextArea() {
-        return textArea;
-    }
+  public TextArea getTextArea() {
+    return textArea;
+  }
 
-    public void setTextArea(TextArea textArea) {
-        this.textArea = textArea;
-    }
+  public void setTextArea(TextArea textArea) {
+    this.textArea = textArea;
+  }
 
 }

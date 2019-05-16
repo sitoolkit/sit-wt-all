@@ -5,50 +5,50 @@ import io.sitoolkit.wt.util.infra.util.StrUtils;
 
 public class MavenVersionsPluginStdoutListener implements StdoutListener {
 
-    private String updatePrefix;
+  private String updatePrefix;
 
-    private String versionPrefix;
+  private String versionPrefix;
 
-    private boolean update = false;
+  private boolean update = false;
 
-    private String currentVersion;
+  private String currentVersion;
 
-    private String newVersion;
+  private String newVersion;
 
-    public MavenVersionsPluginStdoutListener() {
-        // TODO Auto-generated constructor stub
+  public MavenVersionsPluginStdoutListener() {
+    // TODO Auto-generated constructor stub
+  }
+
+  public MavenVersionsPluginStdoutListener(String updatePrefix, String versionPrefix) {
+    super();
+    this.updatePrefix = updatePrefix;
+    this.versionPrefix = versionPrefix;
+  }
+
+  @Override
+  public void nextLine(String line) {
+
+    if (StrUtils.equals(updatePrefix, line)) {
+      update = true;
     }
 
-    public MavenVersionsPluginStdoutListener(String updatePrefix, String versionPrefix) {
-        super();
-        this.updatePrefix = updatePrefix;
-        this.versionPrefix = versionPrefix;
+    if (line.contains(versionPrefix)) {
+      if (update) {
+        int idx = line.indexOf(" -> ");
+        currentVersion = line.substring(line.indexOf("... ") + 4, idx);
+        newVersion = line.substring(idx + 4);
+      } else {
+        currentVersion = line.substring(line.indexOf("... ") + 4);
+      }
     }
+  }
 
-    @Override
-    public void nextLine(String line) {
+  public String getNewVersion() {
+    return newVersion;
+  }
 
-        if (StrUtils.equals(updatePrefix, line)) {
-            update = true;
-        }
-
-        if (line.contains(versionPrefix)) {
-            if (update) {
-                int idx = line.indexOf(" -> ");
-                currentVersion = line.substring(line.indexOf("... ") + 4, idx);
-                newVersion = line.substring(idx + 4);
-            } else {
-                currentVersion = line.substring(line.indexOf("... ") + 4);
-            }
-        }
-    }
-
-    public String getNewVersion() {
-        return newVersion;
-    }
-
-    public String getCurrentVersion() {
-        return currentVersion;
-    }
+  public String getCurrentVersion() {
+    return currentVersion;
+  }
 
 }

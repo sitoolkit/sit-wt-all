@@ -2,7 +2,6 @@ package io.sitoolkit.wt.gui.pres;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-
 import io.sitoolkit.wt.gui.app.sample.SampleService;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.domain.project.ProjectState.State;
@@ -19,83 +18,83 @@ import lombok.Getter;
 
 public class SampleToolbarController implements Initializable {
 
-    @FXML
-    private HBox sampleToolbar;
+  @FXML
+  private HBox sampleToolbar;
 
-    @FXML
-    private Label runSampleButton;
+  @FXML
+  private Label runSampleButton;
 
-    @FXML
-    private Label stopSampleButton;
+  @FXML
+  private Label stopSampleButton;
 
-    private TestToolbarController testToolbarController;
+  private TestToolbarController testToolbarController;
 
-    private MessageView messageView;
+  private MessageView messageView;
 
-    private ProjectState projectState;
+  private ProjectState projectState;
 
-    @Getter
-    private BooleanProperty running = new SimpleBooleanProperty(false);
+  @Getter
+  private BooleanProperty running = new SimpleBooleanProperty(false);
 
-    SampleService service = new SampleService();
+  SampleService service = new SampleService();
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
 
-    }
+  }
 
-    public void initialize(MessageView messageView, TestToolbarController testToolbarController,
-            ProjectState projectState) {
-        this.projectState = projectState;
-        this.testToolbarController = testToolbarController;
-        this.messageView = messageView;
+  public void initialize(MessageView messageView, TestToolbarController testToolbarController,
+      ProjectState projectState) {
+    this.projectState = projectState;
+    this.testToolbarController = testToolbarController;
+    this.messageView = messageView;
 
-        FxUtils.bindVisible(sampleToolbar, projectState.isLoaded());
-        FxUtils.bindVisible(runSampleButton, running.not());
-        FxUtils.bindVisible(stopSampleButton, running);
+    FxUtils.bindVisible(sampleToolbar, projectState.isLoaded());
+    FxUtils.bindVisible(runSampleButton, running.not());
+    FxUtils.bindVisible(stopSampleButton, running);
 
-    }
+  }
 
-    @FXML
-    public void runSample() {
-        projectState.setState(State.LOCKING);
-        messageView.startMsg("サンプルWebサイトを起動します。");
+  @FXML
+  public void runSample() {
+    projectState.setState(State.LOCKING);
+    messageView.startMsg("サンプルWebサイトを起動します。");
 
-        service.create(projectState.getBaseDirPath());
-        service.start(projectState.getBaseDirPath(), onStarted());
-    }
+    service.create(projectState.getBaseDirPath());
+    service.start(projectState.getBaseDirPath(), onStarted());
+  }
 
-    private SampleStartedCallback onStarted() {
-        return success -> {
-            if (success) {
-                String sampleBaseUrl = "http://localhost:8280";
-                messageView.addMsg("サンプルWebサイトを起動しました。" + sampleBaseUrl + "/input.html");
-                messageView.addMsg("サンプルテストスクリプトtestscript/SampleTestScript.csvを左のツリーで選択して実行できます。");
-                // TODO サンプルURLの動的取得
-                testToolbarController.setBaseUrl(sampleBaseUrl);
-                running.set(true);
-            } else {
-                messageView.addMsg("サンプルWebサイトの起動に失敗しました。");
-                running.set(false);
-            }
-            projectState.reset();
-        };
-    }
+  private SampleStartedCallback onStarted() {
+    return success -> {
+      if (success) {
+        String sampleBaseUrl = "http://localhost:8280";
+        messageView.addMsg("サンプルWebサイトを起動しました。" + sampleBaseUrl + "/input.html");
+        messageView.addMsg("サンプルテストスクリプトtestscript/SampleTestScript.csvを左のツリーで選択して実行できます。");
+        // TODO サンプルURLの動的取得
+        testToolbarController.setBaseUrl(sampleBaseUrl);
+        running.set(true);
+      } else {
+        messageView.addMsg("サンプルWebサイトの起動に失敗しました。");
+        running.set(false);
+      }
+      projectState.reset();
+    };
+  }
 
-    @FXML
-    public void stopSample() {
-        messageView.startMsg("サンプルWebサイトを停止します。");
+  @FXML
+  public void stopSample() {
+    messageView.startMsg("サンプルWebサイトを停止します。");
 
-        service.stop(projectState.getBaseDirPath(), retCode -> {
-            running.set(false);
-            Platform.runLater(() -> {
-                messageView.addMsg("サンプルWebサイトを停止しました。");
-            });
-        });
-    }
+    service.stop(projectState.getBaseDirPath(), retCode -> {
+      running.set(false);
+      Platform.runLater(() -> {
+        messageView.addMsg("サンプルWebサイトを停止しました。");
+      });
+    });
+  }
 
-    public void destroy() {
-        service.stop(projectState.getBaseDirPath());
-    }
+  public void destroy() {
+    service.stop(projectState.getBaseDirPath());
+  }
 
 }

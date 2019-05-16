@@ -5,136 +5,133 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
-
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class EvidenceReportEditor {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceReportEditor.class);
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceReportEditor.class);
 
-    private static final String evidenceRes = "js/report.js";
+  private static final String evidenceRes = "js/report.js";
 
-    private static final String reportResourcePath = "target/site";
+  private static final String reportResourcePath = "target/site";
 
-    private static final String scriptTags = "    <script src=\"../js/jquery.js\"></script>\n"
-            + "    <script src=\"" + evidenceRes + "\"></script>\n";
+  private static final String scriptTags = "    <script src=\"../js/jquery.js\"></script>\n"
+      + "    <script src=\"" + evidenceRes + "\"></script>\n";
 
-    public static void main(String[] args) {
-        new EvidenceReportEditor().edit(EvidenceDir.getLatest());
+  public static void main(String[] args) {
+    new EvidenceReportEditor().edit(EvidenceDir.getLatest());
+  }
+
+  public void edit(EvidenceDir evidenceDir) {
+
+    if (!evidenceDir.exists()) {
+      LOG.error("evidence.error");
+    } else if (!EvidenceDir.existsReport(reportResourcePath)) {
+      LOG.error("report.error");
+    } else {
+
+      try {
+        FileUtils.copyDirectory(new File(reportResourcePath), evidenceDir.getReportDir().toFile(),
+            false);
+
+        URL url = ResourceUtils.getURL("classpath:evidence/" + evidenceRes);
+        File dstFile = evidenceDir.getReportDir().resolve(evidenceRes).toFile();
+        FileUtils.copyURLToFile(url, dstFile);
+
+      } catch (IOException e) {
+        LOG.error("resource.copy.error", e);
+        return;
+      } catch (Exception exp) {
+        LOG.error("proxy.error", exp);
+        return;
+      }
+
+      addTags(evidenceDir);
     }
 
-    public void edit(EvidenceDir evidenceDir) {
+  }
 
-        if (!evidenceDir.exists()) {
-            LOG.error("evidence.error");
-        } else if (!EvidenceDir.existsReport(reportResourcePath)) {
-            LOG.error("report.error");
-        } else {
+  private void addTags(EvidenceDir evidenceDir) {
 
-            try {
-                FileUtils.copyDirectory(new File(reportResourcePath),
-                        evidenceDir.getReportDir().toFile(), false);
+    Path failsafeReport = evidenceDir.getFailsafeReport();
 
-                URL url = ResourceUtils.getURL("classpath:evidence/" + evidenceRes);
-                File dstFile = evidenceDir.getReportDir().resolve(evidenceRes).toFile();
-                FileUtils.copyURLToFile(url, dstFile);
+    try {
+      String[] lines =
+          FileUtils.readFileToString(failsafeReport.toFile(), StandardCharsets.UTF_8).split("\n");
 
-            } catch (IOException e) {
-                LOG.error("resource.copy.error", e);
-                return;
-            } catch (Exception exp) {
-                LOG.error("proxy.error", exp);
-                return;
-            }
+      StringBuilder sb = new StringBuilder();
 
-            addTags(evidenceDir);
+      for (String line : lines) {
+
+        String trimmed = line.trim();
+
+        if (trimmed.equals("</body>")) {
+          sb.append(buildInputTags(evidenceDir));
         }
 
-    }
+        sb.append(line + "\n");
 
-    private void addTags(EvidenceDir evidenceDir) {
-
-        Path failsafeReport = evidenceDir.getFailsafeReport();
-
-        try {
-            String[] lines = FileUtils
-                    .readFileToString(failsafeReport.toFile(), StandardCharsets.UTF_8).split("\n");
-
-            StringBuilder sb = new StringBuilder();
-
-            for (String line : lines) {
-
-                String trimmed = line.trim();
-
-                if (trimmed.equals("</body>")) {
-                    sb.append(buildInputTags(evidenceDir));
-                }
-
-                sb.append(line + "\n");
-
-                if (trimmed.equals("<head>")) {
-                    sb.append(scriptTags);
-                }
-
-            }
-
-            FileUtils.writeStringToFile(failsafeReport.toFile(), sb.toString(),
-                    StandardCharsets.UTF_8);
-
-        } catch (IOException e) {
-            LOG.error("add.tags.error", e);
+        if (trimmed.equals("<head>")) {
+          sb.append(scriptTags);
         }
 
+      }
+
+      FileUtils.writeStringToFile(failsafeReport.toFile(), sb.toString(), StandardCharsets.UTF_8);
+
+    } catch (IOException e) {
+      LOG.error("add.tags.error", e);
     }
 
-    private String buildInputTags(EvidenceDir evidenceDir) {
-        StringBuilder sb = new StringBuilder();
+  }
 
-        for (File evidenceFile : evidenceDir.getEvidenceFiles()) {
-            sb.append(buildInputTag(evidenceDir, evidenceFile.toPath()));
-        }
+  private String buildInputTags(EvidenceDir evidenceDir) {
+    StringBuilder sb = new StringBuilder();
 
-        return sb.toString();
+    for (File evidenceFile : evidenceDir.getEvidenceFiles()) {
+      sb.append(buildInputTag(evidenceDir, evidenceFile.toPath()));
     }
 
-    private String buildInputTag(EvidenceDir evidenceDir, Path evidenceFile) {
+    return sb.toString();
+  }
 
-        String evidenceName = evidenceFile.getFileName().toString();
-        String testMethodFullName = FilenameUtils.getBaseName(evidenceName);
+  private String buildInputTag(EvidenceDir evidenceDir, Path evidenceFile) {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(buildAttribute("data-name", testMethodFullName));
+    String evidenceName = evidenceFile.getFileName().toString();
+    String testMethodFullName = FilenameUtils.getBaseName(evidenceName);
 
-        sb.append(buildAttribute("data-evidence", relativizePath(evidenceDir, evidenceFile)));
-        sb.append(buildAttribute("data-mask",
-                fetchPath(evidenceDir, evidenceDir.getMaskEvidence(evidenceName))));
-        sb.append(buildAttribute("data-comp",
-                fetchPath(evidenceDir, evidenceDir.getCompareEvidence(evidenceName))));
-        sb.append(buildAttribute("data-compmask",
-                fetchPath(evidenceDir, evidenceDir.getCompareMaskEvidence(evidenceName))));
-        sb.append(buildAttribute("data-compng",
-                fetchPath(evidenceDir, evidenceDir.getCompareNgEvidence(evidenceName))));
+    StringBuilder sb = new StringBuilder();
+    sb.append(buildAttribute("data-name", testMethodFullName));
 
-        return StringUtils.join("<input class='evidence' type='hidden' ", sb.toString(), "/>\n");
-    }
+    sb.append(buildAttribute("data-evidence", relativizePath(evidenceDir, evidenceFile)));
+    sb.append(buildAttribute("data-mask",
+        fetchPath(evidenceDir, evidenceDir.getMaskEvidence(evidenceName))));
+    sb.append(buildAttribute("data-comp",
+        fetchPath(evidenceDir, evidenceDir.getCompareEvidence(evidenceName))));
+    sb.append(buildAttribute("data-compmask",
+        fetchPath(evidenceDir, evidenceDir.getCompareMaskEvidence(evidenceName))));
+    sb.append(buildAttribute("data-compng",
+        fetchPath(evidenceDir, evidenceDir.getCompareNgEvidence(evidenceName))));
 
-    private String buildAttribute(String name, String value) {
-        return name + "='" + value + "' ";
-    }
+    return StringUtils.join("<input class='evidence' type='hidden' ", sb.toString(), "/>\n");
+  }
 
-    private String fetchPath(EvidenceDir evidenceDir, Path target) {
-        return target.toFile().exists() ? relativizePath(evidenceDir, target) : "";
-    }
+  private String buildAttribute(String name, String value) {
+    return name + "='" + value + "' ";
+  }
 
-    private String relativizePath(EvidenceDir evidenceDir, Path target) {
-        return evidenceDir.getReportDir().relativize(target).toString();
-    }
+  private String fetchPath(EvidenceDir evidenceDir, Path target) {
+    return target.toFile().exists() ? relativizePath(evidenceDir, target) : "";
+  }
+
+  private String relativizePath(EvidenceDir evidenceDir, Path target) {
+    return evidenceDir.getReportDir().relativize(target).toString();
+  }
 
 }

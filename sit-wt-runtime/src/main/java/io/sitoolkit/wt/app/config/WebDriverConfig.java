@@ -1,22 +1,19 @@
 /*
  * Copyright 2016 Monocrea Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package io.sitoolkit.wt.app.config;
 
 import java.net.MalformedURLException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -27,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-
 import io.sitoolkit.wt.domain.tester.TestEventListener;
 import io.sitoolkit.wt.domain.tester.selenium.TestEventListenerWebDriverImpl;
 import io.sitoolkit.wt.domain.webdriver.MobileWebDriver;
@@ -45,78 +41,76 @@ import io.sitoolkit.wt.infra.selenium.WebElementExceptionCheckerImpl;
 @Configuration
 public class WebDriverConfig {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(WebDriverConfig.class);
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(WebDriverConfig.class);
 
-    private PCWebDriverFactory pcDriver = new PCWebDriverFactory();
+  private PCWebDriverFactory pcDriver = new PCWebDriverFactory();
 
-    @Bean
-    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
-    public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer,
-            WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
-            throws MalformedURLException {
-        RemoteWebDriver webDriver = null;
-        String driverType = StringUtils.defaultString(pm.getDriverType());
-        switch (driverType) {
-            case "android":
-            case "ios":
-                MobileWebDriver mobileDriver = new MobileWebDriver();
-                webDriver = mobileDriver.getMobileDriver(pm, closer, webDriverInstaller,
-                        firefoxManager);
-                break;
+  @Bean
+  @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
+  public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer,
+      WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
+      throws MalformedURLException {
+    RemoteWebDriver webDriver = null;
+    String driverType = StringUtils.defaultString(pm.getDriverType());
+    switch (driverType) {
+      case "android":
+      case "ios":
+        MobileWebDriver mobileDriver = new MobileWebDriver();
+        webDriver = mobileDriver.getMobileDriver(pm, closer, webDriverInstaller, firefoxManager);
+        break;
 
-            default:
-                webDriver = pcDriver.createPCDriver(pm, closer, webDriverInstaller, firefoxManager);
-        }
-
-        return webDriver;
+      default:
+        webDriver = pcDriver.createPCDriver(pm, closer, webDriverInstaller, firefoxManager);
     }
 
-    @Bean
-    public WebDriverInstaller webDriverInstaller() {
-        return new WebDriverInstaller();
-    }
+    return webDriver;
+  }
 
-    @Bean(destroyMethod = "")
-    @Primary
-    public RemoteWebDriver webDriver(RemoteWebDriver webDriver,
-            WebElementExceptionChecker checker) {
-        ProxyFactory proxyFactory = new ProxyFactory();
-        proxyFactory.setTargetClass(webDriver.getClass());
-        proxyFactory.addAdvice(new WebDriverMethodInterceptor(checker));
-        proxyFactory.setProxyTargetClass(true);
-        proxyFactory.setTarget(webDriver);
+  @Bean
+  public WebDriverInstaller webDriverInstaller() {
+    return new WebDriverInstaller();
+  }
 
-        Object proxy = proxyFactory.getProxy();
+  @Bean(destroyMethod = "")
+  @Primary
+  public RemoteWebDriver webDriver(RemoteWebDriver webDriver, WebElementExceptionChecker checker) {
+    ProxyFactory proxyFactory = new ProxyFactory();
+    proxyFactory.setTargetClass(webDriver.getClass());
+    proxyFactory.addAdvice(new WebDriverMethodInterceptor(checker));
+    proxyFactory.setProxyTargetClass(true);
+    proxyFactory.setTarget(webDriver);
 
-        LOG.debug("webdriver.proxy", proxy);
+    Object proxy = proxyFactory.getProxy();
 
-        return (RemoteWebDriver) proxy;
-    }
+    LOG.debug("webdriver.proxy", proxy);
 
-    @Bean
-    public WebElementExceptionChecker checker() {
-        return new WebElementExceptionCheckerImpl();
-    }
+    return (RemoteWebDriver) proxy;
+  }
 
-    @Bean
-    public WebDriverCloser webDriverCloser() {
-        return new WebDriverCloser();
-    }
+  @Bean
+  public WebElementExceptionChecker checker() {
+    return new WebElementExceptionCheckerImpl();
+  }
 
-    @Bean
-    @Scope(proxyMode = ScopedProxyMode.INTERFACES, scopeName = "thread")
-    public TakesScreenshot takesScreenshot(WebDriver webDriver) {
-        return (TakesScreenshot) webDriver;
-    }
+  @Bean
+  public WebDriverCloser webDriverCloser() {
+    return new WebDriverCloser();
+  }
 
-    @Bean
-    public TestEventListener testEventListener() {
-        return new TestEventListenerWebDriverImpl();
-    }
+  @Bean
+  @Scope(proxyMode = ScopedProxyMode.INTERFACES, scopeName = "thread")
+  public TakesScreenshot takesScreenshot(WebDriver webDriver) {
+    return (TakesScreenshot) webDriver;
+  }
 
-    @Bean
-    public FirefoxManager firefoxManager() {
-        return new FirefoxManager();
-    }
+  @Bean
+  public TestEventListener testEventListener() {
+    return new TestEventListenerWebDriverImpl();
+  }
+
+  @Bean
+  public FirefoxManager firefoxManager() {
+    return new FirefoxManager();
+  }
 
 }

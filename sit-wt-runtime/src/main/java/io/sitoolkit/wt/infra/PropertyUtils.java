@@ -10,109 +10,105 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeMap;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.resource.MessageManager;
 
 public class PropertyUtils {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(PropertyUtils.class);
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(PropertyUtils.class);
 
-    private static final Map<String, Properties> CACHE = new HashMap<>();
+  private static final Map<String, Properties> CACHE = new HashMap<>();
 
-    public static Properties load(String resourceName, boolean ignoreResourceNotFound) {
-        Properties prop = new Properties();
-        URL url = null;
+  public static Properties load(String resourceName, boolean ignoreResourceNotFound) {
+    Properties prop = new Properties();
+    URL url = null;
 
-        if (resourceName.endsWith(".xml") || resourceName.endsWith(".properties")) {
-            url = PropertyUtils.class.getResource(resourceName);
-        } else {
-            url = PropertyUtils.class.getResource(resourceName + ".properties");
+    if (resourceName.endsWith(".xml") || resourceName.endsWith(".properties")) {
+      url = PropertyUtils.class.getResource(resourceName);
+    } else {
+      url = PropertyUtils.class.getResource(resourceName + ".properties");
 
-            if (url == null) {
-                url = PropertyUtils.class.getResource(resourceName + ".xml");
-            }
-        }
+      if (url == null) {
+        url = PropertyUtils.class.getResource(resourceName + ".xml");
+      }
+    }
 
-        if (url == null) {
-            if (ignoreResourceNotFound) {
-                return prop;
-            } else {
-                throw new ConfigurationException(
-                        MessageManager.getMessage("property.not.found") + resourceName);
-            }
-        }
-
-        LOG.info("property.load", url);
-
-        try {
-            if (url.getFile().endsWith("properties")) {
-                prop.load(url.openStream());
-            } else {
-                prop.loadFromXML(url.openStream());
-            }
-        } catch (IOException e) {
-            throw new ConfigurationException(e);
-        }
-
+    if (url == null) {
+      if (ignoreResourceNotFound) {
         return prop;
+      } else {
+        throw new ConfigurationException(
+            MessageManager.getMessage("property.not.found") + resourceName);
+      }
     }
 
-    public static Map<String, String> loadAsMap(String resourceName,
-            boolean ignoreResourceNotFound) {
-        Properties prop = load(resourceName, ignoreResourceNotFound);
+    LOG.info("property.load", url);
 
-        Map<String, String> map = new HashMap<>();
-
-        for (Entry<Object, Object> entry : prop.entrySet()) {
-            map.put(entry.getKey().toString().trim(), entry.getValue().toString().trim());
-        }
-
-        return map;
-
+    try {
+      if (url.getFile().endsWith("properties")) {
+        prop.load(url.openStream());
+      } else {
+        prop.loadFromXML(url.openStream());
+      }
+    } catch (IOException e) {
+      throw new ConfigurationException(e);
     }
 
-    public static void save(Object obj, File path) {
-        try (FileWriter writer = new FileWriter(path)) {
+    return prop;
+  }
 
-            Map<String, String> map = new TreeMap<>();
-            map.putAll(BeanUtils.describe(obj));
+  public static Map<String, String> loadAsMap(String resourceName, boolean ignoreResourceNotFound) {
+    Properties prop = load(resourceName, ignoreResourceNotFound);
 
-            Properties prop = new Properties();
+    Map<String, String> map = new HashMap<>();
 
-            for (Entry<String, String> entry : map.entrySet()) {
-                prop.setProperty(entry.getKey(), StringUtils.defaultString(entry.getValue()));
-            }
-
-            prop.store(writer, "");
-
-        } catch (Exception e) {
-            throw new ConfigurationException(MessageManager.getMessage("property.save.exception"),
-                    e);
-        }
-
+    for (Entry<Object, Object> entry : prop.entrySet()) {
+      map.put(entry.getKey().toString().trim(), entry.getValue().toString().trim());
     }
 
-    public static Properties loadFromPathWithCache(String path) {
-        Properties prop = CACHE.get(path);
+    return map;
 
-        if (prop == null) {
-            prop = new Properties();
-        }
+  }
 
-        try (FileInputStream fis = new FileInputStream(path)) {
+  public static void save(Object obj, File path) {
+    try (FileWriter writer = new FileWriter(path)) {
 
-            prop.load(fis);
-            CACHE.put(path, prop);
+      Map<String, String> map = new TreeMap<>();
+      map.putAll(BeanUtils.describe(obj));
 
-            return prop;
-        } catch (IOException e) {
-            throw new ConfigurationException(e);
-        }
+      Properties prop = new Properties();
 
+      for (Entry<String, String> entry : map.entrySet()) {
+        prop.setProperty(entry.getKey(), StringUtils.defaultString(entry.getValue()));
+      }
+
+      prop.store(writer, "");
+
+    } catch (Exception e) {
+      throw new ConfigurationException(MessageManager.getMessage("property.save.exception"), e);
     }
+
+  }
+
+  public static Properties loadFromPathWithCache(String path) {
+    Properties prop = CACHE.get(path);
+
+    if (prop == null) {
+      prop = new Properties();
+    }
+
+    try (FileInputStream fis = new FileInputStream(path)) {
+
+      prop.load(fis);
+      CACHE.put(path, prop);
+
+      return prop;
+    } catch (IOException e) {
+      throw new ConfigurationException(e);
+    }
+
+  }
 }

@@ -4,5 +4,5 @@ import io.sitoolkit.wt.domain.operation.Operation;
 
 public interface OperationSupport {
 
-    public boolean isDbVerify(Operation operation);
+  public boolean isDbVerify(Operation operation);
 }

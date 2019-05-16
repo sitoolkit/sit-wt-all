@@ -2,12 +2,12 @@ package io.sitoolkit.wt.domain.pageload;
 
 public interface PageListener {
 
-    void setUp();
+  void setUp();
 
-    void setUpPage(PageContext ctx);
+  void setUpPage(PageContext ctx);
 
-    void tearDown();
+  void tearDown();
 
-    void tearDownPage(PageContext ctx);
+  void tearDownPage(PageContext ctx);
 
 }

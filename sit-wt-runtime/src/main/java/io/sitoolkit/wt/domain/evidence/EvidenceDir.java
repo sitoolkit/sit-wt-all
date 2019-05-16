@@ -12,329 +12,326 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
 public class EvidenceDir {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceDir.class);
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceDir.class);
 
-    private static final String BASE_EVIDENCE_ROOT = "base-evidence";
+  private static final String BASE_EVIDENCE_ROOT = "base-evidence";
 
-    private static final String COMPARE_PREFIX = "comp_";
+  private static final String COMPARE_PREFIX = "comp_";
 
-    private static final String COMPARE_NG_PREFIX = "comp_ng_";
+  private static final String COMPARE_NG_PREFIX = "comp_ng_";
 
-    private static final String MASK_PREFIX = "mask_";
+  private static final String MASK_PREFIX = "mask_";
 
-    private static final String UNMATCH_PREFIX = "unmatch_";
+  private static final String UNMATCH_PREFIX = "unmatch_";
 
-    private static final String FAILSAFE_REPORT_NAME = "failsafe-report.html";
+  private static final String FAILSAFE_REPORT_NAME = "failsafe-report.html";
 
-    private static final String REPORT_DIR = "report";
+  private static final String REPORT_DIR = "report";
 
-    private static final String IMG_BASE_DIR = "base";
+  private static final String IMG_BASE_DIR = "base";
 
-    private static final String EVIDENCE_ROOT_DIR = "evidence";
+  private static final String EVIDENCE_ROOT_DIR = "evidence";
 
-    private File dir;
+  private File dir;
 
-    private static String evidenceDirRegex = "^evidence_.*";
+  private static String evidenceDirRegex = "^evidence_.*";
 
-    private EvidenceDir() {
+  private EvidenceDir() {}
+
+  public static EvidenceDir getInstance(File dir) {
+    EvidenceDir instance = new EvidenceDir();
+    instance.dir = dir;
+    return instance;
+  }
+
+  public static EvidenceDir getInstance(String dir) {
+    return getInstance(new File(dir));
+  }
+
+  public static EvidenceDir getBase(String browser) {
+    return getInstance(new File(getProjectDirectory(), BASE_EVIDENCE_ROOT + "/" + browser));
+  }
+
+  public static String getRoot() {
+    return EVIDENCE_ROOT_DIR;
+  }
+
+  public static EvidenceDir getLatest() {
+    return getInstance(getLatestEvidenceDir());
+  }
+
+  public static File getLatestEvidenceDir() {
+
+    File outputDir = new File(getProjectDirectory() + "/" + EVIDENCE_ROOT_DIR);
+    List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
+        FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
+    evidenceDirs.remove(outputDir);
+    Collections.sort(evidenceDirs, new FileNameComarator(false));
+
+    if (evidenceDirs.isEmpty()) {
+      LOG.info("evidence.dirs.empty", outputDir.getAbsolutePath());
+      return null;
     }
 
-    public static EvidenceDir getInstance(File dir) {
-        EvidenceDir instance = new EvidenceDir();
-        instance.dir = dir;
-        return instance;
+    return evidenceDirs.get(0);
+
+  }
+
+  public static class FileNameComarator implements Comparator<File> {
+
+    private int signum = 1;
+
+    public FileNameComarator() {
+      super();
     }
 
-    public static EvidenceDir getInstance(String dir) {
-        return getInstance(new File(dir));
+    public FileNameComarator(boolean ascending) {
+      this();
+      signum = ascending ? 1 : -1;
     }
 
-    public static EvidenceDir getBase(String browser) {
-        return getInstance(new File(getProjectDirectory(), BASE_EVIDENCE_ROOT + "/" + browser));
+    @Override
+    public int compare(File o1, File o2) {
+      return signum * o1.compareTo(o2);
+    }
+  }
+
+  public static EvidenceDir targetEvidenceDir(String dir) {
+    return dir == null ? EvidenceDir.getLatest() : EvidenceDir.getInstance(dir);
+  }
+
+  public static EvidenceDir baseEvidenceDir(String dir, String browser) {
+    return dir == null ? EvidenceDir.getBase(browser) : EvidenceDir.getInstance(dir);
+  }
+
+  private static String getProjectDirectory() {
+    String dir = System.getProperty("sitwt.projectDirectory");
+    return StringUtils.isEmpty(dir) ? "." : dir;
+  }
+
+  public List<File> getEvidenceFiles() {
+    return FileUtils.listFiles(dir, new String[] {"html"}, true).stream()
+        .filter(this::isNormalEvidenceFile).collect(Collectors.toList());
+  }
+
+  private boolean isNormalEvidenceFile(File file) {
+    String htmlName = file.getName();
+    return !isReport(file.toPath()) && !isCompareEvidence(htmlName)
+        && !isCompareNgEvidence(htmlName) && !isMaskEvidence(htmlName);
+  }
+
+  public Collection<File> getScreenshots(String evidenceFileName) {
+    return getScreenshotFilesAsMap(evidenceFileName).values();
+  }
+
+  public Map<String, File> getScreenshotFilesAsMap(String evidenceFileName) {
+
+    Map<String, File> screenshotFiles = new HashMap<>();
+
+    String evidenceName = StringUtils.removeEnd(evidenceFileName, ".html");
+
+    for (File imgFile : FileUtils.listFiles(dir, new String[] {"png"}, true)) {
+
+      String imgName = imgFile.getName();
+      if (isEvidenceScreenshot(imgName, evidenceName)
+          || isMaskEvidenceScreenshot(imgName, evidenceName)
+          || isUnmatchEvidenceScreenshot(imgName, evidenceName)
+          || isUnmatchMaskEvidenceScreenshot(imgName, evidenceName)) {
+        screenshotFiles.put(imgFile.getName(), imgFile);
+      }
     }
 
-    public static String getRoot() {
-        return EVIDENCE_ROOT_DIR;
+    return screenshotFiles;
+  }
+
+  public static String extractTable(File evidenceFile) throws IOException {
+
+    List<String> lines = FileUtils.readLines(evidenceFile, "UTF-8");
+    int tableTagStart = lines.indexOf("    <table class=\"table\">");
+    int tableTagEnd = lines.indexOf("    </table>");
+
+    if (tableTagStart == -1 || tableTagEnd == -1) {
+      return "";
     }
 
-    public static EvidenceDir getLatest() {
-        return getInstance(getLatestEvidenceDir());
+    StringBuilder sb = new StringBuilder();
+
+    for (String line : lines.subList(tableTagStart, tableTagEnd + 1)) {
+      sb.append(StringUtils.join("        ", line, "\n"));
     }
 
-    public static File getLatestEvidenceDir() {
+    return sb.toString();
+  }
 
-        File outputDir = new File(getProjectDirectory() + "/" + EVIDENCE_ROOT_DIR);
-        List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
-                FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
-        evidenceDirs.remove(outputDir);
-        Collections.sort(evidenceDirs, new FileNameComarator(false));
+  public static String removeInputLine(String htmlString) throws IOException {
 
-        if (evidenceDirs.isEmpty()) {
-            LOG.info("evidence.dirs.empty", outputDir.getAbsolutePath());
-            return null;
-        }
+    String[] lines = htmlString.split("\n");
 
-        return evidenceDirs.get(0);
+    StringBuilder sb = new StringBuilder();
 
+    for (String line : lines) {
+      if (line.trim().startsWith("<input")) {
+        continue;
+      }
+      sb.append(line + "\n");
     }
 
-    public static class FileNameComarator implements Comparator<File> {
+    return sb.toString();
 
-        private int signum = 1;
+  }
 
-        public FileNameComarator() {
-            super();
-        }
+  public static String replaceImgPath(String str) {
+    return StringUtils.replace(str, "src=\"img", "src=\"img/" + IMG_BASE_DIR);
+  }
 
-        public FileNameComarator(boolean ascending) {
-            this();
-            signum = ascending ? 1 : -1;
-        }
+  public static String toMaskEvidenceName(String name) {
+    return concat(MASK_PREFIX, name);
+  }
 
-        @Override
-        public int compare(File o1, File o2) {
-            return signum * o1.compareTo(o2);
-        }
-    }
+  public static String toCompareMaskEvidenceName(String name) {
+    return concat(COMPARE_PREFIX + MASK_PREFIX, name);
+  }
 
-    public static EvidenceDir targetEvidenceDir(String dir) {
-        return dir == null ? EvidenceDir.getLatest() : EvidenceDir.getInstance(dir);
-    }
+  public static String toMaskSsName(String name) {
+    return concat(MASK_PREFIX, name);
+  }
 
-    public static EvidenceDir baseEvidenceDir(String dir, String browser) {
-        return dir == null ? EvidenceDir.getBase(browser) : EvidenceDir.getInstance(dir);
-    }
+  public static String toUnmatchSsName(String name) {
+    return concat(UNMATCH_PREFIX, name);
+  }
 
-    private static String getProjectDirectory() {
-        String dir = System.getProperty("sitwt.projectDirectory");
-        return StringUtils.isEmpty(dir) ? "." : dir;
-    }
+  public static String toUnmatchMaskSsName(String name) {
+    return concat(UNMATCH_PREFIX + MASK_PREFIX, name);
+  }
 
-    public List<File> getEvidenceFiles() {
-        return FileUtils.listFiles(dir, new String[] { "html" }, true).stream()
-                .filter(this::isNormalEvidenceFile).collect(Collectors.toList());
-    }
+  private static String concat(String prefix, String str) {
+    return prefix + str;
+  }
 
-    private boolean isNormalEvidenceFile(File file) {
-        String htmlName = file.getName();
-        return !isReport(file.toPath()) && !isCompareEvidence(htmlName)
-                && !isCompareNgEvidence(htmlName) && !isMaskEvidence(htmlName);
-    }
+  public static String toBeforeMaskSsName(String name) {
+    return StringUtils.removeStart(name, MASK_PREFIX);
+  }
 
-    public Collection<File> getScreenshots(String evidenceFileName) {
-        return getScreenshotFilesAsMap(evidenceFileName).values();
-    }
+  public static boolean isBaseImgDir(File file) {
+    return file.isDirectory() && IMG_BASE_DIR.equals(file.getName());
+  }
 
-    public Map<String, File> getScreenshotFilesAsMap(String evidenceFileName) {
+  public static boolean existsReport(String resourcePath) {
+    return new File(resourcePath, FAILSAFE_REPORT_NAME).exists();
+  }
 
-        Map<String, File> screenshotFiles = new HashMap<>();
+  public static String getCompareEvidencePrefix(boolean withUnmatch) {
+    return withUnmatch ? COMPARE_NG_PREFIX : COMPARE_PREFIX;
+  }
 
-        String evidenceName = StringUtils.removeEnd(evidenceFileName, ".html");
+  public static boolean isCompareEvidence(String name) {
+    return startsWith(name, COMPARE_PREFIX);
+  }
 
-        for (File imgFile : FileUtils.listFiles(dir, new String[] { "png" }, true)) {
+  public static boolean isCompareNgEvidence(String name) {
+    return startsWith(name, COMPARE_NG_PREFIX);
+  }
 
-            String imgName = imgFile.getName();
-            if (isEvidenceScreenshot(imgName, evidenceName)
-                    || isMaskEvidenceScreenshot(imgName, evidenceName)
-                    || isUnmatchEvidenceScreenshot(imgName, evidenceName)
-                    || isUnmatchMaskEvidenceScreenshot(imgName, evidenceName)) {
-                screenshotFiles.put(imgFile.getName(), imgFile);
-            }
-        }
+  public static boolean isMaskEvidence(String name) {
+    return startsWith(name, MASK_PREFIX);
+  }
 
-        return screenshotFiles;
-    }
+  public static boolean isEvidenceScreenshot(String ssName, String evidenceName) {
+    return startsWith(ssName, evidenceName);
+  }
 
-    public static String extractTable(File evidenceFile) throws IOException {
+  public static boolean isMaskEvidenceScreenshot(String name, String evidenceName) {
+    return startsWith(name, MASK_PREFIX + evidenceName);
+  }
 
-        List<String> lines = FileUtils.readLines(evidenceFile, "UTF-8");
-        int tableTagStart = lines.indexOf("    <table class=\"table\">");
-        int tableTagEnd = lines.indexOf("    </table>");
+  public static boolean isUnmatchEvidenceScreenshot(String ssName, String evidenceName) {
+    return startsWith(ssName, UNMATCH_PREFIX + evidenceName);
+  }
 
-        if (tableTagStart == -1 || tableTagEnd == -1) {
-            return "";
-        }
+  public static boolean isUnmatchMaskEvidenceScreenshot(String ssName, String evidenceName) {
+    return startsWith(ssName, UNMATCH_PREFIX + MASK_PREFIX + evidenceName);
+  }
 
-        StringBuilder sb = new StringBuilder();
+  public static boolean isMaskScreenshot(String name) {
+    return startsWith(name, MASK_PREFIX);
+  }
 
-        for (String line : lines.subList(tableTagStart, tableTagEnd + 1)) {
-            sb.append(StringUtils.join("        ", line, "\n"));
-        }
+  public static boolean isUnmatchScreenshot(String name) {
+    return startsWith(name, UNMATCH_PREFIX);
+  }
 
-        return sb.toString();
-    }
+  public static boolean isUnmatchMaskScreenshot(String name) {
+    return startsWith(name, UNMATCH_PREFIX + MASK_PREFIX);
+  }
 
-    public static String removeInputLine(String htmlString) throws IOException {
+  private static boolean startsWith(String name, String prefix) {
+    return StringUtils.startsWith(name, prefix);
+  }
 
-        String[] lines = htmlString.split("\n");
+  public boolean exists() {
+    return dir != null && dir.exists();
+  }
 
-        StringBuilder sb = new StringBuilder();
+  /**
+   * 当該エビデンスの作成に使用されたブラウザを取得します。
+   *
+   * @return 当該エビデンスの作成に使用されたブラウザ
+   */
+  public String getBrowser() {
+    Properties prop =
+        PropertyUtils.loadFromPathWithCache(new File(dir, "sit-wt.properties").getAbsolutePath());
+    return prop.getProperty("driverType");
+  }
 
-        for (String line : lines) {
-            if (line.trim().startsWith("<input")) {
-                continue;
-            }
-            sb.append(line + "\n");
-        }
+  public File getDir() {
+    return dir;
+  }
 
-        return sb.toString();
+  public Path getReportDir() {
+    return dir.toPath().resolve(REPORT_DIR);
+  }
 
-    }
+  public boolean isReport(Path path) {
+    return path.toAbsolutePath().normalize()
+        .startsWith(getReportDir().toAbsolutePath().normalize());
+  }
 
-    public static String replaceImgPath(String str) {
-        return StringUtils.replace(str, "src=\"img", "src=\"img/" + IMG_BASE_DIR);
-    }
+  public Path getFailsafeReport() {
+    return getReportDir().resolve(FAILSAFE_REPORT_NAME);
+  }
 
-    public static String toMaskEvidenceName(String name) {
-        return concat(MASK_PREFIX, name);
-    }
+  public File getImgBaseDir() {
+    return new File(StringUtils.join(new String[] {dir.getPath(), "img", IMG_BASE_DIR}, "/"));
+  }
 
-    public static String toCompareMaskEvidenceName(String name) {
-        return concat(COMPARE_PREFIX + MASK_PREFIX, name);
-    }
+  public Path getMaskEvidence(String name) {
+    return getEvidenceWithPrefix(MASK_PREFIX, name);
+  }
 
-    public static String toMaskSsName(String name) {
-        return concat(MASK_PREFIX, name);
-    }
+  public Path getCompareEvidence(String name) {
+    return getEvidenceWithPrefix(COMPARE_PREFIX, name);
+  }
 
-    public static String toUnmatchSsName(String name) {
-        return concat(UNMATCH_PREFIX, name);
-    }
+  public Path getCompareMaskEvidence(String name) {
+    return getEvidenceWithPrefix(COMPARE_PREFIX + MASK_PREFIX, name);
+  }
 
-    public static String toUnmatchMaskSsName(String name) {
-        return concat(UNMATCH_PREFIX + MASK_PREFIX, name);
-    }
+  public Path getCompareNgEvidence(String name) {
+    return getEvidenceWithPrefix(COMPARE_NG_PREFIX, name);
+  }
 
-    private static String concat(String prefix, String str) {
-        return prefix + str;
-    }
-
-    public static String toBeforeMaskSsName(String name) {
-        return StringUtils.removeStart(name, MASK_PREFIX);
-    }
-
-    public static boolean isBaseImgDir(File file) {
-        return file.isDirectory() && IMG_BASE_DIR.equals(file.getName());
-    }
-
-    public static boolean existsReport(String resourcePath) {
-        return new File(resourcePath, FAILSAFE_REPORT_NAME).exists();
-    }
-
-    public static String getCompareEvidencePrefix(boolean withUnmatch) {
-        return withUnmatch ? COMPARE_NG_PREFIX : COMPARE_PREFIX;
-    }
-
-    public static boolean isCompareEvidence(String name) {
-        return startsWith(name, COMPARE_PREFIX);
-    }
-
-    public static boolean isCompareNgEvidence(String name) {
-        return startsWith(name, COMPARE_NG_PREFIX);
-    }
-
-    public static boolean isMaskEvidence(String name) {
-        return startsWith(name, MASK_PREFIX);
-    }
-
-    public static boolean isEvidenceScreenshot(String ssName, String evidenceName) {
-        return startsWith(ssName, evidenceName);
-    }
-
-    public static boolean isMaskEvidenceScreenshot(String name, String evidenceName) {
-        return startsWith(name, MASK_PREFIX + evidenceName);
-    }
-
-    public static boolean isUnmatchEvidenceScreenshot(String ssName, String evidenceName) {
-        return startsWith(ssName, UNMATCH_PREFIX + evidenceName);
-    }
-
-    public static boolean isUnmatchMaskEvidenceScreenshot(String ssName, String evidenceName) {
-        return startsWith(ssName, UNMATCH_PREFIX + MASK_PREFIX + evidenceName);
-    }
-
-    public static boolean isMaskScreenshot(String name) {
-        return startsWith(name, MASK_PREFIX);
-    }
-
-    public static boolean isUnmatchScreenshot(String name) {
-        return startsWith(name, UNMATCH_PREFIX);
-    }
-
-    public static boolean isUnmatchMaskScreenshot(String name) {
-        return startsWith(name, UNMATCH_PREFIX + MASK_PREFIX);
-    }
-
-    private static boolean startsWith(String name, String prefix) {
-        return StringUtils.startsWith(name, prefix);
-    }
-
-    public boolean exists() {
-        return dir != null && dir.exists();
-    }
-
-    /**
-     * 当該エビデンスの作成に使用されたブラウザを取得します。
-     *
-     * @return 当該エビデンスの作成に使用されたブラウザ
-     */
-    public String getBrowser() {
-        Properties prop = PropertyUtils
-                .loadFromPathWithCache(new File(dir, "sit-wt.properties").getAbsolutePath());
-        return prop.getProperty("driverType");
-    }
-
-    public File getDir() {
-        return dir;
-    }
-
-    public Path getReportDir() {
-        return dir.toPath().resolve(REPORT_DIR);
-    }
-
-    public boolean isReport(Path path) {
-        return path.toAbsolutePath().normalize()
-                .startsWith(getReportDir().toAbsolutePath().normalize());
-    }
-
-    public Path getFailsafeReport() {
-        return getReportDir().resolve(FAILSAFE_REPORT_NAME);
-    }
-
-    public File getImgBaseDir() {
-        return new File(StringUtils.join(new String[] { dir.getPath(), "img", IMG_BASE_DIR }, "/"));
-    }
-
-    public Path getMaskEvidence(String name) {
-        return getEvidenceWithPrefix(MASK_PREFIX, name);
-    }
-
-    public Path getCompareEvidence(String name) {
-        return getEvidenceWithPrefix(COMPARE_PREFIX, name);
-    }
-
-    public Path getCompareMaskEvidence(String name) {
-        return getEvidenceWithPrefix(COMPARE_PREFIX + MASK_PREFIX, name);
-    }
-
-    public Path getCompareNgEvidence(String name) {
-        return getEvidenceWithPrefix(COMPARE_NG_PREFIX, name);
-    }
-
-    private Path getEvidenceWithPrefix(String prefix, String name) {
-        return dir.toPath().resolve(prefix + name);
-    }
+  private Path getEvidenceWithPrefix(String prefix, String name) {
+    return dir.toPath().resolve(prefix + name);
+  }
 
 }

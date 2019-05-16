@@ -2,54 +2,54 @@ package io.sitoolkit.wt.domain.operation;
 
 public class VerifyObj {
 
-    private String verifyCol;
+  private String verifyCol;
 
-    private String expected;
+  private String expected;
 
-    private String actual;
+  private String actual;
 
-    private String log;
+  private String log;
 
-    private String errorLog;
+  private String errorLog;
 
-    public String getVerifyCol() {
-        return verifyCol;
-    }
+  public String getVerifyCol() {
+    return verifyCol;
+  }
 
-    public void setVerifyCol(String verifyCol) {
-        this.verifyCol = verifyCol;
-    }
+  public void setVerifyCol(String verifyCol) {
+    this.verifyCol = verifyCol;
+  }
 
-    public String getExpected() {
-        return expected;
-    }
+  public String getExpected() {
+    return expected;
+  }
 
-    public void setExpected(String expected) {
-        this.expected = expected;
-    }
+  public void setExpected(String expected) {
+    this.expected = expected;
+  }
 
-    public String getActual() {
-        return actual;
-    }
+  public String getActual() {
+    return actual;
+  }
 
-    public void setActual(String actual) {
-        this.actual = actual;
-    }
+  public void setActual(String actual) {
+    this.actual = actual;
+  }
 
-    public String getLog() {
-        return log;
-    }
+  public String getLog() {
+    return log;
+  }
 
-    public void setLog(String log) {
-        this.log = log;
-    }
+  public void setLog(String log) {
+    this.log = log;
+  }
 
-    public String getErrorLog() {
-        return errorLog;
-    }
+  public String getErrorLog() {
+    return errorLog;
+  }
 
-    public void setErrorLog(String errorLog) {
-        this.errorLog = errorLog;
-    }
+  public void setErrorLog(String errorLog) {
+    this.errorLog = errorLog;
+  }
 
 }

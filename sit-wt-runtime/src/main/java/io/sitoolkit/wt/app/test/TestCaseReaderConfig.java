@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
-
 import io.sitoolkit.wt.app.config.BaseConfig;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 
@@ -12,13 +11,12 @@ import io.sitoolkit.wt.domain.testscript.TestScript;
 @Import(BaseConfig.class)
 public class TestCaseReaderConfig {
 
-    public TestCaseReaderConfig() {
-    }
+  public TestCaseReaderConfig() {}
 
-    @Bean
-    @Scope("prototype")
-    public TestScript testScript() {
-        return new TestScript();
-    }
+  @Bean
+  @Scope("prototype")
+  public TestScript testScript() {
+    return new TestScript();
+  }
 
 }
