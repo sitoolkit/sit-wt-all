@@ -5,22 +5,21 @@ import java.util.List;
 
 public class ConversationProcessContainer {
 
-    private static List<ConversationProcess> processes = new ArrayList<>();
+  private static List<ConversationProcess> processes = new ArrayList<>();
 
-    private ConversationProcessContainer() {
+  private ConversationProcessContainer() {}
+
+  public static ConversationProcess create() {
+    ConversationProcess process = new ConversationProcess();
+    processes.add(process);
+    return process;
+  }
+
+  public static void destroy() {
+
+    for (ConversationProcess process : processes) {
+      process.destroy();
     }
 
-    public static ConversationProcess create() {
-        ConversationProcess process = new ConversationProcess();
-        processes.add(process);
-        return process;
-    }
-
-    public static void destroy() {
-
-        for (ConversationProcess process : processes) {
-            process.destroy();
-        }
-
-    }
+  }
 }

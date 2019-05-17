@@ -1,28 +1,27 @@
 package io.sitoolkit.wt.gui.domain.test;
 
 import java.io.File;
-
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import lombok.Data;
 
 @Data
 public class TestRunParams {
 
-    private File baseDir;
+  private File baseDir;
 
-    private File projectDir;
+  private File projectDir;
 
-    private String baseUrl;
+  private String baseUrl;
 
-    private boolean debug;
+  private boolean debug;
 
-    private boolean parallel;
+  private boolean parallel;
 
-    private boolean compareScreenshot;
+  private boolean compareScreenshot;
 
-    private String driverType;
+  private String driverType;
 
-    private String targetScripts;
+  private String targetScripts;
 
-    private DebugListener debugListener;
+  private DebugListener debugListener;
 }

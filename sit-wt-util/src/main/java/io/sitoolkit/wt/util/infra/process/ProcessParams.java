@@ -8,77 +8,76 @@ import java.util.Map;
 
 public class ProcessParams {
 
-	private static File defaultCurrentDir;
+  private static File defaultCurrentDir;
 
-    private List<StdoutListener> stdoutListeners = new ArrayList<>();
+  private List<StdoutListener> stdoutListeners = new ArrayList<>();
 
-    private File directory;
+  private File directory;
 
-    private List<String> command = new ArrayList<>();
+  private List<String> command = new ArrayList<>();
 
-    private Map<String, String> enviroment = new HashMap<>();
+  private Map<String, String> enviroment = new HashMap<>();
 
-    private List<ProcessExitCallback> exitClallbacks = new ArrayList<>();
+  private List<ProcessExitCallback> exitClallbacks = new ArrayList<>();
 
-    private boolean processWait = false;
+  private boolean processWait = false;
 
-    public ProcessParams() {
-    }
+  public ProcessParams() {}
 
-    public static File getDefaultCurrentDir() {
-		return defaultCurrentDir;
-	}
+  public static File getDefaultCurrentDir() {
+    return defaultCurrentDir;
+  }
 
-	public static void setDefaultCurrentDir(File defaultCurrentDir) {
-		ProcessParams.defaultCurrentDir = defaultCurrentDir;
-	}
+  public static void setDefaultCurrentDir(File defaultCurrentDir) {
+    ProcessParams.defaultCurrentDir = defaultCurrentDir;
+  }
 
-	public List<StdoutListener> getStdoutListeners() {
-        return stdoutListeners;
-    }
+  public List<StdoutListener> getStdoutListeners() {
+    return stdoutListeners;
+  }
 
-    public void setStdoutListeners(List<StdoutListener> stdoutListeners) {
-        this.stdoutListeners = stdoutListeners;
-    }
+  public void setStdoutListeners(List<StdoutListener> stdoutListeners) {
+    this.stdoutListeners = stdoutListeners;
+  }
 
-    public File getDirectory() {
-        return directory;
-    }
+  public File getDirectory() {
+    return directory;
+  }
 
-    public void setDirectory(File directory) {
-        this.directory = directory;
-    }
+  public void setDirectory(File directory) {
+    this.directory = directory;
+  }
 
-    public List<String> getCommand() {
-        return command;
-    }
+  public List<String> getCommand() {
+    return command;
+  }
 
-    public void setCommand(List<String> command) {
-        this.command = command;
-    }
+  public void setCommand(List<String> command) {
+    this.command = command;
+  }
 
-    public Map<String, String> getEnviroment() {
-        return enviroment;
-    }
+  public Map<String, String> getEnviroment() {
+    return enviroment;
+  }
 
-    public void setEnviroment(Map<String, String> enviroment) {
-        this.enviroment = enviroment;
-    }
+  public void setEnviroment(Map<String, String> enviroment) {
+    this.enviroment = enviroment;
+  }
 
-    public List<ProcessExitCallback> getExitClallbacks() {
-        return exitClallbacks;
-    }
+  public List<ProcessExitCallback> getExitClallbacks() {
+    return exitClallbacks;
+  }
 
-    public void setExitClallbacks(List<ProcessExitCallback> exitClallbacks) {
-        this.exitClallbacks = exitClallbacks;
-    }
+  public void setExitClallbacks(List<ProcessExitCallback> exitClallbacks) {
+    this.exitClallbacks = exitClallbacks;
+  }
 
-    public boolean isProcessWait() {
-        return processWait;
-    }
+  public boolean isProcessWait() {
+    return processWait;
+  }
 
-    public void setProcessWait(boolean processWait) {
-        this.processWait = processWait;
-    }
+  public void setProcessWait(boolean processWait) {
+    this.processWait = processWait;
+  }
 
 }

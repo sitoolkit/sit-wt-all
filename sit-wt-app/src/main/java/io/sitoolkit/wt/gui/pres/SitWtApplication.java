@@ -1,7 +1,6 @@
 package io.sitoolkit.wt.gui.pres;
 
 import java.util.ResourceBundle;
-
 import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.gui.infra.fx.FxContext;
@@ -21,58 +20,58 @@ import javafx.stage.WindowEvent;
 
 public class SitWtApplication extends Application {
 
-    private static final SitLogger LOG = SitLoggerFactory.getLogger(SitWtApplication.class);
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(SitWtApplication.class);
 
-    private AppController controller;
+  private AppController controller;
 
-    public static void main(String[] args) {
-        LOG.info("app.envInfo", SystemUtils.getEnvironmentInfo());
-        launch(args);
-    }
+  public static void main(String[] args) {
+    LOG.info("app.envInfo", SystemUtils.getEnvironmentInfo());
+    launch(args);
+  }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
+  @Override
+  public void start(Stage primaryStage) throws Exception {
 
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            LOG.error("app.unexpectedException", throwable);
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setContentText("エラーが発生しました。");
-            alert.show();
-        });
+    Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+      LOG.error("app.unexpectedException", throwable);
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setContentText("エラーが発生しました。");
+      alert.show();
+    });
 
-        FxContext.setPrimaryStage(primaryStage);
-        FxContext.setHostServices(getHostServices());
+    FxContext.setPrimaryStage(primaryStage);
+    FxContext.setHostServices(getHostServices());
 
-        ProxySettingService.getInstance().loadProxy();
+    ProxySettingService.getInstance().loadProxy();
 
-        primaryStage.setTitle("SI-Toolkit for Web Testing");
+    primaryStage.setTitle("SI-Toolkit for Web Testing");
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
-        loader.setResources(ResourceBundle.getBundle("message.message"));
-        Parent root = loader.load();
-        controller = loader.getController();
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
+    loader.setResources(ResourceBundle.getBundle("message.message"));
+    Parent root = loader.load();
+    controller = loader.getController();
 
-        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
-            controller.postInit();
-        });
+    primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+      controller.postInit();
+    });
 
-        Scene scene = new Scene(root);
+    Scene scene = new Scene(root);
 
-        // TODO フォントファイルを直接ダウンロードすれば有効か要検証
-        // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Material+Icons");
+    // TODO フォントファイルを直接ダウンロードすれば有効か要検証
+    // scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Material+Icons");
 
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.getIcons().add(new Image("/icon/sitoolkit.png"));
-        primaryStage.show();
+    scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+    primaryStage.setScene(scene);
+    primaryStage.getIcons().add(new Image("/icon/sitoolkit.png"));
+    primaryStage.show();
 
-    }
+  }
 
-    @Override
-    public void stop() throws Exception {
-        controller.destroy();
-        PropertyManager.get().save();
-        ExecutorContainer.get().shutdown();
-    }
+  @Override
+  public void stop() throws Exception {
+    controller.destroy();
+    PropertyManager.get().save();
+    ExecutorContainer.get().shutdown();
+  }
 
 }

@@ -5,9 +5,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 public class SampleState {
 
-    private BooleanProperty running = new SimpleBooleanProperty(false);
+  private BooleanProperty running = new SimpleBooleanProperty(false);
 
-    public SampleState() {
-    }
+  public SampleState() {}
 
 }

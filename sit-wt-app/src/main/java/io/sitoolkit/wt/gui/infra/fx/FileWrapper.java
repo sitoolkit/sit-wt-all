@@ -4,23 +4,23 @@ import java.io.File;
 
 public class FileWrapper {
 
-    private File file;
+  private File file;
 
-    public FileWrapper(String file) {
-        this(new File(file));
-    }
+  public FileWrapper(String file) {
+    this(new File(file));
+  }
 
-    public FileWrapper(File file) {
-        this.file = file;
-    }
+  public FileWrapper(File file) {
+    this.file = file;
+  }
 
-    public File getFile() {
-        return file;
-    }
+  public File getFile() {
+    return file;
+  }
 
-    @Override
-    public String toString() {
-        return file.getName();
-    }
+  @Override
+  public String toString() {
+    return file.getName();
+  }
 
 }

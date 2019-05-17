@@ -5,7 +5,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListenerContainer;
 import io.sitoolkit.wt.gui.app.diffevidence.DiffEvidenceService;
 import io.sitoolkit.wt.gui.app.project.ProjectService;
@@ -36,277 +35,277 @@ import javafx.stage.DirectoryChooser;
 
 public class AppController implements Initializable {
 
-    @FXML
-    private HBox projectGroup;
+  @FXML
+  private HBox projectGroup;
 
-    @FXML
-    private ToolBar genScriptGroup;
+  @FXML
+  private ToolBar genScriptGroup;
 
-    @FXML
-    private ToolBar browsingGroup;
+  @FXML
+  private ToolBar browsingGroup;
 
-    @FXML
-    private TextArea console;
+  @FXML
+  private TextArea console;
 
-    @FXML
-    private Label exportButton;
+  @FXML
+  private Label exportButton;
 
-    @FXML
-    private Label toggleButton;
+  @FXML
+  private Label toggleButton;
 
-    @FXML
-    private Label openButton;
+  @FXML
+  private Label openButton;
 
-    @FXML
-    private Label saveButton;
+  @FXML
+  private Label saveButton;
 
-    @FXML
-    private Label saveAsButton;
+  @FXML
+  private Label saveAsButton;
 
-    @FXML
-    private SampleToolbarController sampleToolbarController;
+  @FXML
+  private SampleToolbarController sampleToolbarController;
 
-    @FXML
-    private FileTreeController fileTreeController;
+  @FXML
+  private FileTreeController fileTreeController;
 
-    @FXML
-    private TestToolbarController testToolbarController;
+  @FXML
+  private TestToolbarController testToolbarController;
 
-    @FXML
-    private DiffEvidenceToolbarController diffEvidenceToolbarController;
+  @FXML
+  private DiffEvidenceToolbarController diffEvidenceToolbarController;
 
-    @FXML
-    private MenuItem sampleRunMenu;
+  @FXML
+  private MenuItem sampleRunMenu;
 
-    @FXML
-    private MenuItem sampleStopMenu;
+  @FXML
+  private MenuItem sampleStopMenu;
 
-    @FXML
-    private TabPane editorTab;
+  @FXML
+  private TabPane editorTab;
 
-    @FXML
-    private MenuBarController menuBarController;
+  @FXML
+  private MenuBarController menuBarController;
 
-    private MessageView messageView = new MessageView();
+  private MessageView messageView = new MessageView();
 
-    private ConversationProcess conversationProcess;
+  private ConversationProcess conversationProcess;
 
-    private ProjectState projectState = new ProjectState();
+  private ProjectState projectState = new ProjectState();
 
-    UpdateController updateController = new UpdateController();
+  UpdateController updateController = new UpdateController();
 
-    EditorTabController editorTabController = new EditorTabController();
+  EditorTabController editorTabController = new EditorTabController();
 
-    DiffEvidenceService diffEvidenceService = new DiffEvidenceService();
+  DiffEvidenceService diffEvidenceService = new DiffEvidenceService();
 
-    TestService testService = new TestService();
+  TestService testService = new TestService();
 
-    ProjectService projectService = new ProjectService();
+  ProjectService projectService = new ProjectService();
 
-    ScriptService scriptService = new ScriptService();
+  ScriptService scriptService = new ScriptService();
 
-    // private double stageHeight;
-    //
-    // private double stageWidth;
-    //
-    // @FXML
-    // private Label maximizeButton;
-    //
-    // @FXML
-    // private Label minimizeButton;
-    //
-    // private BooleanProperty windowMaximized = new
-    // SimpleBooleanProperty(true);
+  // private double stageHeight;
+  //
+  // private double stageWidth;
+  //
+  // @FXML
+  // private Label maximizeButton;
+  //
+  // @FXML
+  // private Label minimizeButton;
+  //
+  // private BooleanProperty windowMaximized = new
+  // SimpleBooleanProperty(true);
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
 
-        DelegatingOutputStreamAppender.setStaticOutputStream(new TextAreaOutputStream(console));
+    DelegatingOutputStreamAppender.setStaticOutputStream(new TextAreaOutputStream(console));
 
-        FxUtils.bindVisible(projectGroup, projectState.isLocking().not());
-        FxUtils.bindVisible(genScriptGroup, projectState.isLoaded());
-        FxUtils.bindVisible(browsingGroup, projectState.isBrowsing());
+    FxUtils.bindVisible(projectGroup, projectState.isLocking().not());
+    FxUtils.bindVisible(genScriptGroup, projectState.isLoaded());
+    FxUtils.bindVisible(browsingGroup, projectState.isBrowsing());
 
-        // FxUtils.bindVisible(maximizeButton, windowMaximized.not());
-        // FxUtils.bindVisible(minimizeButton, windowMaximized);
+    // FxUtils.bindVisible(maximizeButton, windowMaximized.not());
+    // FxUtils.bindVisible(minimizeButton, windowMaximized);
 
-        messageView.setTextArea(console);
-        StdoutListenerContainer.getInstance().getStdoutListeners()
-                .add(new TextAreaStdoutListener(console));
-        StdoutListenerContainer.getInstance().getStderrListeners()
-                .add(new TextAreaStdoutListener(console));
+    messageView.setTextArea(console);
+    StdoutListenerContainer.getInstance().getStdoutListeners()
+        .add(new TextAreaStdoutListener(console));
+    StdoutListenerContainer.getInstance().getStderrListeners()
+        .add(new TextAreaStdoutListener(console));
 
-        testToolbarController.initialize(messageView, fileTreeController, projectState,
-                editorTabController, editorTabController, editorTabController);
-        testToolbarController.testService = testService;
-        sampleToolbarController.initialize(messageView, testToolbarController, projectState);
-        diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
+    testToolbarController.initialize(messageView, fileTreeController, projectState,
+        editorTabController, editorTabController, editorTabController);
+    testToolbarController.testService = testService;
+    sampleToolbarController.initialize(messageView, testToolbarController, projectState);
+    diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
 
-        fileTreeController.setTestRunnable(testToolbarController);
-        fileTreeController.fileOpenable = editorTabController;
-        fileTreeController.scriptService = scriptService;
+    fileTreeController.setTestRunnable(testToolbarController);
+    fileTreeController.fileOpenable = editorTabController;
+    fileTreeController.scriptService = scriptService;
 
-        editorTabController.setTabs(editorTab);
-        editorTabController.setScriptService(scriptService);
-        editorTabController.initialize();
-        FxUtils.bindDisable(saveButton, editorTabController.getEmpty());
-        FxUtils.bindDisable(saveAsButton, editorTabController.getEmpty());
+    editorTabController.setTabs(editorTab);
+    editorTabController.setScriptService(scriptService);
+    editorTabController.initialize();
+    FxUtils.bindDisable(saveButton, editorTabController.getEmpty());
+    FxUtils.bindDisable(saveAsButton, editorTabController.getEmpty());
 
-        menuBarController.setProjectState(projectState);
-        menuBarController.setAppController(this);
-        menuBarController.setEditorTabController(editorTabController);
-        menuBarController.setTestToolbarController(testToolbarController);
-        menuBarController.setDiffEvidenceToolbarController(diffEvidenceToolbarController);
-        menuBarController.setSampleToolbarController(sampleToolbarController);
-        menuBarController.initialize();
+    menuBarController.setProjectState(projectState);
+    menuBarController.setAppController(this);
+    menuBarController.setEditorTabController(editorTabController);
+    menuBarController.setTestToolbarController(testToolbarController);
+    menuBarController.setDiffEvidenceToolbarController(diffEvidenceToolbarController);
+    menuBarController.setSampleToolbarController(sampleToolbarController);
+    menuBarController.initialize();
+  }
+
+  public void postInit() {
+    File pomFile = projectService.openProject(new File(""), projectState);
+    if (pomFile == null) {
+      openProject();
+    } else {
+      loadProject(pomFile);
+    }
+  }
+
+  public void destroy() {
+    ConversationProcessContainer.destroy();
+    testToolbarController.destroy();
+    fileTreeController.destroy();
+    sampleToolbarController.destroy();
+
+  }
+
+  @FXML
+  public void openProject() {
+    DirectoryChooser dirChooser = new DirectoryChooser();
+    dirChooser.setTitle("プロジェクトフォルダを選択してください。");
+    dirChooser.setInitialDirectory(new File("."));
+
+    File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
+
+    if (projectDir == null) {
+      return;
     }
 
-    public void postInit() {
-        File pomFile = projectService.openProject(new File(""), projectState);
-        if (pomFile == null) {
-            openProject();
-        } else {
-            loadProject(pomFile);
-        }
-    }
+    File pomFile = projectService.openProject(projectDir, projectState);
 
-    public void destroy() {
-        ConversationProcessContainer.destroy();
-        testToolbarController.destroy();
-        fileTreeController.destroy();
-        sampleToolbarController.destroy();
+    if (pomFile == null) {
 
-    }
+      Alert alert = new Alert(AlertType.CONFIRMATION);
+      alert.setContentText(projectDir.getAbsolutePath() + "にプロジェクトを作成しますか？");
 
-    @FXML
-    public void openProject() {
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("プロジェクトフォルダを選択してください。");
-        dirChooser.setInitialDirectory(new File("."));
+      Optional<ButtonType> answer = alert.showAndWait();
+      if (answer.get() == ButtonType.OK) {
+        pomFile = projectService.createProject(projectDir, projectState);
+        loadProject(pomFile);
+      }
 
-        File projectDir = dirChooser.showDialog(FxContext.getPrimaryStage());
+    } else {
 
-        if (projectDir == null) {
-            return;
-        }
-
-        File pomFile = projectService.openProject(projectDir, projectState);
-
-        if (pomFile == null) {
-
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setContentText(projectDir.getAbsolutePath() + "にプロジェクトを作成しますか？");
-
-            Optional<ButtonType> answer = alert.showAndWait();
-            if (answer.get() == ButtonType.OK) {
-                pomFile = projectService.createProject(projectDir, projectState);
-                loadProject(pomFile);
-            }
-
-        } else {
-
-            loadProject(pomFile);
-
-        }
-
-        if (!Boolean.getBoolean("skipUpdate")) {
-            ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
-        }
-
-        System.setProperty("sitwt.projectDirectory", projectDir.getAbsolutePath());
+      loadProject(pomFile);
 
     }
 
-    private void loadProject(File pomFile) {
-        File projectDir = pomFile.getAbsoluteFile().getParentFile();
-        messageView.addMsg("プロジェクトを開きます。" + projectDir.getAbsolutePath());
-        fileTreeController.setFileTreeRoot(projectDir);
-        testToolbarController.loadProject();
-        scriptService.loadProject();
-        FxContext.setTitie(projectDir.getAbsolutePath());
+    if (!Boolean.getBoolean("skipUpdate")) {
+      ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
     }
 
-    @FXML
-    public void editScript() {
-        menuBarController.open();
-    }
+    System.setProperty("sitwt.projectDirectory", projectDir.getAbsolutePath());
 
-    @FXML
-    public void editor2script() {
-        menuBarController.save();
-    }
+  }
 
-    @FXML
-    public void editor2scriptAs() {
-        menuBarController.saveAs();
-    }
+  private void loadProject(File pomFile) {
+    File projectDir = pomFile.getAbsoluteFile().getParentFile();
+    messageView.addMsg("プロジェクトを開きます。" + projectDir.getAbsolutePath());
+    fileTreeController.setFileTreeRoot(projectDir);
+    testToolbarController.loadProject();
+    scriptService.loadProject();
+    FxContext.setTitie(projectDir.getAbsolutePath());
+  }
 
-    @FXML
-    public void page2script() {
-        messageView.startMsg("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
+  @FXML
+  public void editScript() {
+    menuBarController.open();
+  }
 
-        projectState.setState(State.BROWSING);
+  @FXML
+  public void editor2script() {
+    menuBarController.save();
+  }
 
-        scriptService.page2script(testToolbarController.getDriverType(),
-                testToolbarController.getBaseUrl());
-    }
+  @FXML
+  public void editor2scriptAs() {
+    menuBarController.saveAs();
+  }
 
-    @FXML
-    public void quitBrowsing() {
-        scriptService.quitBrowsing();
-        projectState.reset();
-    }
+  @FXML
+  public void page2script() {
+    messageView.startMsg("ブラウザでページを表示した状態で「スクリプト生成」ボタンをクリックしてください。");
 
-    @FXML
-    public void ope2script() {
-        messageView.startMsg("ブラウザ操作の記録はFirefoxとSelenium IDE Pluginを使用します。");
-        messageView.addMsg("Selenium IDEで記録したテストスクリプトをhtml形式でtestscriptディレクトリに保存してください。");
+    projectState.setState(State.BROWSING);
 
-        scriptService.ope2script(testToolbarController.getBaseUrl());
+    scriptService.page2script(testToolbarController.getDriverType(),
+        testToolbarController.getBaseUrl());
+  }
 
-    }
+  @FXML
+  public void quitBrowsing() {
+    scriptService.quitBrowsing();
+    projectState.reset();
+  }
 
-    @FXML
-    public void export() {
-        Path exportScript = scriptService.export();
-        editorTabController.open(exportScript);
-    }
+  @FXML
+  public void ope2script() {
+    messageView.startMsg("ブラウザ操作の記録はFirefoxとSelenium IDE Pluginを使用します。");
+    messageView.addMsg("Selenium IDEで記録したテストスクリプトをhtml形式でtestscriptディレクトリに保存してください。");
 
-    @FXML
-    public void openScript() {
-        conversationProcess.input("o");
-    }
+    scriptService.ope2script(testToolbarController.getBaseUrl());
 
-    @FXML
-    public void quit() {
-        conversationProcess.destroy();
-        projectState.reset();
-    }
+  }
 
-    // @FXML
-    // public void minimizeWindow() {
-    // Stage primaryStage = FxContext.getPrimaryStage();
-    // stageHeight = primaryStage.getHeight();
-    // stageWidth = primaryStage.getWidth();
-    // // TODO コンソールのサイズ設定
-    // StageResizer.resize(primaryStage, 600, 90);
-    // windowMaximized.set(false);
-    // }
-    //
-    // @FXML
-    // public void maximizeWindow() {
-    // Stage primaryStage = FxContext.getPrimaryStage();
-    // StageResizer.resize(primaryStage, stageWidth, stageHeight);
-    // windowMaximized.set(true);
-    // }
+  @FXML
+  public void export() {
+    Path exportScript = scriptService.export();
+    editorTabController.open(exportScript);
+  }
 
-    @FXML
-    public void settings() {
-        FxContext.openFile(new File(projectState.getBaseDir(), "src/main/resources"));
-    }
+  @FXML
+  public void openScript() {
+    conversationProcess.input("o");
+  }
 
-    @FXML
-    public void help() {
-        FxContext.showDocument("https://github.com/sitoolkit/sit-wt-all/wiki");
-    }
+  @FXML
+  public void quit() {
+    conversationProcess.destroy();
+    projectState.reset();
+  }
+
+  // @FXML
+  // public void minimizeWindow() {
+  // Stage primaryStage = FxContext.getPrimaryStage();
+  // stageHeight = primaryStage.getHeight();
+  // stageWidth = primaryStage.getWidth();
+  // // TODO コンソールのサイズ設定
+  // StageResizer.resize(primaryStage, 600, 90);
+  // windowMaximized.set(false);
+  // }
+  //
+  // @FXML
+  // public void maximizeWindow() {
+  // Stage primaryStage = FxContext.getPrimaryStage();
+  // StageResizer.resize(primaryStage, stageWidth, stageHeight);
+  // windowMaximized.set(true);
+  // }
+
+  @FXML
+  public void settings() {
+    FxContext.openFile(new File(projectState.getBaseDir(), "src/main/resources"));
+  }
+
+  @FXML
+  public void help() {
+    FxContext.showDocument("https://github.com/sitoolkit/sit-wt-all/wiki");
+  }
 }

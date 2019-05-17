@@ -5,19 +5,18 @@ import java.util.List;
 
 public class StdoutListenerContainer {
 
-    private static StdoutListenerContainer instance = new StdoutListenerContainer();
+  private static StdoutListenerContainer instance = new StdoutListenerContainer();
 
-    private List<StdoutListener> listeners = new ArrayList<>();
+  private List<StdoutListener> listeners = new ArrayList<>();
 
-    private StdoutListenerContainer() {
-    }
+  private StdoutListenerContainer() {}
 
-    public static StdoutListenerContainer get() {
-        return instance;
-    }
+  public static StdoutListenerContainer get() {
+    return instance;
+  }
 
-    public List<StdoutListener> getListeners() {
-        return listeners;
-    }
+  public List<StdoutListener> getListeners() {
+    return listeners;
+  }
 
 }

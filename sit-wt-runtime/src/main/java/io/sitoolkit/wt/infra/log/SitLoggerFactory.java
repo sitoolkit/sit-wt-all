@@ -4,8 +4,8 @@ import org.slf4j.LoggerFactory;
 
 public class SitLoggerFactory {
 
-    public static SitLogger getLogger(Class<?> clazz) {
-        return new DefaultLoggerImpl(LoggerFactory.getLogger(clazz));
-    }
+  public static SitLogger getLogger(Class<?> clazz) {
+    return new DefaultLoggerImpl(LoggerFactory.getLogger(clazz));
+  }
 
 }

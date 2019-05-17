@@ -4,55 +4,55 @@ import java.util.Collection;
 
 public class StrUtils {
 
-    public static String join(Collection<? extends Object> objects) {
+  public static String join(Collection<? extends Object> objects) {
 
-        if (objects == null || objects.isEmpty()) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        for (Object str : objects) {
-
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(str);
-
-        }
-
-        return sb.toString();
+    if (objects == null || objects.isEmpty()) {
+      return "";
     }
 
-    public static boolean isEmpty(String str) {
-        return str == null || str.isEmpty();
+    StringBuilder sb = new StringBuilder();
+
+    for (Object str : objects) {
+
+      if (sb.length() > 0) {
+        sb.append(",");
+      }
+      sb.append(str);
+
     }
 
-    public static boolean isNotEmpty(String str) {
-        return !isEmpty(str);
+    return sb.toString();
+  }
+
+  public static boolean isEmpty(String str) {
+    return str == null || str.isEmpty();
+  }
+
+  public static boolean isNotEmpty(String str) {
+    return !isEmpty(str);
+  }
+
+  public static boolean equals(String a, String b) {
+    return a == null ? b == null : a.equals(b);
+  }
+
+  public static boolean endsWithAny(String str, String... suffixes) {
+
+    for (String suffix : suffixes) {
+      if (str.endsWith(suffix)) {
+        return true;
+      }
     }
 
-    public static boolean equals(String a, String b) {
-        return a == null ? b == null : a.equals(b);
-    }
+    return false;
+  }
 
-    public static boolean endsWithAny(String str, String... suffixes) {
+  public static String sanitizeMetaCharacter(String str) {
+    String regex = "[ !\"#$%&'()=~|\\-^\\\\@\\[\\]:;`\\{\\}*+<>?,./]";
+    return str.replaceAll(regex, "_");
+  }
 
-        for (String suffix : suffixes) {
-            if (str.endsWith(suffix)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static String sanitizeMetaCharacter(String str) {
-        String regex = "[ !\"#$%&'()=~|\\-^\\\\@\\[\\]:;`\\{\\}*+<>?,./]";
-        return str.replaceAll(regex, "_");
-    }
-
-    public static String addEscape(String str) {
-        return str.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"");
-    }
+  public static String addEscape(String str) {
+    return str.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"");
+  }
 }

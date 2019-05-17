@@ -6,18 +6,18 @@ import java.util.concurrent.TimeUnit;
 
 public class ExecutorContainer {
 
-    private static ExecutorService executor = Executors.newCachedThreadPool();
+  private static ExecutorService executor = Executors.newCachedThreadPool();
 
-    public static ExecutorService get() {
-        return executor;
-    }
+  public static ExecutorService get() {
+    return executor;
+  }
 
-    public static void awaitTermination() {
-        executor.shutdown();
-        try {
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+  public static void awaitTermination() {
+    executor.shutdown();
+    try {
+      executor.awaitTermination(30, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
+  }
 }
