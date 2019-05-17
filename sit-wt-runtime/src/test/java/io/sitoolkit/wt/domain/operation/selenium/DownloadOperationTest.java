@@ -13,8 +13,8 @@
  */
 package io.sitoolkit.wt.domain.operation.selenium;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,7 +39,7 @@ public class DownloadOperationTest extends SitTesterTestBase {
   public void test001() throws FileNotFoundException, IOException {
     test();
 
-    File targetFile = new File("src/main/webapp/pdf/DownloadTest.pdf");
+    File targetFile = new File("src/test/webapp/pdf/DownloadTest.pdf");
     String targetHash = DigestUtils.md5Hex(new FileInputStream(targetFile));
 
     String testScriptName = StringUtils.substringAfterLast(getTestScriptPath(), "/");
