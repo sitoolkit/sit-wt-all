@@ -36,7 +36,7 @@ public class SampleServiceTest {
 
     tester.runTest();
 
-    ThreadUtils.waitFor("sample test isn't finished", 60000, () -> tester.finished());
+    ThreadUtils.waitFor("sample test isn't finished", 120000, () -> tester.finished());
 
     assertThat("sample test failed", tester.getExitCode(), is(0));
   }
