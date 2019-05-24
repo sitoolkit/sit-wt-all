@@ -21,13 +21,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import io.sitoolkit.wt.app.sample.SampleGenerator;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-public class Selenium2ScriptTest extends SitTesterTestBase {
+public class Selenium2ScriptTest extends TestBase {
 
   private String testScriptPath;
 

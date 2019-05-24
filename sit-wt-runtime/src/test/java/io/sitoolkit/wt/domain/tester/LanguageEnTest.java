@@ -14,22 +14,15 @@
 package io.sitoolkit.wt.domain.tester;
 
 import java.util.Locale;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import io.sitoolkit.wt.app.sample.SampleGenerator;
 
 /**
  *
  * @author tsunami.nakano
  */
-public class LanguageEnTest extends SitTesterTestBase {
+public class LanguageEnTest extends TestBase {
 
   private String language = Locale.getDefault().getLanguage();
-
-  @BeforeClass
-  public static void generateSample() {
-    SampleGenerator.generate();
-  }
 
   @Test
   public void test001() {

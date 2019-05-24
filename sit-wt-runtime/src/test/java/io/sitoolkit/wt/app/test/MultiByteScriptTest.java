@@ -1,21 +1,14 @@
 package io.sitoolkit.wt.app.test;
 
 import javax.annotation.Resource;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
-import io.sitoolkit.wt.app.sample.SampleGenerator;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
-public class MultiByteScriptTest extends SitTesterTestBase {
+public class MultiByteScriptTest extends TestBase {
 
   @Resource
   ConfigurableApplicationContext appCtx;
-
-  @BeforeClass
-  public static void generateSample() {
-    SampleGenerator.generate();
-  }
 
   @Test
   public void testMultiByteCase() {

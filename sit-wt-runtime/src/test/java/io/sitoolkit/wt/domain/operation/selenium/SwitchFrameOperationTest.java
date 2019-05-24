@@ -14,13 +14,13 @@
 package io.sitoolkit.wt.domain.operation.selenium;
 
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-public class SwitchFrameOperationTest extends SitTesterTestBase {
+public class SwitchFrameOperationTest extends TestBase {
 
   @Test
   public void test001() {

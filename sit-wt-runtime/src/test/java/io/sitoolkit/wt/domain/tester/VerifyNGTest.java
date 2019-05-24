@@ -13,16 +13,14 @@
  */
 package io.sitoolkit.wt.domain.tester;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
-import io.sitoolkit.wt.domain.tester.TestResult;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-public class VerifyNGTest extends SitTesterTestBase {
+public class VerifyNGTest extends TestBase {
 
   @Test
   public void test001() {

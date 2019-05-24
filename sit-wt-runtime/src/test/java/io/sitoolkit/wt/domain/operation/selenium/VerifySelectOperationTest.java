@@ -3,10 +3,10 @@ package io.sitoolkit.wt.domain.operation.selenium;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 import io.sitoolkit.wt.domain.tester.TestResult;
 
-public class VerifySelectOperationTest extends SitTesterTestBase {
+public class VerifySelectOperationTest extends TestBase {
 
   @Test
   public void test001() {

@@ -1,9 +1,9 @@
 package io.sitoolkit.wt.app.config;
 
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
-public class WebDriverConfigParallelTest extends SitTesterTestBase {
+public class WebDriverConfigParallelTest extends TestBase {
 
   @Test
   public void test001() {

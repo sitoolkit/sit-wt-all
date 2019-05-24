@@ -4,7 +4,7 @@ public class SampleGenerator {
 
   private static boolean generated = false;
 
-  public static void generate() {
+  public static synchronized void generate() {
     if (generated) {
       return;
     }

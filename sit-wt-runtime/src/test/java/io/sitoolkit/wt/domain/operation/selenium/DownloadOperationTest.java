@@ -24,13 +24,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import io.sitoolkit.wt.domain.evidence.EvidenceManager;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
 /**
  *
  * @author takuya.kumakura
  */
-public class DownloadOperationTest extends SitTesterTestBase {
+public class DownloadOperationTest extends TestBase {
 
   @Resource
   EvidenceManager em;

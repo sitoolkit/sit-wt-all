@@ -14,13 +14,12 @@
 package io.sitoolkit.wt.domain.tester;
 
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
 
 /**
  *
  * @author tsunami.nakano
  */
-public class ScreenshotTest extends SitTesterTestBase {
+public class ScreenshotTest extends TestBase {
 
   @Test
   public void test001() {
