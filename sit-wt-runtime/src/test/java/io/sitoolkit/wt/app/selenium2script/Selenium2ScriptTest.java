@@ -18,8 +18,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.File;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import io.sitoolkit.wt.app.selenium2script.Selenium2Script;
+import io.sitoolkit.wt.app.sample.SampleGenerator;
 import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
 
 /**
@@ -33,6 +34,11 @@ public class Selenium2ScriptTest extends SitTesterTestBase {
   private static String TARGET_SCRIPT = "testscript/SeleniumIDETestScript.html";
 
   private static String BACKUPED_SCRIPT = TARGET_SCRIPT + ".bk";
+
+  @BeforeClass
+  public static void generateSample() {
+    SampleGenerator.generate();
+  }
 
   @Before
   @Override

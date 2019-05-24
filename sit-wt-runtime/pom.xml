@@ -282,7 +282,6 @@
       <id>localhost</id>
       <properties>
         <baseUrl>http://localhost:8280/</baseUrl>
-        <webAppSourceDirectory>src/test/webapp</webAppSourceDirectory>
       </properties>
     </profile>
 
@@ -318,7 +317,9 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
             <configuration>
-              <webAppSourceDirectory>${project.basedir}/${webAppSourceDirectory}</webAppSourceDirectory>
+              <webApp>
+                <resourceBases>${project.basedir}/sample,${project.basedir}/src/main/webapp</resourceBases>
+              </webApp>
             </configuration>
             <executions>
               <execution>

@@ -16,10 +16,12 @@ package io.sitoolkit.wt.domain.operation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import javax.annotation.Resource;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import io.sitoolkit.wt.app.sample.SampleGenerator;
 import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
 
 /**
@@ -30,6 +32,11 @@ public class IncludeOperationTest extends SitTesterTestBase {
 
   @Resource
   WebDriver driver;
+
+  @BeforeClass
+  public static void generateSample() {
+    SampleGenerator.generate();
+  }
 
   @Test
   public void test001() {

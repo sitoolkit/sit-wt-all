@@ -13,7 +13,9 @@
  */
 package io.sitoolkit.wt.domain.operation;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
+import io.sitoolkit.wt.app.sample.SampleGenerator;
 import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
 
 /**
@@ -21,6 +23,11 @@ import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
  * @author yuichi.kuwahara
  */
 public class GoToOperationTest extends SitTesterTestBase {
+
+  @BeforeClass
+  public static void generateSample() {
+    SampleGenerator.generate();
+  }
 
   @Test
   public void test001() {

@@ -14,8 +14,9 @@
 package io.sitoolkit.wt.domain.tester;
 
 import java.util.Locale;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.app.sample.SampleGenerator;
 
 /**
  *
@@ -24,6 +25,11 @@ import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
 public class LanguageEnTest extends SitTesterTestBase {
 
   private String language = Locale.getDefault().getLanguage();
+
+  @BeforeClass
+  public static void generateSample() {
+    SampleGenerator.generate();
+  }
 
   @Test
   public void test001() {

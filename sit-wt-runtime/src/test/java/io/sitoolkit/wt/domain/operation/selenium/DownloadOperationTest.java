@@ -39,7 +39,7 @@ public class DownloadOperationTest extends SitTesterTestBase {
   public void test001() throws FileNotFoundException, IOException {
     test();
 
-    File targetFile = new File("src/test/webapp/pdf/DownloadTest.pdf");
+    File targetFile = new File("src/main/webapp/pdf/DownloadTest.pdf");
     String targetHash = DigestUtils.md5Hex(new FileInputStream(targetFile));
 
     String testScriptName = StringUtils.substringAfterLast(getTestScriptPath(), "/");
