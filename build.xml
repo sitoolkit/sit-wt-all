@@ -39,6 +39,10 @@
 
   <target name="01_local-install-stage">
 
+    <!--
+      In the sit-wt-project, only the install:install goal is executed
+      because the build plugin fails when the install phase is executed.
+    -->
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-pl=!sit-wt-project" />
