@@ -45,8 +45,7 @@ public class PCWebDriverFactory {
   private String defaultDriverType = DEFAULT_DRIVER_TYPE;
 
   public RemoteWebDriver createPCDriver(PropertyManager pm, WebDriverCloser closer,
-      WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
-      throws MalformedURLException {
+      FirefoxManager firefoxManager) throws MalformedURLException {
 
     String driverType = StringUtils.defaultString(pm.getDriverType());
     DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -59,8 +58,7 @@ public class PCWebDriverFactory {
 
     LOG.info("webdriver.start", driverType, capabilities);
 
-    RemoteWebDriver webDriver =
-        selectWebDriver(driverType, pm, webDriverInstaller, firefoxManager, capabilities);
+    RemoteWebDriver webDriver = selectWebDriver(driverType, pm, firefoxManager, capabilities);
 
     webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
 
@@ -80,34 +78,32 @@ public class PCWebDriverFactory {
   }
 
   private RemoteWebDriver selectWebDriver(String driverType, PropertyManager pm,
-      WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager,
-      DesiredCapabilities capabilities) throws MalformedURLException {
+      FirefoxManager firefoxManager, DesiredCapabilities capabilities)
+      throws MalformedURLException {
 
     if (StringUtils.isNotEmpty(driverType)) {
-      return selectWebDriver2(driverType, pm, webDriverInstaller, firefoxManager, capabilities);
+      return selectWebDriver2(driverType, pm, firefoxManager, capabilities);
     }
 
     try {
-      return selectWebDriver2(defaultDriverType, pm, webDriverInstaller, firefoxManager,
-          capabilities);
+      return selectWebDriver2(defaultDriverType, pm, firefoxManager, capabilities);
     } catch (WebDriverException e) {
       // NOP
     }
 
     defaultDriverType = SECOND_DEFAULT_DRIVER_TYPE;
 
-    return selectWebDriver2(defaultDriverType, pm, webDriverInstaller, firefoxManager,
-        capabilities);
+    return selectWebDriver2(defaultDriverType, pm, firefoxManager, capabilities);
   }
 
   private RemoteWebDriver selectWebDriver2(String driverType, PropertyManager pm,
-      WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager,
-      DesiredCapabilities capabilities) throws MalformedURLException {
+      FirefoxManager firefoxManager, DesiredCapabilities capabilities)
+      throws MalformedURLException {
 
     switch (driverType) {
 
       case "chrome":
-        webDriverInstaller.installChromeDriver();
+        WebDriverInstaller.getInstance().installChromeDriver();
 
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("credentials_enable_service", false);
@@ -121,12 +117,12 @@ public class PCWebDriverFactory {
 
       case "ie":
       case "internet explorer":
-        webDriverInstaller.installIeDriver();
+        WebDriverInstaller.getInstance().installIeDriver();
         InternetExplorerOptions ieOptions = new InternetExplorerOptions(capabilities);
         return new InternetExplorerDriver(ieOptions);
 
       case "edge":
-        webDriverInstaller.installEdgeDriver();
+        WebDriverInstaller.getInstance().installEdgeDriver();
         EdgeOptions edgeOptions = new EdgeOptions().merge(capabilities);
         return new EdgeDriver(edgeOptions);
 
@@ -136,7 +132,7 @@ public class PCWebDriverFactory {
           return new SafariDriver(safariOptions);
         } catch (UnreachableBrowserException e) {
           if (StringUtils.startsWith(e.getMessage(), "Failed to connect to SafariDriver")) {
-            webDriverInstaller.installSafariDriver();
+            WebDriverInstaller.getInstance().installSafariDriver();
             return new SafariDriver(safariOptions);
           }
         }
@@ -148,7 +144,7 @@ public class PCWebDriverFactory {
 
       case "firefox":
       case "ff":
-        webDriverInstaller.installGeckoDriver();
+        WebDriverInstaller.getInstance().installGeckoDriver();
         return firefoxManager.startWebDriver(capabilities);
 
       default:

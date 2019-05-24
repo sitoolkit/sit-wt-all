@@ -10,7 +10,6 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import javax.annotation.PostConstruct;
 import javax.swing.JOptionPane;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -26,6 +25,7 @@ import io.sitoolkit.wt.infra.SitRepository;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.process.ProcessUtils;
+import lombok.Getter;
 
 public class WebDriverInstaller {
 
@@ -38,6 +38,22 @@ public class WebDriverInstaller {
   private WebDriverBinaryInfo ieBinaryInfo = new WebDriverBinaryInfo("ie");
   private WebDriverBinaryInfo edgeBinaryInfo = new WebDriverBinaryInfo("edge");
   private WebDriverBinaryInfo safariBinaryInfo = new WebDriverBinaryInfo("safari");
+
+  @Getter
+  private static final WebDriverInstaller instance = new WebDriverInstaller();
+
+  private WebDriverInstaller() {
+    Map<String, String> prop = PropertyUtils.loadAsMap("/webdriver-default.properties", false);
+    prop.putAll(PropertyUtils.loadAsMap("/webdriver.properties", true));
+
+    setProperties(prop, winGeckoBinaryInfo);
+    setProperties(prop, macGeckoBinaryInfo);
+    setProperties(prop, winChromeBinaryInfo);
+    setProperties(prop, macChromeBinaryInfo);
+    setProperties(prop, ieBinaryInfo);
+    setProperties(prop, edgeBinaryInfo);
+    setProperties(prop, safariBinaryInfo);
+  }
 
   class WebDriverBinaryInfo {
 
@@ -62,20 +78,6 @@ public class WebDriverInstaller {
     String zipEntry;
     String installDir;
     String installFile;
-  }
-
-  @PostConstruct
-  public void init() {
-    Map<String, String> prop = PropertyUtils.loadAsMap("/webdriver-default.properties", false);
-    prop.putAll(PropertyUtils.loadAsMap("/webdriver.properties", true));
-
-    setProperties(prop, winGeckoBinaryInfo);
-    setProperties(prop, macGeckoBinaryInfo);
-    setProperties(prop, winChromeBinaryInfo);
-    setProperties(prop, macChromeBinaryInfo);
-    setProperties(prop, ieBinaryInfo);
-    setProperties(prop, edgeBinaryInfo);
-    setProperties(prop, safariBinaryInfo);
   }
 
   private void setProperties(Map<String, String> prop, WebDriverBinaryInfo binaryInfo) {

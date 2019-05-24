@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import io.sitoolkit.wt.app.config.RuntimeConfig;
-import io.sitoolkit.wt.infra.ApplicationContextHelper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = RuntimeConfig.class)
@@ -18,7 +17,7 @@ public class WebDriverInstallerTest {
   @Test
   public void test() {
 
-    WebDriverInstaller installer = ApplicationContextHelper.getBean(WebDriverInstaller.class);
+    WebDriverInstaller installer = WebDriverInstaller.getInstance();
 
     File repositoryDir = new File(installer.getRrepositoryDir(""));
     FileUtils.deleteQuietly(repositoryDir);

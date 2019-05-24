@@ -13,9 +13,9 @@
  */
 package io.sitoolkit.wt.infra.selenium;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 import java.net.MalformedURLException;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +34,6 @@ import io.sitoolkit.wt.infra.ApplicationContextHelper;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.SitPathUtils;
 import io.sitoolkit.wt.infra.firefox.FirefoxManager;
-import io.sitoolkit.wt.infra.selenium.WebDriverCloser;
-import io.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = RuntimeConfig.class)
@@ -74,7 +72,6 @@ public class WebElementMethodInterceptorTest {
     WebDriverConfig config = new WebDriverConfig();
     return config.innerWebDriver(ApplicationContextHelper.getBean(PropertyManager.class),
         ApplicationContextHelper.getBean(WebDriverCloser.class),
-        ApplicationContextHelper.getBean(WebDriverInstaller.class),
         ApplicationContextHelper.getBean(FirefoxManager.class));
   }
 
