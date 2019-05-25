@@ -2,6 +2,7 @@ package io.sitoolkit.wt.app.test;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -121,7 +122,8 @@ public class TestRunner {
 
       selenium2scripts(testCase.getScriptPath()).forEach(testScript -> {
         TestCase seleniumTestCase = new TestCase();
-        testCase.setScriptPath(testScript.toAbsolutePath().toString());
+        seleniumTestCase.setScriptPath(testScript.toAbsolutePath().toString());
+        seleniumTestCase.setCaseNo(Selenium2Script.DEFAULT_CASE_NO);
         allTestCase.add(seleniumTestCase);
       });
     }
@@ -140,7 +142,7 @@ public class TestRunner {
     s2s.setOpenScript(false);
     s2s.setOverwriteScript(false);
 
-    File seleniumScript = new File(seleniumScriptPath);
+    Path seleniumScript = Paths.get(seleniumScriptPath);
 
     List<Path> scripts = s2s.convert(seleniumScript);
     s2s.backup(seleniumScript);

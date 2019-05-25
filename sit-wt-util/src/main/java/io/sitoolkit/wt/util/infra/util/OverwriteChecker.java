@@ -3,6 +3,9 @@ package io.sitoolkit.wt.util.infra.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import javafx.application.Platform;
 import javafx.scene.control.ChoiceDialog;
 
 /**
@@ -29,13 +32,22 @@ public class OverwriteChecker {
       return true;
     }
 
-    ChoiceDialog<Answer> choice = new ChoiceDialog<>(Answer.n, Answer.values());
-    choice.setHeaderText("SIToolkit ファイル上書き確認");
-    choice.setContentText("書込み先にファイルが存在します。\n" + path.toAbsolutePath());
-    Answer answer = choice.showAndWait().orElse(Answer.n);
+    FutureTask<Answer> task = new FutureTask<>(() -> {
+      ChoiceDialog<Answer> choice = new ChoiceDialog<>(Answer.n, Answer.values());
+      choice.setHeaderText("SIToolkit ファイル上書き確認");
+      choice.setContentText("書込み先にファイルが存在します。\n" + path.toAbsolutePath());
+      return choice.showAndWait().orElse(Answer.n);
+    });
+    Platform.runLater(task);
 
-    allWritable = answer.allWritable;
-    return Writable.Yes.equals(answer.writable);
+    try {
+      Answer answer = task.get();
+      allWritable = answer.allWritable;
+      return Writable.Yes.equals(answer.writable);
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
   enum Writable {

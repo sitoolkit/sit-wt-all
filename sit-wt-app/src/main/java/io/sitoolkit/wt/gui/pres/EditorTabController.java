@@ -70,7 +70,9 @@ public class EditorTabController implements FileOpenable, DebugListenerFinder, F
 
   @Override
   public void save() {
-    getSelectedEditorController().save();
+    if (canSave()) {
+      getSelectedEditorController().save();
+    }
   }
 
   public void saveAs(Path file) {
@@ -96,6 +98,10 @@ public class EditorTabController implements FileOpenable, DebugListenerFinder, F
 
   private EditorController getSelectedEditorController() {
     return (EditorController) tabs.getSelectionModel().getSelectedItem().getUserData();
+  }
+
+  private boolean canSave() {
+    return !tabs.getSelectionModel().isEmpty();
   }
 
   private void setFileInfo(Tab tab, Path file) {

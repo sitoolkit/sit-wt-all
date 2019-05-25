@@ -16,13 +16,16 @@ package io.sitoolkit.wt.app.selenium2script;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,6 +46,8 @@ public class Selenium2Script {
 
   protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
+  public static final String DEFAULT_CASE_NO = "001";
+
   private TestScriptDao dao;
 
   private SeleniumStepConverter seleniumStepConverter;
@@ -50,8 +55,6 @@ public class Selenium2Script {
   private String outputDir = "testscript";
 
   private String seleniumScriptDirs = outputDir + ",.";
-
-  private String caseNo = "001";
 
   private boolean openScript = true;
 
@@ -87,9 +90,9 @@ public class Selenium2Script {
 
       boolean recursive = !".".equals(seleniumScriptDir);
       for (File seleniumScript : FileUtils.listFiles(scriptDir, new String[] {"side"}, recursive)) {
-        List<Path> scripts = convert(seleniumScript);
+        List<Path> scripts = convert(seleniumScript.toPath());
 
-        backup(seleniumScript);
+        backup(seleniumScript.toPath());
 
         if (!isOpenScript()) {
           continue;
@@ -109,33 +112,47 @@ public class Selenium2Script {
     return ret;
   }
 
-  public List<Path> convert(File seleniumScript) {
-    log.info("selenium.script.convert", seleniumScript.getAbsolutePath());
+  public List<Path> convert(Path seleniumScript) {
+    log.info("selenium.script.convert", seleniumScript.toAbsolutePath());
 
     List<SeleniumTestScript> scripts = loadSeleniumScripts(seleniumScript);
 
-    String baseName = FilenameUtils.getBaseName(seleniumScript.getName());
-
     return scripts.stream().map((script) -> {
-      List<TestStep> testStepList = seleniumStepConverter.convertTestScript(script, caseNo);
-      return write(baseName, script.getName(), testStepList);
+      List<TestStep> testStepList =
+          seleniumStepConverter.convertTestScript(script, DEFAULT_CASE_NO);
+      return write(seleniumScript, script.getName(), testStepList);
     }).collect(Collectors.toList());
   }
 
-  private Path write(String baseName, String caseName, List<TestStep> testStepList) {
-    Path dest =
-        Paths.get(outputDir, baseName + "_" + StrUtils.sanitizeMetaCharacter(caseName) + ".csv");
-    dao.write(dest.toFile(), testStepList, overwriteScript);
+  private Path write(Path seleniumScript, String caseName, List<TestStep> testStepList) {
+    String baseName = FilenameUtils.getBaseName(seleniumScript.toString());
+    Path destFile = getOutputDirPath()
+        .resolve(baseName + "_" + StrUtils.sanitizeMetaCharacter(caseName) + ".csv");
 
-    return dest;
+    dao.write(destFile.toFile(), testStepList, overwriteScript);
+
+    return destFile;
   }
 
-  public void backup(File seleniumScript) {
-    File bkFile = new File(seleniumScript.getParentFile(), seleniumScript.getName() + ".bk");
+  public void backup(Path seleniumScript) {
+    Path bkFile = seleniumScript.resolveSibling(seleniumScript.getFileName() + ".bk");
 
-    log.info("selenium.script.backup", seleniumScript.getAbsolutePath(), bkFile);
+    log.info("selenium.script.backup", seleniumScript.toAbsolutePath(), bkFile);
 
-    seleniumScript.renameTo(bkFile);
+    try {
+      Files.move(seleniumScript, bkFile, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Path getOutputDirPath() {
+    return Paths.get(getProjectDirectory(), outputDir);
+  }
+
+  private String getProjectDirectory() {
+    String dir = System.getProperty("sitwt.projectDirectory");
+    return StringUtils.isEmpty(dir) ? "." : dir;
   }
 
   /**
@@ -144,12 +161,12 @@ public class Selenium2Script {
    * @param file SeleniumScriptのファイル
    * @return SeleniumTestStep
    */
-  protected List<SeleniumTestScript> loadSeleniumScripts(File file) {
+  protected List<SeleniumTestScript> loadSeleniumScripts(Path script) {
     ObjectMapper mapper = new ObjectMapper();
     List<SeleniumTestScript> scripts = new ArrayList<>();
 
     try {
-      JsonNode node = mapper.readTree(file);
+      JsonNode node = mapper.readTree(script.toFile());
       String baseUrl = node.get("url").asText();
 
       for (JsonNode testNode : node.get("tests")) {
@@ -207,14 +224,6 @@ public class Selenium2Script {
 
   public void setOutputDir(String outputDir) {
     this.outputDir = outputDir;
-  }
-
-  public String getCaseNo() {
-    return caseNo;
-  }
-
-  public void setCaseNo(String caseNo) {
-    this.caseNo = caseNo;
   }
 
   public void setSeleniumStepConverter(SeleniumStepConverter seleniumStepConverter) {
