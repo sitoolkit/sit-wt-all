@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
+import io.sitoolkit.wt.domain.testscript.TestStepInputType;
+import io.sitoolkit.wt.infra.SitPathUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
@@ -48,7 +50,8 @@ public class SeleniumStepConverter implements ApplicationContextAware {
       // open操作の場合はseleniumScriptのbaseUrlを設定
       if ("open".equals(sitStep.getOperationName())) {
         String locatorValue = sitStep.getLocator().getValue();
-        sitStep.getLocator().setValue(seleniumTestScript.getBaseUrl() + locatorValue);
+        sitStep.getLocator()
+            .setValue(SitPathUtils.buildUrl(seleniumTestScript.getBaseUrl(), locatorValue));
       }
 
       // スクリーンショット
@@ -86,7 +89,8 @@ public class SeleniumStepConverter implements ApplicationContextAware {
     String operationName = seleniumIdeCommandMap.get(seleniumStep.getCommand());
 
     if (operationName == null) {
-      if (appCtx.containsBeanDefinition(seleniumStep.getCommand() + "Operation")) {
+
+      if (!TestStepInputType.decode(seleniumStep.getCommand()).equals(TestStepInputType.na)) {
         operationName = seleniumStep.getCommand();
       } else {
         log.info("selenium.command.unmatched", seleniumStep.getCommand());
@@ -98,6 +102,11 @@ public class SeleniumStepConverter implements ApplicationContextAware {
   }
 
   protected Locator convertLocator(SeleniumTestStep seleniumStep) {
+    if (seleniumStep.getTarget().startsWith("linkText=")) {
+      return Locator.build(Locator.Type.link.toString(),
+          StringUtils.removeStart(seleniumStep.getTarget(), "linkText="));
+    }
+
     return Locator.build(seleniumStep.getTarget());
   }
 
