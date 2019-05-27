@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import io.sitoolkit.wt.app.selenium2script.Selenium2Script;
 import io.sitoolkit.wt.gui.infra.UnInitializedException;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
@@ -23,7 +24,8 @@ public class SitWtRuntimeUtils {
 
   private static String javaHome;
 
-  private static final Pattern SCRIPT_FILE_PATTERN = Pattern.compile(".*\\.csv$|.*\\.side$");
+  private static final Pattern SCRIPT_FILE_PATTERN =
+      Pattern.compile(".*\\.csv$|.*\\" + Selenium2Script.SCRIPT_EXTENSION + "$");
 
   public static List<Path> decodeScrintStr(String scriptStr) {
     return Stream.of(scriptStr.split(",")).map(str -> StringUtils.substringBefore(str, "#"))

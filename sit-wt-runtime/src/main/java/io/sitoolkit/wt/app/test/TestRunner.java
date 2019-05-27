@@ -115,7 +115,7 @@ public class TestRunner {
     for (String testCondition : testCaseStr.split(",")) {
       TestCase testCase = TestCase.parse(testCondition);
 
-      if (!testCase.getScriptPath().endsWith(".side")) {
+      if (!testCase.getScriptPath().endsWith(Selenium2Script.SCRIPT_EXTENSION)) {
         allTestCase.add(testCase);
         continue;
       }

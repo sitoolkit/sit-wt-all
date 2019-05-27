@@ -48,6 +48,8 @@ public class Selenium2Script {
 
   public static final String DEFAULT_CASE_NO = "001";
 
+  public static final String SCRIPT_EXTENSION = ".side";
+
   private TestScriptDao dao;
 
   private SeleniumStepConverter seleniumStepConverter;
@@ -89,7 +91,8 @@ public class Selenium2Script {
       }
 
       boolean recursive = !".".equals(seleniumScriptDir);
-      for (File seleniumScript : FileUtils.listFiles(scriptDir, new String[] {"side"}, recursive)) {
+      for (File seleniumScript : FileUtils.listFiles(scriptDir, new String[] {SCRIPT_EXTENSION},
+          recursive)) {
         List<Path> scripts = convert(seleniumScript.toPath());
 
         backup(seleniumScript.toPath());
