@@ -39,24 +39,13 @@
 
   <target name="01_local-install-stage">
 
-    <!--
-      Because the packaging of sit-wt-project is pom, execute the install:install phase separately
-      so that unnecessary build processes are not executed.
-    -->
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-pl=!sit-wt-project" />
       <arg value="-Dmaven.test.skip=true" />
       <arg value="clean" />
       <arg value="install" />
     </exec>
 
-    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
-      <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-pl=sit-wt-project" />
-      <arg value="install:install" />
-    </exec>
-  	
   </target>
 
 
