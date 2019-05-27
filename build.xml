@@ -40,8 +40,8 @@
   <target name="01_local-install-stage">
 
     <!--
-      In the sit-wt-project, only the install:install goal is executed
-      because the build plugin fails when the install phase is executed.
+      Because the packaging of sit-wt-project is pom, execute the install:install phase separately
+      so that unnecessary build processes are not executed.
     -->
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
