@@ -29,10 +29,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sitoolkit.wt.app.config.ExtConfig;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.domain.testscript.TestStep;
+import io.sitoolkit.wt.infra.JsonUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.util.StrUtils;
@@ -93,7 +93,7 @@ public class Selenium2Script {
       boolean recursive = !".".equals(seleniumScriptDir);
       for (File seleniumScript : FileUtils.listFiles(scriptDir, new String[] {SCRIPT_EXTENSION},
           recursive)) {
-        List<Path> scripts = convert(seleniumScript.toPath());
+        List<Path> testScripts = convert(seleniumScript.toPath());
 
         backup(seleniumScript.toPath());
 
@@ -101,9 +101,9 @@ public class Selenium2Script {
           continue;
         }
 
-        for (Path script : scripts) {
+        for (Path testScript : testScripts) {
           try {
-            Desktop.getDesktop().open(script.toFile());
+            Desktop.getDesktop().open(testScript.toFile());
           } catch (IOException e) {
             log.error("open.script.error", e);
             ret = 2;
@@ -115,20 +115,20 @@ public class Selenium2Script {
     return ret;
   }
 
-  public List<Path> convert(Path seleniumScript) {
-    log.info("selenium.script.convert", seleniumScript.toAbsolutePath());
+  public List<Path> convert(Path sourcePath) {
+    log.info("selenium.script.convert", sourcePath.toAbsolutePath());
 
-    List<SeleniumTestScript> scripts = loadSeleniumScripts(seleniumScript);
+    List<SeleniumTestScript> seleniumScripts = loadSeleniumScripts(sourcePath);
 
-    return scripts.stream().map((script) -> {
+    return seleniumScripts.stream().map((seleniumScript) -> {
       List<TestStep> testStepList =
-          seleniumStepConverter.convertTestScript(script, DEFAULT_CASE_NO);
-      return write(seleniumScript, script.getName(), testStepList);
+          seleniumStepConverter.convertTestScript(seleniumScript, DEFAULT_CASE_NO);
+      return write(sourcePath, seleniumScript.getName(), testStepList);
     }).collect(Collectors.toList());
   }
 
-  private Path write(Path seleniumScript, String caseName, List<TestStep> testStepList) {
-    String baseName = FilenameUtils.getBaseName(seleniumScript.toString());
+  private Path write(Path sourcePath, String caseName, List<TestStep> testStepList) {
+    String baseName = FilenameUtils.getBaseName(sourcePath.toString());
     Path destFile = getOutputDirPath()
         .resolve(baseName + "_" + StrUtils.sanitizeMetaCharacter(caseName) + ".csv");
 
@@ -158,32 +158,20 @@ public class Selenium2Script {
     return StringUtils.isEmpty(dir) ? "." : dir;
   }
 
-  /**
-   * SeleniumScriptを読み込みます。
-   *
-   * @param file SeleniumScriptのファイル
-   * @return SeleniumTestStep
-   */
-  protected List<SeleniumTestScript> loadSeleniumScripts(Path script) {
-    ObjectMapper mapper = new ObjectMapper();
+  private List<SeleniumTestScript> loadSeleniumScripts(Path script) {
     List<SeleniumTestScript> scripts = new ArrayList<>();
 
-    try {
-      JsonNode node = mapper.readTree(script.toFile());
-      String baseUrl = node.get("url").asText();
+    JsonNode node = JsonUtils.readTree(script);
+    String baseUrl = node.get("url").asText();
 
-      for (JsonNode testNode : node.get("tests")) {
-        scripts.add(loadSeleniumScript(testNode, baseUrl));
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    for (JsonNode testNode : node.get("tests")) {
+      scripts.add(loadSeleniumScript(testNode, baseUrl));
     }
 
     return scripts;
-
   }
 
-  protected SeleniumTestScript loadSeleniumScript(JsonNode testNode, String baseUrl) {
+  private SeleniumTestScript loadSeleniumScript(JsonNode testNode, String baseUrl) {
     SeleniumTestScript script = new SeleniumTestScript();
     script.setBaseUrl(baseUrl);
     script.setName(testNode.get("name").asText());

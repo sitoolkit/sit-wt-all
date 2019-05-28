@@ -17,8 +17,8 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.zeroturnaround.zip.ZipUtil;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
+import io.sitoolkit.wt.infra.JsonUtils;
 import io.sitoolkit.wt.infra.MultiThreadUtils;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.SitRepository;
@@ -145,20 +145,13 @@ public class FirefoxManager {
   }
 
   protected String getSeleniumIdeInstallVersion() {
-    String version = null;
-
     Path manifest = Paths.get(SitRepository.getRepositoryPath(), "selenium/ide/manifest.json");
     if (Files.exists(manifest)) {
-      ObjectMapper mapper = new ObjectMapper();
-      try {
-        JsonNode node = mapper.readTree(manifest.toFile());
-        version = node.get("version").asText();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      JsonNode node = JsonUtils.readTree(manifest);
+      return node.get("version").asText();
     }
 
-    return version;
+    return null;
   }
 
   public void uninstallSeleniumIde() {
