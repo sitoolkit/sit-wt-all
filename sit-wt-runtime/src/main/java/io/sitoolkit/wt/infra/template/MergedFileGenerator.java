@@ -4,15 +4,15 @@ import java.nio.file.Path;
 import java.util.Properties;
 import javax.annotation.Resource;
 
-public class LocalizedFileGenerator {
+public class MergedFileGenerator {
 
   @Resource
   private TemplateEngine templateEngine;
 
-  public void generate(String template, Path destDir, String destFileBase, String destFileExt,
+  public void generate(String templateBase, Path destDir, String destFileBase, String destFileExt,
       Properties properties) {
     TemplateModel model = new TemplateModel();
-    model.setTemplate(template);
+    model.setTemplate(templateBase + ".vm");
     model.setOutDir(destDir.toAbsolutePath().toString());
     model.setFileBase(destFileBase);
     model.setFileExt(destFileExt);

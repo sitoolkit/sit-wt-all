@@ -2,27 +2,46 @@ package io.sitoolkit.wt.app.evidence;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ResourceUtils;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import io.sitoolkit.wt.app.template.TemplateConfig;
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
+import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import io.sitoolkit.wt.infra.template.MergedFileGenerator;
 
 public class EvidenceReportEditor {
 
   private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceReportEditor.class);
 
-  private static final String evidenceRes = "js/report.js";
+  private static final String EVIDENCE_RESOURCE_DIR = "evidence/";
 
-  private static final String reportResourcePath = "target/site";
+  private static final String SCRIPT_DIR = "js/";
 
-  private static final String scriptTags = "    <script src=\"../js/jquery.js\"></script>\n"
-      + "    <script src=\"" + evidenceRes + "\"></script>\n";
+  private static final String SCRIPT_BASENAME = "report";
+
+  private static final String SCRIPT_EXTENTION = "js";
+
+  private static final String REPORT_RESOURCE_PATH = "target/site";
+
+  private static final String ADDITIONAL_SCRIPT_TAGS =
+      "    <script src=\"../js/jquery.js\"></script>\n" + "    <script src=\"" + SCRIPT_DIR
+          + SCRIPT_BASENAME + "." + SCRIPT_EXTENTION + "\"></script>\n";
+
+  private MergedFileGenerator mergedFileGenerator;
+
+  public EvidenceReportEditor() {
+    try (AnnotationConfigApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(TemplateConfig.class)) {
+      mergedFileGenerator = appCtx.getBean(MergedFileGenerator.class);
+    }
+  }
 
   public static void main(String[] args) {
     new EvidenceReportEditor().edit(EvidenceDir.getLatest());
@@ -32,29 +51,35 @@ public class EvidenceReportEditor {
 
     if (!evidenceDir.exists()) {
       LOG.error("evidence.error");
-    } else if (!EvidenceDir.existsReport(reportResourcePath)) {
-      LOG.error("report.error");
-    } else {
-
-      try {
-        FileUtils.copyDirectory(new File(reportResourcePath), evidenceDir.getReportDir().toFile(),
-            false);
-
-        URL url = ResourceUtils.getURL("classpath:evidence/" + evidenceRes);
-        File dstFile = evidenceDir.getReportDir().resolve(evidenceRes).toFile();
-        FileUtils.copyURLToFile(url, dstFile);
-
-      } catch (IOException e) {
-        LOG.error("resource.copy.error", e);
-        return;
-      } catch (Exception exp) {
-        LOG.error("proxy.error", exp);
-        return;
-      }
-
-      addTags(evidenceDir);
+      return;
     }
 
+    if (!EvidenceDir.existsReport(REPORT_RESOURCE_PATH)) {
+      LOG.error("report.error");
+      return;
+    }
+
+    try {
+      FileUtils.copyDirectory(new File(REPORT_RESOURCE_PATH), evidenceDir.getReportDir().toFile(),
+          false);
+    } catch (IOException e) {
+      LOG.error("resource.copy.error", e);
+      return;
+    }
+
+    generateReportScript(evidenceDir);
+
+    addTags(evidenceDir);
+
+  }
+
+  private void generateReportScript(EvidenceDir evidenceDir) {
+    String resourceBase = EVIDENCE_RESOURCE_DIR + SCRIPT_DIR + SCRIPT_BASENAME;
+    Properties properties = PropertyUtils.loadLocalizedProperties("/" + resourceBase, false);
+
+    Path destDir = evidenceDir.getReportDir().resolve(SCRIPT_DIR);
+    mergedFileGenerator.generate(resourceBase, destDir, SCRIPT_BASENAME, SCRIPT_EXTENTION,
+        properties);
   }
 
   private void addTags(EvidenceDir evidenceDir) {
@@ -78,7 +103,7 @@ public class EvidenceReportEditor {
         sb.append(line + "\n");
 
         if (trimmed.equals("<head>")) {
-          sb.append(scriptTags);
+          sb.append(ADDITIONAL_SCRIPT_TAGS);
         }
 
       }

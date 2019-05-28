@@ -7,7 +7,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import io.sitoolkit.wt.app.template.TemplateConfig;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
-import io.sitoolkit.wt.infra.template.LocalizedFileGenerator;
+import io.sitoolkit.wt.infra.template.MergedFileGenerator;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 
 public class SampleManager {
@@ -16,12 +16,12 @@ public class SampleManager {
 
   private static final String RESOURCE_DIR = "sample/";
 
-  private LocalizedFileGenerator localizedFileGenerator;
+  private MergedFileGenerator mergedFileGenerator;
 
   public SampleManager() {
     try (AnnotationConfigApplicationContext appCtx =
         new AnnotationConfigApplicationContext(TemplateConfig.class)) {
-      localizedFileGenerator = appCtx.getBean(LocalizedFileGenerator.class);
+      mergedFileGenerator = appCtx.getBean(MergedFileGenerator.class);
     }
   }
 
@@ -44,7 +44,7 @@ public class SampleManager {
     scriptProperties.putAll(doneProperties);
     scriptProperties.putAll(MessageManager.getMessageMap("testScript-"));
 
-    localizedFileGenerator.generate(RESOURCE_DIR + "SampleTestScript.vm", getDestPath("testscript"),
+    mergedFileGenerator.generate(RESOURCE_DIR + "SampleTestScript", getDestPath("testscript"),
         "SampleTestScript", "csv", scriptProperties);
   }
 
@@ -56,8 +56,8 @@ public class SampleManager {
   private Properties generateLocalizedHtml(String fileBase) {
     Properties properties = loadProperties(fileBase);
 
-    localizedFileGenerator.generate(RESOURCE_DIR + fileBase + ".vm", getDestPath(RESOURCE_DIR),
-        fileBase, "html", properties);
+    mergedFileGenerator.generate(RESOURCE_DIR + fileBase, getDestPath(RESOURCE_DIR), fileBase,
+        "html", properties);
 
     return properties;
   }
