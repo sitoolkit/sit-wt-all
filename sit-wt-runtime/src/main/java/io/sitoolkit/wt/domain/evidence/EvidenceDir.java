@@ -73,6 +73,12 @@ public class EvidenceDir {
   public static File getLatestEvidenceDir() {
 
     File outputDir = new File(getProjectDirectory() + "/" + EVIDENCE_ROOT_DIR);
+
+    if (!outputDir.exists()) {
+      LOG.info("evidence.dirs.empty", outputDir.getAbsolutePath());
+      return null;
+    }
+
     List<File> evidenceDirs = new ArrayList<File>(FileUtils.listFilesAndDirs(outputDir,
         FalseFileFilter.INSTANCE, new RegexFileFilter(evidenceDirRegex)));
     evidenceDirs.remove(outputDir);

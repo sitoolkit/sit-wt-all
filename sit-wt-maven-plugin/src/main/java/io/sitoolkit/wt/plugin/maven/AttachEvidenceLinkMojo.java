@@ -20,6 +20,10 @@ public class AttachEvidenceLinkMojo extends AbstractMojo {
 
     EvidenceDir targetDir = EvidenceDir.targetEvidenceDir(targetEvidence);
 
+    if (!targetDir.exists()) {
+      return;
+    }
+
     EvidenceReportEditor editor = new EvidenceReportEditor();
     editor.edit(targetDir);
   }
