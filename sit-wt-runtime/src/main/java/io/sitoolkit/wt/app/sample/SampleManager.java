@@ -2,14 +2,12 @@ package io.sitoolkit.wt.app.sample;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Properties;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import io.sitoolkit.wt.app.template.TemplateConfig;
 import io.sitoolkit.wt.infra.PropertyUtils;
-import io.sitoolkit.wt.infra.SitLocaleUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
-import io.sitoolkit.wt.infra.template.TemplateEngine;
-import io.sitoolkit.wt.infra.template.TemplateModel;
+import io.sitoolkit.wt.infra.template.LocalizedFileGenerator;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 
 public class SampleManager {
@@ -18,12 +16,12 @@ public class SampleManager {
 
   private static final String RESOURCE_DIR = "sample/";
 
-  private TemplateEngine templateEngine;
+  private LocalizedFileGenerator localizedFileGenerator;
 
   public SampleManager() {
     try (AnnotationConfigApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(SampleConfig.class)) {
-      templateEngine = appCtx.getBean(TemplateEngine.class);
+        new AnnotationConfigApplicationContext(TemplateConfig.class)) {
+      localizedFileGenerator = appCtx.getBean(LocalizedFileGenerator.class);
     }
   }
 
@@ -46,8 +44,8 @@ public class SampleManager {
     scriptProperties.putAll(doneProperties);
     scriptProperties.putAll(MessageManager.getMessageMap("testScript-"));
 
-    generateLocalizedFile("SampleTestScript.vm", "testscript", "SampleTestScript", "csv",
-        scriptProperties);
+    localizedFileGenerator.generate(RESOURCE_DIR + "SampleTestScript.vm", getDestPath("testscript"),
+        "SampleTestScript", "csv", scriptProperties);
   }
 
   private void unarchive(String filename) {
@@ -57,36 +55,16 @@ public class SampleManager {
 
   private Properties generateLocalizedHtml(String fileBase) {
     Properties properties = loadProperties(fileBase);
-    generateLocalizedFile(fileBase + ".vm", RESOURCE_DIR, fileBase, "html", properties);
+
+    localizedFileGenerator.generate(RESOURCE_DIR + fileBase + ".vm", getDestPath(RESOURCE_DIR),
+        fileBase, "html", properties);
 
     return properties;
   }
 
-  private void generateLocalizedFile(String template, String destDir, String destFileBase,
-      String destFileExt, Properties properties) {
-    TemplateModel model = new TemplateModel();
-    model.setTemplate(RESOURCE_DIR + template);
-    model.setOutDir(getDestPath(destDir).toString());
-    model.setFileBase(destFileBase);
-    model.setFileExt(destFileExt);
-    model.setProperties(properties);
-
-    templateEngine.write(model);
-  }
-
   private Properties loadProperties(String fileBase) {
-    String resourcePath = "/" + RESOURCE_DIR + getPropertiesFileName(fileBase);
-    return PropertyUtils.load(resourcePath, false);
-  }
-
-  private String getPropertiesFileName(String name) {
-    String fileName;
-    if (SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
-      fileName = name + "_" + Locale.JAPANESE.getLanguage();
-    } else {
-      fileName = name;
-    }
-    return fileName + ".properties";
+    String resourcePath = "/" + RESOURCE_DIR + fileBase;
+    return PropertyUtils.loadLocalizedProperties(resourcePath, false);
   }
 
   private Path getDestPath(String path) {
