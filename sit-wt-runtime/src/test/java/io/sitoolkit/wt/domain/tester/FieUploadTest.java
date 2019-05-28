@@ -14,13 +14,12 @@
 package io.sitoolkit.wt.domain.tester;
 
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-public class FieUploadTest extends SitTesterTestBase {
+public class FieUploadTest extends TestBase {
 
   @Test
   public void test001() {

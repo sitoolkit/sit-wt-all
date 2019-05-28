@@ -316,6 +316,11 @@
           <plugin>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
+            <configuration>
+              <webApp>
+                <resourceBases>${project.basedir}/sample,${project.basedir}/src/main/webapp</resourceBases>
+              </webApp>
+            </configuration>
             <executions>
               <execution>
                 <id>start-jetty</id>

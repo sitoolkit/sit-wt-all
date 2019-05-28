@@ -23,8 +23,7 @@ public class MobileWebDriver {
   private static final SitLogger LOG = SitLoggerFactory.getLogger(MobileWebDriver.class);
 
   public RemoteWebDriver getMobileDriver(PropertyManager pm, WebDriverCloser closer,
-      WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
-      throws MalformedURLException {
+      FirefoxManager firefoxManager) throws MalformedURLException {
     RemoteWebDriver webDriver = null;
 
     String driverType = StringUtils.defaultString(pm.getDriverType());
@@ -53,7 +52,7 @@ public class MobileWebDriver {
         // geckodriver is not stable yet as of 2016/10
         // so we doesn't support neigther selenium 3 nor firefox 48.x
         // higher
-        webDriverInstaller.installGeckoDriver();
+        WebDriverInstaller.getInstance().installGeckoDriver();
 
         webDriver = firefoxManager.startWebDriver(capabilities);
     }

@@ -20,13 +20,13 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
 /**
  *
  * @author yu.kawai
  */
-public class IncludeOperationTest extends SitTesterTestBase {
+public class IncludeOperationTest extends TestBase {
 
   @Resource
   WebDriver driver;

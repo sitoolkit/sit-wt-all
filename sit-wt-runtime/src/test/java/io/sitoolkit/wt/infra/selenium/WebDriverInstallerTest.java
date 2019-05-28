@@ -1,20 +1,23 @@
 package io.sitoolkit.wt.infra.selenium;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import io.sitoolkit.wt.infra.selenium.WebDriverInstaller;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import io.sitoolkit.wt.app.config.RuntimeConfig;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = RuntimeConfig.class)
 public class WebDriverInstallerTest {
 
   @Test
   public void test() {
 
-    WebDriverInstaller installer = new WebDriverInstaller();
-
-    installer.init();
+    WebDriverInstaller installer = WebDriverInstaller.getInstance();
 
     File repositoryDir = new File(installer.getRrepositoryDir(""));
     FileUtils.deleteQuietly(repositoryDir);

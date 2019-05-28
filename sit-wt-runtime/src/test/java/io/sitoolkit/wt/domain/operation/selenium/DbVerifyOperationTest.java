@@ -1,7 +1,8 @@
 package io.sitoolkit.wt.domain.operation.selenium;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.sql.Connection;
@@ -10,12 +11,12 @@ import java.sql.Statement;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
 /**
  *
  */
-public class DbVerifyOperationTest extends SitTesterTestBase {
+public class DbVerifyOperationTest extends TestBase {
 
   @BeforeClass
   public static void runDerby() throws Exception {

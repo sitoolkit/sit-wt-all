@@ -33,7 +33,6 @@ import io.sitoolkit.wt.infra.firefox.FirefoxManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.selenium.WebDriverCloser;
-import io.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 import io.sitoolkit.wt.infra.selenium.WebDriverMethodInterceptor;
 import io.sitoolkit.wt.infra.selenium.WebElementExceptionChecker;
 import io.sitoolkit.wt.infra.selenium.WebElementExceptionCheckerImpl;
@@ -48,27 +47,21 @@ public class WebDriverConfig {
   @Bean
   @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, scopeName = "thread")
   public RemoteWebDriver innerWebDriver(PropertyManager pm, WebDriverCloser closer,
-      WebDriverInstaller webDriverInstaller, FirefoxManager firefoxManager)
-      throws MalformedURLException {
+      FirefoxManager firefoxManager) throws MalformedURLException {
     RemoteWebDriver webDriver = null;
     String driverType = StringUtils.defaultString(pm.getDriverType());
     switch (driverType) {
       case "android":
       case "ios":
         MobileWebDriver mobileDriver = new MobileWebDriver();
-        webDriver = mobileDriver.getMobileDriver(pm, closer, webDriverInstaller, firefoxManager);
+        webDriver = mobileDriver.getMobileDriver(pm, closer, firefoxManager);
         break;
 
       default:
-        webDriver = pcDriver.createPCDriver(pm, closer, webDriverInstaller, firefoxManager);
+        webDriver = pcDriver.createPCDriver(pm, closer, firefoxManager);
     }
 
     return webDriver;
-  }
-
-  @Bean
-  public WebDriverInstaller webDriverInstaller() {
-    return new WebDriverInstaller();
   }
 
   @Bean(destroyMethod = "")

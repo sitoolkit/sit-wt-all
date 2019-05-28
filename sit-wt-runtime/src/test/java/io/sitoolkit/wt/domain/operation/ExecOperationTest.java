@@ -18,13 +18,13 @@ import java.io.File;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
 /**
  *
  * @author yu.kawai
  */
-public class ExecOperationTest extends SitTesterTestBase {
+public class ExecOperationTest extends TestBase {
 
   private static final String TEST_DIR = "./testdir";
 

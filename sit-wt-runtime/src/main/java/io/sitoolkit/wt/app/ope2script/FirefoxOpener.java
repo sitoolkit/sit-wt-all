@@ -18,8 +18,6 @@ public class FirefoxOpener {
 
   private FirefoxManager ffManager = new FirefoxManager();
 
-  private WebDriverInstaller webDriverInstaller = new WebDriverInstaller();
-
   private String guidanceFile = "guidance/guidance-ope2script.html";
 
   private String[] guidanceResources = new String[] {guidanceFile, "guidance/css/bootstrap.min.css",
@@ -29,7 +27,6 @@ public class FirefoxOpener {
 
   public FirefoxOpener() {
     ffManager.init();
-    webDriverInstaller.init();
     baseUrl = System.getProperty("baseUrl");
   }
 
@@ -47,7 +44,7 @@ public class FirefoxOpener {
   public int open() {
     try {
       ffManager.switchEsr();
-      webDriverInstaller.installGeckoDriver();
+      WebDriverInstaller.getInstance().installGeckoDriver();
 
       GuidanceUtils.retrieve(guidanceResources);
 

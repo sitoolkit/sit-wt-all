@@ -14,13 +14,13 @@
 package io.sitoolkit.wt.domain.operation;
 
 import org.junit.Test;
-import io.sitoolkit.wt.domain.tester.SitTesterTestBase;
+import io.sitoolkit.wt.domain.tester.TestBase;
 
 /**
  *
  * @author yuichi.kuwahara
  */
-public class GoToOperationTest extends SitTesterTestBase {
+public class GoToOperationTest extends TestBase {
 
   @Test
   public void test001() {
