@@ -11,7 +11,7 @@ public class SampleGenerator {
 
     generated = true;
 
-    new SampleManager().unarchiveBasicSample();
+    SampleManager.staticUnarchiveBasicSample();
   }
 
 }

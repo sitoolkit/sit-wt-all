@@ -88,8 +88,7 @@ public class DiffEvidenceGenerator {
       boolean result = generator.generate(baseDir, targetDir, compareScreenshot);
 
       if (!result) {
-        EvidenceReportEditor editor = appCtx.getBean(EvidenceReportEditor.class);
-        editor.edit(targetDir);
+        EvidenceReportEditor.staticExecute(targetDir);
 
         if (evidenceOpen) {
           ReportOpener opener = appCtx.getBean(ReportOpener.class);

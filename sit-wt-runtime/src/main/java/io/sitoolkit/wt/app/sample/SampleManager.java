@@ -3,8 +3,8 @@ package io.sitoolkit.wt.app.sample;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import io.sitoolkit.wt.app.template.TemplateConfig;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
 import io.sitoolkit.wt.infra.template.MergedFileGenerator;
@@ -16,12 +16,14 @@ public class SampleManager {
 
   private static final String RESOURCE_DIR = "sample/";
 
+  @Resource
   private MergedFileGenerator mergedFileGenerator;
 
-  public SampleManager() {
+  public static void staticUnarchiveBasicSample() {
     try (AnnotationConfigApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(TemplateConfig.class)) {
-      mergedFileGenerator = appCtx.getBean(MergedFileGenerator.class);
+        new AnnotationConfigApplicationContext(SampleManagerConfig.class)) {
+
+      appCtx.getBean(SampleManager.class).unarchiveBasicSample();
     }
   }
 
@@ -30,7 +32,7 @@ public class SampleManager {
     unarchiveBasicSample();
   }
 
-  public void unarchiveBasicSample() {
+  private void unarchiveBasicSample() {
     unarchive("bootstrap.min.css");
     unarchive("pom.xml");
 
@@ -72,6 +74,6 @@ public class SampleManager {
   }
 
   public static void main(String[] args) {
-    new SampleManager().unarchiveBasicSample();
+    staticUnarchiveBasicSample();
   }
 }

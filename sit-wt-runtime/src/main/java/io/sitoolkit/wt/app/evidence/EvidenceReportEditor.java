@@ -9,7 +9,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import io.sitoolkit.wt.app.template.TemplateConfig;
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -36,15 +35,16 @@ public class EvidenceReportEditor {
 
   private MergedFileGenerator mergedFileGenerator;
 
-  public EvidenceReportEditor() {
-    try (AnnotationConfigApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(TemplateConfig.class)) {
-      mergedFileGenerator = appCtx.getBean(MergedFileGenerator.class);
-    }
+  public static void main(String[] args) {
+    staticExecute(EvidenceDir.getLatest());
   }
 
-  public static void main(String[] args) {
-    new EvidenceReportEditor().edit(EvidenceDir.getLatest());
+  public static void staticExecute(EvidenceDir evidenceDir) {
+    try (AnnotationConfigApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(EvidenceReportEditorConfig.class)) {
+
+      appCtx.getBean(EvidenceReportEditor.class).edit(evidenceDir);
+    }
   }
 
   public void edit(EvidenceDir evidenceDir) {

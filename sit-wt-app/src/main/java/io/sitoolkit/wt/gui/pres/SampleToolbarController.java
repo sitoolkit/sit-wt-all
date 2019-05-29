@@ -2,6 +2,7 @@ package io.sitoolkit.wt.gui.pres;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javax.annotation.Resource;
 import io.sitoolkit.wt.gui.app.sample.SampleService;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.domain.project.ProjectState.State;
@@ -36,7 +37,8 @@ public class SampleToolbarController implements Initializable {
   @Getter
   private BooleanProperty running = new SimpleBooleanProperty(false);
 
-  SampleService service = new SampleService();
+  @Resource
+  SampleService service;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
