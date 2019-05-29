@@ -4,15 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Properties;
+import java.util.Map;
+import javax.annotation.Resource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
-import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import io.sitoolkit.wt.infra.resource.MessageManager;
 import io.sitoolkit.wt.infra.template.MergedFileGenerator;
 
 public class EvidenceReportEditor {
@@ -33,6 +34,7 @@ public class EvidenceReportEditor {
       "    <script src=\"../js/jquery.js\"></script>\n" + "    <script src=\"" + SCRIPT_DIR
           + SCRIPT_BASENAME + "." + SCRIPT_EXTENTION + "\"></script>\n";
 
+  @Resource
   private MergedFileGenerator mergedFileGenerator;
 
   public static void main(String[] args) {
@@ -75,7 +77,7 @@ public class EvidenceReportEditor {
 
   private void generateReportScript(EvidenceDir evidenceDir) {
     String resourceBase = EVIDENCE_RESOURCE_DIR + SCRIPT_DIR + SCRIPT_BASENAME;
-    Properties properties = PropertyUtils.loadLocalizedProperties("/" + resourceBase, false);
+    Map<String, String> properties = MessageManager.getResourceAsMap();
 
     Path destDir = evidenceDir.getReportDir().resolve(SCRIPT_DIR);
     mergedFileGenerator.generate(resourceBase, destDir, SCRIPT_BASENAME, SCRIPT_EXTENTION,

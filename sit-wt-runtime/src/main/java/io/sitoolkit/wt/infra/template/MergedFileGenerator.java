@@ -1,7 +1,7 @@
 package io.sitoolkit.wt.infra.template;
 
 import java.nio.file.Path;
-import java.util.Properties;
+import java.util.Map;
 import javax.annotation.Resource;
 
 public class MergedFileGenerator {
@@ -10,7 +10,7 @@ public class MergedFileGenerator {
   private TemplateEngine templateEngine;
 
   public void generate(String templateBase, Path destDir, String destFileBase, String destFileExt,
-      Properties properties) {
+      Map<String, String> properties) {
     TemplateModel model = new TemplateModel();
     model.setTemplate(templateBase + ".vm");
     model.setOutDir(destDir.toAbsolutePath().toString());

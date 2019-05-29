@@ -1,7 +1,6 @@
 package io.sitoolkit.wt.app.test;
 
 import java.nio.file.Path;
-import java.util.Properties;
 import javax.annotation.Resource;
 import org.apache.commons.io.FilenameUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
@@ -23,10 +22,7 @@ public class TestScriptGenerator {
     model.setOutDir(destFile.getParent().toString());
     model.setFileBase(destFileBase);
     model.setFileExt(destFileExt);
-
-    Properties properties = new Properties();
-    properties.putAll(MessageManager.getMessageMap("testScript-"));
-    model.setProperties(properties);
+    model.setProperties(MessageManager.getResourceAsMap());
 
     templateEngine.write(model);
   }

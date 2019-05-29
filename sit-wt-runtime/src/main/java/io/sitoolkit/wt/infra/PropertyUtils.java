@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -60,18 +59,6 @@ public class PropertyUtils {
 
     return prop;
   }
-
-  public static Properties loadLocalizedProperties(String baseName,
-      boolean ignoreResourceNotFound) {
-    String fileName;
-    if (SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
-      fileName = baseName + "_" + Locale.JAPANESE.getLanguage();
-    } else {
-      fileName = baseName;
-    }
-    return load(fileName + ".properties", ignoreResourceNotFound);
-  }
-
 
   public static Map<String, String> loadAsMap(String resourceName, boolean ignoreResourceNotFound) {
     Properties prop = load(resourceName, ignoreResourceNotFound);

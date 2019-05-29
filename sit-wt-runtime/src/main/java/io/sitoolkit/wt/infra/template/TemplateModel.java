@@ -1,6 +1,6 @@
 package io.sitoolkit.wt.infra.template;
 
-import java.util.Properties;
+import java.util.Map;
 
 public class TemplateModel {
 
@@ -29,7 +29,7 @@ public class TemplateModel {
   /**
    * テンプレート内で参照するプロパティ
    */
-  private Properties properties;
+  private Map<String, String> properties;
 
   public String getOutDir() {
     return outDir;
@@ -55,11 +55,11 @@ public class TemplateModel {
     this.var = var;
   }
 
-  public Properties getProperties() {
+  public Map<String, String> getProperties() {
     return properties;
   }
 
-  public void setProperties(Properties properties) {
+  public void setProperties(Map<String, String> properties) {
     this.properties = properties;
   }
 

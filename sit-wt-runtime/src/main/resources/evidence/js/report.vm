@@ -1,11 +1,11 @@
 $(function () {
 
   var typeMap = new Map();
-  typeMap.set("evidence", "${evidence-type-normal}");
-  typeMap.set("mask", "${evidence-type-mask}");
-  typeMap.set("comp", "${evidence-type-compare}");
-  typeMap.set("compmask", "${evidence-type-compare-mask}")
-  typeMap.set("compng", "${evidence-type-compare-ng}");
+  typeMap.set("evidence", "${report-evidence-type-normal}");
+  typeMap.set("mask", "${report-evidence-type-mask}");
+  typeMap.set("comp", "${report-evidence-type-compare}");
+  typeMap.set("compmask", "${report-evidence-type-compare-mask}")
+  typeMap.set("compng", "${report-evidence-type-compare-ng}");
 
   var section = $("h2:contains(Test Cases)").closest(".section");
 
@@ -31,7 +31,7 @@ $(function () {
     let input = $(this);
     section.find("td > a[name='TC_" + input.data("name") + "']").each(function () {
       let td = $(this).parent();
-      td.append(" ( ${evidence-label}： " + buildEvidenceLinks(input.data()) + " )");
+      td.append(" ( ${report-evidence-label}： " + buildEvidenceLinks(input.data()) + " )");
     });
   });
 
