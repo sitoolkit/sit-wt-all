@@ -1,6 +1,7 @@
 package io.sitoolkit.wt.gui.app.sample;
 
 import java.nio.file.Path;
+import javax.annotation.Resource;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessExitCallback;
 import io.sitoolkit.wt.app.sample.SampleManager;
 import io.sitoolkit.wt.gui.domain.sample.SampleProcessClient;
@@ -10,7 +11,8 @@ public class SampleService {
 
   SampleProcessClient client = new SampleProcessClient();
 
-  SampleManager sampleManager = new SampleManager();
+  @Resource
+  SampleManager sampleManager;
 
   /**
    * サンプルWebサイトを{@code destDir}以下に展開します。

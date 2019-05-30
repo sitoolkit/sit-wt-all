@@ -9,24 +9,32 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessExitCallback;
 import io.sitoolkit.wt.gui.app.project.ProjectService;
 import io.sitoolkit.wt.gui.app.project.ProjectTestUtils;
 import io.sitoolkit.wt.gui.domain.sample.SampleStartedCallback;
+import io.sitoolkit.wt.gui.infra.config.ApplicationConfig;
 import io.sitoolkit.wt.gui.testutil.ThreadUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = ApplicationConfig.class)
 public class SampleServiceTest {
 
   ProjectService projectService = new ProjectService();
 
-  SampleService sampleService = new SampleService();
+  @Resource
+  SampleService sampleService;
 
   Path projectDir = Paths.get("target/sampletest").toAbsolutePath();
 

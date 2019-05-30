@@ -11,8 +11,7 @@ public class GetSampleMojo extends AbstractMojo {
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    SampleManager sample = new SampleManager();
-    sample.unarchiveBasicSample();
+    SampleManager.staticUnarchiveBasicSample();
   }
 
 }

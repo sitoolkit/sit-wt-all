@@ -24,7 +24,6 @@ public class AttachEvidenceLinkMojo extends AbstractMojo {
       return;
     }
 
-    EvidenceReportEditor editor = new EvidenceReportEditor();
-    editor.edit(targetDir);
+    EvidenceReportEditor.staticExecute(targetDir);
   }
 }

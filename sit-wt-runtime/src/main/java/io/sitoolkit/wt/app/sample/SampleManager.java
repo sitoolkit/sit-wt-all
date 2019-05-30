@@ -3,13 +3,13 @@ package io.sitoolkit.wt.app.sample;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
-import java.util.Properties;
+import java.util.Map;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import io.sitoolkit.wt.infra.PropertyUtils;
 import io.sitoolkit.wt.infra.SitLocaleUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
-import io.sitoolkit.wt.infra.template.TemplateEngine;
-import io.sitoolkit.wt.infra.template.TemplateModel;
+import io.sitoolkit.wt.infra.template.MergedFileGenerator;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
 
 public class SampleManager {
@@ -18,12 +18,14 @@ public class SampleManager {
 
   private static final String RESOURCE_DIR = "sample/";
 
-  private TemplateEngine templateEngine;
+  @Resource
+  private MergedFileGenerator mergedFileGenerator;
 
-  public SampleManager() {
+  public static void staticUnarchiveBasicSample() {
     try (AnnotationConfigApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(SampleConfig.class)) {
-      templateEngine = appCtx.getBean(TemplateEngine.class);
+        new AnnotationConfigApplicationContext(SampleManagerConfig.class)) {
+
+      appCtx.getBean(SampleManager.class).unarchiveBasicSample();
     }
   }
 
@@ -32,22 +34,22 @@ public class SampleManager {
     unarchiveBasicSample();
   }
 
-  public void unarchiveBasicSample() {
+  private void unarchiveBasicSample() {
     unarchive("bootstrap.min.css");
     unarchive("pom.xml");
 
-    Properties inputProperties = generateLocalizedHtml("input");
-    Properties termsProperties = generateLocalizedHtml("terms");
-    Properties doneProperties = generateLocalizedHtml("done");
+    Map<String, String> inputProperties = generateLocalizedHtml("input");
+    Map<String, String> termsProperties = generateLocalizedHtml("terms");
+    Map<String, String> doneProperties = generateLocalizedHtml("done");
 
-    Properties scriptProperties = loadProperties("SampleTestScript");
+    Map<String, String> scriptProperties = loadProperties("SampleTestScript");
     scriptProperties.putAll(inputProperties);
     scriptProperties.putAll(termsProperties);
     scriptProperties.putAll(doneProperties);
-    scriptProperties.putAll(MessageManager.getMessageMap("testScript-"));
+    scriptProperties.putAll(MessageManager.getResourceAsMap());
 
-    generateLocalizedFile("SampleTestScript.vm", "testscript", "SampleTestScript", "csv",
-        scriptProperties);
+    mergedFileGenerator.generate(RESOURCE_DIR + "SampleTestScript", getDestPath("testscript"),
+        "SampleTestScript", "csv", scriptProperties);
   }
 
   private void unarchive(String filename) {
@@ -55,28 +57,18 @@ public class SampleManager {
     FileIOUtils.sysRes2file(resource, getDestPath(resource));
   }
 
-  private Properties generateLocalizedHtml(String fileBase) {
-    Properties properties = loadProperties(fileBase);
-    generateLocalizedFile(fileBase + ".vm", RESOURCE_DIR, fileBase, "html", properties);
+  private Map<String, String> generateLocalizedHtml(String fileBase) {
+    Map<String, String> properties = loadProperties(fileBase);
+
+    mergedFileGenerator.generate(RESOURCE_DIR + fileBase, getDestPath(RESOURCE_DIR), fileBase,
+        "html", properties);
 
     return properties;
   }
 
-  private void generateLocalizedFile(String template, String destDir, String destFileBase,
-      String destFileExt, Properties properties) {
-    TemplateModel model = new TemplateModel();
-    model.setTemplate(RESOURCE_DIR + template);
-    model.setOutDir(getDestPath(destDir).toString());
-    model.setFileBase(destFileBase);
-    model.setFileExt(destFileExt);
-    model.setProperties(properties);
-
-    templateEngine.write(model);
-  }
-
-  private Properties loadProperties(String fileBase) {
+  private Map<String, String> loadProperties(String fileBase) {
     String resourcePath = "/" + RESOURCE_DIR + getPropertiesFileName(fileBase);
-    return PropertyUtils.load(resourcePath, false);
+    return PropertyUtils.loadAsMap(resourcePath, false);
   }
 
   private String getPropertiesFileName(String name) {
@@ -94,6 +86,6 @@ public class SampleManager {
   }
 
   public static void main(String[] args) {
-    new SampleManager().unarchiveBasicSample();
+    staticUnarchiveBasicSample();
   }
 }

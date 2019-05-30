@@ -1,7 +1,10 @@
 package io.sitoolkit.wt.gui.pres;
 
 import java.util.ResourceBundle;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
+import io.sitoolkit.wt.gui.infra.config.ApplicationConfig;
 import io.sitoolkit.wt.gui.infra.config.PropertyManager;
 import io.sitoolkit.wt.gui.infra.fx.FxContext;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -23,6 +26,8 @@ public class SitWtApplication extends Application {
   private static final SitLogger LOG = SitLoggerFactory.getLogger(SitWtApplication.class);
 
   private AppController controller;
+
+  private ConfigurableApplicationContext appCtx;
 
   public static void main(String[] args) {
     LOG.info("app.envInfo", SystemUtils.getEnvironmentInfo());
@@ -48,6 +53,10 @@ public class SitWtApplication extends Application {
 
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/App.fxml"));
     loader.setResources(ResourceBundle.getBundle("message.message"));
+
+    appCtx = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+    loader.setControllerFactory(appCtx::getBean);
+
     Parent root = loader.load();
     controller = loader.getController();
 
@@ -70,6 +79,7 @@ public class SitWtApplication extends Application {
   @Override
   public void stop() throws Exception {
     controller.destroy();
+    appCtx.close();
     PropertyManager.get().save();
     ExecutorContainer.get().shutdown();
   }

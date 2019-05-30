@@ -16,6 +16,8 @@ public class MessageManager {
 
   private static ResourceBundle resource;
 
+  private static Map<String, String> resourceMap;
+
   private static synchronized ResourceBundle getResource() {
     if (resource == null) {
       String baseName = MessageManager.class.getPackage().getName().replace(".", "/") + "/message";
@@ -45,14 +47,19 @@ public class MessageManager {
 
   }
 
-  public static Map<String, String> getMessageMap(String keyPrefix) {
-    Map<String, String> messageMap = new HashMap<>();
-    for (String key : Collections.list(getResource().getKeys())) {
-      if (key.startsWith(keyPrefix)) {
-        messageMap.put(key, getResource().getString(key));
-      }
+  public synchronized static Map<String, String> getResourceAsMap() {
+    if (resourceMap != null) {
+      return resourceMap;
     }
-    return messageMap;
+
+    Map<String, String> map = new HashMap<>();
+    ResourceBundle resourceBundle = getResource();
+    for (String key : Collections.list(resourceBundle.getKeys())) {
+      map.put(key, resourceBundle.getString(key));
+    }
+    resourceMap = Collections.unmodifiableMap(map);
+
+    return resourceMap;
   }
 
 }
