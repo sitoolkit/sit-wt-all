@@ -38,13 +38,13 @@
   <parent>
     <groupId>io.sitoolkit.wt</groupId>
     <artifactId>sit-wt-all</artifactId>
-    <version>3.0.0-beta.1</version>
+    <version>3.0.0-beta.2-SNAPSHOT</version>
   </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <sitwt.version>3.0.0-beta.1</sitwt.version>
+    <sitwt.version>3.0.0-beta.2-SNAPSHOT</sitwt.version>
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
     <trimStackTrace>false</trimStackTrace>
     <mpir.skip>true</mpir.skip>
