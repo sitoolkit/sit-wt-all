@@ -25,7 +25,7 @@ import org.springframework.context.ApplicationContextAware;
 import io.sitoolkit.wt.infra.resource.MessageManager;
 
 /**
- * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプトに変換するクラスです。
+ * Selenium IDEのテストスクリプト(.side)をSIT-WTのテストスクリプトに変換するクラスです。
  *
  * @author yuichi.kuwahara
  * @author kaori.ogawa

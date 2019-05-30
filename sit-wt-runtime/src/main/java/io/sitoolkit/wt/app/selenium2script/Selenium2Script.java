@@ -39,7 +39,7 @@ import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.util.StrUtils;
 
 /**
- * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(csv)に変換するクラスです。
+ * Selenium IDEのテストスクリプト(.side)をSIT-WTのテストスクリプト(.csv)に変換するクラスです。
  *
  * @author yuichi.kuwahara
  */
@@ -76,7 +76,7 @@ public class Selenium2Script {
   }
 
   /**
-   * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(csv)に変換します。
+   * Selenium IDEのテストスクリプト(.side)をSIT-WTのテストスクリプト(.csv)に変換します。
    */
   public void execute() {
 
