@@ -50,9 +50,8 @@ public class Selenium2ScriptTest extends TestBase {
 
     Selenium2Script converter = Selenium2Script.initInstance();
     converter.setOpenScript(false);
-    int ret = converter.execute();
+    converter.execute();
 
-    assertThat("実行結果コード", ret, is(0));
     assertThat("バックアップされたSeleniumScriptファイル", new File(BACKUPED_SCRIPT).exists(), is(true));
 
     testScriptPath = testScript.getAbsolutePath();

@@ -115,7 +115,7 @@ public class TestRunner {
     for (String testCondition : testCaseStr.split(",")) {
       TestCase testCase = TestCase.parse(testCondition);
 
-      if (!testCase.getScriptPath().endsWith(Selenium2Script.SCRIPT_EXTENSION)) {
+      if (!testCase.getScriptPath().endsWith("." + Selenium2Script.SCRIPT_EXTENSION)) {
         allTestCase.add(testCase);
         continue;
       }
@@ -144,7 +144,7 @@ public class TestRunner {
 
     Path seleniumScript = Paths.get(seleniumScriptPath);
 
-    List<Path> scripts = s2s.convert(seleniumScript);
+    List<Path> scripts = s2s.convertScriptFile(seleniumScript);
     s2s.backup(seleniumScript);
 
     return scripts;

@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
@@ -48,15 +49,15 @@ public class Selenium2Script {
 
   public static final String DEFAULT_CASE_NO = "001";
 
-  public static final String SCRIPT_EXTENSION = ".side";
+  public static final String SCRIPT_EXTENSION = "side";
+
+  private static final String SELENIUM_SCRIPT_DIR = "testscript";
 
   private TestScriptDao dao;
 
   private SeleniumStepConverter seleniumStepConverter;
 
-  private String outputDir = "testscript";
-
-  private String seleniumScriptDirs = outputDir + ",.";
+  private String outputDir = SELENIUM_SCRIPT_DIR;
 
   private boolean openScript = true;
 
@@ -65,8 +66,7 @@ public class Selenium2Script {
   public Selenium2Script() {}
 
   public static void main(String[] args) {
-    Selenium2Script converter = initInstance();
-    System.exit(converter.execute());
+    initInstance().execute();
   }
 
   public static Selenium2Script initInstance() {
@@ -77,45 +77,34 @@ public class Selenium2Script {
 
   /**
    * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(csv)に変換します。
-   *
-   * @return 0:正常終了
    */
-  public int execute() {
+  public void execute() {
 
-    int ret = 0;
+    List<Path> testScripts = convertScriptFiles();
 
-    for (String seleniumScriptDir : seleniumScriptDirs.split(",")) {
-      File scriptDir = new File(seleniumScriptDir);
-      if (!scriptDir.exists()) {
-        continue;
-      }
-
-      boolean recursive = !".".equals(seleniumScriptDir);
-      for (File seleniumScript : FileUtils.listFiles(scriptDir, new String[] {SCRIPT_EXTENSION},
-          recursive)) {
-        List<Path> testScripts = convert(seleniumScript.toPath());
-
-        backup(seleniumScript.toPath());
-
-        if (!isOpenScript()) {
-          continue;
-        }
-
-        for (Path testScript : testScripts) {
-          try {
-            Desktop.getDesktop().open(testScript.toFile());
-          } catch (IOException e) {
-            log.error("open.script.error", e);
-            ret = 2;
-          }
-        }
-      }
+    if (isOpenScript()) {
+      openTestScripts(testScripts);
     }
-
-    return ret;
   }
 
-  public List<Path> convert(Path sourcePath) {
+  private List<Path> convertScriptFiles() {
+
+    File scriptDir = new File(getProjectDirectory(), SELENIUM_SCRIPT_DIR);
+    if (!scriptDir.exists()) {
+      return Collections.emptyList();
+    }
+
+    List<Path> testScripts = new ArrayList<>();
+    FileUtils.listFiles(scriptDir, new String[] {SCRIPT_EXTENSION}, true)
+        .forEach((seleniumScript) -> {
+          testScripts.addAll(convertScriptFile(seleniumScript.toPath()));
+          backup(seleniumScript.toPath());
+        });
+
+    return testScripts;
+  }
+
+  public List<Path> convertScriptFile(Path sourcePath) {
     log.info("selenium.script.convert", sourcePath.toAbsolutePath());
 
     List<SeleniumTestScript> seleniumScripts = loadSeleniumScripts(sourcePath);
@@ -123,18 +112,18 @@ public class Selenium2Script {
     return seleniumScripts.stream().map((seleniumScript) -> {
       List<TestStep> testStepList =
           seleniumStepConverter.convertTestScript(seleniumScript, DEFAULT_CASE_NO);
-      return write(sourcePath, seleniumScript.getName(), testStepList);
+
+      Path outputPath = buildOutputPath(sourcePath, seleniumScript.getName());
+      dao.write(outputPath.toFile(), testStepList, overwriteScript);
+
+      return outputPath;
     }).collect(Collectors.toList());
   }
 
-  private Path write(Path sourcePath, String caseName, List<TestStep> testStepList) {
+  private Path buildOutputPath(Path sourcePath, String testName) {
     String baseName = FilenameUtils.getBaseName(sourcePath.toString());
-    Path destFile = getOutputDirPath()
-        .resolve(baseName + "_" + StrUtils.sanitizeMetaCharacter(caseName) + ".csv");
-
-    dao.write(destFile.toFile(), testStepList, overwriteScript);
-
-    return destFile;
+    String fileName = baseName + "_" + StrUtils.sanitizeMetaCharacter(testName) + ".csv";
+    return getOutputDirPath().resolve(fileName);
   }
 
   public void backup(Path seleniumScript) {
@@ -146,6 +135,16 @@ public class Selenium2Script {
       Files.move(seleniumScript, bkFile, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private void openTestScripts(List<Path> testScripts) {
+    for (Path testScript : testScripts) {
+      try {
+        Desktop.getDesktop().open(testScript.toFile());
+      } catch (IOException e) {
+        log.error("open.script.error", e);
+      }
     }
   }
 
@@ -199,14 +198,6 @@ public class Selenium2Script {
 
   public void setDao(TestScriptDao dao) {
     this.dao = dao;
-  }
-
-  public String getSeleniumScriptDir() {
-    return seleniumScriptDirs;
-  }
-
-  public void setSeleniumScriptDir(String seleniumScriptDir) {
-    this.seleniumScriptDirs = seleniumScriptDir;
   }
 
   public String getOutputDir() {

@@ -25,7 +25,7 @@ public class SitWtRuntimeUtils {
   private static String javaHome;
 
   private static final Pattern SCRIPT_FILE_PATTERN =
-      Pattern.compile(".*\\.csv$|.*\\" + Selenium2Script.SCRIPT_EXTENSION + "$");
+      Pattern.compile(".*\\.csv$|.*\\." + Selenium2Script.SCRIPT_EXTENSION + "$");
 
   public static List<Path> decodeScrintStr(String scriptStr) {
     return Stream.of(scriptStr.split(",")).map(str -> StringUtils.substringBefore(str, "#"))
