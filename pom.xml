@@ -99,9 +99,15 @@
             <artifactId>ant</artifactId>
             <version>1.10.5</version>
           </dependency>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+          </dependency>
         </dependencies>
         <configuration>
           <target>
+            <property name="maven.plugin.classpath" refid="maven.plugin.classpath" />
             <ant antfile="build.xml" target="${run}" />
           </target>
         </configuration>
@@ -216,10 +222,10 @@
 
     <profile>
       <id>analyze</id>
-      
+
       <build>
         <plugins>
-        
+
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
@@ -232,7 +238,7 @@
               </execution>
             </executions>
           </plugin>
-          
+
         </plugins>
       </build>
     </profile>

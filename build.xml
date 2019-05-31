@@ -5,6 +5,8 @@
          basedir="."
          default="install">
 
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${maven.plugin.classpath}"/>
+  
   <property environment="env" />
   <property name="testArtifactId" value="sit-wt-test" />
   <property name="testdir" value="${basedir}/${testArtifactId}" />
@@ -22,7 +24,6 @@
   <condition property="mvn.profile.ci" value="localhost,ci,release" else="">
     <isset property="ci" />
   </condition>
-
 
   <target name="install">
     <antcall target="01_local-install-stage" />
@@ -109,11 +110,23 @@
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
                    replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
 
+    <if>
+      <not>
+        <matches string="${version}" pattern="^.*-SNAPSHOT$" />
+      </not>
+      <then>
+          <replaceregexp file="${basedir}/README.md"
+                 match="io/sitoolkit/wt/sit-wt-app/.*/sit-wt-app-.*\.jar"
+                 replace="io/sitoolkit/wt/sit-wt-app/${version}/sit-wt-app-${version}.jar" />
+      </then>
+    </if>
+    
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />
       <arg value="versions:set" />
     </exec>
-
+    
   </target>
 
+ 
 </project>
