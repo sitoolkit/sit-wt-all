@@ -249,6 +249,18 @@
       "targets": [],
       "value": ""
     }, {
+      "id": "a14a63ed-c846-4ed3-9a11-e23ac7b32ebd",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=tr:nth-child(1) > td",
+      "targets": [
+        ["css=tr:nth-child(1) > td", "css:finder"],
+        ["xpath=//table[@id='confirm']/tbody/tr/td", "xpath:idRelative"],
+        ["xpath=//td", "xpath:position"],
+        ["xpath=//td[contains(.,'試験太郎')]", "xpath:innerText"]
+      ],
+      "value": "試験太郎"
+    }, {
       "id": "b1d8c7ac-c93c-4e5d-91df-0676800a1262",
       "comment": "",
       "command": "click",

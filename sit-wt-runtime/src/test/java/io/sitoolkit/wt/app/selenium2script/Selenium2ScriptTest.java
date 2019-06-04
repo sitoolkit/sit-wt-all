@@ -61,9 +61,9 @@ public class Selenium2ScriptTest extends TestBase {
     TestScript testScript1 = dao.load(outputFile1, getSheetName(), false);
     TestScript testScript2 = dao.load(outputFile2, getSheetName(), false);
 
-    assertThat("Case1 step count", testScript1.getTestStepCount(), is(18));
-    assertThat("Case1 step count", testScript1.getIndexByScriptNo("21"), is(17));
-    assertThat("Case1 step count", testScript1.getIndexByScriptNo("22"), is(-1));
+    assertThat("Case1 step count", testScript1.getTestStepCount(), is(19));
+    assertThat("Case1 step count", testScript1.getIndexByScriptNo("22"), is(18));
+    assertThat("Case1 step count", testScript1.getIndexByScriptNo("23"), is(-1));
     assertThat("Case2 step count", testScript2.getTestStepCount(), is(8));
     assertThat("Case2 step count", testScript2.getIndexByScriptNo("9"), is(7));
     assertThat("Case2 step count", testScript2.getIndexByScriptNo("10"), is(-1));

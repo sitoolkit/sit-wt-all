@@ -3,7 +3,6 @@ package io.sitoolkit.wt.app.selenium2script;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -29,19 +28,20 @@ public class SeleniumStepConverter implements ApplicationContextAware {
 
   private Pattern screenshotPattern;
 
-  private final List<String> autoInsertedCommands = Arrays.asList(new String[] {
-      "chooseOkOnNextConfirmation", "chooseCancelOnNextConfirmation", "storeWindowHandle"});
+  private static final List<String> commandsToSkip = Arrays.asList("chooseOkOnNextConfirmation",
+      "chooseCancelOnNextConfirmation", "assertConfirmation", "storeWindowHandle");
+
+  private static final List<String> confirmationCommands = Arrays.asList(
+      "webdriverChooseOkOnVisibleConfirmation", "webdriverChooseCancelOnVisibleConfirmation");
 
   public List<TestStep> convertTestScript(SeleniumTestScript seleniumTestScript, String caseNo) {
     List<TestStep> testStepList = new ArrayList<TestStep>();
 
     int stepNo = 1;
 
-    Iterator<SeleniumTestStep> iterator = seleniumTestScript.getTestStepList().iterator();
-
-    while (iterator.hasNext()) {
-      SeleniumTestStep seleniumStep = iterator.next();
-      if (autoInsertedCommands.contains(seleniumStep.getCommand())) {
+    for (SeleniumTestStep seleniumStep : seleniumTestScript.getTestStepList()) {
+      String command = seleniumStep.getCommand();
+      if (commandsToSkip.contains(command)) {
         continue;
       }
 
@@ -62,8 +62,8 @@ public class SeleniumStepConverter implements ApplicationContextAware {
       sitStep.setScreenshotTiming(convertScreenshotTiming(seleniumStep));
 
       String value = seleniumStep.getValue();
-      if (seleniumStep.getCommand().equals("assertConfirmation")) {
-        sitStep.setTestData(convertConfirmData(caseNo, iterator.next().getCommand()));
+      if (confirmationCommands.contains(command)) {
+        sitStep.setTestData(convertConfirmData(caseNo, command));
       } else {
         setTestData(sitStep, inputType, caseNo, value);
       }
