@@ -66,7 +66,9 @@ public class Selenium2Script {
   public Selenium2Script() {}
 
   public static void main(String[] args) {
-    initInstance().execute();
+    Selenium2Script instance = initInstance();
+    instance.setOverwriteScript(true);
+    instance.execute();
   }
 
   public static Selenium2Script initInstance() {
@@ -93,6 +95,8 @@ public class Selenium2Script {
     if (!scriptDir.exists()) {
       return Collections.emptyList();
     }
+
+    getOutputDirPath().toFile().mkdirs();
 
     List<Path> testScripts = new ArrayList<>();
     FileUtils.listFiles(scriptDir, new String[] {SCRIPT_EXTENSION}, true)

@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.resource.MessageManager;
@@ -177,6 +178,10 @@ public class TestScript {
    */
   private void copyLocator(List<TestStep> list, TestStep testStep) {
     String itemName = testStep.getItemName();
+
+    if (StringUtils.isBlank(itemName)) {
+      return;
+    }
 
     for (TestStep ts : list) {
       if (itemName.equals(ts.getItemName())) {
