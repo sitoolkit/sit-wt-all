@@ -1,6 +1,8 @@
 package io.sitoolkit.wt.app.test;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -113,11 +115,17 @@ public class TestRunner {
     for (String testCondition : testCaseStr.split(",")) {
       TestCase testCase = TestCase.parse(testCondition);
 
-      if (testCase.getScriptPath().endsWith(".html")) {
-        testCase.setScriptPath(selenium2script(testCase.getScriptPath()).getAbsolutePath());
+      if (!testCase.getScriptPath().endsWith("." + Selenium2Script.SCRIPT_EXTENSION)) {
+        allTestCase.add(testCase);
+        continue;
       }
 
-      allTestCase.add(testCase);
+      selenium2scripts(testCase.getScriptPath()).forEach(testScript -> {
+        TestCase seleniumTestCase = new TestCase();
+        seleniumTestCase.setScriptPath(testScript.toAbsolutePath().toString());
+        seleniumTestCase.setCaseNo(Selenium2Script.DEFAULT_CASE_NO);
+        allTestCase.add(seleniumTestCase);
+      });
     }
 
     if (isParallel) {
@@ -129,17 +137,17 @@ public class TestRunner {
     return results;
   }
 
-  private File selenium2script(String seleniumScriptPath) {
+  private List<Path> selenium2scripts(String seleniumScriptPath) {
     Selenium2Script s2s = Selenium2Script.initInstance();
     s2s.setOpenScript(false);
     s2s.setOverwriteScript(false);
 
-    File seleniumScript = new File(seleniumScriptPath);
+    Path seleniumScript = Paths.get(seleniumScriptPath);
 
-    File script = s2s.convert(seleniumScript);
+    List<Path> scripts = s2s.convertScriptFile(seleniumScript);
     s2s.backup(seleniumScript);
 
-    return script;
+    return scripts;
   }
 
   private List<TestResult> runAllCase(List<TestCase> testCases, boolean isEvidenceOpen) {

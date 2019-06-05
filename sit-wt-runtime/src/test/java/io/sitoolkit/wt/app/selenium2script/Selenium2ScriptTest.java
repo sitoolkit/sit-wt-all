@@ -22,6 +22,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import io.sitoolkit.wt.app.sample.SampleGenerator;
 import io.sitoolkit.wt.domain.tester.TestBase;
+import io.sitoolkit.wt.domain.testscript.TestScript;
+import io.sitoolkit.wt.domain.testscript.TestScriptDao;
+import io.sitoolkit.wt.infra.ApplicationContextHelper;
 
 /**
  *
@@ -31,7 +34,7 @@ public class Selenium2ScriptTest extends TestBase {
 
   private String testScriptPath;
 
-  private static String TARGET_SCRIPT = "testscript/SeleniumIDETestScript.html";
+  private static String TARGET_SCRIPT = "testscript/SeleniumIDETestScript.side";
 
   private static String BACKUPED_SCRIPT = TARGET_SCRIPT + ".bk";
 
@@ -43,23 +46,40 @@ public class Selenium2ScriptTest extends TestBase {
   @Before
   @Override
   public void setUp() {
-    File testScript = new File("testscript/SeleniumIDETestScript.csv");
-    if (testScript.exists()) {
-      testScript.delete();
-    }
+    File outputFile1 = new File("testscript/SeleniumIDETestScript_Sample_Case_1.csv");
+    File outputFile2 = new File("testscript/SeleniumIDETestScript_Sample_Case_2.csv");
+    deleteFile(outputFile1);
+    deleteFile(outputFile2);
 
     Selenium2Script converter = Selenium2Script.initInstance();
     converter.setOpenScript(false);
-    int ret = converter.execute();
+    converter.execute();
 
-    assertThat("実行結果コード", ret, is(0));
     assertThat("バックアップされたSeleniumScriptファイル", new File(BACKUPED_SCRIPT).exists(), is(true));
 
-    testScriptPath = testScript.getAbsolutePath();
+    TestScriptDao dao = ApplicationContextHelper.getBean(TestScriptDao.class);
+    TestScript testScript1 = dao.load(outputFile1, getSheetName(), false);
+    TestScript testScript2 = dao.load(outputFile2, getSheetName(), false);
 
-    testScript.deleteOnExit();
+    assertThat("Case1 step count", testScript1.getTestStepCount(), is(19));
+    assertThat("Case1 step count", testScript1.getIndexByScriptNo("22"), is(18));
+    assertThat("Case1 step count", testScript1.getIndexByScriptNo("23"), is(-1));
+    assertThat("Case2 step count", testScript2.getTestStepCount(), is(8));
+    assertThat("Case2 step count", testScript2.getIndexByScriptNo("9"), is(7));
+    assertThat("Case2 step count", testScript2.getIndexByScriptNo("10"), is(-1));
+
+    testScriptPath = outputFile1.getAbsolutePath();
+
+    outputFile1.deleteOnExit();
+    outputFile2.deleteOnExit();
 
     super.setUp();
+  }
+
+  private void deleteFile(File file) {
+    if (file.exists()) {
+      file.delete();
+    }
   }
 
   @Test
@@ -70,10 +90,10 @@ public class Selenium2ScriptTest extends TestBase {
   @After
   @Override
   public void tearDown() {
-    super.tearDown();
-
     File seleniumScript = new File(BACKUPED_SCRIPT);
     seleniumScript.renameTo(new File(TARGET_SCRIPT));
+
+    super.tearDown();
   }
 
   @Override

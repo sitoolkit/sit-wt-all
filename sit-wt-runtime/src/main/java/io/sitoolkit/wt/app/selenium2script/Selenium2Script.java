@@ -16,48 +16,53 @@ package io.sitoolkit.wt.app.selenium2script;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.sitoolkit.wt.app.config.ExtConfig;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.domain.testscript.TestStep;
-import io.sitoolkit.wt.infra.TestException;
+import io.sitoolkit.wt.infra.JsonUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import io.sitoolkit.wt.util.infra.util.StrUtils;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(csv)に変換するクラスです。
+ * Class to convert Selenium IDE test script (.side) to SIT-WT test script (.csv).
  *
  * @author yuichi.kuwahara
  */
-public class Selenium2Script implements ApplicationContextAware {
+@Getter
+@Setter
+public class Selenium2Script {
 
+  @Getter(AccessLevel.NONE)
   protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
-  private ApplicationContext appCtx;
+  public static final String DEFAULT_CASE_NO = "001";
+
+  public static final String SCRIPT_EXTENSION = "side";
+
+  private static final String SELENIUM_SCRIPT_DIR = "testscript";
 
   private TestScriptDao dao;
 
   private SeleniumStepConverter seleniumStepConverter;
 
-  private String outputDir = "testscript";
-
-  private String seleniumScriptDirs = outputDir + ",.";
-
-  private String caseNo = "001";
+  private String outputDir = SELENIUM_SCRIPT_DIR;
 
   private boolean openScript = true;
 
@@ -66,212 +71,134 @@ public class Selenium2Script implements ApplicationContextAware {
   public Selenium2Script() {}
 
   public static void main(String[] args) {
-    Selenium2Script converter = initInstance();
-    System.exit(converter.execute());
+    Selenium2Script instance = initInstance();
+    instance.setOverwriteScript(true);
+    instance.execute();
   }
 
   public static Selenium2Script initInstance() {
-    ApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(Selenium2ScriptConfig.class, ExtConfig.class);
-    return appCtx.getBean(Selenium2Script.class);
+    try (AnnotationConfigApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(Selenium2ScriptConfig.class, ExtConfig.class)) {
+      return appCtx.getBean(Selenium2Script.class);
+    }
   }
 
   /**
-   * Selenium IDEのテストスクリプト(html)をSIT-WTのテストスクリプト(csv)に変換します。
-   *
-   * @return 0:正常終了
+   * Convert Selenium IDE test script (.side) to SIT-WT test script (.csv).
    */
-  public int execute() {
+  public void execute() {
 
-    int ret = 0;
+    List<Path> testScripts = convertScriptFiles();
 
-    for (String seleniumScriptDir : seleniumScriptDirs.split(",")) {
-      File scriptDir = new File(seleniumScriptDir);
-      if (!scriptDir.exists()) {
-        continue;
-      }
+    if (isOpenScript()) {
+      openTestScripts(testScripts);
+    }
+  }
 
-      boolean recursive = !".".equals(seleniumScriptDir);
-      for (File seleniumScript : FileUtils.listFiles(scriptDir, new String[] {"html"}, recursive)) {
-        File sitScript = convert(seleniumScript);
+  private List<Path> convertScriptFiles() {
 
-        backup(seleniumScript);
-
-        if (isOpenScript()) {
-          try {
-            Desktop.getDesktop().open(sitScript);
-          } catch (IOException e) {
-            log.error("open.script.error", e);
-            ret = 2;
-          }
-        }
-      }
+    File scriptDir = new File(getProjectDirectory(), SELENIUM_SCRIPT_DIR);
+    if (!scriptDir.exists()) {
+      return Collections.emptyList();
     }
 
-    return ret;
+    getOutputDirPath().toFile().mkdirs();
+
+    List<Path> testScripts = new ArrayList<>();
+    FileUtils.listFiles(scriptDir, new String[] {SCRIPT_EXTENSION}, true)
+        .forEach((seleniumScript) -> {
+          testScripts.addAll(convertScriptFile(seleniumScript.toPath()));
+          backup(seleniumScript.toPath());
+        });
+
+    return testScripts;
   }
 
-  public File convert(File seleniumScript) {
-    log.info("selenium.script.convert", seleniumScript.getAbsolutePath());
+  public List<Path> convertScriptFile(Path sourcePath) {
+    log.info("selenium.script.convert", sourcePath.toAbsolutePath());
 
-    // htmlの読み込み
-    SeleniumTestScript list = loadSeleniumScript(seleniumScript);
+    List<SeleniumTestScript> seleniumScripts = loadSeleniumScripts(sourcePath);
 
-    // SeleniumTestScriptオブジェクトをTestScriptオブジェクトに変換
-    List<TestStep> testStepList = seleniumStepConverter.convertTestScript(list, caseNo);
+    return seleniumScripts.stream().map((seleniumScript) -> {
+      List<TestStep> testStepList =
+          seleniumStepConverter.convertTestScript(seleniumScript, DEFAULT_CASE_NO);
 
-    String sitScriptName = seleniumScript.getName().replace(".html", ".csv");
-    File sitScriptFile = new File(outputDir, sitScriptName);
+      Path outputPath = buildOutputPath(sourcePath, seleniumScript.getName());
+      dao.write(outputPath.toFile(), testStepList, overwriteScript);
 
-    dao.write(sitScriptFile, testStepList, overwriteScript);
-
-    return sitScriptFile;
+      return outputPath;
+    }).collect(Collectors.toList());
   }
 
-  public void backup(File seleniumScript) {
-    File bkFile = new File(seleniumScript.getParentFile(), seleniumScript.getName() + ".bk");
-
-    log.info("selenium.script.backup", seleniumScript.getAbsolutePath(), bkFile);
-
-    seleniumScript.renameTo(bkFile);
+  private Path buildOutputPath(Path sourcePath, String testName) {
+    String baseName = FilenameUtils.getBaseName(sourcePath.toString());
+    String fileName = baseName + "_" + StrUtils.sanitizeMetaCharacter(testName) + ".csv";
+    return getOutputDirPath().resolve(fileName);
   }
 
-  /**
-   * SeleniumScriptを読み込みます。
-   *
-   * @param file SeleniumScriptのファイル
-   * @return SeleniumTestStep
-   */
-  protected SeleniumTestScript loadSeleniumScript(File file) {
-    Document doc = parse(file);
+  public void backup(Path seleniumScript) {
+    Path bkFile = seleniumScript.resolveSibling(seleniumScript.getFileName() + ".bk");
 
-    SeleniumTestScript script = new SeleniumTestScript();
+    log.info("selenium.script.backup", seleniumScript.toAbsolutePath(), bkFile);
 
-    script.setBaseUrl(getBaseUrl(doc));
+    try {
+      Files.move(seleniumScript, bkFile, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-    NodeList tdList = doc.getElementsByTagName("td");
-
-    List<SeleniumTestStep> list = script.getTestStepList();
-
-    SeleniumTestStep testStep = appCtx.getBean(SeleniumTestStep.class);
-
-    for (int i = 1; i < tdList.getLength(); i++) {
-      String nodeValue = tdList.item(i).getTextContent();
-
-      switch ((i - 1) % 3) {
-        case 0:
-          testStep.setCommand(nodeValue);
-          break;
-        case 1:
-          testStep.setTarget(nodeValue);
-          break;
-        case 2:
-          testStep.setValue(nodeValue);
-          list.add(testStep);
-          log.debug("test.step.load", testStep.getCommand(), testStep.getTarget(),
-              testStep.getValue());
-          testStep = new SeleniumTestStep();
-          break;
-        default:
-          break;
+  private void openTestScripts(List<Path> testScripts) {
+    for (Path testScript : testScripts) {
+      try {
+        Desktop.getDesktop().open(testScript.toFile());
+      } catch (IOException e) {
+        log.error("open.script.error", e);
       }
+    }
+  }
+
+  private Path getOutputDirPath() {
+    return Paths.get(getProjectDirectory(), outputDir);
+  }
+
+  private String getProjectDirectory() {
+    String dir = System.getProperty("sitwt.projectDirectory");
+    return StringUtils.isEmpty(dir) ? "." : dir;
+  }
+
+  private List<SeleniumTestScript> loadSeleniumScripts(Path script) {
+    List<SeleniumTestScript> scripts = new ArrayList<>();
+
+    JsonNode node = JsonUtils.readTree(script);
+    String baseUrl = node.get("url").asText();
+
+    for (JsonNode testNode : node.get("tests")) {
+      scripts.add(loadSeleniumScript(testNode, baseUrl));
+    }
+
+    return scripts;
+  }
+
+  private SeleniumTestScript loadSeleniumScript(JsonNode testNode, String baseUrl) {
+    SeleniumTestScript script = new SeleniumTestScript();
+    script.setBaseUrl(baseUrl);
+    script.setName(testNode.get("name").asText());
+
+    for (JsonNode commandNode : testNode.get("commands")) {
+
+      SeleniumTestStep testStep = new SeleniumTestStep();
+
+      testStep.setCommand(commandNode.get("command").asText());
+      testStep.setTarget(commandNode.get("target").asText());
+      testStep.setValue(commandNode.get("value").asText());
+
+      script.getTestStepList().add(testStep);
+
+      log.debug("test.step.load", testStep.getCommand(), testStep.getTarget(), testStep.getValue());
     }
 
     return script;
-  }
-
-  /**
-   * XMLファイルを読み込んでDOMにパースします。
-   *
-   * @param file XMLファイル
-   * @return DOM
-   */
-  private Document parse(File file) {
-    try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      builder.setEntityResolver(new EntityResolver() {
-        @Override
-        public InputSource resolveEntity(String publicId, String systemId)
-            throws SAXException, IOException {
-          return new InputSource(new StringReader(""));
-        }
-      });
-
-      return builder.parse(file);
-    } catch (Exception e) {
-      throw new TestException(e);
-    }
-  }
-
-  private String getBaseUrl(Document doc) {
-    NodeList linkNodes = doc.getElementsByTagName("link");
-
-    for (int i = 0; i < linkNodes.getLength(); i++) {
-      Element linkNode = (Element) linkNodes.item(i);
-
-      if ("selenium.base".equals(linkNode.getAttribute("rel"))) {
-        return linkNode.getAttribute("href");
-      }
-    }
-    return "";
-  }
-
-  @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.appCtx = applicationContext;
-  }
-
-  public TestScriptDao getDao() {
-    return dao;
-  }
-
-  public void setDao(TestScriptDao dao) {
-    this.dao = dao;
-  }
-
-  public String getSeleniumScriptDir() {
-    return seleniumScriptDirs;
-  }
-
-  public void setSeleniumScriptDir(String seleniumScriptDir) {
-    this.seleniumScriptDirs = seleniumScriptDir;
-  }
-
-  public String getOutputDir() {
-    return outputDir;
-  }
-
-  public void setOutputDir(String outputDir) {
-    this.outputDir = outputDir;
-  }
-
-  public String getCaseNo() {
-    return caseNo;
-  }
-
-  public void setCaseNo(String caseNo) {
-    this.caseNo = caseNo;
-  }
-
-  public void setSeleniumStepConverter(SeleniumStepConverter seleniumStepConverter) {
-    this.seleniumStepConverter = seleniumStepConverter;
-  }
-
-  public boolean isOpenScript() {
-    return openScript;
-  }
-
-  public void setOpenScript(boolean openScript) {
-    this.openScript = openScript;
-  }
-
-  public boolean isOverwriteScript() {
-    return overwriteScript;
-  }
-
-  public void setOverwriteScript(boolean overwriteScript) {
-    this.overwriteScript = overwriteScript;
   }
 
 }

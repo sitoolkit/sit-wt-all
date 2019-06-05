@@ -34,7 +34,7 @@ public class Locator {
   /**
    * 形式
    */
-  private String type = Type.na.name();
+  private String type = Type.na.getLabel();
 
   /**
    * 値
@@ -51,7 +51,7 @@ public class Locator {
   }
 
   private Locator(Type type, String value) {
-    this.type = type.name();
+    this.type = type.getLabel();
     setValue(value);
   }
 

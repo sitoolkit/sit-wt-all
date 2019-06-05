@@ -1,0 +1,405 @@
+{
+  "id": "1d28f608-5a2a-4589-a0dd-cd44c22f3d1f",
+  "version": "2.0",
+  "name": "SeleniumIDETestScript",
+  "url": "http://localhost:8280",
+  "tests": [{
+    "id": "3b47ea17-6e7c-4a66-ac22-9fde049a8091",
+    "name": "Sample-Case 1",
+    "commands": [{
+      "id": "b69c68a9-e24c-476c-9dbd-e09a8683f95d",
+      "comment": "",
+      "command": "open",
+      "target": "input.html",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "8894d035-af51-405a-8fa0-92bac930d829",
+      "comment": "",
+      "command": "click",
+      "target": "id=name",
+      "targets": [
+        ["id=name", "id"],
+        ["name=名前", "name"],
+        ["css=#name", "css:finder"],
+        ["xpath=//input[@id='name']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "1e5a4a89-f292-4575-80c9-e861ee7de177",
+      "comment": "",
+      "command": "type",
+      "target": "id=name",
+      "targets": [
+        ["id=name", "id"],
+        ["name=名前", "name"],
+        ["css=#name", "css:finder"],
+        ["xpath=//input[@id='name']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "試験太郎"
+    }, {
+      "id": "27582655-822e-4097-812a-635995411976",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-group:nth-child(1) li:nth-child(2)",
+      "targets": [
+        ["css=.form-group:nth-child(1) li:nth-child(2)", "css:finder"],
+        ["xpath=//li[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "2fd537b7-108b-484d-8174-16cae2c3946e",
+      "comment": "",
+      "command": "click",
+      "target": "id=gender-male",
+      "targets": [
+        ["id=gender-male", "id"],
+        ["name=性別", "name"],
+        ["css=#gender-male", "css:finder"],
+        ["xpath=//input[@id='gender-male']", "xpath:attributes"],
+        ["xpath=//label/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c8c2d35a-3e23-4d84-80ce-79af5116a349",
+      "comment": "",
+      "command": "click",
+      "target": "id=prefecture",
+      "targets": [
+        ["id=prefecture", "id"],
+        ["name=都道府県", "name"],
+        ["css=#prefecture", "css:finder"],
+        ["xpath=//select[@id='prefecture']", "xpath:attributes"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "80ff1d4f-55ee-45c4-b938-09e108596d5e",
+      "comment": "",
+      "command": "select",
+      "target": "id=prefecture",
+      "targets": [],
+      "value": "label=北海道"
+    }, {
+      "id": "42bc85b3-d583-44f5-8d9c-bb9246f28f77",
+      "comment": "",
+      "command": "click",
+      "target": "css=#prefecture > option:nth-child(2)",
+      "targets": [
+        ["css=#prefecture > option:nth-child(2)", "css:finder"],
+        ["xpath=//option[@value='P01']", "xpath:attributes"],
+        ["xpath=//select[@id='prefecture']/option[2]", "xpath:idRelative"],
+        ["xpath=//option[2]", "xpath:position"],
+        ["xpath=//option[contains(.,'北海道')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7ecc9326-15f2-4926-86ac-0482ef6de93c",
+      "comment": "",
+      "command": "click",
+      "target": "id=city",
+      "targets": [
+        ["id=city", "id"],
+        ["name=市区町村", "name"],
+        ["css=#city", "css:finder"],
+        ["xpath=//select[@id='city']", "xpath:attributes"],
+        ["xpath=//select[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "877aebab-61c7-4ab6-9396-ed2c21411e28",
+      "comment": "",
+      "command": "select",
+      "target": "id=city",
+      "targets": [],
+      "value": "label=富良野"
+    }, {
+      "id": "fb502ce5-915f-455f-86f4-f920a2248d88",
+      "comment": "",
+      "command": "click",
+      "target": "css=#city > option:nth-child(3)",
+      "targets": [
+        ["css=#city > option:nth-child(3)", "css:finder"],
+        ["xpath=//select[@id='city']/option[3]", "xpath:idRelative"],
+        ["xpath=//select[2]/option[3]", "xpath:position"],
+        ["xpath=//option[contains(.,'富良野')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "00e03fa9-826c-42a1-80a0-79064f8b0d82",
+      "comment": "",
+      "command": "click",
+      "target": "css=.checkbox-inline:nth-child(1)",
+      "targets": [
+        ["css=.checkbox-inline:nth-child(1)", "css:finder"],
+        ["xpath=//div[4]/div/label", "xpath:position"],
+        ["xpath=//label[contains(.,'運動')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "2ce96195-0685-42f9-953b-dc6af8f14f5b",
+      "comment": "",
+      "command": "click",
+      "target": "id=hobby-work",
+      "targets": [
+        ["id=hobby-work", "id"],
+        ["css=#hobby-work", "css:finder"],
+        ["xpath=//input[@id='hobby-work']", "xpath:attributes"],
+        ["xpath=//label[3]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "805fa257-9cee-479c-a440-720cfda17c8a",
+      "comment": "",
+      "command": "click",
+      "target": "id=remark",
+      "targets": [
+        ["id=remark", "id"],
+        ["name=備考", "name"],
+        ["css=#remark", "css:finder"],
+        ["xpath=//textarea[@id='remark']", "xpath:attributes"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "28c5282b-6a5f-4c43-a7c5-649fcc3ec009",
+      "comment": "",
+      "command": "type",
+      "target": "id=remark",
+      "targets": [
+        ["id=remark", "id"],
+        ["name=備考", "name"],
+        ["css=#remark", "css:finder"],
+        ["xpath=//textarea[@id='remark']", "xpath:attributes"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "特になし"
+    }, {
+      "id": "47e6fe72-0b1b-4cdd-a5cf-f86bc47dff2b",
+      "comment": "",
+      "command": "mouseDownAt",
+      "target": "id=remark",
+      "targets": [
+        ["id=remark", "id"],
+        ["name=備考", "name"],
+        ["css=#remark", "css:finder"],
+        ["xpath=//textarea[@id='remark']", "xpath:attributes"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "234,38.3499755859375"
+    }, {
+      "id": "17633091-b0df-4e6c-ae01-7bf7f8d121b9",
+      "comment": "",
+      "command": "mouseMoveAt",
+      "target": "id=remark",
+      "targets": [
+        ["id=remark", "id"],
+        ["name=備考", "name"],
+        ["css=#remark", "css:finder"],
+        ["xpath=//textarea[@id='remark']", "xpath:attributes"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "234,38.3499755859375"
+    }, {
+      "id": "40a72f8b-7471-4e1b-9560-7fc58dcd006e",
+      "comment": "",
+      "command": "mouseUpAt",
+      "target": "id=remark",
+      "targets": [
+        ["id=remark", "id"],
+        ["name=備考", "name"],
+        ["css=#remark", "css:finder"],
+        ["xpath=//textarea[@id='remark']", "xpath:attributes"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "234,38.3499755859375"
+    }, {
+      "id": "5b91994e-f7d2-4c56-9a47-e6db6e92f3d6",
+      "comment": "",
+      "command": "chooseOkOnNextConfirmation",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f94db4ad-3703-4e3e-ab1b-78d6fdde9224",
+      "comment": "",
+      "command": "click",
+      "target": "id=confirm",
+      "targets": [
+        ["id=confirm", "id"],
+        ["css=#confirm", "css:finder"],
+        ["xpath=//input[@id='confirm']", "xpath:attributes"],
+        ["xpath=//div[6]/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "9ddb7768-d08d-448b-9456-0ea0f23f9a94",
+      "comment": "",
+      "command": "assertConfirmation",
+      "target": "よろしいですか？",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "97f7fca9-8f22-49c2-ab24-dded6afd367e",
+      "comment": "",
+      "command": "webdriverChooseOkOnVisibleConfirmation",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a14a63ed-c846-4ed3-9a11-e23ac7b32ebd",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=tr:nth-child(1) > td",
+      "targets": [
+        ["css=tr:nth-child(1) > td", "css:finder"],
+        ["xpath=//table[@id='confirm']/tbody/tr/td", "xpath:idRelative"],
+        ["xpath=//td", "xpath:position"],
+        ["xpath=//td[contains(.,'試験太郎')]", "xpath:innerText"]
+      ],
+      "value": "試験太郎"
+    }, {
+      "id": "b1d8c7ac-c93c-4e5d-91df-0676800a1262",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=戻る",
+      "targets": [
+        ["linkText=戻る", "linkText"],
+        ["css=a", "css:finder"],
+        ["xpath=//a[contains(text(),'戻る')]", "xpath:link"],
+        ["xpath=//a[@onclick=\"window.location.href='input.html'\"]", "xpath:attributes"],
+        ["xpath=//a[contains(@href, '#')]", "xpath:href"],
+        ["xpath=//a", "xpath:position"],
+        ["xpath=//a[contains(.,'戻る')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "9934a047-8c19-4641-b893-fb106f8fcecb",
+    "name": "Sample.Case.2",
+    "commands": [{
+      "id": "5bb2058b-862d-421d-9621-3394887b3cab",
+      "comment": "",
+      "command": "open",
+      "target": "input.html",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "fe26b10a-6939-444f-aee1-1fa2cca26c32",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=利用規約",
+      "targets": [
+        ["linkText=利用規約", "linkText"],
+        ["css=a", "css:finder"],
+        ["xpath=//a[contains(text(),'利用規約')]", "xpath:link"],
+        ["xpath=//a[contains(@href, 'terms.html')]", "xpath:href"],
+        ["xpath=//a", "xpath:position"],
+        ["xpath=//a[contains(.,'利用規約')]", "xpath:innerText"]
+      ],
+      "value": "",
+      "opensWindow": true,
+      "windowHandleName": "win1123",
+      "windowTimeout": 2000
+    }, {
+      "id": "aec403e7-1d18-4281-90b6-6ef064d05894",
+      "comment": "",
+      "command": "storeWindowHandle",
+      "target": "root",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "56a418ea-0798-4aae-9da8-f5af2098ac2d",
+      "comment": "",
+      "command": "selectWindow",
+      "target": "handle=${win1123}",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f84bd289-c8e1-4f40-8268-7036c0e0dcfd",
+      "comment": "",
+      "command": "close",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1917c432-eb74-4969-a4fc-1bb832236de6",
+      "comment": "",
+      "command": "selectWindow",
+      "target": "handle=${root}",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ba1f2165-1e3c-4383-99c7-c42b6681fe03",
+      "comment": "",
+      "command": "chooseCancelOnNextConfirmation",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1c7e3c63-4ea3-4f94-ba7d-46006c7d174f",
+      "comment": "",
+      "command": "click",
+      "target": "id=confirm",
+      "targets": [
+        ["id=confirm", "id"],
+        ["css=#confirm", "css:finder"],
+        ["xpath=//input[@id='confirm']", "xpath:attributes"],
+        ["xpath=//div[6]/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "84dbdb31-5f14-49ff-88c6-d8f93e2bf12f",
+      "comment": "",
+      "command": "assertConfirmation",
+      "target": "よろしいですか？",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a5ad5659-403e-4b34-b3fd-6ac9602778a5",
+      "comment": "",
+      "command": "webdriverChooseCancelOnVisibleConfirmation",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "39d3b76b-576d-462c-b2c0-7fb990f2be24",
+      "comment": "",
+      "command": "click",
+      "target": "id=name",
+      "targets": [
+        ["id=name", "id"],
+        ["name=名前", "name"],
+        ["css=#name", "css:finder"],
+        ["xpath=//input[@id='name']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "d80c20af-b5df-4622-b30e-88e1216a77eb",
+      "comment": "",
+      "command": "type",
+      "target": "id=name",
+      "targets": [
+        ["id=name", "id"],
+        ["name=名前", "name"],
+        ["css=#name", "css:finder"],
+        ["xpath=//input[@id='name']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "試験太郎"
+    }]
+  }],
+  "suites": [{
+    "id": "7656c522-3f12-4c19-808e-97d9c3cfd114",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["3b47ea17-6e7c-4a66-ac22-9fde049a8091"]
+  }],
+  "urls": ["http://localhost:8280/"],
+  "plugins": []
+}
