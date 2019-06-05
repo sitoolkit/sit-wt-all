@@ -16,7 +16,8 @@ public class SampleManager {
 
   private String projectDir = null;
 
-  private static final String RESOURCE_DIR = "sample/";
+  private static final String SAMPLE_RESOURCE_DIR = "sample/";
+  private static final String MESSAGE_RESOURCE_DIR = "io/sitoolkit/wt/infra/resource/";
 
   @Resource
   private MergedFileGenerator mergedFileGenerator;
@@ -38,45 +39,40 @@ public class SampleManager {
     unarchive("bootstrap.min.css");
     unarchive("pom.xml");
 
-    Map<String, String> inputProperties = generateLocalizedHtml("input");
-    Map<String, String> termsProperties = generateLocalizedHtml("terms");
-    Map<String, String> doneProperties = generateLocalizedHtml("done");
+    Map<String, String> properties = loadProperties();
 
-    Map<String, String> scriptProperties = loadProperties("SampleTestScript");
-    scriptProperties.putAll(inputProperties);
-    scriptProperties.putAll(termsProperties);
-    scriptProperties.putAll(doneProperties);
-    scriptProperties.putAll(MessageManager.getResourceAsMap());
+    generateLocalizedHtml("input", properties);
+    generateLocalizedHtml("terms", properties);
+    generateLocalizedHtml("done", properties);
 
-    mergedFileGenerator.generate(RESOURCE_DIR + "SampleTestScript", getDestPath("testscript"),
-        "SampleTestScript", "csv", scriptProperties);
+    properties.putAll(MessageManager.getResourceAsMap());
+
+    mergedFileGenerator.generate(SAMPLE_RESOURCE_DIR + "SampleTestScript",
+        getDestPath("testscript"), "SampleTestScript", "csv", properties);
   }
 
   private void unarchive(String filename) {
-    String resource = RESOURCE_DIR + filename;
+    String resource = SAMPLE_RESOURCE_DIR + filename;
     FileIOUtils.sysRes2file(resource, getDestPath(resource));
   }
 
-  private Map<String, String> generateLocalizedHtml(String fileBase) {
-    Map<String, String> properties = loadProperties(fileBase);
-
-    mergedFileGenerator.generate(RESOURCE_DIR + fileBase, getDestPath(RESOURCE_DIR), fileBase,
-        "html", properties);
-
-    return properties;
+  private void generateLocalizedHtml(String fileBase, Map<String, String> properties) {
+    mergedFileGenerator.generate(SAMPLE_RESOURCE_DIR + fileBase, getDestPath(SAMPLE_RESOURCE_DIR),
+        fileBase, "html", properties);
   }
 
-  private Map<String, String> loadProperties(String fileBase) {
-    String resourcePath = "/" + RESOURCE_DIR + getPropertiesFileName(fileBase);
+  private Map<String, String> loadProperties() {
+    String resourcePath = "/" + MESSAGE_RESOURCE_DIR + getPropertiesFileName();
     return PropertyUtils.loadAsMap(resourcePath, false);
   }
 
-  private String getPropertiesFileName(String name) {
+  private String getPropertiesFileName() {
     String fileName;
-    if (SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
-      fileName = name + "_" + Locale.JAPANESE.getLanguage();
+    String baceName = "message";
+    if (!SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
+      fileName = baceName + "_" + Locale.JAPANESE.getLanguage() + "_JP";
     } else {
-      fileName = name;
+      fileName = baceName;
     }
     return fileName + ".properties";
   }
