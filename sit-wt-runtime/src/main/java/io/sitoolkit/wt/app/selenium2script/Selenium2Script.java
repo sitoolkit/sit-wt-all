@@ -36,14 +36,20 @@ import io.sitoolkit.wt.infra.JsonUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.util.infra.util.StrUtils;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Selenium IDEのテストスクリプト(.side)をSIT-WTのテストスクリプト(.csv)に変換するクラスです。
+ * Class to convert Selenium IDE test script (.side) to SIT-WT test script (.csv).
  *
  * @author yuichi.kuwahara
  */
+@Getter
+@Setter
 public class Selenium2Script {
 
+  @Getter(AccessLevel.NONE)
   protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
   public static final String DEFAULT_CASE_NO = "001";
@@ -78,7 +84,7 @@ public class Selenium2Script {
   }
 
   /**
-   * Selenium IDEのテストスクリプト(.side)をSIT-WTのテストスクリプト(.csv)に変換します。
+   * Convert Selenium IDE test script (.side) to SIT-WT test script (.csv).
    */
   public void execute() {
 
@@ -193,42 +199,6 @@ public class Selenium2Script {
     }
 
     return script;
-  }
-
-  public TestScriptDao getDao() {
-    return dao;
-  }
-
-  public void setDao(TestScriptDao dao) {
-    this.dao = dao;
-  }
-
-  public String getOutputDir() {
-    return outputDir;
-  }
-
-  public void setOutputDir(String outputDir) {
-    this.outputDir = outputDir;
-  }
-
-  public void setSeleniumStepConverter(SeleniumStepConverter seleniumStepConverter) {
-    this.seleniumStepConverter = seleniumStepConverter;
-  }
-
-  public boolean isOpenScript() {
-    return openScript;
-  }
-
-  public void setOpenScript(boolean openScript) {
-    this.openScript = openScript;
-  }
-
-  public boolean isOverwriteScript() {
-    return overwriteScript;
-  }
-
-  public void setOverwriteScript(boolean overwriteScript) {
-    this.overwriteScript = overwriteScript;
   }
 
 }

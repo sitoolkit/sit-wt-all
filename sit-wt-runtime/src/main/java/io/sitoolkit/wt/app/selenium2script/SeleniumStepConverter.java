@@ -18,6 +18,7 @@ import io.sitoolkit.wt.domain.testscript.TestStepInputType;
 import io.sitoolkit.wt.infra.SitPathUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
+import lombok.Setter;
 
 public class SeleniumStepConverter implements ApplicationContextAware {
 
@@ -25,8 +26,10 @@ public class SeleniumStepConverter implements ApplicationContextAware {
 
   protected ApplicationContext appCtx;
 
+  @Setter
   private Map<String, String> seleniumIdeCommandMap;
 
+  @Setter
   private Pattern screenshotPattern;
 
   private static final List<String> COMMANDS_TO_SKIP =
@@ -147,15 +150,4 @@ public class SeleniumStepConverter implements ApplicationContextAware {
     this.appCtx = applicationContext;
   }
 
-  public Map<String, String> getSeleniumIdeCommandMap() {
-    return seleniumIdeCommandMap;
-  }
-
-  public void setSeleniumIdeCommandMap(Map<String, String> seleniumIdeCommandMap) {
-    this.seleniumIdeCommandMap = seleniumIdeCommandMap;
-  }
-
-  public void setScreenshotPattern(Pattern screenshotPattern) {
-    this.screenshotPattern = screenshotPattern;
-  }
 }
