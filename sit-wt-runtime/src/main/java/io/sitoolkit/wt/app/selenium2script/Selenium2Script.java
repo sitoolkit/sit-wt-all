@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.sitoolkit.wt.app.config.ExtConfig;
@@ -72,9 +71,10 @@ public class Selenium2Script {
   }
 
   public static Selenium2Script initInstance() {
-    ApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(Selenium2ScriptConfig.class, ExtConfig.class);
-    return appCtx.getBean(Selenium2Script.class);
+    try (AnnotationConfigApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(Selenium2ScriptConfig.class, ExtConfig.class)) {
+      return appCtx.getBean(Selenium2Script.class);
+    }
   }
 
   /**
@@ -188,8 +188,7 @@ public class Selenium2Script {
       testStep.setValue(commandNode.get("value").asText());
 
       script.getTestStepList().add(testStep);
-      System.out.println("TestStep: " + testStep.getCommand() + " : " + testStep.getTarget() + " : "
-          + testStep.getValue());
+
       log.debug("test.step.load", testStep.getCommand(), testStep.getTarget(), testStep.getValue());
     }
 

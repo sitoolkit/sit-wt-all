@@ -8,13 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonUtils {
 
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private JsonUtils() {}
 
   public static JsonNode readTree(Path path) {
     try {
-      return mapper.readTree(path.toFile());
+      return MAPPER.readTree(path.toFile());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

@@ -2,6 +2,7 @@ package io.sitoolkit.wt.app.selenium2script;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +29,13 @@ public class SeleniumStepConverter implements ApplicationContextAware {
 
   private Pattern screenshotPattern;
 
-  private static final List<String> commandsToSkip = Arrays.asList("chooseOkOnNextConfirmation",
-      "chooseCancelOnNextConfirmation", "assertConfirmation", "storeWindowHandle");
+  private static final List<String> COMMANDS_TO_SKIP =
+      Collections.unmodifiableList(Arrays.asList("chooseOkOnNextConfirmation",
+          "chooseCancelOnNextConfirmation", "assertConfirmation", "storeWindowHandle"));
 
-  private static final List<String> confirmationCommands = Arrays.asList(
-      "webdriverChooseOkOnVisibleConfirmation", "webdriverChooseCancelOnVisibleConfirmation");
+  private static final List<String> CONFIRMATION_COMMANDS =
+      Collections.unmodifiableList(Arrays.asList("webdriverChooseOkOnVisibleConfirmation",
+          "webdriverChooseCancelOnVisibleConfirmation"));
 
   public List<TestStep> convertTestScript(SeleniumTestScript seleniumTestScript, String caseNo) {
     List<TestStep> testStepList = new ArrayList<TestStep>();
@@ -41,7 +44,7 @@ public class SeleniumStepConverter implements ApplicationContextAware {
 
     for (SeleniumTestStep seleniumStep : seleniumTestScript.getTestStepList()) {
       String command = seleniumStep.getCommand();
-      if (commandsToSkip.contains(command)) {
+      if (COMMANDS_TO_SKIP.contains(command)) {
         continue;
       }
 
@@ -62,7 +65,7 @@ public class SeleniumStepConverter implements ApplicationContextAware {
       sitStep.setScreenshotTiming(convertScreenshotTiming(seleniumStep));
 
       String value = seleniumStep.getValue();
-      if (confirmationCommands.contains(command)) {
+      if (CONFIRMATION_COMMANDS.contains(command)) {
         sitStep.setTestData(convertConfirmData(caseNo, command));
       } else {
         setTestData(sitStep, inputType, caseNo, value);
@@ -79,7 +82,7 @@ public class SeleniumStepConverter implements ApplicationContextAware {
   }
 
   protected Map<String, String> convertConfirmData(String caseNo, String command) {
-    String data = command.equals("webdriverChooseOkOnVisibleConfirmation") ? "ok" : "cancel";
+    String data = "webdriverChooseOkOnVisibleConfirmation".equals(command) ? "ok" : "cancel";
     return createTestData(caseNo, data);
   }
 
@@ -105,7 +108,7 @@ public class SeleniumStepConverter implements ApplicationContextAware {
     }
 
     TestStepInputType inputType = TestStepInputType.decode(operationName);
-    if (inputType.equals(TestStepInputType.na)) {
+    if (TestStepInputType.na.equals(inputType)) {
       log.info("selenium.command.unmatched", seleniumStep.getCommand());
       return null;
     } else {
@@ -118,7 +121,7 @@ public class SeleniumStepConverter implements ApplicationContextAware {
       SeleniumTestStep seleniumStep) {
     String target = seleniumStep.getTarget();
 
-    if (inputType.equals(TestStepInputType.open)) {
+    if (TestStepInputType.open.equals(inputType)) {
       String url = SitPathUtils.buildUrl(seleniumScript.getBaseUrl(), target);
       return Locator.build(url);
 
@@ -127,7 +130,7 @@ public class SeleniumStepConverter implements ApplicationContextAware {
       return Locator.build(Locator.Type.link.toString(),
           StringUtils.removeStart(target, "linkText="));
 
-    } else if (inputType.equals(TestStepInputType.switchWindow)) {
+    } else if (TestStepInputType.switchWindow.equals(inputType)) {
       return Locator.build(null);
     }
 
