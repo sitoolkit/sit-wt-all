@@ -69,7 +69,7 @@ public class SampleManager {
   private String getPropertiesFileName() {
     String fileName;
     String baceName = "message";
-    if (!SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
+    if (SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
       fileName = baceName + "_" + Locale.JAPANESE.getLanguage() + "_JP";
     } else {
       fileName = baceName;
