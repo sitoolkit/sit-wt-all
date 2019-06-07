@@ -2,12 +2,9 @@ package io.sitoolkit.wt.app.sample;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import io.sitoolkit.wt.infra.PropertyUtils;
-import io.sitoolkit.wt.infra.SitLocaleUtils;
 import io.sitoolkit.wt.infra.resource.MessageManager;
 import io.sitoolkit.wt.infra.template.MergedFileGenerator;
 import io.sitoolkit.wt.util.infra.util.FileIOUtils;
@@ -38,18 +35,14 @@ public class SampleManager {
     unarchive("bootstrap.min.css");
     unarchive("pom.xml");
 
-    Map<String, String> inputProperties = generateLocalizedHtml("input");
-    Map<String, String> termsProperties = generateLocalizedHtml("terms");
-    Map<String, String> doneProperties = generateLocalizedHtml("done");
+    Map<String, String> properties = MessageManager.getResourceAsMap();
 
-    Map<String, String> scriptProperties = loadProperties("SampleTestScript");
-    scriptProperties.putAll(inputProperties);
-    scriptProperties.putAll(termsProperties);
-    scriptProperties.putAll(doneProperties);
-    scriptProperties.putAll(MessageManager.getResourceAsMap());
+    generateLocalizedHtml("input", properties);
+    generateLocalizedHtml("terms", properties);
+    generateLocalizedHtml("done", properties);
 
     mergedFileGenerator.generate(RESOURCE_DIR + "SampleTestScript", getDestPath("testscript"),
-        "SampleTestScript", "csv", scriptProperties);
+        "SampleTestScript", "csv", properties);
   }
 
   private void unarchive(String filename) {
@@ -57,28 +50,9 @@ public class SampleManager {
     FileIOUtils.sysRes2file(resource, getDestPath(resource));
   }
 
-  private Map<String, String> generateLocalizedHtml(String fileBase) {
-    Map<String, String> properties = loadProperties(fileBase);
-
+  private void generateLocalizedHtml(String fileBase, Map<String, String> properties) {
     mergedFileGenerator.generate(RESOURCE_DIR + fileBase, getDestPath(RESOURCE_DIR), fileBase,
         "html", properties);
-
-    return properties;
-  }
-
-  private Map<String, String> loadProperties(String fileBase) {
-    String resourcePath = "/" + RESOURCE_DIR + getPropertiesFileName(fileBase);
-    return PropertyUtils.loadAsMap(resourcePath, false);
-  }
-
-  private String getPropertiesFileName(String name) {
-    String fileName;
-    if (SitLocaleUtils.defaultLanguageEquals(Locale.JAPANESE)) {
-      fileName = name + "_" + Locale.JAPANESE.getLanguage();
-    } else {
-      fileName = name;
-    }
-    return fileName + ".properties";
   }
 
   private Path getDestPath(String path) {
