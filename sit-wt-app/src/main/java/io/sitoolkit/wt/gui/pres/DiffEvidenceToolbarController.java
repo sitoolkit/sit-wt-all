@@ -2,6 +2,7 @@ package io.sitoolkit.wt.gui.pres;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javax.annotation.Resource;
 import io.sitoolkit.wt.gui.app.diffevidence.DiffEvidenceService;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
 import io.sitoolkit.wt.gui.infra.fx.FxUtils;
@@ -22,7 +23,8 @@ public class DiffEvidenceToolbarController implements Initializable {
 
   private ProjectState projectState;
 
-  private DiffEvidenceService diffEvidenceService = new DiffEvidenceService();
+  @Resource
+  private DiffEvidenceService diffEvidenceService;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {

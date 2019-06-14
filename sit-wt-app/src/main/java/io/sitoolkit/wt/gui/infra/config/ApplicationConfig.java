@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGeneratorConfig;
 import io.sitoolkit.wt.app.sample.SampleManagerConfig;
+import io.sitoolkit.wt.gui.app.diffevidence.DiffEvidenceService;
 import io.sitoolkit.wt.gui.app.sample.SampleService;
 import io.sitoolkit.wt.gui.pres.AppController;
 import io.sitoolkit.wt.gui.pres.DiffEvidenceToolbarController;
@@ -51,5 +52,11 @@ public class ApplicationConfig {
   public SampleService sampleService() {
     return new SampleService();
   }
+
+  @Bean
+  DiffEvidenceService diffEvidenceService() {
+    return new DiffEvidenceService();
+  }
+
 
 }
