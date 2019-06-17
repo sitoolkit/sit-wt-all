@@ -5,6 +5,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javax.annotation.Resource;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListenerContainer;
 import io.sitoolkit.wt.gui.app.diffevidence.DiffEvidenceService;
 import io.sitoolkit.wt.gui.app.project.ProjectService;
@@ -102,7 +103,8 @@ public class AppController implements Initializable {
 
   ProjectService projectService = new ProjectService();
 
-  ScriptService scriptService = new ScriptService();
+  @Resource
+  ScriptService scriptService;
 
   // private double stageHeight;
   //
