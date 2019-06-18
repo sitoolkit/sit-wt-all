@@ -254,7 +254,6 @@ public class AppController implements Initializable {
 
   @FXML
   public void quitBrowsing() {
-    scriptService.quitBrowsing();
     projectState.reset();
   }
 

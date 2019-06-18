@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.annotation.Resource;
-import org.springframework.context.ConfigurableApplicationContext;
 import io.sitoolkit.wt.app.ope2script.FirefoxOpener;
 import io.sitoolkit.wt.app.page2script.Page2Script;
 import io.sitoolkit.wt.app.test.TestCaseReader;
@@ -34,9 +33,8 @@ public class ScriptService {
 
   FirefoxOpener firefoxOpener = new FirefoxOpener();
 
-  ConfigurableApplicationContext pageCtx;
-
-  TestCaseReader testCaseReader = new TestCaseReader();
+  @Resource
+  TestCaseReader testCaseReader;
 
   OperationConverter operationConverter = new OperationConverter();
 
@@ -126,9 +124,6 @@ public class ScriptService {
     return page2script.getCreateFile();
   }
 
-  public void quitBrowsing() {
-    pageCtx.close();
-  }
 
   public void generateNewScript(Path destFile) {
     testScriptGenerator.generateNewScript(destFile);

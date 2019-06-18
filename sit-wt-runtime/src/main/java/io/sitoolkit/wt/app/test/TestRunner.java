@@ -84,11 +84,8 @@ public class TestRunner {
    * @param isEvidenceOpen テスト実行後にエビデンスを開く場合にtrue
    * @return テスト結果
    */
-  public List<TestResult> runScript(String testCaseStr, boolean isParallel,
-      boolean isEvidenceOpen) {
-
-    ConfigurableApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(RuntimeConfig.class);
+  public List<TestResult> runScript(ConfigurableApplicationContext appCtx, String testCaseStr,
+      boolean isParallel, boolean isEvidenceOpen) {
 
     List<TestResult> result = runScript(appCtx, testCaseStr, isParallel, isEvidenceOpen);
 
@@ -107,8 +104,8 @@ public class TestRunner {
    * @param isEvidenceOpen テスト実行後にエビデンスを開く場合にtrue
    * @return テスト結果
    */
-  public List<TestResult> runScript(ConfigurableApplicationContext appCtx, String testCaseStr,
-      boolean isParallel, boolean isEvidenceOpen) {
+  public List<TestResult> runScript(String testCaseStr, boolean isParallel,
+      boolean isEvidenceOpen) {
 
     List<TestResult> results = new ArrayList<>();
     List<TestCase> allTestCase = new ArrayList<>();
