@@ -1,14 +1,9 @@
 package io.sitoolkit.wt.app.test;
 
-import javax.annotation.Resource;
 import org.junit.Test;
-import org.springframework.context.ConfigurableApplicationContext;
 import io.sitoolkit.wt.domain.tester.TestBase;
 
 public class MultiByteScriptTest extends TestBase {
-
-  @Resource
-  ConfigurableApplicationContext appCtx;
 
   @Test
   public void testMultiByteCase() {

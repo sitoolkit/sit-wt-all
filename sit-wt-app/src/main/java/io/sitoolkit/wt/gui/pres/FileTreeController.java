@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javax.annotation.Resource;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
 import io.sitoolkit.wt.gui.infra.fx.FileSystemWatchService;
 import io.sitoolkit.wt.gui.infra.fx.FileTreeItem;
@@ -52,11 +53,13 @@ public class FileTreeController implements Initializable {
 
   FileOpenable fileOpenable;
 
+  @Resource
   ScriptService scriptService;
 
   TestCaseDialogController testCaseDialogController;
 
-  public FileTreeController() {}
+  public FileTreeController() {
+  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {

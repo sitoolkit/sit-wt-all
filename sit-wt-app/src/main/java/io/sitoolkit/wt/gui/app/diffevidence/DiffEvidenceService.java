@@ -27,7 +27,7 @@ public class DiffEvidenceService {
   BaseEvidenceManager baseEvidenceManager = new BaseEvidenceManager();
 
   @Resource
-  DiffEvidenceGenerator DiffEvidenceGenerator;
+  DiffEvidenceGenerator diffEvidenceGenerator;
 
   public boolean genMaskEvidence(File selectedItem) {
 
@@ -92,7 +92,7 @@ public class DiffEvidenceService {
     EvidenceDir targetEvidence = EvidenceDir.targetEvidenceDir(targetDir);
     EvidenceDir baseEvidence = EvidenceDir.baseEvidenceDir(baseDir, targetEvidence.getBrowser());
 
-    DiffEvidenceGenerator.generate(baseEvidence, targetEvidence, false);
+    diffEvidenceGenerator.generate(baseEvidence, targetEvidence, false);
     evidenceOpener.openCompareEvidence(targetEvidence);
 
     return true;

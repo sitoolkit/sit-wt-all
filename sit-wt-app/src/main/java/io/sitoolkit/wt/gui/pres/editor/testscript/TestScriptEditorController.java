@@ -3,6 +3,7 @@ package io.sitoolkit.wt.gui.pres.editor.testscript;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Resource;
 import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.testscript.TestScript;
@@ -39,6 +40,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
   private MenuState menuState = new MenuState();
 
   @NonNull
+  @Resource
   private ScriptService scriptService;
 
   public TestScriptEditorController(ScriptService scriptService) {
