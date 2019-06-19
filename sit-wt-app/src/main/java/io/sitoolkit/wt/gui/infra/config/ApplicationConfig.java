@@ -20,7 +20,6 @@ import io.sitoolkit.wt.gui.pres.FileTreeController;
 import io.sitoolkit.wt.gui.pres.MenuBarController;
 import io.sitoolkit.wt.gui.pres.SampleToolbarController;
 import io.sitoolkit.wt.gui.pres.TestToolbarController;
-import io.sitoolkit.wt.gui.app.test.TestService;
 
 @Configuration
 @Import({SampleManagerConfig.class, DiffEvidenceGeneratorConfig.class, TestScriptConfig.class,
@@ -75,10 +74,5 @@ public class ApplicationConfig {
   @Bean
   public TestCaseReader TestCaseReader() {
     return new TestCaseReader();
-  }
-  
-  @Bean
-  public TestService TestService() {
-    return new TestService();
   }
 }

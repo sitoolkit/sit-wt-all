@@ -17,7 +17,7 @@ public class MultiByteScriptTest extends TestBase {
     boolean isEvidenceOpen = Boolean.getBoolean("sitwt.open-evidence");
     TestRunner testRunner = new TestRunner();
 
-    testRunner.runScript(appCtx, getTestScriptPath(), isParallel, isEvidenceOpen);
+    testRunner.runScript(getTestScriptPath(), isParallel, isEvidenceOpen);
   }
 
   @Override
