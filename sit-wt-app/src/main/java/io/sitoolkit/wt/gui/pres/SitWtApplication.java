@@ -1,6 +1,7 @@
 package io.sitoolkit.wt.gui.pres;
 
 import java.util.ResourceBundle;
+import org.openqa.selenium.WebDriver;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
@@ -55,6 +56,8 @@ public class SitWtApplication extends Application {
     loader.setResources(ResourceBundle.getBundle("message.message"));
 
     appCtx = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+    appCtx.getBean(WebDriver.class).quit();
+
     loader.setControllerFactory(appCtx::getBean);
 
     Parent root = loader.load();
