@@ -145,7 +145,6 @@ public class AppController implements Initializable {
 
     fileTreeController.setTestRunnable(testToolbarController);
     fileTreeController.fileOpenable = editorTabController;
-    fileTreeController.scriptService = scriptService;
 
     editorTabController.setTabs(editorTab);
     editorTabController.setScriptService(scriptService);

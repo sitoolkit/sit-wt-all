@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.annotation.Resource;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import io.sitoolkit.wt.app.config.ExtConfig;
 import io.sitoolkit.wt.app.ope2script.FirefoxOpener;
 import io.sitoolkit.wt.app.page2script.Page2Script;
+import io.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import io.sitoolkit.wt.app.test.TestCaseReader;
 import io.sitoolkit.wt.app.test.TestScriptGenerator;
 import io.sitoolkit.wt.domain.operation.OperationConverter;
@@ -28,10 +32,11 @@ public class ScriptService {
   @Resource
   io.sitoolkit.wt.infra.PropertyManager runtimePm;
 
-  @Resource
   Page2Script page2script;
 
   FirefoxOpener firefoxOpener = new FirefoxOpener();
+
+  ConfigurableApplicationContext pageCtx;
 
   @Resource
   TestCaseReader testCaseReader;
@@ -65,6 +70,8 @@ public class ScriptService {
   }
 
   public void page2script(String driverType, String baseUrl) {
+    pageCtx = new AnnotationConfigApplicationContext(Page2ScriptConfig.class, ExtConfig.class);
+    page2script = pageCtx.getBean(Page2Script.class);
     page2script.setOpenScript(false);
     page2script.openBrowser(baseUrl, driverType);
   }
