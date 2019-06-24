@@ -131,6 +131,9 @@ public class ScriptService {
     return page2script.getCreateFile();
   }
 
+  public void quitBrowsing() {
+    pageCtx.close();
+  }
 
   public void generateNewScript(Path destFile) {
     testScriptGenerator.generateNewScript(destFile);
