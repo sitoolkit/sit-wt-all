@@ -6,16 +6,14 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import org.springframework.context.ApplicationContext;
+import javax.annotation.Resource;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import io.sitoolkit.wt.app.config.BaseConfig;
 import io.sitoolkit.wt.app.config.ExtConfig;
 import io.sitoolkit.wt.app.ope2script.FirefoxOpener;
 import io.sitoolkit.wt.app.page2script.Page2Script;
 import io.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import io.sitoolkit.wt.app.test.TestCaseReader;
-import io.sitoolkit.wt.app.test.TestScriptConfig;
 import io.sitoolkit.wt.app.test.TestScriptGenerator;
 import io.sitoolkit.wt.domain.operation.OperationConverter;
 import io.sitoolkit.wt.domain.testscript.TestScript;
@@ -28,10 +26,10 @@ public class ScriptService {
 
   CaseNoCache cache = new CaseNoCache();
 
+  @Resource
   TestScriptDao dao;
 
-  ApplicationContext appCtx;
-
+  @Resource
   io.sitoolkit.wt.infra.PropertyManager runtimePm;
 
   Page2Script page2script;
@@ -40,24 +38,14 @@ public class ScriptService {
 
   ConfigurableApplicationContext pageCtx;
 
-  TestCaseReader testCaseReader = new TestCaseReader();
+  @Resource
+  TestCaseReader testCaseReader;
 
   OperationConverter operationConverter = new OperationConverter();
 
+  @Resource
   TestScriptGenerator testScriptGenerator;
 
-  public ScriptService() {
-    initialize();
-  }
-
-  private void initialize() {
-    ExecutorContainer.get().execute(() -> {
-      appCtx = new AnnotationConfigApplicationContext(BaseConfig.class, TestScriptConfig.class);
-      dao = appCtx.getBean(TestScriptDao.class);
-      runtimePm = appCtx.getBean(io.sitoolkit.wt.infra.PropertyManager.class);
-      testScriptGenerator = appCtx.getBean(TestScriptGenerator.class);
-    });
-  }
 
   public void loadProject() {
     PropertyManager pm = PropertyManager.get();
@@ -86,7 +74,6 @@ public class ScriptService {
     page2script = pageCtx.getBean(Page2Script.class);
     page2script.setOpenScript(false);
     page2script.openBrowser(baseUrl, driverType);
-
   }
 
   public void ope2script(String baseUrl) {

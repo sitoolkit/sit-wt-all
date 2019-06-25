@@ -2,8 +2,7 @@ package io.sitoolkit.wt.app.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import javax.annotation.Resource;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestScriptDao;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -13,7 +12,11 @@ public class TestCaseReader {
 
   private static final SitLogger LOG = SitLoggerFactory.getLogger(TestCaseReader.class);
 
-  public TestCaseReader() {}
+  @Resource
+  TestScriptDao testScriptDao;
+
+  public TestCaseReader() {
+  }
 
   public static void main(String[] args) {
     System.exit(new TestCaseReader().execute(args));
@@ -40,11 +43,7 @@ public class TestCaseReader {
   }
 
   List<String> read(String scriptPath, String sheetName) {
-    ConfigurableApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(TestCaseReaderConfig.class);
-    TestScriptDao testScriptDao = appCtx.getBean(TestScriptDao.class);
     TestScript testScript = testScriptDao.load(scriptPath, sheetName, true);
-    appCtx.close();
     return new ArrayList<>(testScript.getCaseNoMap().keySet());
   }
 

@@ -1,14 +1,9 @@
 package io.sitoolkit.wt.app.test;
 
-import javax.annotation.Resource;
 import org.junit.Test;
-import org.springframework.context.ConfigurableApplicationContext;
 import io.sitoolkit.wt.domain.tester.TestBase;
 
 public class MultiByteScriptTest extends TestBase {
-
-  @Resource
-  ConfigurableApplicationContext appCtx;
 
   @Test
   public void testMultiByteCase() {
@@ -17,7 +12,7 @@ public class MultiByteScriptTest extends TestBase {
     boolean isEvidenceOpen = Boolean.getBoolean("sitwt.open-evidence");
     TestRunner testRunner = new TestRunner();
 
-    testRunner.runScript(appCtx, getTestScriptPath(), isParallel, isEvidenceOpen);
+    testRunner.runScript(getTestScriptPath(), isParallel, isEvidenceOpen);
   }
 
   @Override

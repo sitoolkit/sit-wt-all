@@ -55,6 +55,7 @@ public class SitWtApplication extends Application {
     loader.setResources(ResourceBundle.getBundle("message.message"));
 
     appCtx = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+
     loader.setControllerFactory(appCtx::getBean);
 
     Parent root = loader.load();

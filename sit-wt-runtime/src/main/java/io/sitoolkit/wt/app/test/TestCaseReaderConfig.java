@@ -11,7 +11,8 @@ import io.sitoolkit.wt.domain.testscript.TestScript;
 @Import(BaseConfig.class)
 public class TestCaseReaderConfig {
 
-  public TestCaseReaderConfig() {}
+  public TestCaseReaderConfig() {
+  }
 
   @Bean
   @Scope("prototype")
@@ -19,4 +20,8 @@ public class TestCaseReaderConfig {
     return new TestScript();
   }
 
+  @Bean
+  public TestCaseReader TestCaseReader() {
+    return new TestCaseReader();
+  }
 }

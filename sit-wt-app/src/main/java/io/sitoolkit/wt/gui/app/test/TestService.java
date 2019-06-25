@@ -50,7 +50,7 @@ public class TestService {
           DebugSupport debugSupport = appCtx.getBean(DebugSupport.class);
           debugSupport.setListener(params.getDebugListener());
           callback.callback(
-              runner.runScript(appCtx, params.getTargetScripts(), params.isParallel(), false));
+              runner.runScript(params.getTargetScripts(), params.isParallel(), false));
         } catch (Exception e) {
           LOG.error("app.unexpectedException", e);
           callback.callback(Collections.emptyList());

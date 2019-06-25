@@ -4,11 +4,9 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import javax.annotation.Resource;
 import io.sitoolkit.wt.app.compareevidence.BaseEvidenceManager;
 import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
-import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGeneratorConfig;
 import io.sitoolkit.wt.app.compareevidence.MaskEvidenceGenerator;
 import io.sitoolkit.wt.app.compareevidence.MaskScreenshotGenerator;
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
@@ -28,6 +26,7 @@ public class DiffEvidenceService {
 
   BaseEvidenceManager baseEvidenceManager = new BaseEvidenceManager();
 
+  @Resource
   DiffEvidenceGenerator diffEvidenceGenerator;
 
   public boolean genMaskEvidence(File selectedItem) {
@@ -90,9 +89,6 @@ public class DiffEvidenceService {
       targetDir = selectedFiles.get(0).getAbsolutePath();
     }
 
-    ApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(DiffEvidenceGeneratorConfig.class);
-    diffEvidenceGenerator = appCtx.getBean(DiffEvidenceGenerator.class);
     EvidenceDir targetEvidence = EvidenceDir.targetEvidenceDir(targetDir);
     EvidenceDir baseEvidence = EvidenceDir.baseEvidenceDir(baseDir, targetEvidence.getBrowser());
 
@@ -101,5 +97,4 @@ public class DiffEvidenceService {
 
     return true;
   }
-
 }

@@ -10,11 +10,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGenerator;
 import io.sitoolkit.wt.app.compareevidence.DiffEvidenceGeneratorConfig;
-import io.sitoolkit.wt.app.config.RuntimeConfig;
 import io.sitoolkit.wt.app.selenium2script.Selenium2Script;
 import io.sitoolkit.wt.domain.evidence.EvidenceDir;
 import io.sitoolkit.wt.domain.evidence.EvidenceOpener;
@@ -86,29 +84,6 @@ public class TestRunner {
    */
   public List<TestResult> runScript(String testCaseStr, boolean isParallel,
       boolean isEvidenceOpen) {
-
-    ConfigurableApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(RuntimeConfig.class);
-
-    List<TestResult> result = runScript(appCtx, testCaseStr, isParallel, isEvidenceOpen);
-
-    appCtx.close();
-
-    return result;
-
-  }
-
-  /**
-   * テストスクリプトを実行します。
-   *
-   * @param appCtx {@link RuntimeConfig}で構成された {@code ConfigurableApplicationContext}
-   * @param testCaseStr 実行するテストケース(scriptPath1,scriptPath2#case_1,scriptPath3!TestScript#case_1)
-   * @param isParallel ケースを並列に実行する場合にtrue
-   * @param isEvidenceOpen テスト実行後にエビデンスを開く場合にtrue
-   * @return テスト結果
-   */
-  public List<TestResult> runScript(ConfigurableApplicationContext appCtx, String testCaseStr,
-      boolean isParallel, boolean isEvidenceOpen) {
 
     List<TestResult> results = new ArrayList<>();
     List<TestCase> allTestCase = new ArrayList<>();
