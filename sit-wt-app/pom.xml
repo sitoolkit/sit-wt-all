@@ -22,6 +22,23 @@
       <artifactId>sit-wt-runtime</artifactId>
       <version>3.0.0-beta.2-SNAPSHOT</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-web</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    
   </dependencies>
 
   <parent>
@@ -35,6 +52,7 @@
     <threadCountClasses>1</threadCountClasses>
     <threadCountMethods>1</threadCountMethods>
     <finalName.mobile>${project.artifactId}-${project.version}-mobile</finalName.mobile>
+    <javafx.version>13-ea+9</javafx.version>
   </properties>
 
   <!-- Build Settings -->
