@@ -48,7 +48,6 @@
     <threadCountClasses>1</threadCountClasses>
     <threadCountMethods>1</threadCountMethods>
     <finalName.mobile>${project.artifactId}-${project.version}-mobile</finalName.mobile>
-    <javafx.version>13-ea+9</javafx.version>
   </properties>
 
   <!-- Build Settings -->

@@ -19,8 +19,10 @@ jlink --compress=2 --output ../jre --module-path javafx-jmods-${FX_VERSION}/ --a
 
 ### For cross platform
 
-1. Download and extract the OpenJDK for target OS as a compressed file such as zip or tar.gz
-2. 
+1. Download and extract the OpenJDK for target OS as a compressed file
+1. Set the --module-path option to the jmods directory path when executing the jlink command
+
+e.g.
 
 ```
 export JMODS_DIR=<path/to/openjdk/jmods/>

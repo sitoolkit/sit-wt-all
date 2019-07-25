@@ -26,6 +26,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <surefire.version>3.0.0-M3</surefire.version>
+    <javafx.version>13-ea+9</javafx.version>
     <run>install</run>
   </properties>
   <parent>
