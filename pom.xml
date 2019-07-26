@@ -16,8 +16,8 @@
     <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
-      <version>1.3.2</version>
-    </dependency>    
+      <version>${javax.annotation-api.version}</version>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,6 +27,7 @@
     <surefire.version>3.0.0-M3</surefire.version>
     <javafx.version>12.0.1</javafx.version>
     <lombok.version>1.18.8</lombok.version>
+    <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
     <run>install</run>
   </properties>
   <parent>
@@ -120,6 +121,19 @@
       </plugin>
     </plugins>
 
+    <extensions>
+      <!-- Make javafx.annotation-api.Resource be load before jsr250-api.@Resource -->
+      <extension>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>${javax.annotation-api.version}</version>
+      </extension>
+      <extension>
+        <groupId>javax.annotation</groupId>
+        <artifactId>jsr250-api</artifactId>
+        <version>1.0</version>
+      </extension>
+    </extensions>
   </build>
 
 
