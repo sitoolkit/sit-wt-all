@@ -35,17 +35,6 @@
     </dependency>
 
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>1.1.7</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.8</version>
-    </dependency>
-    <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
       <version>1.3.0.Final</version>
@@ -68,7 +57,6 @@
     <threadCountClasses>1</threadCountClasses>
     <threadCountMethods>1</threadCountMethods>
     <finalName.mobile>${project.artifactId}-${project.version}-mobile</finalName.mobile>
-    <user.dir>${project.build.directory}</user.dir>
   </properties>
 
   <!-- Build Settings -->
@@ -94,7 +82,7 @@
           <archive>
             <index>true</index>
             <manifest>
-              <mainClass>sit.wt.app/io.sitoolkit.wt.gui.pres.SitWtApplication</mainClass>
+              <mainClass>io.sitoolkit.wt.gui.pres.SitWtApplication</mainClass>
               <useUniqueVersions>true</useUniqueVersions>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
@@ -106,12 +94,11 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
         <configuration>
-          <release>11</release>
           <annotationProcessorPaths>
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-              <version>1.18.8</version>
+              <version>${lombok.version}</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -122,24 +109,12 @@
         <version>0.0.2</version>
         <configuration>
           <mainClass>sit.wt.app/io.sitoolkit.wt.gui.pres.SitWtApplication</mainClass>
-          <release>11</release>
-          <jlinkImageName>hellofx</jlinkImageName>
-          <launcher>launcher</launcher>
+          <release>${maven.compiler.target}</release>
+          <options combine.children="append">
+            <option>--add-opens</option>
+            <option>java.base/java.lang=spring.core</option>
+          </options>
         </configuration>
-        <executions>
-          <execution>
-            <id>default-cli</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <options combine.children="append">
-                <option>--add-opens</option>
-                <option>java.base/java.lang=spring.core</option>
-              </options>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
