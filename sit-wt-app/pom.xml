@@ -110,10 +110,6 @@
         <configuration>
           <mainClass>sit.wt.app/io.sitoolkit.wt.gui.pres.SitWtApplication</mainClass>
           <release>${maven.compiler.target}</release>
-          <options combine.children="append">
-            <option>--add-opens</option>
-            <option>java.base/java.lang=spring.core</option>
-          </options>
         </configuration>
       </plugin>
     </plugins>
@@ -175,6 +171,8 @@
             <artifactId>javafx-maven-plugin</artifactId>
             <configuration>
               <options>
+                <option>--add-opens</option>
+                <option>java.base/java.lang=spring.core</option>
                 <option>-Duser.dir=${project.build.directory}</option>
                 <option>-DskipUpdate=true</option>
                 <option>-Xdebug</option>
