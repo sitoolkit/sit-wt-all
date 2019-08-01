@@ -14,8 +14,6 @@ module sit.wt.app {
   requires spring.core;
   requires spring.beans;
   requires lombok;
-  requires org.mapstruct;
-  requires org.mapstruct.processor;
   requires commons.io;
   requires commons.lang3;
   requires controlsfx;
