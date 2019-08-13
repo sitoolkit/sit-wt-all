@@ -73,7 +73,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${surefire.version}</version>
           <configuration>
-            <argLine>-Dfile.encoding=${file.encoding} -XX:-UseSplitVerifier
+            <argLine>-Dfile.encoding=${file.encoding}
               -Duser.language=${user.language} -Duser.country=${user.country}</argLine>
           </configuration>
         </plugin>
