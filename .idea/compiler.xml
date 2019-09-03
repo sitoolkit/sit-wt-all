@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="sit-wt-maven-plugin" />
+        <module name="sit-wt-runtime" />
+        <module name="sit-wt-util" />
+      </profile>
+      <profile name="Annotation profile for sit-wt-all" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.8/lombok-1.18.8.jar" />
+        </processorPath>
+        <module name="sit-wt-app" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="sit-wt-all" target="11" />
+      <module name="sit-wt-app" target="11" />
+      <module name="sit-wt-maven-plugin" target="11" />
+      <module name="sit-wt-project" target="11" />
+      <module name="sit-wt-runtime" target="11" />
+      <module name="sit-wt-util" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

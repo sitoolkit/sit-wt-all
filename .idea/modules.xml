@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/sit-wt-all.iml" filepath="$PROJECT_DIR$/sit-wt-all.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sit-wt-app/sit-wt-app.iml" filepath="$PROJECT_DIR$/sit-wt-app/sit-wt-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sit-wt-maven-plugin/sit-wt-maven-plugin.iml" filepath="$PROJECT_DIR$/sit-wt-maven-plugin/sit-wt-maven-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sit-wt-project/sit-wt-project.iml" filepath="$PROJECT_DIR$/sit-wt-project/sit-wt-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sit-wt-runtime/sit-wt-runtime.iml" filepath="$PROJECT_DIR$/sit-wt-runtime/sit-wt-runtime.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sit-wt-util/sit-wt-util.iml" filepath="$PROJECT_DIR$/sit-wt-util/sit-wt-util.iml" />
+    </modules>
+  </component>
+</project>

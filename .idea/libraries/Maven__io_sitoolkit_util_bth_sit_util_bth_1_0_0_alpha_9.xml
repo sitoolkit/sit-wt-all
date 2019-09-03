@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: io.sitoolkit.util.bth:sit-util-bth:1.0.0-alpha.9">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/sitoolkit/util/bth/sit-util-bth/1.0.0-alpha.9/sit-util-bth-1.0.0-alpha.9.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/io/sitoolkit/util/bth/sit-util-bth/1.0.0-alpha.9/sit-util-bth-1.0.0-alpha.9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/sitoolkit/util/bth/sit-util-bth/1.0.0-alpha.9/sit-util-bth-1.0.0-alpha.9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

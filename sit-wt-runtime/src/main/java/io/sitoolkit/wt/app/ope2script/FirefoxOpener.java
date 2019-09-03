@@ -1,5 +1,6 @@
 package io.sitoolkit.wt.app.ope2script;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -44,7 +45,7 @@ public class FirefoxOpener {
   public int open() {
     try {
       ffManager.switchEsr();
-      WebDriverInstaller.getInstance().installGeckoDriver();
+      WebDriverManager.firefoxdriver().setup();
 
       GuidanceUtils.retrieve(guidanceResources);
 
