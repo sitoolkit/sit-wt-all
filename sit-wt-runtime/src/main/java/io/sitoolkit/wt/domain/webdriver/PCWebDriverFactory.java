@@ -105,7 +105,6 @@ public class PCWebDriverFactory {
 
       case "chrome":
         WebDriverManager.chromedriver().setup();
-
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("credentials_enable_service", false);
         prefs.put("password_manager_enabled", false);
@@ -114,6 +113,7 @@ public class PCWebDriverFactory {
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
         ChromeOptions chromeOptions = new ChromeOptions().merge(capabilities);
+
         return new ChromeDriver(chromeOptions);
 
       case "ie":
