@@ -1,5 +1,6 @@
 package io.sitoolkit.wt.domain.webdriver;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,7 +53,7 @@ public class MobileWebDriver {
         // geckodriver is not stable yet as of 2016/10
         // so we doesn't support neigther selenium 3 nor firefox 48.x
         // higher
-        WebDriverInstaller.getInstance().installGeckoDriver();
+        WebDriverManager.firefoxdriver().setup();
 
         webDriver = firefoxManager.startWebDriver(capabilities);
     }

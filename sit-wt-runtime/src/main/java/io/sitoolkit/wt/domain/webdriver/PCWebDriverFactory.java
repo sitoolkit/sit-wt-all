@@ -1,5 +1,6 @@
 package io.sitoolkit.wt.domain.webdriver;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -103,8 +104,7 @@ public class PCWebDriverFactory {
     switch (driverType) {
 
       case "chrome":
-        WebDriverInstaller.getInstance().installChromeDriver();
-
+        WebDriverManager.chromedriver().setup();
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("credentials_enable_service", false);
         prefs.put("password_manager_enabled", false);
@@ -113,16 +113,17 @@ public class PCWebDriverFactory {
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
         ChromeOptions chromeOptions = new ChromeOptions().merge(capabilities);
+
         return new ChromeDriver(chromeOptions);
 
       case "ie":
       case "internet explorer":
-        WebDriverInstaller.getInstance().installIeDriver();
+        WebDriverManager.iedriver().setup();
         InternetExplorerOptions ieOptions = new InternetExplorerOptions(capabilities);
         return new InternetExplorerDriver(ieOptions);
 
       case "edge":
-        WebDriverInstaller.getInstance().installEdgeDriver();
+        WebDriverManager.edgedriver().setup();
         EdgeOptions edgeOptions = new EdgeOptions().merge(capabilities);
         return new EdgeDriver(edgeOptions);
 
@@ -132,6 +133,7 @@ public class PCWebDriverFactory {
           return new SafariDriver(safariOptions);
         } catch (UnreachableBrowserException e) {
           if (StringUtils.startsWith(e.getMessage(), "Failed to connect to SafariDriver")) {
+            // TODO WebDriverManager 非対応なので WebDriverInstaller を使用
             WebDriverInstaller.getInstance().installSafariDriver();
             return new SafariDriver(safariOptions);
           }
@@ -144,7 +146,7 @@ public class PCWebDriverFactory {
 
       case "firefox":
       case "ff":
-        WebDriverInstaller.getInstance().installGeckoDriver();
+        WebDriverManager.firefoxdriver().setup();
         return firefoxManager.startWebDriver(capabilities);
 
       default:
