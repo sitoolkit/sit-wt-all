@@ -29,7 +29,7 @@ public class SitWtApplication extends Application {
 
   private ConfigurableApplicationContext appCtx;
 
-  public static void main(String[] args) {
+  public static void launchApplication(String[] args) {
     LOG.info("app.envInfo", SystemUtils.getEnvironmentInfo());
     launch(args);
   }
