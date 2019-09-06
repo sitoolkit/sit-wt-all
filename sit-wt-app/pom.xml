@@ -59,53 +59,27 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.1.1</version>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
-              <goal>single</goal>
+              <goal>shade</goal>
             </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>project-classifier</shadedClassifierName>
+              <outputFile>shade\${project.artifactId}.jar</outputFile>
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>io.sitoolkit.wt.gui.pres.SitWtLauncher</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <appendAssemblyId>false</appendAssemblyId>
-          <archive>
-            <index>true</index>
-            <manifest>
-              <mainClass>io.sitoolkit.wt.gui.pres.SitWtApplication</mainClass>
-              <useUniqueVersions>true</useUniqueVersions>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <configuration>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>${lombok.version}</version>
-            </path>
-          </annotationProcessorPaths>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.2</version>
-        <configuration>
-          <mainClass>sit.wt.app/io.sitoolkit.wt.gui.pres.SitWtApplication</mainClass>
-          <release>${maven.compiler.target}</release>
-        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -152,28 +126,6 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>dev</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-maven-plugin</artifactId>
-            <configuration>
-              <options>
-                <option>--add-opens</option>
-                <option>java.base/java.lang=spring.core</option>
-                <option>-Duser.dir=${project.build.directory}</option>
-                <option>-DskipUpdate=true</option>
-                <option>-Xdebug</option>
-                <option>-Xrunjdwp:server=y,transport=dt_socket,address=*:8000,suspend=y</option>
-              </options>
-            </configuration>
           </plugin>
         </plugins>
       </build>
