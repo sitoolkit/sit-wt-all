@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import javax.annotation.PostConstruct;
@@ -71,10 +72,11 @@ public class FirefoxManager {
     installIni = "ff-esr-inst.ini";
   }
 
-  public FirefoxDriver startWebDriver(DesiredCapabilities capabilities) {
+  public FirefoxDriver startWebDriver(DesiredCapabilities capabilities, List<String> arguments) {
     return MultiThreadUtils.submitWithProgress(() -> {
       FirefoxOptions options = new FirefoxOptions(capabilities);
       options.setBinary(getFirefoxBinary());
+      options.addArguments(arguments);
       return new FirefoxDriver(options);
     });
 

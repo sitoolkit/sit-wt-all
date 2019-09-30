@@ -5,7 +5,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -21,7 +24,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Configuration
-@PropertySource(ignoreResourceNotFound = true,
+@PropertySource(
+    ignoreResourceNotFound = true,
     value = {"classpath:sit-wt-default.properties", "classpath:sit-wt.properties"})
 public class PropertyManager {
 
@@ -64,6 +68,12 @@ public class PropertyManager {
   @Value("${driver.type:}")
   private String driverType;
 
+  @Value("${headless:}")
+  private boolean headlessMode;
+
+  @Value("${browser.options:}")
+  private String browserOptions;
+
   @Value("${appium.address}")
   private String appiumAddress;
 
@@ -105,13 +115,9 @@ public class PropertyManager {
   @Value("${wait.waitSpan}")
   private int waitSpan;
 
-  @Setter
-  @Getter
-  private Charset csvCharset = StandardCharsets.UTF_8;
+  @Setter @Getter private Charset csvCharset = StandardCharsets.UTF_8;
 
-  @Setter
-  @Getter
-  private boolean csvHasBOM = true;
+  @Setter @Getter private boolean csvHasBOM = true;
 
   @Getter
   @Value("${sitwt.projectDirectory:#{null}}")
@@ -131,6 +137,8 @@ public class PropertyManager {
 
   private boolean isChromeDriver;
 
+  private List<String> browserArguments = new ArrayList<>();
+
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
     PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -141,9 +149,15 @@ public class PropertyManager {
   @PostConstruct
   public void init() {
     capabilities = PropertyUtils.loadAsMap("/capabilities", true);
+    browserArguments = new ArrayList<>(Arrays.asList(browserOptions.split(",")));
+    if (isChromeDriver() && headlessMode) {
+      browserArguments.add("--headless");
+    }
+    if (isFirefoxDriver() && headlessMode) {
+      browserArguments.add("-headless");
+    }
 
     setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
-
   }
 
   public void save(File dir) {
@@ -300,6 +314,10 @@ public class PropertyManager {
     return capabilities;
   }
 
+  public List<String> getBrowserArguments() {
+    return browserArguments;
+  }
+
   public boolean isDebug() {
     return isDebug;
   }
@@ -315,5 +333,4 @@ public class PropertyManager {
   public int getWaitSpan() {
     return waitSpan;
   }
-
 }
