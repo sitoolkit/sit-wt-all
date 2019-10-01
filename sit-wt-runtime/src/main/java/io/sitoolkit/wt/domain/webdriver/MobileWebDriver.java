@@ -1,6 +1,5 @@
 package io.sitoolkit.wt.domain.webdriver;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,20 +10,21 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.context.annotation.Profile;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.firefox.FirefoxManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.selenium.WebDriverCloser;
-import io.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 
 @Profile("mobile")
 public class MobileWebDriver {
 
   private static final SitLogger LOG = SitLoggerFactory.getLogger(MobileWebDriver.class);
 
-  public RemoteWebDriver getMobileDriver(PropertyManager pm, WebDriverCloser closer,
-      FirefoxManager firefoxManager) throws MalformedURLException {
+  public RemoteWebDriver getMobileDriver(
+      PropertyManager pm, WebDriverCloser closer, FirefoxManager firefoxManager)
+      throws MalformedURLException {
     RemoteWebDriver webDriver = null;
 
     String driverType = StringUtils.defaultString(pm.getDriverType());
@@ -55,7 +55,7 @@ public class MobileWebDriver {
         // higher
         WebDriverManager.firefoxdriver().setup();
 
-        webDriver = firefoxManager.startWebDriver(capabilities);
+        webDriver = firefoxManager.startWebDriver(capabilities, pm.getBrowserArguments());
     }
 
     webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
@@ -66,5 +66,4 @@ public class MobileWebDriver {
 
     return webDriver;
   }
-
 }
