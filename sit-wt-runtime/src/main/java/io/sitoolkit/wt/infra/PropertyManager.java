@@ -6,18 +6,19 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.util.StringUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import lombok.Getter;
@@ -68,7 +69,7 @@ public class PropertyManager {
   @Value("${driver.type:}")
   private String driverType;
 
-  @Value("${headless:}")
+  @Value("${headless:false}")
   private boolean headlessMode;
 
   @Value("${browser.options:}")
@@ -149,15 +150,21 @@ public class PropertyManager {
   @PostConstruct
   public void init() {
     capabilities = PropertyUtils.loadAsMap("/capabilities", true);
-    browserArguments = new ArrayList<>(Arrays.asList(browserOptions.split(",")));
+
+    setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
+
+    if (StringUtils.hasLength(browserOptions)) {
+      Stream.of(browserOptions.split(","))
+          .filter(StringUtils::hasLength)
+          .forEach(browserArguments::add);
+    }
+
     if (isChromeDriver() && headlessMode) {
       browserArguments.add("--headless");
     }
     if (isFirefoxDriver() && headlessMode) {
       browserArguments.add("-headless");
     }
-
-    setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
   }
 
   public void save(File dir) {
