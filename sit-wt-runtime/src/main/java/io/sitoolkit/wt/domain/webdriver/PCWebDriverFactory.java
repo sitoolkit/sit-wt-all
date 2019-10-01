@@ -1,6 +1,5 @@
 package io.sitoolkit.wt.domain.webdriver;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -23,6 +22,7 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.springframework.context.annotation.Profile;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.firefox.FirefoxManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
@@ -113,6 +113,7 @@ public class PCWebDriverFactory {
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
         ChromeOptions chromeOptions = new ChromeOptions().merge(capabilities);
+        chromeOptions.addArguments(pm.getBrowserArguments());
 
         return new ChromeDriver(chromeOptions);
 
@@ -147,7 +148,7 @@ public class PCWebDriverFactory {
       case "firefox":
       case "ff":
         WebDriverManager.firefoxdriver().setup();
-        return firefoxManager.startWebDriver(capabilities);
+        return firefoxManager.startWebDriver(capabilities, pm.getBrowserArguments());
 
       default:
         return null;

@@ -5,23 +5,28 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.util.StringUtils;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
 
 @Configuration
-@PropertySource(ignoreResourceNotFound = true,
+@PropertySource(
+    ignoreResourceNotFound = true,
     value = {"classpath:sit-wt-default.properties", "classpath:sit-wt.properties"})
 public class PropertyManager {
 
@@ -64,6 +69,12 @@ public class PropertyManager {
   @Value("${driver.type:}")
   private String driverType;
 
+  @Value("${headless:false}")
+  private boolean headlessMode;
+
+  @Value("${browser.options:}")
+  private String browserOptions;
+
   @Value("${appium.address}")
   private String appiumAddress;
 
@@ -105,13 +116,9 @@ public class PropertyManager {
   @Value("${wait.waitSpan}")
   private int waitSpan;
 
-  @Setter
-  @Getter
-  private Charset csvCharset = StandardCharsets.UTF_8;
+  @Setter @Getter private Charset csvCharset = StandardCharsets.UTF_8;
 
-  @Setter
-  @Getter
-  private boolean csvHasBOM = true;
+  @Setter @Getter private boolean csvHasBOM = true;
 
   @Getter
   @Value("${sitwt.projectDirectory:#{null}}")
@@ -131,6 +138,8 @@ public class PropertyManager {
 
   private boolean isChromeDriver;
 
+  private List<String> browserArguments = new ArrayList<>();
+
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
     PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
@@ -144,6 +153,18 @@ public class PropertyManager {
 
     setDriverFlags(toLowerCase(driverType), toLowerCase(capabilities.get("browserName")));
 
+    if (StringUtils.hasLength(browserOptions)) {
+      Stream.of(browserOptions.split(","))
+          .filter(StringUtils::hasLength)
+          .forEach(browserArguments::add);
+    }
+
+    if (isChromeDriver() && headlessMode) {
+      browserArguments.add("--headless");
+    }
+    if (isFirefoxDriver() && headlessMode) {
+      browserArguments.add("-headless");
+    }
   }
 
   public void save(File dir) {
@@ -300,6 +321,10 @@ public class PropertyManager {
     return capabilities;
   }
 
+  public List<String> getBrowserArguments() {
+    return browserArguments;
+  }
+
   public boolean isDebug() {
     return isDebug;
   }
@@ -315,5 +340,4 @@ public class PropertyManager {
   public int getWaitSpan() {
     return waitSpan;
   }
-
 }
