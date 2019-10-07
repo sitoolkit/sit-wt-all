@@ -1,16 +1,20 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import java.util.Arrays;
+import static java.util.stream.Collectors.toCollection;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 
 public class TestScriptEditorFxImpl implements TestScriptEditor {
 
@@ -18,30 +22,68 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public void load(TestScript testScript) {
+    tableView.setItems(buildEditorRows(testScript));
+    tableView.getColumns().setAll(buildEditorColumns(testScript));
 
-    ObservableList<ScriptEditorRow> rows = buildEditorRows(testScript);
-    tableView.setItems(rows);
-    tableView.getColumns().setAll(getViewColumns());
+    tableView.setId(testScript.getScriptFile().getAbsolutePath());
+    tableView
+        .getStylesheets()
+        .add(getClass().getResource("/testScriptEditor.css").toExternalForm());
+
+    // TODO implement SpreadSheet's RowPickers-like feature instead of breakpoint column
+    // TODO set context-menu-event-handler to tableView
+    //    tableView.setOnContextMenuRequested(new ContextMenuEventHandler());
   }
 
-  private List<TableColumn<ScriptEditorRow, String>> getViewColumns() {
-    TableColumn<ScriptEditorRow, String> firstNameCol = new TableColumn<>("Column-1");
-    firstNameCol.setCellValueFactory(new PropertyValueFactory<>("column1"));
-    TableColumn<ScriptEditorRow, String> lastNameCol = new TableColumn<>("Column-2");
-    lastNameCol.setCellValueFactory(new PropertyValueFactory<>("column2"));
-    return Arrays.asList(firstNameCol, lastNameCol);
+  private List<TableColumn<ScriptEditorRow, String>> buildEditorColumns(TestScript testScript) {
+    List<TableColumn<ScriptEditorRow, String>> columns = new ArrayList<>();
+    int colIndex = 0;
+    for (String headerName : testScript.getHeaders()) {
+      String caseNo = StringUtils.substringAfter(headerName, testScript.getCaseNoPrefix());
+      columns.add(buildEditorColumn(headerName, colIndex, caseNo));
+      colIndex++;
+    }
+    return columns;
+  }
+
+  private TableColumn<ScriptEditorRow, String> buildEditorColumn(
+      String headerName, int columnIndex, String caseNo) {
+    TableColumn<ScriptEditorRow, String> col = new TableColumn<>(headerName);
+    col.setCellValueFactory(createCellValueFactory(columnIndex, caseNo));
+    return col;
+  }
+
+  private Callback<CellDataFeatures<ScriptEditorRow, String>, ObservableValue<String>>
+      createCellValueFactory(int columnIndex, String caseNo) {
+
+    switch (columnIndex) {
+      case 0:
+        return p -> p.getValue().noProperty();
+      case 1:
+        return p -> p.getValue().itemNameProperty();
+      case 2:
+        return p -> p.getValue().operationNameProperty();
+      case 3:
+        return p -> p.getValue().locatorTypeProperty();
+      case 4:
+        return p -> p.getValue().locatorProperty();
+      case 5:
+        return p -> p.getValue().dataTypeProperty();
+      case 6:
+        return p -> p.getValue().screenshotTimingProperty();
+      case 7:
+        return p -> p.getValue().breakpointProperty();
+      default:
+        return p -> p.getValue().testDataProperty(caseNo);
+    }
   }
 
   private ObservableList<ScriptEditorRow> buildEditorRows(TestScript testScript) {
-    ObservableList<ScriptEditorRow> rows = FXCollections.observableArrayList();
-    ScriptEditorRow row1 = new ScriptEditorRow();
-    row1.setColumn1("R1C1");
-    row1.setColumn2("R1C2");
-    ScriptEditorRow row2 = new ScriptEditorRow();
-    row2.setColumn1("R2C1");
-    row2.setColumn2("R2C2");
-    rows.addAll(row1, row2);
-    return rows;
+    return testScript
+        .getTestStepList()
+        .stream()
+        .map(ScriptEditorRow::createFromTestStep)
+        .collect(toCollection(FXCollections::observableArrayList));
   }
 
   @Override
