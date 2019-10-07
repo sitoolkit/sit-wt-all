@@ -34,12 +34,11 @@ public class TestScriptEditorController implements EditorController, DebugListen
     DATAFORMAT_SPREADSHEET = fmt;
   }
 
-  private TestScriptEditor editor = new TestScriptEditor();
+  private TestScriptEditor editor = new TestScriptEditorFxImpl();
 
   private MenuState menuState = new MenuState();
 
-  @NonNull
-  private ScriptService scriptService;
+  @NonNull private ScriptService scriptService;
 
   public TestScriptEditorController(ScriptService scriptService) {
     this.scriptService = scriptService;
@@ -302,5 +301,4 @@ public class TestScriptEditorController implements EditorController, DebugListen
     private BooleanProperty caseInsertable = new SimpleBooleanProperty(false);
     private BooleanProperty stepInsertable = new SimpleBooleanProperty(false);
   }
-
 }
