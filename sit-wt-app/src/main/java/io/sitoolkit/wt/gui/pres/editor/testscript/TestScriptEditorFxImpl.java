@@ -1,11 +1,14 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
+import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +21,8 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 
 public class TestScriptEditorFxImpl implements TestScriptEditor {
+
+  private static final int COLUMN_INDEX_FIRST_CASE = 8;
 
   private TableView<ScriptEditorRow> tableView = new TableView<>();
 
@@ -41,7 +46,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     List<TableColumn<ScriptEditorRow, String>> columns = new ArrayList<>();
     int colIndex = 0;
     for (String headerName : testScript.getHeaders()) {
-      String caseNo = StringUtils.substringAfter(headerName, testScript.getCaseNoPrefix());
+      String caseNo = getCaseNo(testScript, headerName);
       columns.add(buildEditorColumn(headerName, colIndex, caseNo));
       colIndex++;
     }
@@ -55,6 +60,10 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     col.setCellValueFactory(createCellValueFactory(columnIndex, caseNo));
     col.setEditable(true);
     return col;
+  }
+
+  private String getCaseNo(TestScript testScript, String headerName) {
+    return StringUtils.substringAfter(headerName, testScript.getCaseNoPrefix());
   }
 
   private Callback<CellDataFeatures<ScriptEditorRow, String>, ObservableValue<String>>
@@ -98,8 +107,22 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public TestScript buildTestScript() {
-    // TODO Auto-generated method stub
-    return null;
+    TestScript testScript = new TestScript();
+    testScript.setScriptFile(new File(tableView.getId()));
+    List<String> headers =
+        tableView.getColumns().stream().map(TableColumn::getText).collect(toList());
+    List<String> caseNoList =
+        headers
+            .stream()
+            .skip(COLUMN_INDEX_FIRST_CASE)
+            .map(header -> getCaseNo(testScript, header))
+            .collect(toList());
+    List<TestStep> testStepList =
+        tableView.getItems().stream().map(row -> row.buildTestStep(caseNoList)).collect(toList());
+
+    headers.stream().forEach(header -> testScript.addHeader(header));
+    testScript.setTestStepList(testStepList);
+    return testScript;
   }
 
   @Override

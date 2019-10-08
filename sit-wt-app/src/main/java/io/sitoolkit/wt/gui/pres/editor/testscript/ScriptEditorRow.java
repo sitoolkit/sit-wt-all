@@ -1,8 +1,11 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -42,8 +45,26 @@ public class ScriptEditorRow {
     }
   }
 
-  public TestStep buildTestStep() {
-    return null;
+  public TestStep buildTestStep(List<String> caseNoList) {
+    TestStep testStep = new TestStep();
+    testStep.setNo(noProperty().getValue());
+    testStep.setItemName(itemNameProperty().getValue());
+    testStep.setOperationName(operationNameProperty().getValue());
+    Locator locator = new Locator();
+    locator.setType(locatorTypeProperty().getValue());
+    locator.setValue(locatorProperty().getValue());
+    testStep.setLocator(locator);
+    testStep.setDataType(dataTypeProperty().getValue());
+    testStep.setScreenshotTiming(screenshotTimingProperty().getValue());
+    testStep.setBreakPoint(breakpointProperty().getValue());
+
+    Map<String, String> testData = new LinkedHashMap<String, String>();
+    for (String caseNo : caseNoList) {
+      testData.put(caseNo, testDataProperty(caseNo).getValue());
+    }
+    testStep.setTestData(testData);
+
+    return testStep;
   }
 
   public StringProperty noProperty() {
