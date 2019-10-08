@@ -14,6 +14,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 
 public class TestScriptEditorFxImpl implements TestScriptEditor {
@@ -24,6 +25,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   public void load(TestScript testScript) {
     tableView.setItems(buildEditorRows(testScript));
     tableView.getColumns().setAll(buildEditorColumns(testScript));
+    tableView.setEditable(true);
 
     tableView.setId(testScript.getScriptFile().getAbsolutePath());
     tableView
@@ -49,7 +51,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   private TableColumn<ScriptEditorRow, String> buildEditorColumn(
       String headerName, int columnIndex, String caseNo) {
     TableColumn<ScriptEditorRow, String> col = new TableColumn<>(headerName);
+    col.setCellFactory(TextFieldTableCell.forTableColumn());
     col.setCellValueFactory(createCellValueFactory(columnIndex, caseNo));
+    col.setEditable(true);
     return col;
   }
 
