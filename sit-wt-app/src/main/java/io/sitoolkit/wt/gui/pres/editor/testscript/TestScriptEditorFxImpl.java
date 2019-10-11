@@ -4,7 +4,9 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
@@ -14,9 +16,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 
@@ -32,6 +36,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     tableView.getColumns().setAll(buildEditorColumns(testScript));
     tableView.setEditable(true);
     tableView.getSelectionModel().setCellSelectionEnabled(true);
+    tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
     tableView.setId(testScript.getScriptFile().getAbsolutePath());
     tableView
@@ -154,14 +159,32 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public boolean insertTestStep() {
-    // TODO Auto-generated method stub
-    return false;
+    return insertTestSteps(getSelectedRowCount());
+  }
+
+  @Override
+  public boolean insertTestSteps(int count) {
+    Optional<Integer> insertPosition = getInsertRowPosition();
+    insertPosition.ifPresent(rowPosition -> insertTestSteps(rowPosition, count));
+    return insertPosition.isPresent();
+  }
+
+  private void insertTestSteps(int rowPosition, int count) {
+    ObservableList<ScriptEditorRow> rows = tableView.getItems();
+    for (int i = 0; i < count; i++) {
+      rows.add(rowPosition, new ScriptEditorRow());
+    }
+    getSelection().clearAndSelect(rowPosition, tableView.getColumns().get(0));
   }
 
   @Override
   public void appendTestStep() {
-    // TODO Auto-generated method stub
+    appendTestSteps(1);
+  }
 
+  @Override
+  public void appendTestSteps(int count) {
+    insertTestSteps(tableView.getItems().size(), count);
   }
 
   @Override
@@ -189,19 +212,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
-  public boolean insertTestSteps(int count) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public void appendTestCases(int count) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void appendTestSteps(int count) {
     // TODO Auto-generated method stub
 
   }
@@ -226,9 +237,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public boolean isStepSelected() {
-    tableView.getSelectionModel().getSelectedItem();
-    // TODO Auto-generated method stub
-    return false;
+    return getSelection().getSelectedItem() != null;
   }
 
   @Override
@@ -239,8 +248,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public boolean isStepInsertable() {
-    // TODO Auto-generated method stub
-    return false;
+    return getInsertRowPosition().isPresent();
   }
 
   @Override
@@ -252,5 +260,17 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   @Override
   public Node getSpreadSheet() {
     return tableView;
+  }
+
+  private TableViewSelectionModel<ScriptEditorRow> getSelection() {
+    return tableView.getSelectionModel();
+  }
+
+  private int getSelectedRowCount() {
+    return (int) getSelection().getSelectedIndices().stream().distinct().count();
+  }
+
+  private Optional<Integer> getInsertRowPosition() {
+    return getSelection().getSelectedIndices().stream().min(Comparator.naturalOrder());
   }
 }
