@@ -188,6 +188,12 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
+  public void deleteTestStep() {
+    tableView.getItems().removeAll(getSelection().getSelectedItems());
+    getSelection().clearSelection();
+  }
+
+  @Override
   public int getCaseCount(List<GridChange> changeList) {
     // TODO Auto-generated method stub
     return 0;
@@ -219,12 +225,6 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public void deleteTestCase() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void deleteTestStep() {
     // TODO Auto-generated method stub
 
   }
