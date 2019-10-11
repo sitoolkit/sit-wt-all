@@ -31,6 +31,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     tableView.setItems(buildEditorRows(testScript));
     tableView.getColumns().setAll(buildEditorColumns(testScript));
     tableView.setEditable(true);
+    tableView.getSelectionModel().setCellSelectionEnabled(true);
 
     tableView.setId(testScript.getScriptFile().getAbsolutePath());
     tableView
@@ -101,8 +102,10 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public ContextMenu getContextMenu() {
-    // TODO Auto-generated method stub
-    return new ContextMenu();
+    if (tableView.getContextMenu() == null) {
+      tableView.setContextMenu(new ContextMenu());
+    }
+    return tableView.getContextMenu();
   }
 
   @Override
@@ -223,6 +226,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public boolean isStepSelected() {
+    tableView.getSelectionModel().getSelectedItem();
     // TODO Auto-generated method stub
     return false;
   }
