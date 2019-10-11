@@ -1,5 +1,6 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -191,6 +192,15 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
+  public void deleteTestCase() {
+    getSelectedCaseIndexes()
+        .stream()
+        .sorted(reverseOrder())
+        .mapToInt(Integer::intValue)
+        .forEach(tableView.getColumns()::remove);
+  }
+
+  @Override
   public boolean insertTestStep() {
     return insertTestSteps(getSelectedRowCount());
   }
@@ -242,12 +252,6 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   public int getStepCount(List<GridChange> changeList) {
     // TODO Auto-generated method stub
     return 0;
-  }
-
-  @Override
-  public void deleteTestCase() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
