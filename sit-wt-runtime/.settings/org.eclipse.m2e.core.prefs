@@ -1,4 +1,4 @@
-activeProfiles=localhost
+activeProfiles=localhost, ci, analyze
 eclipse.preferences.version=1
 resolveWorkspaceProjects=true
 version=1

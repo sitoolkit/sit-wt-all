@@ -1,49 +1,46 @@
 package io.sitoolkit.wt.gui.domain.sample;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
-import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessExitCallback;
-import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
+import io.sitoolkit.wt.domain.httpserver.SitHttpServer;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SampleProcessClient {
 
-  public SampleProcessClient() {}
+  private SitHttpServer server;
 
-  /**
-   * 次のコマンドを実行します。
-   *
-   * <pre>
-   * mvn
-   * </pre>
-   *
-   */
-  public void start(Path basetDir, Path sampleDir, SampleStartedCallback callback) {
-
-    JettyMavenPluginStdoutListener listener = new JettyMavenPluginStdoutListener();
-    MavenProject.load(basetDir).mvnw("-f", sampleDir.toString()).stdout(listener).executeAsync();
-
-    ExecutorContainer.get().execute(() -> {
-      callback.onStarted(listener.isSuccess());
-    });
+  public SampleProcessClient() {
   }
 
   /**
-   * 次のコマンドを実行します。
-   *
-   * <pre>
-   * mvn jetty:stop
-   * </pre>
+   * HTTPサーバーを起動します。
+   * 
+   */
+  public void start(Path basetDir, Path sampleDir, SampleStartedCallback callback) {
+
+    try {
+
+      server = SitHttpServer.of(8280, sampleDir.toAbsolutePath().toString());
+      log.info("httpserver start : server={}", server);
+      server.start();
+      callback.onStarted(true);
+
+    } catch (IOException e) {
+      callback.onStarted(false);
+    }
+  }
+
+  /**
+   * HTTPサーバーを停止します。
    *
    */
   public void stop(Path baseDir, Path sampleDir, ProcessExitCallback callback) {
+    log.info("httpserver stop : server={}", server);
+    server.stopNow();
     if (!sampleDir.toFile().exists() && callback != null) {
       callback.callback(0);
     }
-
-    ProcessCommand cmd = MavenProject.load(baseDir).mvnw("jetty:stop", "-f", sampleDir.toString());
-    if (callback != null)
-      cmd.getExitCallbacks().add(callback);
-    cmd.executeAsync();
   }
 }

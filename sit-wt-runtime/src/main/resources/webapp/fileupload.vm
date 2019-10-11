@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<%@page pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -27,7 +26,7 @@ limitations under the License.
 				<h1>ファイルアップロード</h1>
 				<p>
 				</p>
-				<form action="/fileupload" method="post" enctype="multipart/form-data">
+				<form action="/fileupload.html" method="post" enctype="multipart/form-data">
 					<table class="input-form" style="width:100%;">
 						<col style="width:30%;"/>
 						<col style="width:70%;"/>
@@ -38,7 +37,7 @@ limitations under the License.
 							</tr>
 							<tr>
 								<th>ファイルの内容</th>
-								<td id="fileContent">${requestScope.content}</td>
+								<td id="fileContent">$!{file}</td>
 							</tr>
 						</tbody>
 						<tfoot>

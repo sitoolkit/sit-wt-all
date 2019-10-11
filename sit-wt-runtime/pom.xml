@@ -23,6 +23,11 @@
       <version>1.9.2</version>
     </dependency>
     <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
       <version>1.12</version>
@@ -48,7 +53,6 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>3.0.1</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>
@@ -196,7 +200,7 @@
         <directory>${project.basedir}/src/main/resources</directory>
       </resource>
       <resource>
-        <directory>${project.basedir}/src/main/webapp</directory>
+        <directory>${project.basedir}/src/main/resources/webapp</directory>
         <includes>
           <include>*.vm</include>
           <include>*.properties</include>
@@ -245,6 +249,11 @@
           <configuration>
             <systemPropertiesFile>${sitwt.test.properties}</systemPropertiesFile>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
         </plugin>
         <plugin>
           <groupId>org.eclipse.jetty</groupId>
@@ -327,30 +336,33 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
-            <configuration>
-              <webApp>
-                <resourceBases>${project.basedir}/sample,${project.basedir}/src/main/webapp</resourceBases>
-              </webApp>
-            </configuration>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>start-jetty</id>
+                <id>start-server</id>
                 <phase>test-compile</phase>
                 <goals>
-                  <goal>start</goal>
+                  <goal>java</goal>
                 </goals>
                 <configuration>
-                  <daemon>true</daemon>
+                  <mainClass>io.sitoolkit.wt.app.httpserver.SitHttpServerStart</mainClass>
+                  <arguments>
+                    <argument>8280</argument>
+                    <argument>${project.build.outputDirectory}/webapp</argument>
+                  </arguments>
+                  <cleanupDaemonThreads>false</cleanupDaemonThreads>
                 </configuration>
               </execution>
               <execution>
-                <id>stop-jetty</id>
+                <id>stop-server</id>
                 <phase>test</phase>
                 <goals>
-                  <goal>stop</goal>
+                  <goal>java</goal>
                 </goals>
+                <configuration>
+                  <mainClass>io.sitoolkit.wt.app.httpserver.SitHttpServerStop</mainClass>
+                </configuration>
               </execution>
             </executions>
           </plugin>

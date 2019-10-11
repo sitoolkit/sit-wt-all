@@ -1,5 +1,5 @@
 ﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
-1,開始URL,open,,fileupload.jsp,,,y
+1,開始URL,open,,fileupload.html,,,y
 2,ファイル,input,id,file,,,src/test/resources/アップロードファイル.txt
 3,アップロード,click,css,input[value='アップロード'],,前,y
 4,確認,verify,id,fileContent,,前,テキストファイル
