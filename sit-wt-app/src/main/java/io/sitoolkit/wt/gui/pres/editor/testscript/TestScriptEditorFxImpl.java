@@ -27,6 +27,9 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.util.Callback;
 
 public class TestScriptEditorFxImpl implements TestScriptEditor {
@@ -38,6 +41,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   private ClipboardScriptAccessor clipboardAccessor;
 
   private String caseNoPrefix = "case_";
+
+  private static final KeyCodeCombination KEY_CODE_COPY =
+      new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
 
   @Override
   public void load(TestScript testScript) {
@@ -52,6 +58,13 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     tableView
         .getStylesheets()
         .add(getClass().getResource("/testScriptEditor.css").toExternalForm());
+
+    tableView.setOnKeyPressed(
+        event -> {
+          if (KEY_CODE_COPY.match(event)) {
+            getClipboardAccessor().copy();
+          }
+        });
 
     // TODO implement SpreadSheet's RowPickers-like feature instead of breakpoint column
     // TODO set context-menu-event-handler to tableView

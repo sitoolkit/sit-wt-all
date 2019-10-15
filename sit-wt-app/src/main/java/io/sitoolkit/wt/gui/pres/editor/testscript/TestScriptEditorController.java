@@ -15,6 +15,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -142,11 +145,16 @@ public class TestScriptEditorController implements EditorController, DebugListen
     ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
     MenuItem item;
     Menu menu;
+    final KeyCodeCombination keyCodeCopy =
+        new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
+    final KeyCodeCombination keyCodePaste =
+        new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
 
     item = new MenuItem("コピー");
     item.setMnemonicParsing(false);
     item.setOnAction(this::copy);
     item.disableProperty().bind(menuState.getCellSelected().not());
+    item.setAccelerator(keyCodeCopy);
     menuItems.add(item);
 
     item = new MenuItem("貼り付け");
@@ -154,6 +162,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
     item.setOnAction(this::paste);
     item.disableProperty()
         .bind(menuState.getCellSelected().not().or(menuState.getClipboardHasCell().not()));
+    item.setAccelerator(keyCodePaste);
     menuItems.add(item);
 
     menuItems.add(new SeparatorMenuItem());
