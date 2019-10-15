@@ -1,12 +1,16 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
@@ -19,6 +23,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -30,8 +35,11 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private TableView<ScriptEditorRow> tableView = new TableView<>();
 
+  private String caseNoPrefix = "case_";
+
   @Override
   public void load(TestScript testScript) {
+    caseNoPrefix = testScript.getCaseNoPrefix();
     tableView.setItems(buildEditorRows(testScript));
     tableView.getColumns().setAll(buildEditorColumns(testScript));
     tableView.setEditable(true);
@@ -65,11 +73,17 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     col.setCellFactory(TextFieldTableCell.forTableColumn());
     col.setCellValueFactory(createCellValueFactory(columnIndex, caseNo));
     col.setEditable(true);
+    col.setSortable(false);
+    col.setReorderable(false);
     return col;
   }
 
   private String getCaseNo(TestScript testScript, String headerName) {
     return StringUtils.substringAfter(headerName, testScript.getCaseNoPrefix());
+  }
+
+  private String getCaseHeaderName(String caseNo) {
+    return caseNoPrefix + caseNo;
   }
 
   private Callback<CellDataFeatures<ScriptEditorRow, String>, ObservableValue<String>>
@@ -147,14 +161,43 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public boolean insertTestCase() {
-    // TODO Auto-generated method stub
-    return false;
+    return insertTestCases(getSelectedCaseCount());
+  }
+
+  @Override
+  public boolean insertTestCases(int count) {
+    Optional<Integer> insertPosition = getInsertCasePosition();
+    insertPosition.ifPresent(colPosition -> insertTestCases(colPosition, count));
+    return insertPosition.isPresent();
+  }
+
+  private void insertTestCases(int colPosition, int count) {
+    ObservableList<TableColumn<ScriptEditorRow, ?>> columns = tableView.getColumns();
+    for (int i = 0; i < count; i++) {
+      String caseNo = String.format("%04d", columns.size() - COLUMN_INDEX_FIRST_CASE + 1);
+      columns.add(
+          colPosition + i, buildEditorColumn(getCaseHeaderName(caseNo), colPosition + i, caseNo));
+    }
+    getSelection().clearAndSelect(0, tableView.getColumns().get(colPosition));
   }
 
   @Override
   public void appendTestCase() {
-    // TODO Auto-generated method stub
+    appendTestCases(1);
+  }
 
+  @Override
+  public void appendTestCases(int count) {
+    insertTestCases(tableView.getColumns().size(), count);
+  }
+
+  @Override
+  public void deleteTestCase() {
+    getSelectedCaseIndexes()
+        .stream()
+        .sorted(reverseOrder())
+        .mapToInt(Integer::intValue)
+        .forEach(tableView.getColumns()::remove);
   }
 
   @Override
@@ -200,12 +243,6 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
-  public boolean insertTestCases(int count) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public void pasteClipboard() {
     // TODO Auto-generated method stub
 
@@ -218,21 +255,8 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
-  public void appendTestCases(int count) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void deleteTestCase() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public boolean isCaseSelected() {
-    // TODO Auto-generated method stub
-    return false;
+    return !getSelectedCaseIndexes().isEmpty();
   }
 
   @Override
@@ -242,8 +266,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public boolean isCaseInsertable() {
-    // TODO Auto-generated method stub
-    return false;
+    return getInsertCasePosition().isPresent();
   }
 
   @Override
@@ -270,7 +293,32 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     return (int) getSelection().getSelectedIndices().stream().distinct().count();
   }
 
+  private int getSelectedCaseCount() {
+    return (int) getSelectedCaseIndexes().stream().distinct().count();
+  }
+
   private Optional<Integer> getInsertRowPosition() {
     return getSelection().getSelectedIndices().stream().min(Comparator.naturalOrder());
+  }
+
+  private Optional<Integer> getInsertCasePosition() {
+    return getSelectedCaseIndexes().stream().min(Comparator.naturalOrder());
+  }
+
+  private Set<Integer> getSelectedCaseIndexes() {
+    Set<Integer> selectedColumnIndexes =
+        getSelection()
+            .getSelectedCells()
+            .stream()
+            .map(TablePosition::getColumn)
+            .distinct()
+            .collect(toSet());
+
+    boolean onlyCaseSelected = selectedColumnIndexes.stream().allMatch(this::isCaseColumn);
+    return onlyCaseSelected ? selectedColumnIndexes : Collections.emptySet();
+  }
+
+  private boolean isCaseColumn(int columnPosition) {
+    return columnPosition >= COLUMN_INDEX_FIRST_CASE;
   }
 }
