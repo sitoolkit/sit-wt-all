@@ -34,6 +34,10 @@ public class TestScriptEditorController implements EditorController, DebugListen
   public void open(Path file) {
     TestScript testScript = scriptService.read(file.toFile());
     editor.load(testScript);
+
+    // TODO Move context menu items from createMenuItems() to fxml File
+    // Since SpreadView's own context menu is no longer used,
+    // dynamic construction of the context menu is no longer necessary.
     editor.getContextMenu().getItems().addAll(createMenuItems());
     editor.getContextMenu().setOnShowing(e -> updateManuState());
   }
