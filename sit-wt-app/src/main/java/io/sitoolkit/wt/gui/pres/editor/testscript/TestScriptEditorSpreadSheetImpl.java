@@ -50,7 +50,7 @@ public class TestScriptEditorSpreadSheetImpl implements TestScriptEditor {
 
   private TestScriptInputHelper inputHelper = new TestScriptInputHelper(spreadSheet);
 
-  private ScriptClipboardAccessor clipboardAccessor;
+  private ClipboardScriptAccessor clipboardAccessor;
 
   public void load(TestScript testScript) {
     Collection<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
@@ -708,9 +708,9 @@ public class TestScriptEditorSpreadSheetImpl implements TestScriptEditor {
   }
 
   @Override
-  public ScriptClipboardAccessor getClipboardAccessor() {
+  public ClipboardScriptAccessor getClipboardAccessor() {
     if (clipboardAccessor == null) {
-      clipboardAccessor = new SpreadsheetClipboardAccessor(this);
+      clipboardAccessor = new ClipboardScriptAccessorSpreadsheetImpl(this);
     }
 
     return clipboardAccessor;

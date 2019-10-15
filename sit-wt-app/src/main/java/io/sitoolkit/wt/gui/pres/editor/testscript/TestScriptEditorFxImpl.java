@@ -35,7 +35,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private TableView<ScriptEditorRow> tableView = new TableView<>();
 
-  private ScriptClipboardAccessor clipboardAccessor;
+  private ClipboardScriptAccessor clipboardAccessor;
 
   private String caseNoPrefix = "case_";
 
@@ -330,9 +330,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
-  public ScriptClipboardAccessor getClipboardAccessor() {
+  public ClipboardScriptAccessor getClipboardAccessor() {
     if (clipboardAccessor == null) {
-      clipboardAccessor = new SpreadsheetClipboardAccessor(this);
+      clipboardAccessor = new ClipboardScriptAccessorFxImpl(this);
     }
     return clipboardAccessor;
   }

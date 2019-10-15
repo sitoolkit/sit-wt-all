@@ -58,5 +58,5 @@ public interface TestScriptEditor {
 
   void toggleBreakpoint();
 
-  ScriptClipboardAccessor getClipboardAccessor();
+  ClipboardScriptAccessor getClipboardAccessor();
 }

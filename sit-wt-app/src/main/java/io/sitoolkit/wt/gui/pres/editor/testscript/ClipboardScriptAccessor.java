@@ -1,6 +1,6 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-public interface ScriptClipboardAccessor {
+public interface ClipboardScriptAccessor {
 
   void pasteCase();
 

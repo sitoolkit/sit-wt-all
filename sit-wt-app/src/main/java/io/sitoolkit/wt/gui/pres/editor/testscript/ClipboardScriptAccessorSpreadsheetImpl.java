@@ -5,7 +5,7 @@ import org.controlsfx.control.spreadsheet.GridChange;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 
-public class SpreadsheetClipboardAccessor implements ScriptClipboardAccessor {
+public class ClipboardScriptAccessorSpreadsheetImpl implements ClipboardScriptAccessor {
 
   private static final DataFormat DATAFORMAT_SPREADSHEET;
 
@@ -19,7 +19,7 @@ public class SpreadsheetClipboardAccessor implements ScriptClipboardAccessor {
 
   private TestScriptEditor editor;
 
-  public SpreadsheetClipboardAccessor(TestScriptEditor editor) {
+  public ClipboardScriptAccessorSpreadsheetImpl(TestScriptEditor editor) {
     this.editor = editor;
   }
 
