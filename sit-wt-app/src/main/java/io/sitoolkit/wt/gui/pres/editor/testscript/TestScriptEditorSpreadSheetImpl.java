@@ -50,6 +50,8 @@ public class TestScriptEditorSpreadSheetImpl implements TestScriptEditor {
 
   private TestScriptInputHelper inputHelper = new TestScriptInputHelper(spreadSheet);
 
+  private ScriptClipboardAccessor clipboardAccessor;
+
   public void load(TestScript testScript) {
     Collection<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
@@ -703,5 +705,14 @@ public class TestScriptEditorSpreadSheetImpl implements TestScriptEditor {
     private boolean isClickedOnCellText(ContextMenuEvent event) {
       return ((Node) event.getTarget()).getParent() instanceof IndexedCell;
     }
+  }
+
+  @Override
+  public ScriptClipboardAccessor getClipboardAccessor() {
+    if (clipboardAccessor == null) {
+      clipboardAccessor = new SpreadsheetClipboardAccessor(this);
+    }
+
+    return clipboardAccessor;
   }
 }

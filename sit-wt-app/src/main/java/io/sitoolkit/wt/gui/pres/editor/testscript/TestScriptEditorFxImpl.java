@@ -35,6 +35,8 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private TableView<ScriptEditorRow> tableView = new TableView<>();
 
+  private ScriptClipboardAccessor clipboardAccessor;
+
   private String caseNoPrefix = "case_";
 
   @Override
@@ -320,5 +322,13 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private boolean isCaseColumn(int columnPosition) {
     return columnPosition >= COLUMN_INDEX_FIRST_CASE;
+  }
+
+  @Override
+  public ScriptClipboardAccessor getClipboardAccessor() {
+    if (clipboardAccessor == null) {
+      clipboardAccessor = new SpreadsheetClipboardAccessor(this);
+    }
+    return clipboardAccessor;
   }
 }

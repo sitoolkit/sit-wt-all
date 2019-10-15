@@ -1,9 +1,7 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
-import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
@@ -17,22 +15,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.DataFormat;
 import lombok.Getter;
 import lombok.NonNull;
 
 public class TestScriptEditorController implements EditorController, DebugListener {
-
-  private static final DataFormat DATAFORMAT_SPREADSHEET;
-
-  static {
-    DataFormat fmt;
-    if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
-      fmt = new DataFormat("SpreadsheetView");
-    }
-    DATAFORMAT_SPREADSHEET = fmt;
-  }
 
   private TestScriptEditor editor = new TestScriptEditorFxImpl();
 
@@ -102,62 +88,19 @@ public class TestScriptEditorController implements EditorController, DebugListen
   }
 
   public void pasteCase(ActionEvent e) {
-
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getCaseCount(changeList);
-      if (count > 0) {
-        if (editor.insertTestCases(count)) {
-          editor.pasteClipboard();
-        }
-      }
-    }
+    editor.getClipboardAccessor().pasteCase();
   }
 
   public void pasteStep(ActionEvent e) {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getStepCount(changeList);
-      if (count > 0) {
-        if (editor.insertTestSteps(count)) {
-          editor.pasteClipboard();
-        }
-      }
-    }
+    editor.getClipboardAccessor().pasteStep();
   }
 
   public void pasteCaseTail(ActionEvent e) {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getCaseCount(changeList);
-      if (count > 0) {
-        editor.appendTestCases(count);
-        editor.pasteClipboard();
-      }
-    }
+    editor.getClipboardAccessor().pasteCaseTail();
   }
 
   public void pasteStepTail(ActionEvent e) {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getStepCount(changeList);
-      if (count > 0) {
-        editor.appendTestSteps(count);
-        editor.pasteClipboard();
-      }
-    }
+    editor.getClipboardAccessor().pasteStepTail();
   }
 
   public void deleteCase(ActionEvent e) {
@@ -269,27 +212,11 @@ public class TestScriptEditorController implements EditorController, DebugListen
   }
 
   private boolean hasClipboardSteps() {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      return editor.getStepCount(changeList) > 0;
-
-    } else {
-      return false;
-    }
+    return editor.getClipboardAccessor().hasClipboardSteps();
   }
 
   private boolean hasClipboardCases() {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      return editor.getCaseCount(changeList) > 0;
-
-    } else {
-      return false;
-    }
+    return editor.getClipboardAccessor().hasClipboardCases();
   }
 
   @Getter

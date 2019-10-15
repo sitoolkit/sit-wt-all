@@ -55,4 +55,6 @@ public interface TestScriptEditor {
   boolean isStepInsertable();
 
   void toggleBreakpoint();
+
+  ScriptClipboardAccessor getClipboardAccessor();
 }
