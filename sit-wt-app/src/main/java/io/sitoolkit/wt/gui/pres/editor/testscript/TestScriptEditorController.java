@@ -91,6 +91,14 @@ public class TestScriptEditorController implements EditorController, DebugListen
     editor.appendTestStep();
   }
 
+  public void copyCell(ActionEvent e) {
+    editor.getClipboardAccessor().pasteCase();
+  }
+
+  public void pasteCell(ActionEvent e) {
+    editor.getClipboardAccessor().pasteCase();
+  }
+
   public void pasteCase(ActionEvent e) {
     editor.getClipboardAccessor().pasteCase();
   }
@@ -116,8 +124,10 @@ public class TestScriptEditorController implements EditorController, DebugListen
   }
 
   private void updateManuState() {
+    menuState.getClipboardHasCell().set(hasClipboardCells());
     menuState.getClipboardHasCase().set(hasClipboardCases());
     menuState.getClipboardHasStep().set(hasClipboardSteps());
+    menuState.getCellSelected().set(editor.isCellSelected());
     menuState.getCaseSelected().set(editor.isCaseSelected());
     menuState.getStepSelected().set(editor.isStepSelected());
     menuState.getCaseInsertable().set(editor.isCaseInsertable());
@@ -132,6 +142,19 @@ public class TestScriptEditorController implements EditorController, DebugListen
     ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
     MenuItem item;
     Menu menu;
+
+    item = new MenuItem("コピー");
+    item.setMnemonicParsing(false);
+    item.setOnAction(this::copyCell);
+    item.disableProperty().bind(menuState.getCellSelected().not());
+    menuItems.add(item);
+
+    item = new MenuItem("貼り付け");
+    item.setMnemonicParsing(false);
+    item.setOnAction(this::pasteCell);
+    item.disableProperty()
+        .bind(menuState.getCellSelected().not().or(menuState.getClipboardHasCell().not()));
+    menuItems.add(item);
 
     menuItems.add(new SeparatorMenuItem());
 
@@ -223,10 +246,16 @@ public class TestScriptEditorController implements EditorController, DebugListen
     return editor.getClipboardAccessor().hasClipboardCases();
   }
 
+  private boolean hasClipboardCells() {
+    return editor.getClipboardAccessor().hasClipboardCells();
+  }
+
   @Getter
   private class MenuState {
+    private BooleanProperty clipboardHasCell = new SimpleBooleanProperty(false);
     private BooleanProperty clipboardHasCase = new SimpleBooleanProperty(false);
     private BooleanProperty clipboardHasStep = new SimpleBooleanProperty(false);
+    private BooleanProperty cellSelected = new SimpleBooleanProperty(false);
     private BooleanProperty caseSelected = new SimpleBooleanProperty(false);
     private BooleanProperty stepSelected = new SimpleBooleanProperty(false);
     private BooleanProperty caseInsertable = new SimpleBooleanProperty(false);

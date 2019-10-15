@@ -104,4 +104,10 @@ public class SpreadsheetClipboardAccessor implements ScriptClipboardAccessor {
       return false;
     }
   }
+
+  @Override
+  public boolean hasClipboardCells() {
+    // TODO Auto-generated method stub
+    return false;
+  }
 }

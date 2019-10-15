@@ -13,4 +13,6 @@ public interface ScriptClipboardAccessor {
   boolean hasClipboardCases();
 
   boolean hasClipboardSteps();
+
+  boolean hasClipboardCells();
 }

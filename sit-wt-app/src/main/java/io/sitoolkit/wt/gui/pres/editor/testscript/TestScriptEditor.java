@@ -46,6 +46,8 @@ public interface TestScriptEditor {
 
   void deleteTestStep();
 
+  boolean isCellSelected();
+
   boolean isCaseSelected();
 
   boolean isStepSelected();

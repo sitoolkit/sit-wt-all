@@ -257,6 +257,11 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
+  public boolean isCellSelected() {
+    return getSelection().getSelectedItem() != null;
+  }
+
+  @Override
   public boolean isCaseSelected() {
     return !getSelectedCaseIndexes().isEmpty();
   }

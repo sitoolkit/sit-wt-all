@@ -715,4 +715,10 @@ public class TestScriptEditorSpreadSheetImpl implements TestScriptEditor {
 
     return clipboardAccessor;
   }
+
+  @Override
+  public boolean isCellSelected() {
+    // TODO Auto-generated method stub
+    return false;
+  }
 }
