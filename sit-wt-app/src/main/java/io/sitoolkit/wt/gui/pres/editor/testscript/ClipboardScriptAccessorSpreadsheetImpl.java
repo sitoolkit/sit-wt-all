@@ -110,4 +110,10 @@ public class ClipboardScriptAccessorSpreadsheetImpl implements ClipboardScriptAc
     // TODO Auto-generated method stub
     return false;
   }
+
+  @Override
+  public void copy() {
+    // TODO Auto-generated method stub
+
+  }
 }

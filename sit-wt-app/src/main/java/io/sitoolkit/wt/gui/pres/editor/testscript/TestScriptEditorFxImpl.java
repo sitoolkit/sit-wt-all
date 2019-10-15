@@ -292,7 +292,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     return tableView;
   }
 
-  private TableViewSelectionModel<ScriptEditorRow> getSelection() {
+  TableViewSelectionModel<ScriptEditorRow> getSelection() {
     return tableView.getSelectionModel();
   }
 
@@ -335,5 +335,13 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
       clipboardAccessor = new ClipboardScriptAccessorFxImpl(this);
     }
     return clipboardAccessor;
+  }
+
+  public String getCellValue(TablePosition<?, ?> position) {
+    return tableView
+        .getColumns()
+        .get(position.getColumn())
+        .getCellData(position.getRow())
+        .toString();
   }
 }

@@ -91,11 +91,11 @@ public class TestScriptEditorController implements EditorController, DebugListen
     editor.appendTestStep();
   }
 
-  public void copyCell(ActionEvent e) {
-    editor.getClipboardAccessor().pasteCase();
+  public void copy(ActionEvent e) {
+    editor.getClipboardAccessor().copy();
   }
 
-  public void pasteCell(ActionEvent e) {
+  public void paste(ActionEvent e) {
     editor.getClipboardAccessor().pasteCase();
   }
 
@@ -145,13 +145,13 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     item = new MenuItem("コピー");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::copyCell);
+    item.setOnAction(this::copy);
     item.disableProperty().bind(menuState.getCellSelected().not());
     menuItems.add(item);
 
     item = new MenuItem("貼り付け");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteCell);
+    item.setOnAction(this::paste);
     item.disableProperty()
         .bind(menuState.getCellSelected().not().or(menuState.getClipboardHasCell().not()));
     menuItems.add(item);
