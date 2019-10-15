@@ -22,7 +22,6 @@ public class SampleService {
    *   sample
    *    input.html
    *    :
-   *    pom.xml
    *   testscript
    *     SampleTestScript.csv
    * </pre>
@@ -37,8 +36,8 @@ public class SampleService {
     sampleManager.unarchiveBasicSample(destDir.toString());
   }
 
-  public void start(Path baseDir, SampleStartedCallback callback) {
-    client.start(baseDir, getSampleDir(baseDir), callback);
+  public void start(int port, Path baseDir, SampleStartedCallback callback) {
+    client.start(port, getSampleDir(baseDir), callback);
   }
 
   public void stop(Path baseDir) {
@@ -46,7 +45,7 @@ public class SampleService {
   }
 
   public void stop(Path baseDir, ProcessExitCallback callback) {
-    client.stop(baseDir, getSampleDir(baseDir), callback);
+    client.stop(getSampleDir(baseDir), callback);
   }
 
   private Path getSampleDir(Path baseDir) {

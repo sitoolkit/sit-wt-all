@@ -3,9 +3,12 @@ package io.sitoolkit.wt.domain.httpserver;
 import java.io.IOException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import io.sitoolkit.wt.infra.log.SitLogger;
+import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import lombok.Getter;
 
 public class ShutdownRequestHandler implements HttpHandler {
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(ShutdownRequestHandler.class);
 
   @Getter
   private boolean requested = false;
@@ -21,6 +24,7 @@ public class ShutdownRequestHandler implements HttpHandler {
       requested = true;
 
     } catch (Exception e) {
+      LOG.warn("httpserver.internalerror", e);
       httpExchange.getResponseHeaders().add("connection", "close");
       httpExchange.sendResponseHeaders(503, 0);
 

@@ -8,29 +8,29 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import io.sitoolkit.wt.app.httpserver.SitHttpServerConfig;
+import io.sitoolkit.wt.infra.log.SitLogger;
+import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 import io.sitoolkit.wt.infra.thread.DaemonThreadFactory;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class SitHttpServer {
-
-  private ApplicationContext appCtx;
+  private static final SitLogger LOG = SitLoggerFactory.getLogger(SitHttpServer.class);
 
   private HttpServer server;
+  private boolean running = false;
+
   private int port;
   private String baseDir;
 
-  private HttpServer shutdownListener;
+  private ApplicationContext appCtx;
   private ShutdownRequestHandler shutdownRequestHandler;
-  private final int shutdownPort = 9999;
 
   private SitHttpServer(int port, String baseDir) {
     this.port = port;
     this.baseDir = baseDir;
     this.appCtx = new AnnotationConfigApplicationContext(SitHttpServerConfig.class);
+    this.shutdownRequestHandler = appCtx.getBean(ShutdownRequestHandler.class);
   }
 
   public static SitHttpServer of(int port, String baseDir) {
@@ -43,8 +43,10 @@ public class SitHttpServer {
     serverExecutor.submit(() -> {
       try {
         startServer();
+        running = true;
 
       } catch (IOException e) {
+        LOG.error("httpserver.start.failed", e);
         throw new UncheckedIOException(e);
       }
     });
@@ -52,7 +54,7 @@ public class SitHttpServer {
     ExecutorService shutdownRequestMonitor =
         Executors.newCachedThreadPool(new DaemonThreadFactory());
     shutdownRequestMonitor.submit(() -> {
-      if (getShutdownRequest()) {
+      if (doShutdown()) {
         stopNow();
       }
       serverExecutor.shutdownNow();
@@ -62,39 +64,32 @@ public class SitHttpServer {
   private void startServer() throws IOException {
     SitHttpHandler handler = appCtx.getBean(SitHttpHandler.class);
     handler.setBaseDir(baseDir);
-    server = startServer(port, handler);
-
-    shutdownRequestHandler = appCtx.getBean(ShutdownRequestHandler.class);
-    shutdownListener = startServer(shutdownPort, shutdownRequestHandler);
-    log.info("start server={}, shutdownListener={}", server, shutdownListener);
-  }
-
-  private HttpServer startServer(int port, HttpHandler handler) throws IOException {
-    HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+    server = HttpServer.create(new InetSocketAddress(port), 0);
     server.createContext("/", handler);
+    server.createContext("/stop", shutdownRequestHandler);
     server.start();
-    return server;
   }
 
   public void stop(int delay) {
-    log.info("stop server={}, shutdownListener={}", server, shutdownListener);
-    server.stop(delay);
-    shutdownListener.stop(delay);
+    if (running) {
+      server.stop(delay);
+      running = false;
+    }
   }
 
   public void stopNow() {
     stop(0);
   }
 
-  private boolean getShutdownRequest() {
-    while (!shutdownRequestHandler.isRequested()) {
+  private boolean doShutdown() {
+    while (!shutdownRequestHandler.isRequested() || !running) {
       try {
         TimeUnit.MILLISECONDS.sleep(10);
       } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        LOG.error("httpserver.monitoring.failed", e);
       }
     }
-    return shutdownRequestHandler.isRequested();
+    LOG.info("httpserver.shutdown.requested");
+    return !shutdownRequestHandler.isRequested() || !running;
   }
 }

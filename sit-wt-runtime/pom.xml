@@ -84,7 +84,6 @@
       <groupId>io.github.bonigarcia</groupId>
       <artifactId>webdrivermanager</artifactId>
       <version>3.6.2</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
@@ -362,6 +361,9 @@
                 </goals>
                 <configuration>
                   <mainClass>io.sitoolkit.wt.app.httpserver.SitHttpServerStop</mainClass>
+                  <arguments>
+                    <argument>8280</argument>
+                  </arguments>
                 </configuration>
               </execution>
             </executions>

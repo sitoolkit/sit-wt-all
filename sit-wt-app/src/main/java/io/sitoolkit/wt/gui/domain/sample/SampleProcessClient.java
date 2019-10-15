@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessExitCallback;
 import io.sitoolkit.wt.domain.httpserver.SitHttpServer;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class SampleProcessClient {
 
   private SitHttpServer server;
@@ -18,12 +16,10 @@ public class SampleProcessClient {
    * HTTPサーバーを起動します。
    * 
    */
-  public void start(Path basetDir, Path sampleDir, SampleStartedCallback callback) {
+  public void start(int port, Path sampleDir, SampleStartedCallback callback) {
 
     try {
-
-      server = SitHttpServer.of(8280, sampleDir.toAbsolutePath().toString());
-      log.info("httpserver start : server={}", server);
+      server = SitHttpServer.of(port, sampleDir.toAbsolutePath().toString());
       server.start();
       callback.onStarted(true);
 
@@ -36,8 +32,7 @@ public class SampleProcessClient {
    * HTTPサーバーを停止します。
    *
    */
-  public void stop(Path baseDir, Path sampleDir, ProcessExitCallback callback) {
-    log.info("httpserver stop : server={}", server);
+  public void stop(Path sampleDir, ProcessExitCallback callback) {
     server.stopNow();
     if (!sampleDir.toFile().exists() && callback != null) {
       callback.callback(0);

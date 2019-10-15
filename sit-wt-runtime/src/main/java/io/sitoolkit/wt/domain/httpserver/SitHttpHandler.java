@@ -54,12 +54,12 @@ public class SitHttpHandler implements HttpHandler {
       httpExchange.getResponseBody().write(response);
 
     } catch (FileNotFoundException fe) {
-      LOG.error("httpserver.holder", "fileNotFound : " + fe.getMessage(), fe);
+      LOG.warn("httpserver.filenotfound", fe);
       httpExchange.getResponseHeaders().add("connection", "close");
       httpExchange.sendResponseHeaders(404, 0);
 
     } catch (Exception e) {
-      LOG.error("httpserver.holder", "exception occurred : " + e.getClass().getName(), e);
+      LOG.warn("httpserver.internalerror", e);
       httpExchange.getResponseHeaders().add("connection", "close");
       httpExchange.sendResponseHeaders(503, 0);
 
