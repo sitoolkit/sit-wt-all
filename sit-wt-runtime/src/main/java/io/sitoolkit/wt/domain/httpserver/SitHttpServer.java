@@ -43,7 +43,6 @@ public class SitHttpServer {
     serverExecutor.submit(() -> {
       try {
         startServer();
-        running = true;
 
       } catch (IOException e) {
         LOG.error("httpserver.start.failed", e);
@@ -54,6 +53,7 @@ public class SitHttpServer {
     ExecutorService shutdownRequestMonitor =
         Executors.newCachedThreadPool(new DaemonThreadFactory());
     shutdownRequestMonitor.submit(() -> {
+      running = true;
       if (doShutdown()) {
         stopNow();
       }
@@ -82,14 +82,17 @@ public class SitHttpServer {
   }
 
   private boolean doShutdown() {
-    while (!shutdownRequestHandler.isRequested() || !running) {
+    while (!needToStop()) {
       try {
         TimeUnit.MILLISECONDS.sleep(10);
       } catch (InterruptedException e) {
         LOG.error("httpserver.monitoring.failed", e);
       }
     }
-    LOG.info("httpserver.shutdown.requested");
-    return !shutdownRequestHandler.isRequested() || !running;
+    return needToStop();
+  }
+
+  private boolean needToStop() {
+    return shutdownRequestHandler.isRequested() || !running;
   }
 }
