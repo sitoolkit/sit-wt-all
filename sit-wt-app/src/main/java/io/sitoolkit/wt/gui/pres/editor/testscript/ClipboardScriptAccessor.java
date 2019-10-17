@@ -2,21 +2,17 @@ package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 public interface ClipboardScriptAccessor {
 
-  void pasteCase();
+  void copy();
 
-  void pasteStep();
+  void paste();
 
-  void pasteCaseTail();
+  int getClipboardCaseCount();
 
-  void pasteStepTail();
+  int getClipboardStepCount();
 
   boolean hasClipboardCases();
 
   boolean hasClipboardSteps();
 
   boolean clipboardPastable();
-
-  void copy();
-
-  void paste();
 }

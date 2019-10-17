@@ -38,49 +38,23 @@ public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
   }
 
   @Override
-  public void pasteCase() {
-    int count = countCases(readFromClipboard());
-    if (count > 0) {
-      editor.insertTestCases(count);
-      paste();
-    }
+  public int getClipboardCaseCount() {
+    return countCases(readFromClipboard());
   }
 
   @Override
-  public void pasteStep() {
-    int count = countSteps(readFromClipboard());
-    if (count > 0) {
-      editor.insertTestSteps(count);
-      paste();
-    }
-  }
-
-  @Override
-  public void pasteCaseTail() {
-    int count = countCases(readFromClipboard());
-    if (count > 0) {
-      editor.appendTestCases(count);
-      paste();
-    }
-  }
-
-  @Override
-  public void pasteStepTail() {
-    int count = countSteps(readFromClipboard());
-    if (count > 0) {
-      editor.appendTestSteps(count);
-      paste();
-    }
+  public int getClipboardStepCount() {
+    return countSteps(readFromClipboard());
   }
 
   @Override
   public boolean hasClipboardCases() {
-    return countCases(readFromClipboard()) > 0;
+    return getClipboardCaseCount() > 0;
   }
 
   @Override
   public boolean hasClipboardSteps() {
-    return countSteps(readFromClipboard()) > 0;
+    return getClipboardStepCount() > 0;
   }
 
   private int countCases(List<Cell> changeList) {

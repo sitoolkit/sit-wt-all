@@ -102,20 +102,36 @@ public class TestScriptEditorController implements EditorController, DebugListen
     editor.getClipboardAccessor().paste();
   }
 
-  public void pasteCase(ActionEvent e) {
-    editor.getClipboardAccessor().pasteCase();
+  public void insertAndPasteCase(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardCaseCount();
+    if (count > 0) {
+      editor.insertTestCases(count);
+      editor.getClipboardAccessor().paste();
+    }
   }
 
-  public void pasteStep(ActionEvent e) {
-    editor.getClipboardAccessor().pasteStep();
+  public void insertAndPasteStep(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardStepCount();
+    if (count > 0) {
+      editor.insertTestSteps(count);
+      editor.getClipboardAccessor().paste();
+    }
   }
 
-  public void pasteCaseTail(ActionEvent e) {
-    editor.getClipboardAccessor().pasteCaseTail();
+  public void appendAndPasteCase(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardCaseCount();
+    if (count > 0) {
+      editor.appendTestCases(count);
+      editor.getClipboardAccessor().paste();
+    }
   }
 
-  public void pasteStepTail(ActionEvent e) {
-    editor.getClipboardAccessor().pasteStepTail();
+  public void appendAndPasteStep(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardStepCount();
+    if (count > 0) {
+      editor.appendTestSteps(count);
+      editor.getClipboardAccessor().paste();
+    }
   }
 
   public void deleteCase(ActionEvent e) {
@@ -175,7 +191,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     item = new MenuItem("コピーしたケースの挿入");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteCase);
+    item.setOnAction(this::insertAndPasteCase);
     item.disableProperty()
         .bind(menuState.getCaseInsertable().and(menuState.getClipboardHasCase()).not());
     menu.getItems().add(item);
@@ -188,7 +204,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     item = new MenuItem("コピーしたステップの挿入");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteStep);
+    item.setOnAction(this::insertAndPasteStep);
     item.disableProperty()
         .bind(menuState.getStepInsertable().and(menuState.getClipboardHasStep()).not());
     menu.getItems().add(item);
@@ -209,13 +225,13 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     item = new MenuItem("コピーしたケースを末尾に追加");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteCaseTail);
+    item.setOnAction(this::appendAndPasteCase);
     item.disableProperty().bind(menuState.getClipboardHasCase().not());
     menu.getItems().add(item);
 
     item = new MenuItem("コピーしたステップを末尾に追加");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteStepTail);
+    item.setOnAction(this::appendAndPasteStep);
     item.disableProperty().bind(menuState.getClipboardHasStep().not());
     menu.getItems().add(item);
 

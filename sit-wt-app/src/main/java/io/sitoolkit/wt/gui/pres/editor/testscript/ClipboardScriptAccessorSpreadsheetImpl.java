@@ -121,4 +121,16 @@ public class ClipboardScriptAccessorSpreadsheetImpl implements ClipboardScriptAc
   public void paste() {
     editor.pasteClipboard();
   }
+
+  @Override
+  public int getClipboardCaseCount() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int getClipboardStepCount() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
 }
