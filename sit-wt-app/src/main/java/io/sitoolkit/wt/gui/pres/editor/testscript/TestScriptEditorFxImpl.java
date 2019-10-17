@@ -358,18 +358,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
         && column < tableView.getColumns().size();
   }
 
+  @SuppressWarnings("unchecked")
   private Property<String> getProperty(int row, int column) {
-
-    ScriptEditorRow tableItem = tableView.getItems().get(row);
-
-    @SuppressWarnings("unchecked")
-    TableColumn<ScriptEditorRow, String> tableColumn =
-        (TableColumn<ScriptEditorRow, String>) tableView.getColumns().get(column);
-
-    return (Property<String>)
-        tableColumn
-            .getCellValueFactory()
-            .call(new CellDataFeatures<>(tableView, tableColumn, tableItem));
+    return (Property<String>) tableView.getColumns().get(column).getCellObservableValue(row);
   }
 
   public int getRowCount() {
