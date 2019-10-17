@@ -51,7 +51,7 @@ public class SampleServiceTest {
 
   @After
   public void tearDown() {
-    sampleService.stop(projectDir);
+    sampleService.stop();
   }
 
   public class SampleProjectTester {

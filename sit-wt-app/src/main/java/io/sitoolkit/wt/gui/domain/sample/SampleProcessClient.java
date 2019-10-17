@@ -13,8 +13,11 @@ public class SampleProcessClient {
   }
 
   /**
-   * HTTPサーバーを起動します。
+   * Start HTTP server.
    * 
+   * @param port HTTP server port
+   * @param sampleDir SIT-WT sample contents directory
+   * @param callback Callback function
    */
   public void start(int port, Path sampleDir, SampleStartedCallback callback) {
 
@@ -29,10 +32,11 @@ public class SampleProcessClient {
   }
 
   /**
-   * HTTPサーバーを停止します。
+   * Stop HTTP server.
    *
+   * @param callback Callback function
    */
-  public void stop(Path sampleDir, ProcessExitCallback callback) {
+  public void stop(ProcessExitCallback callback) {
     server.stopNow();
     if (callback != null) {
       callback.callback(0);
