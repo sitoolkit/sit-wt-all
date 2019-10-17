@@ -1,7 +1,5 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import java.util.List;
-import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -28,13 +26,7 @@ public interface TestScriptEditor {
 
   void appendTestStep();
 
-  int getCaseCount(List<GridChange> changeList);
-
   boolean insertTestCases(int count);
-
-  void pasteClipboard();
-
-  int getStepCount(List<GridChange> changeList);
 
   boolean insertTestSteps(int count);
 
@@ -46,6 +38,8 @@ public interface TestScriptEditor {
 
   void deleteTestStep();
 
+  boolean isCellSelected();
+
   boolean isCaseSelected();
 
   boolean isStepSelected();
@@ -55,4 +49,6 @@ public interface TestScriptEditor {
   boolean isStepInsertable();
 
   void toggleBreakpoint();
+
+  ClipboardScriptAccessor getClipboardAccessor();
 }

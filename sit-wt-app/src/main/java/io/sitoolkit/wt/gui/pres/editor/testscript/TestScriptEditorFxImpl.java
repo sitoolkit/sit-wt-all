@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
+import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,6 +27,9 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.util.Callback;
 
 public class TestScriptEditorFxImpl implements TestScriptEditor {
@@ -35,7 +38,14 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private TableView<ScriptEditorRow> tableView = new TableView<>();
 
+  private ClipboardScriptAccessor clipboardAccessor;
+
   private String caseNoPrefix = "case_";
+
+  public static final KeyCodeCombination KEY_CODE_COPY =
+      new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
+  public static final KeyCodeCombination KEY_CODE_PASTE =
+      new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
 
   @Override
   public void load(TestScript testScript) {
@@ -50,6 +60,16 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     tableView
         .getStylesheets()
         .add(getClass().getResource("/testScriptEditor.css").toExternalForm());
+
+    tableView.setOnKeyPressed(
+        event -> {
+          if (KEY_CODE_COPY.match(event)) {
+            getClipboardAccessor().copy();
+          }
+          if (KEY_CODE_PASTE.match(event)) {
+            getClipboardAccessor().paste();
+          }
+        });
 
     // TODO implement SpreadSheet's RowPickers-like feature instead of breakpoint column
     // TODO set context-menu-event-handler to tableView
@@ -237,21 +257,8 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
-  public int getCaseCount(List<GridChange> changeList) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public void pasteClipboard() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public int getStepCount(List<GridChange> changeList) {
-    // TODO Auto-generated method stub
-    return 0;
+  public boolean isCellSelected() {
+    return getSelection().getSelectedItem() != null;
   }
 
   @Override
@@ -285,7 +292,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     return tableView;
   }
 
-  private TableViewSelectionModel<ScriptEditorRow> getSelection() {
+  TableViewSelectionModel<ScriptEditorRow> getSelection() {
     return tableView.getSelectionModel();
   }
 
@@ -320,5 +327,47 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private boolean isCaseColumn(int columnPosition) {
     return columnPosition >= COLUMN_INDEX_FIRST_CASE;
+  }
+
+  @Override
+  public ClipboardScriptAccessor getClipboardAccessor() {
+    if (clipboardAccessor == null) {
+      clipboardAccessor = new ClipboardScriptAccessorFxImpl(this);
+    }
+    return clipboardAccessor;
+  }
+
+  public String getCellValue(int row, int column) {
+    if (isInRange(row, column)) {
+      return getProperty(row, column).getValue();
+    } else {
+      return null;
+    }
+  }
+
+  public void setCellValue(int row, int column, String value) {
+    if (isInRange(row, column)) {
+      getProperty(row, column).setValue(value);
+    }
+  }
+
+  private boolean isInRange(int row, int column) {
+    return 0 <= row
+        && row < tableView.getItems().size()
+        && 0 <= column
+        && column < tableView.getColumns().size();
+  }
+
+  @SuppressWarnings("unchecked")
+  private Property<String> getProperty(int row, int column) {
+    return (Property<String>) tableView.getColumns().get(column).getCellObservableValue(row);
+  }
+
+  public int getRowCount() {
+    return tableView.getItems().size();
+  }
+
+  public int getColumnCount() {
+    return tableView.getColumns().size();
   }
 }

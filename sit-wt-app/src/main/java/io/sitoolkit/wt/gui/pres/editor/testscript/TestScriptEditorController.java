@@ -1,9 +1,7 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
-import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.debug.DebugListener;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.gui.app.script.ScriptService;
@@ -17,22 +15,13 @@ import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import lombok.Getter;
 import lombok.NonNull;
 
 public class TestScriptEditorController implements EditorController, DebugListener {
-
-  private static final DataFormat DATAFORMAT_SPREADSHEET;
-
-  static {
-    DataFormat fmt;
-    if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
-      fmt = new DataFormat("SpreadsheetView");
-    }
-    DATAFORMAT_SPREADSHEET = fmt;
-  }
 
   private TestScriptEditor editor = new TestScriptEditorFxImpl();
 
@@ -48,6 +37,10 @@ public class TestScriptEditorController implements EditorController, DebugListen
   public void open(Path file) {
     TestScript testScript = scriptService.read(file.toFile());
     editor.load(testScript);
+
+    // TODO Move context menu items from createMenuItems() to fxml File
+    // Since SpreadView's own context menu is no longer used,
+    // dynamic construction of the context menu is no longer necessary.
     editor.getContextMenu().getItems().addAll(createMenuItems());
     editor.getContextMenu().setOnShowing(e -> updateManuState());
   }
@@ -101,62 +94,43 @@ public class TestScriptEditorController implements EditorController, DebugListen
     editor.appendTestStep();
   }
 
-  public void pasteCase(ActionEvent e) {
+  public void copy(ActionEvent e) {
+    editor.getClipboardAccessor().copy();
+  }
 
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
+  public void paste(ActionEvent e) {
+    editor.getClipboardAccessor().paste();
+  }
 
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getCaseCount(changeList);
-      if (count > 0) {
-        if (editor.insertTestCases(count)) {
-          editor.pasteClipboard();
-        }
-      }
+  public void insertAndPasteCase(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardCaseCount();
+    if (count > 0) {
+      editor.insertTestCases(count);
+      editor.getClipboardAccessor().paste();
     }
   }
 
-  public void pasteStep(ActionEvent e) {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getStepCount(changeList);
-      if (count > 0) {
-        if (editor.insertTestSteps(count)) {
-          editor.pasteClipboard();
-        }
-      }
+  public void insertAndPasteStep(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardStepCount();
+    if (count > 0) {
+      editor.insertTestSteps(count);
+      editor.getClipboardAccessor().paste();
     }
   }
 
-  public void pasteCaseTail(ActionEvent e) {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getCaseCount(changeList);
-      if (count > 0) {
-        editor.appendTestCases(count);
-        editor.pasteClipboard();
-      }
+  public void appendAndPasteCase(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardCaseCount();
+    if (count > 0) {
+      editor.appendTestCases(count);
+      editor.getClipboardAccessor().paste();
     }
   }
 
-  public void pasteStepTail(ActionEvent e) {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      int count = editor.getStepCount(changeList);
-      if (count > 0) {
-        editor.appendTestSteps(count);
-        editor.pasteClipboard();
-      }
+  public void appendAndPasteStep(ActionEvent e) {
+    int count = editor.getClipboardAccessor().getClipboardStepCount();
+    if (count > 0) {
+      editor.appendTestSteps(count);
+      editor.getClipboardAccessor().paste();
     }
   }
 
@@ -169,8 +143,10 @@ public class TestScriptEditorController implements EditorController, DebugListen
   }
 
   private void updateManuState() {
+    menuState.getClipboardPastable().set(clipboardPastable());
     menuState.getClipboardHasCase().set(hasClipboardCases());
     menuState.getClipboardHasStep().set(hasClipboardSteps());
+    menuState.getCellSelected().set(editor.isCellSelected());
     menuState.getCaseSelected().set(editor.isCaseSelected());
     menuState.getStepSelected().set(editor.isStepSelected());
     menuState.getCaseInsertable().set(editor.isCaseInsertable());
@@ -185,6 +161,24 @@ public class TestScriptEditorController implements EditorController, DebugListen
     ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
     MenuItem item;
     Menu menu;
+    final KeyCodeCombination keyCodeCopy =
+        new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
+    final KeyCodeCombination keyCodePaste =
+        new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
+
+    item = new MenuItem("コピー");
+    item.setMnemonicParsing(false);
+    item.setOnAction(this::copy);
+    item.disableProperty().bind(menuState.getCellSelected().not());
+    item.setAccelerator(keyCodeCopy);
+    menuItems.add(item);
+
+    item = new MenuItem("貼り付け");
+    item.setMnemonicParsing(false);
+    item.setOnAction(this::paste);
+    item.disableProperty().bind(menuState.getClipboardPastable().not());
+    item.setAccelerator(keyCodePaste);
+    menuItems.add(item);
 
     menuItems.add(new SeparatorMenuItem());
 
@@ -197,7 +191,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     item = new MenuItem("コピーしたケースの挿入");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteCase);
+    item.setOnAction(this::insertAndPasteCase);
     item.disableProperty()
         .bind(menuState.getCaseInsertable().and(menuState.getClipboardHasCase()).not());
     menu.getItems().add(item);
@@ -210,7 +204,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     item = new MenuItem("コピーしたステップの挿入");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteStep);
+    item.setOnAction(this::insertAndPasteStep);
     item.disableProperty()
         .bind(menuState.getStepInsertable().and(menuState.getClipboardHasStep()).not());
     menu.getItems().add(item);
@@ -231,13 +225,13 @@ public class TestScriptEditorController implements EditorController, DebugListen
 
     item = new MenuItem("コピーしたケースを末尾に追加");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteCaseTail);
+    item.setOnAction(this::appendAndPasteCase);
     item.disableProperty().bind(menuState.getClipboardHasCase().not());
     menu.getItems().add(item);
 
     item = new MenuItem("コピーしたステップを末尾に追加");
     item.setMnemonicParsing(false);
-    item.setOnAction(this::pasteStepTail);
+    item.setOnAction(this::appendAndPasteStep);
     item.disableProperty().bind(menuState.getClipboardHasStep().not());
     menu.getItems().add(item);
 
@@ -269,33 +263,23 @@ public class TestScriptEditorController implements EditorController, DebugListen
   }
 
   private boolean hasClipboardSteps() {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      return editor.getStepCount(changeList) > 0;
-
-    } else {
-      return false;
-    }
+    return editor.getClipboardAccessor().hasClipboardSteps();
   }
 
   private boolean hasClipboardCases() {
-    Clipboard cb = Clipboard.getSystemClipboard();
-    if (cb.hasContent(DATAFORMAT_SPREADSHEET)) {
-      @SuppressWarnings("unchecked")
-      List<GridChange> changeList = (List<GridChange>) cb.getContent(DATAFORMAT_SPREADSHEET);
-      return editor.getCaseCount(changeList) > 0;
+    return editor.getClipboardAccessor().hasClipboardCases();
+  }
 
-    } else {
-      return false;
-    }
+  private boolean clipboardPastable() {
+    return editor.getClipboardAccessor().clipboardPastable();
   }
 
   @Getter
   private class MenuState {
+    private BooleanProperty clipboardPastable = new SimpleBooleanProperty(false);
     private BooleanProperty clipboardHasCase = new SimpleBooleanProperty(false);
     private BooleanProperty clipboardHasStep = new SimpleBooleanProperty(false);
+    private BooleanProperty cellSelected = new SimpleBooleanProperty(false);
     private BooleanProperty caseSelected = new SimpleBooleanProperty(false);
     private BooleanProperty stepSelected = new SimpleBooleanProperty(false);
     private BooleanProperty caseInsertable = new SimpleBooleanProperty(false);
