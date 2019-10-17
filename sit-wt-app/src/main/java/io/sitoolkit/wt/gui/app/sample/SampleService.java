@@ -40,12 +40,12 @@ public class SampleService {
     client.start(port, getSampleDir(baseDir), callback);
   }
 
-  public void stop(Path baseDir) {
-    stop(baseDir, null);
+  public void stop() {
+    stop(null);
   }
 
-  public void stop(Path baseDir, ProcessExitCallback callback) {
-    client.stop(getSampleDir(baseDir), callback);
+  public void stop(ProcessExitCallback callback) {
+    client.stop(callback);
   }
 
   private Path getSampleDir(Path baseDir) {
