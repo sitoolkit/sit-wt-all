@@ -1,49 +1,41 @@
 package io.sitoolkit.wt.gui.domain.sample;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
-import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessExitCallback;
-import io.sitoolkit.wt.util.infra.concurrent.ExecutorContainer;
+import io.sitoolkit.wt.domain.httpserver.SitHttpServer;
 
 public class SampleProcessClient {
 
-  public SampleProcessClient() {}
+  private SitHttpServer server;
 
-  /**
-   * 次のコマンドを実行します。
-   *
-   * <pre>
-   * mvn
-   * </pre>
-   *
-   */
-  public void start(Path basetDir, Path sampleDir, SampleStartedCallback callback) {
-
-    JettyMavenPluginStdoutListener listener = new JettyMavenPluginStdoutListener();
-    MavenProject.load(basetDir).mvnw("-f", sampleDir.toString()).stdout(listener).executeAsync();
-
-    ExecutorContainer.get().execute(() -> {
-      callback.onStarted(listener.isSuccess());
-    });
+  public SampleProcessClient() {
   }
 
   /**
-   * 次のコマンドを実行します。
-   *
-   * <pre>
-   * mvn jetty:stop
-   * </pre>
+   * HTTPサーバーを起動します。
+   * 
+   */
+  public void start(int port, Path sampleDir, SampleStartedCallback callback) {
+
+    try {
+      server = SitHttpServer.of(port, sampleDir.toAbsolutePath().toString());
+      server.start();
+      callback.onStarted(true);
+
+    } catch (IOException e) {
+      callback.onStarted(false);
+    }
+  }
+
+  /**
+   * HTTPサーバーを停止します。
    *
    */
-  public void stop(Path baseDir, Path sampleDir, ProcessExitCallback callback) {
-    if (!sampleDir.toFile().exists() && callback != null) {
+  public void stop(Path sampleDir, ProcessExitCallback callback) {
+    server.stopNow();
+    if (callback != null) {
       callback.callback(0);
     }
-
-    ProcessCommand cmd = MavenProject.load(baseDir).mvnw("jetty:stop", "-f", sampleDir.toString());
-    if (callback != null)
-      cmd.getExitCallbacks().add(callback);
-    cmd.executeAsync();
   }
 }

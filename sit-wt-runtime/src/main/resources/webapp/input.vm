@@ -126,13 +126,13 @@ limitations under the License.
           <label class="col-sm-2 control-label">${input-form-type-select-name}</label>
           <div class="col-sm-4">
             <label for="${input-form-type-select-address-name}"
-              class="control-label">${input-form-type-select-prefecture}：</label><select id="${input-form-type-select-address-name}"
+              class="control-label">${input-form-type-select-prefecture}:</label><select id="${input-form-type-select-address-name}"
               name="${input-form-type-select-prefecture}" onchange="prefectureChange(this);" class="form-control">
               <option value="P00"></option>
               <option value="P01">${input-form-type-select-address1}</option>
               <option value="P02">${input-form-type-select-address2}</option>
               <option value="P03">${input-form-type-select-address3}</option>
-            </select> <label for="city" class="control-label">${input-form-type-select-city}：</label><select id="city"
+            </select> <label for="city" class="control-label">${input-form-type-select-city}:</label><select id="city"
               name="${input-form-type-select-city}" class="form-control">
             </select>
           </div>

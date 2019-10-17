@@ -33,7 +33,6 @@ public class SampleManager {
 
   private void unarchiveBasicSample() {
     unarchive("bootstrap.min.css");
-    unarchive("pom.xml");
 
     Map<String, String> properties = MessageManager.getResourceAsMap();
 

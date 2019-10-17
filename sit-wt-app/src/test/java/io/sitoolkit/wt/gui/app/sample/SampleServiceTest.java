@@ -78,7 +78,7 @@ public class SampleServiceTest {
             .stdout(line -> log.debug(line)).exitCallback(exitCallback).execute();
       };
 
-      sampleService.start(projectDir, sampleStartedCallback);
+      sampleService.start(8280, projectDir, sampleStartedCallback);
 
     }
   }
