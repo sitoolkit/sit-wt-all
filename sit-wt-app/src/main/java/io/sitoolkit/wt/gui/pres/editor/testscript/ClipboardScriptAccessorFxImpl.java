@@ -3,7 +3,12 @@ package io.sitoolkit.wt.gui.pres.editor.testscript;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import javafx.scene.control.TablePosition;
@@ -34,44 +39,85 @@ public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
 
   @Override
   public void pasteCase() {
-    // TODO Auto-generated method stub
-
+    int count = countCases(readFromClipboard());
+    if (count > 0) {
+      editor.insertTestCases(count);
+      paste();
+    }
   }
 
   @Override
   public void pasteStep() {
-    // TODO Auto-generated method stub
-
+    int count = countSteps(readFromClipboard());
+    if (count > 0) {
+      editor.insertTestSteps(count);
+      paste();
+    }
   }
 
   @Override
   public void pasteCaseTail() {
-    // TODO Auto-generated method stub
-
+    int count = countCases(readFromClipboard());
+    if (count > 0) {
+      editor.appendTestCases(count);
+      paste();
+    }
   }
 
   @Override
   public void pasteStepTail() {
-    // TODO Auto-generated method stub
-
+    int count = countSteps(readFromClipboard());
+    if (count > 0) {
+      editor.appendTestSteps(count);
+      paste();
+    }
   }
 
   @Override
   public boolean hasClipboardCases() {
-    // TODO Auto-generated method stub
-    return false;
+    return countCases(readFromClipboard()) > 0;
   }
 
   @Override
   public boolean hasClipboardSteps() {
-    // TODO Auto-generated method stub
-    return false;
+    return countSteps(readFromClipboard()) > 0;
+  }
+
+  private int countCases(List<Cell> changeList) {
+    int columnCount = countColumns(changeList);
+    int rowCount = countRows(changeList);
+    return editor.getRowCount() == rowCount ? columnCount : 0;
+  }
+
+  private int countSteps(List<Cell> changeList) {
+    int columnCount = countColumns(changeList);
+    int rowCount = countRows(changeList);
+    return editor.getColumnCount() == columnCount ? rowCount : 0;
+  }
+
+  private int countColumns(List<Cell> changeList) {
+    Set<Integer> colSet =
+        changeList.stream().map(change -> change.getColumn()).collect(Collectors.toSet());
+    return countMinToMax(colSet);
+  }
+
+  private int countRows(List<Cell> changeList) {
+    Set<Integer> rowSet =
+        changeList.stream().map(change -> change.getRow()).collect(Collectors.toSet());
+    return countMinToMax(rowSet);
+  }
+
+  private int countMinToMax(Collection<Integer> values) {
+    return values.isEmpty()
+        ? 0
+        : values.stream().max(Comparator.naturalOrder()).get()
+            - values.stream().min(Comparator.naturalOrder()).get()
+            + 1;
   }
 
   @Override
   public boolean clipboardPastable() {
-    return Clipboard.getSystemClipboard().hasContent(DATAFORMAT_CELL)
-        && editor.getSelection().getSelectedCells().size() == 1;
+    return readFromClipboard().size() > 0 && editor.getSelection().getSelectedCells().size() == 1;
   }
 
   @Override
@@ -87,12 +133,9 @@ public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
     int leftColumn = posList.stream().mapToInt(TablePosition::getColumn).min().getAsInt();
     int topRow = posList.stream().mapToInt(TablePosition::getRow).min().getAsInt();
     List<Cell> selectedCells =
-        posList.stream().map(p -> createCellData(p, topRow, leftColumn)).collect(toList());
+        posList.stream().map(p -> createDataFromEditor(p, topRow, leftColumn)).collect(toList());
 
-    final ClipboardContent content = new ClipboardContent();
-    content.put(DATAFORMAT_CELL, selectedCells);
-    content.putString(toTsvString(selectedCells));
-    Clipboard.getSystemClipboard().setContent(content);
+    writeToClipboard(selectedCells);
   }
 
   @Override
@@ -102,24 +145,34 @@ public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
       return;
     }
     TablePosition<?, ?> position = editor.getSelection().getSelectedCells().get(0);
-
-    @SuppressWarnings("unchecked")
-    List<Cell> cells = (List<Cell>) Clipboard.getSystemClipboard().getContent(DATAFORMAT_CELL);
-    cells.stream().forEach(cell -> writeCellData(position, cell));
+    readFromClipboard().stream().forEach(cell -> writeToEditor(position, cell));
   }
 
-  private Cell createCellData(TablePosition<?, ?> position, int topRow, int leftColumn) {
+  private Cell createDataFromEditor(TablePosition<?, ?> position, int topRow, int leftColumn) {
     return new Cell(
         position.getRow() - topRow,
         position.getColumn() - leftColumn,
         editor.getCellValue(position.getRow(), position.getColumn()));
   }
 
-  private void writeCellData(TablePosition<?, ?> position, Cell cell) {
+  private void writeToEditor(TablePosition<?, ?> position, Cell cell) {
     editor.setCellValue(
         position.getRow() + cell.getRow(),
         position.getColumn() + cell.getColumn(),
         cell.getValue());
+  }
+
+  private List<Cell> readFromClipboard() {
+    @SuppressWarnings("unchecked")
+    List<Cell> cells = (List<Cell>) Clipboard.getSystemClipboard().getContent(DATAFORMAT_CELL);
+    return cells != null ? cells : Collections.emptyList();
+  }
+
+  private void writeToClipboard(List<Cell> cells) {
+    final ClipboardContent content = new ClipboardContent();
+    content.put(DATAFORMAT_CELL, cells);
+    content.putString(toTsvString(cells));
+    Clipboard.getSystemClipboard().setContent(content);
   }
 
   private String toTsvString(List<Cell> cells) {

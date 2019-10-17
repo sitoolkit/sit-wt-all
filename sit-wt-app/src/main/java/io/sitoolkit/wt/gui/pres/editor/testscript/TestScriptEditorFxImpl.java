@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.beans.property.Property;
@@ -258,18 +257,6 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
-  public int getCaseCount(List<GridChange> changeList) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public int getStepCount(List<GridChange> changeList) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
   public boolean isCellSelected() {
     return getSelection().getSelectedItem() != null;
   }
@@ -383,5 +370,13 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
         tableColumn
             .getCellValueFactory()
             .call(new CellDataFeatures<>(tableView, tableColumn, tableItem));
+  }
+
+  public int getRowCount() {
+    return tableView.getItems().size();
+  }
+
+  public int getColumnCount() {
+    return tableView.getColumns().size();
   }
 }
