@@ -99,7 +99,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
   }
 
   public void paste(ActionEvent e) {
-    editor.getClipboardAccessor().pasteCase();
+    editor.getClipboardAccessor().paste();
   }
 
   public void pasteCase(ActionEvent e) {
@@ -127,7 +127,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
   }
 
   private void updateManuState() {
-    menuState.getClipboardHasCell().set(hasClipboardCells());
+    menuState.getClipboardPastable().set(clipboardPastable());
     menuState.getClipboardHasCase().set(hasClipboardCases());
     menuState.getClipboardHasStep().set(hasClipboardSteps());
     menuState.getCellSelected().set(editor.isCellSelected());
@@ -160,8 +160,7 @@ public class TestScriptEditorController implements EditorController, DebugListen
     item = new MenuItem("貼り付け");
     item.setMnemonicParsing(false);
     item.setOnAction(this::paste);
-    item.disableProperty()
-        .bind(menuState.getCellSelected().not().or(menuState.getClipboardHasCell().not()));
+    item.disableProperty().bind(menuState.getClipboardPastable().not());
     item.setAccelerator(keyCodePaste);
     menuItems.add(item);
 
@@ -255,13 +254,13 @@ public class TestScriptEditorController implements EditorController, DebugListen
     return editor.getClipboardAccessor().hasClipboardCases();
   }
 
-  private boolean hasClipboardCells() {
-    return editor.getClipboardAccessor().hasClipboardCells();
+  private boolean clipboardPastable() {
+    return editor.getClipboardAccessor().clipboardPastable();
   }
 
   @Getter
   private class MenuState {
-    private BooleanProperty clipboardHasCell = new SimpleBooleanProperty(false);
+    private BooleanProperty clipboardPastable = new SimpleBooleanProperty(false);
     private BooleanProperty clipboardHasCase = new SimpleBooleanProperty(false);
     private BooleanProperty clipboardHasStep = new SimpleBooleanProperty(false);
     private BooleanProperty cellSelected = new SimpleBooleanProperty(false);

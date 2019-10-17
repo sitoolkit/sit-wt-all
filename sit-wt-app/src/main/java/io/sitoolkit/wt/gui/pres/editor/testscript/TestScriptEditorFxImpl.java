@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.spreadsheet.GridChange;
 import io.sitoolkit.wt.domain.testscript.TestScript;
 import io.sitoolkit.wt.domain.testscript.TestStep;
+import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,8 +43,10 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private String caseNoPrefix = "case_";
 
-  private static final KeyCodeCombination KEY_CODE_COPY =
+  public static final KeyCodeCombination KEY_CODE_COPY =
       new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
+  public static final KeyCodeCombination KEY_CODE_PASTE =
+      new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
 
   @Override
   public void load(TestScript testScript) {
@@ -63,6 +66,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
         event -> {
           if (KEY_CODE_COPY.match(event)) {
             getClipboardAccessor().copy();
+          }
+          if (KEY_CODE_PASTE.match(event)) {
+            getClipboardAccessor().paste();
           }
         });
 
@@ -258,12 +264,6 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @Override
-  public void pasteClipboard() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public int getStepCount(List<GridChange> changeList) {
     // TODO Auto-generated method stub
     return 0;
@@ -350,11 +350,38 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     return clipboardAccessor;
   }
 
-  public String getCellValue(TablePosition<?, ?> position) {
-    return tableView
-        .getColumns()
-        .get(position.getColumn())
-        .getCellData(position.getRow())
-        .toString();
+  public String getCellValue(int row, int column) {
+    if (isInRange(row, column)) {
+      return getProperty(row, column).getValue();
+    } else {
+      return null;
+    }
+  }
+
+  public void setCellValue(int row, int column, String value) {
+    if (isInRange(row, column)) {
+      getProperty(row, column).setValue(value);
+    }
+  }
+
+  private boolean isInRange(int row, int column) {
+    return 0 <= row
+        && row < tableView.getItems().size()
+        && 0 <= column
+        && column < tableView.getColumns().size();
+  }
+
+  private Property<String> getProperty(int row, int column) {
+
+    ScriptEditorRow tableItem = tableView.getItems().get(row);
+
+    @SuppressWarnings("unchecked")
+    TableColumn<ScriptEditorRow, String> tableColumn =
+        (TableColumn<ScriptEditorRow, String>) tableView.getColumns().get(column);
+
+    return (Property<String>)
+        tableColumn
+            .getCellValueFactory()
+            .call(new CellDataFeatures<>(tableView, tableColumn, tableItem));
   }
 }

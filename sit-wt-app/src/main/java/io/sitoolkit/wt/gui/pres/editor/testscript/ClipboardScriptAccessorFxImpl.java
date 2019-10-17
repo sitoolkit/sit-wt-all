@@ -1,18 +1,16 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import lombok.Getter;
 import lombok.Value;
 
 public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
@@ -71,8 +69,9 @@ public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
   }
 
   @Override
-  public boolean hasClipboardCells() {
-    return Clipboard.getSystemClipboard().hasContent(DATAFORMAT_CELL);
+  public boolean clipboardPastable() {
+    return Clipboard.getSystemClipboard().hasContent(DATAFORMAT_CELL)
+        && editor.getSelection().getSelectedCells().size() == 1;
   }
 
   @Override
@@ -88,57 +87,57 @@ public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
     int leftColumn = posList.stream().mapToInt(TablePosition::getColumn).min().getAsInt();
     int topRow = posList.stream().mapToInt(TablePosition::getRow).min().getAsInt();
     List<Cell> selectedCells =
-        posList
-            .stream()
-            .map(p -> createCellData(editor, p, topRow, leftColumn))
-            .collect(Collectors.toCollection(ArrayList::new));
-
-    Grid grid = new Grid(selectedCells);
+        posList.stream().map(p -> createCellData(p, topRow, leftColumn)).collect(toList());
 
     final ClipboardContent content = new ClipboardContent();
-    content.put(DATAFORMAT_CELL, grid);
-    content.putString(grid.toTsvString());
+    content.put(DATAFORMAT_CELL, selectedCells);
+    content.putString(toTsvString(selectedCells));
     Clipboard.getSystemClipboard().setContent(content);
   }
 
-  private Cell createCellData(
-      TestScriptEditorFxImpl editor, TablePosition<?, ?> position, int topRow, int leftColumn) {
+  @Override
+  public void paste() {
+
+    if (!clipboardPastable()) {
+      return;
+    }
+    TablePosition<?, ?> position = editor.getSelection().getSelectedCells().get(0);
+
+    @SuppressWarnings("unchecked")
+    List<Cell> cells = (List<Cell>) Clipboard.getSystemClipboard().getContent(DATAFORMAT_CELL);
+    cells.stream().forEach(cell -> writeCellData(position, cell));
+  }
+
+  private Cell createCellData(TablePosition<?, ?> position, int topRow, int leftColumn) {
     return new Cell(
         position.getRow() - topRow,
         position.getColumn() - leftColumn,
-        editor.getCellValue(position));
+        editor.getCellValue(position.getRow(), position.getColumn()));
   }
 
-  static class Grid implements Serializable {
+  private void writeCellData(TablePosition<?, ?> position, Cell cell) {
+    editor.setCellValue(
+        position.getRow() + cell.getRow(),
+        position.getColumn() + cell.getColumn(),
+        cell.getValue());
+  }
 
-    private static final long serialVersionUID = 1L;
+  private String toTsvString(List<Cell> cells) {
+    String[][] grid = createGrid(cells);
+    return Stream.of(grid)
+        .map(row -> Stream.of(row).map(StringUtils::defaultString).collect(joining("\t")))
+        .collect(joining("\n"));
+  }
 
-    @Getter private List<Cell> cells;
-
-    private transient String[][] grid;
-
-    public Grid(List<Cell> cells) {
-      this.cells = cells;
-    }
-
-    public String toTsvString() {
-      return Stream.of(getGrid())
-          .map(row -> Stream.of(row).map(StringUtils::defaultString).collect(joining("\t")))
-          .collect(joining("\n"));
-    }
-
-    private String[][] getGrid() {
-      if (grid == null) {
-        int row = cells.stream().mapToInt(Cell::getRow).max().getAsInt();
-        int column = cells.stream().mapToInt(Cell::getColumn).max().getAsInt();
-        grid = new String[row + 1][column + 1];
-        cells.forEach(
-            c -> {
-              grid[c.getRow()][c.getColumn()] = c.getContent();
-            });
-      }
-      return grid;
-    }
+  private String[][] createGrid(List<Cell> cells) {
+    int row = cells.stream().mapToInt(Cell::getRow).max().getAsInt();
+    int column = cells.stream().mapToInt(Cell::getColumn).max().getAsInt();
+    String[][] grid = new String[row + 1][column + 1];
+    cells.forEach(
+        c -> {
+          grid[c.getRow()][c.getColumn()] = c.getValue();
+        });
+    return grid;
   }
 
   @Value
@@ -146,6 +145,6 @@ public class ClipboardScriptAccessorFxImpl implements ClipboardScriptAccessor {
     private static final long serialVersionUID = 1L;
     private int row;
     private int column;
-    private String content;
+    private String value;
   }
 }

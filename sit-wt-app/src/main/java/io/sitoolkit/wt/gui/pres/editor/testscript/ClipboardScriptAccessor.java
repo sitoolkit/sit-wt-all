@@ -14,7 +14,9 @@ public interface ClipboardScriptAccessor {
 
   boolean hasClipboardSteps();
 
-  boolean hasClipboardCells();
+  boolean clipboardPastable();
 
   void copy();
+
+  void paste();
 }

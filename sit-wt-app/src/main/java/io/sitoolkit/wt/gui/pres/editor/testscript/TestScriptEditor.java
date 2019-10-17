@@ -32,8 +32,6 @@ public interface TestScriptEditor {
 
   boolean insertTestCases(int count);
 
-  void pasteClipboard();
-
   int getStepCount(List<GridChange> changeList);
 
   boolean insertTestSteps(int count);

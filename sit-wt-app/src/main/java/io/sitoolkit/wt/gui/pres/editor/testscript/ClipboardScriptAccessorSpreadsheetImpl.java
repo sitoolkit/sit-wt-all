@@ -17,9 +17,9 @@ public class ClipboardScriptAccessorSpreadsheetImpl implements ClipboardScriptAc
     DATAFORMAT_SPREADSHEET = fmt;
   }
 
-  private TestScriptEditor editor;
+  private TestScriptEditorSpreadSheetImpl editor;
 
-  public ClipboardScriptAccessorSpreadsheetImpl(TestScriptEditor editor) {
+  public ClipboardScriptAccessorSpreadsheetImpl(TestScriptEditorSpreadSheetImpl editor) {
     this.editor = editor;
   }
 
@@ -106,7 +106,7 @@ public class ClipboardScriptAccessorSpreadsheetImpl implements ClipboardScriptAc
   }
 
   @Override
-  public boolean hasClipboardCells() {
+  public boolean clipboardPastable() {
     // TODO Auto-generated method stub
     return false;
   }
@@ -115,5 +115,10 @@ public class ClipboardScriptAccessorSpreadsheetImpl implements ClipboardScriptAc
   public void copy() {
     // TODO Auto-generated method stub
 
+  }
+
+  @Override
+  public void paste() {
+    editor.pasteClipboard();
   }
 }
