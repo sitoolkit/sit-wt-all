@@ -1,21 +1,16 @@
-.spreadsheet-cell.header {
-    -fx-font-weight: bold;
-    -fx-alignment: center;
-}
-
-.spreadsheet-cell.non-editable {
+.table-row-cell:empty {
     -fx-background-color: #f3f3f3;
 }
 
-.spreadsheet-cell.debugStep {
+.table-cell.debugStep {
     -fx-background-color: lightgreen;
 }
 
-.spreadsheet-cell.debugCase {
+.table-cell.debugCase {
     -fx-background-color: lightyellow;
 }
 
-.spreadsheet-cell.debugCase.debugStep{
+.table-cell.debugCase.debugStep {
     -fx-background-color: yellowgreen;
 }
 

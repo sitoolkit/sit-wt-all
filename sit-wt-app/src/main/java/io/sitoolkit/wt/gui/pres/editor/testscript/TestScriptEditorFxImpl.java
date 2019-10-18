@@ -76,8 +76,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     //    tableView.setOnContextMenuRequested(new ContextMenuEventHandler());
   }
 
-  private List<TableColumn<ScriptEditorRow, String>> buildEditorColumns(TestScript testScript) {
-    List<TableColumn<ScriptEditorRow, String>> columns = new ArrayList<>();
+  private List<TableColumn<ScriptEditorRow, ScriptEditorCell>> buildEditorColumns(
+      TestScript testScript) {
+    List<TableColumn<ScriptEditorRow, ScriptEditorCell>> columns = new ArrayList<>();
     int colIndex = 0;
     for (String headerName : testScript.getHeaders()) {
       String caseNo = getCaseNo(testScript, headerName);
@@ -87,10 +88,10 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     return columns;
   }
 
-  private TableColumn<ScriptEditorRow, String> buildEditorColumn(
+  private TableColumn<ScriptEditorRow, ScriptEditorCell> buildEditorColumn(
       String headerName, int columnIndex, String caseNo) {
-    TableColumn<ScriptEditorRow, String> col = new TableColumn<>(headerName);
-    col.setCellFactory(TextFieldTableCell.forTableColumn());
+    TableColumn<ScriptEditorRow, ScriptEditorCell> col = new TableColumn<>(headerName);
+    col.setCellFactory(l -> new ScriptEditorTestDataTableCell());
     col.setCellValueFactory(createCellValueFactory(columnIndex, caseNo));
     col.setEditable(true);
     col.setSortable(false);
@@ -102,11 +103,20 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
     return StringUtils.substringAfter(headerName, testScript.getCaseNoPrefix());
   }
 
+  private String getCaseNo(String headerName) {
+    return StringUtils.substringAfter(headerName, caseNoPrefix);
+  }
+
+  private String getCaseNo(int caseIndex) {
+    return getCaseNo(tableView.getColumns().get(COLUMN_INDEX_FIRST_CASE + caseIndex).getText());
+  }
+
   private String getCaseHeaderName(String caseNo) {
     return caseNoPrefix + caseNo;
   }
 
-  private Callback<CellDataFeatures<ScriptEditorRow, String>, ObservableValue<String>>
+  private Callback<
+          CellDataFeatures<ScriptEditorRow, ScriptEditorCell>, ObservableValue<ScriptEditorCell>>
       createCellValueFactory(int columnIndex, String caseNo) {
 
     switch (columnIndex) {
@@ -169,14 +179,15 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public void setDebugStyle(int nextStepIndex, int caseIndex) {
-    // TODO Auto-generated method stub
-
+    removeDebugStyle();
+    tableView.getItems().get(nextStepIndex).setDebugStep();
+    tableView.getItems().forEach(row -> row.setDebugCase(getCaseNo(caseIndex)));
   }
 
   @Override
   public void removeDebugStyle() {
-    // TODO Auto-generated method stub
-
+    tableView.getItems().forEach(ScriptEditorRow::removeDebugCase);
+    tableView.getItems().forEach(ScriptEditorRow::removeDebugStep);
   }
 
   @Override
@@ -369,5 +380,31 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public int getColumnCount() {
     return tableView.getColumns().size();
+  }
+
+  static class ScriptEditorTestDataTableCell
+      extends TextFieldTableCell<ScriptEditorRow, ScriptEditorCell> {
+
+    public ScriptEditorTestDataTableCell() {
+      super(ScriptEditorCell.converter);
+    }
+
+    @Override
+    public void updateItem(ScriptEditorCell cell, boolean empty) {
+      super.updateItem(cell, empty);
+
+      if (!empty) {
+        getStyleClass().remove("debugCase");
+        getStyleClass().remove("debugStep");
+
+        if (cell.isDebugCase()) {
+          getStyleClass().add("debugCase");
+        }
+
+        if (cell.isDebugStep()) {
+          getStyleClass().add("debugStep");
+        }
+      }
+    }
   }
 }
