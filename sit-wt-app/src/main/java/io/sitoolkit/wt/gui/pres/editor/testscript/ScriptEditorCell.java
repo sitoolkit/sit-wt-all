@@ -3,27 +3,21 @@ package io.sitoolkit.wt.gui.pres.editor.testscript;
 import org.codehaus.plexus.util.StringUtils;
 import javafx.util.StringConverter;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
 @AllArgsConstructor
-@NoArgsConstructor
 public class ScriptEditorCell {
 
-  public static final StringConverter<ScriptEditorCell> converter = new ScriptEditorCellConverter();
+  private String value;
+  private boolean debugCase;
+  private boolean debugStep;
 
   public static ScriptEditorCell of(String value) {
-    return new ScriptEditorCell(value);
+    return new ScriptEditorCell(value, false, false);
   }
 
-  private String value = "";
-  private boolean debugCase = false;
-  private boolean debugStep = false;
-
-  public ScriptEditorCell(String value) {
-    this.value = value;
-  }
+  public static final StringConverter<ScriptEditorCell> converter = new ScriptEditorCellConverter();
 
   static class ScriptEditorCellConverter extends StringConverter<ScriptEditorCell> {
     @Override
