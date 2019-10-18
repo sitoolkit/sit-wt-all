@@ -7,22 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 
 public class ScriptEditorRow {
 
-  private StringProperty no;
-  private StringProperty itemName;
-  private StringProperty operationName;
-  private StringProperty locatorType;
-  private StringProperty locator;
-  private StringProperty dataType;
-  private StringProperty screenshotTiming;
-  private StringProperty breakpoint; // TODO move cell to row-selector
-
-  // caseName -> property of testData
-  private Map<String, StringProperty> testData = new HashMap<>();
+  // propertyName -> property
+  private Map<String, Property<ScriptEditorCell>> properties = new HashMap<>();
 
   public static ScriptEditorRow createFromTestStep(TestStep testStep) {
     ScriptEditorRow row = new ScriptEditorRow();
@@ -31,87 +22,112 @@ public class ScriptEditorRow {
   }
 
   private void loadTestStep(TestStep testStep) {
-    noProperty().setValue(testStep.getNo());
-    itemNameProperty().setValue(testStep.getItemName());
-    operationNameProperty().setValue(testStep.getOperationName());
-    locatorTypeProperty().setValue(testStep.getLocator().getType());
-    locatorProperty().setValue(testStep.getLocator().getValue());
-    dataTypeProperty().setValue(testStep.getDataType());
-    screenshotTimingProperty().setValue(testStep.getScreenshotTiming().getLabel());
-    breakpointProperty().setValue(testStep.getBreakPoint());
+    noProperty().setValue(ScriptEditorCell.of(testStep.getNo()));
+    itemNameProperty().setValue(ScriptEditorCell.of(testStep.getItemName()));
+    operationNameProperty().setValue(ScriptEditorCell.of(testStep.getOperationName()));
+    locatorTypeProperty().setValue(ScriptEditorCell.of(testStep.getLocator().getType()));
+    locatorProperty().setValue(ScriptEditorCell.of(testStep.getLocator().getValue()));
+    dataTypeProperty().setValue(ScriptEditorCell.of(testStep.getDataType()));
+    screenshotTimingProperty()
+        .setValue(ScriptEditorCell.of(testStep.getScreenshotTiming().getLabel()));
+    breakpointProperty().setValue(ScriptEditorCell.of(testStep.getBreakPoint()));
 
     for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
-      testDataProperty(entry.getKey()).setValue(entry.getValue());
+      testDataProperty(entry.getKey()).setValue(ScriptEditorCell.of(entry.getValue()));
     }
   }
 
   public TestStep buildTestStep(List<String> caseNoList) {
     TestStep testStep = new TestStep();
-    testStep.setNo(noProperty().getValue());
-    testStep.setItemName(itemNameProperty().getValue());
-    testStep.setOperationName(operationNameProperty().getValue());
-    Locator locator = new Locator();
-    locator.setType(locatorTypeProperty().getValue());
-    locator.setValue(locatorProperty().getValue());
-    testStep.setLocator(locator);
-    testStep.setDataType(dataTypeProperty().getValue());
-    testStep.setScreenshotTiming(screenshotTimingProperty().getValue());
-    testStep.setBreakPoint(breakpointProperty().getValue());
+    testStep.setNo(noProperty().getValue().getValue());
+    testStep.setItemName(itemNameProperty().getValue().getValue());
+    testStep.setOperationName(operationNameProperty().getValue().getValue());
+    Locator loc = new Locator();
+    loc.setType(locatorTypeProperty().getValue().getValue());
+    loc.setValue(locatorProperty().getValue().getValue());
+    testStep.setLocator(loc);
+    testStep.setDataType(dataTypeProperty().getValue().getValue());
+    testStep.setScreenshotTiming(screenshotTimingProperty().getValue().getValue());
+    testStep.setBreakPoint(breakpointProperty().getValue().getValue());
 
-    Map<String, String> testData = new LinkedHashMap<String, String>();
+    Map<String, String> data = new LinkedHashMap<>();
     for (String caseNo : caseNoList) {
-      testData.put(caseNo, testDataProperty(caseNo).getValue());
+      data.put(caseNo, testDataProperty(caseNo).getValue().getValue());
     }
-    testStep.setTestData(testData);
+    testStep.setTestData(data);
 
     return testStep;
   }
 
-  public StringProperty noProperty() {
-    if (no == null) no = new SimpleStringProperty(this, "no");
-    return no;
+  public void setDebugCase(String caseNo) {
+    removeDebugCase();
+    setDebugCase(testDataProperty(caseNo), true);
   }
 
-  public StringProperty itemNameProperty() {
-    if (itemName == null) itemName = new SimpleStringProperty(this, "itemName");
-    return itemName;
+  public void removeDebugCase() {
+    properties.values().forEach(tdp -> setDebugCase(tdp, false));
   }
 
-  public StringProperty operationNameProperty() {
-    if (operationName == null) operationName = new SimpleStringProperty(this, "operationName");
-    return operationName;
+  public void setDebugStep() {
+    properties.values().forEach(tdp -> setDebugStep(tdp, true));
   }
 
-  public StringProperty locatorTypeProperty() {
-    if (locatorType == null) locatorType = new SimpleStringProperty(this, "locatorType");
-    return locatorType;
+  public void removeDebugStep() {
+    properties.values().forEach(tdp -> setDebugStep(tdp, false));
   }
 
-  public StringProperty locatorProperty() {
-    if (locator == null) locator = new SimpleStringProperty(this, "locator");
-    return locator;
-  }
-
-  public StringProperty dataTypeProperty() {
-    if (dataType == null) dataType = new SimpleStringProperty(this, "dataType");
-    return dataType;
-  }
-
-  public StringProperty screenshotTimingProperty() {
-    if (screenshotTiming == null)
-      screenshotTiming = new SimpleStringProperty(this, "screenshotTiming");
-    return screenshotTiming;
-  }
-
-  public StringProperty breakpointProperty() {
-    if (breakpoint == null) breakpoint = new SimpleStringProperty(this, "breakpoint");
-    return breakpoint;
-  }
-
-  public StringProperty testDataProperty(String caseNo) {
-    if (testData.get(caseNo) == null) {
-      testData.put(caseNo, new SimpleStringProperty(this, "case_" + caseNo));
+  private void setDebugStep(Property<ScriptEditorCell> p, boolean debugStep) {
+    ScriptEditorCell cell = p.getValue();
+    if (debugStep != cell.isDebugStep()) {
+      p.setValue(new ScriptEditorCell(cell.getValue(), cell.isDebugCase(), debugStep));
     }
-    return testData.get(caseNo);
+  }
+
+  private void setDebugCase(Property<ScriptEditorCell> p, boolean debugCase) {
+    ScriptEditorCell cell = p.getValue();
+    if (debugCase != cell.isDebugCase()) {
+      p.setValue(new ScriptEditorCell(cell.getValue(), debugCase, cell.isDebugStep()));
+    }
+  }
+
+  public Property<ScriptEditorCell> noProperty() {
+    return getProperty("no");
+  }
+
+  public Property<ScriptEditorCell> itemNameProperty() {
+    return getProperty("itemName");
+  }
+
+  public Property<ScriptEditorCell> operationNameProperty() {
+    return getProperty("operationName");
+  }
+
+  public Property<ScriptEditorCell> locatorTypeProperty() {
+    return getProperty("locatorType");
+  }
+
+  public Property<ScriptEditorCell> locatorProperty() {
+    return getProperty("locator");
+  }
+
+  public Property<ScriptEditorCell> dataTypeProperty() {
+    return getProperty("dataType");
+  }
+
+  public Property<ScriptEditorCell> screenshotTimingProperty() {
+    return getProperty("screenshotTiming");
+  }
+
+  public Property<ScriptEditorCell> breakpointProperty() {
+    return getProperty("breakpoint");
+  }
+
+  public Property<ScriptEditorCell> testDataProperty(String caseNo) {
+    return getProperty("case_" + caseNo);
+  }
+
+  private Property<ScriptEditorCell> getProperty(String name) {
+    properties.computeIfAbsent(name, n -> new SimpleObjectProperty<>(this, n));
+    return properties.get(name);
   }
 }
