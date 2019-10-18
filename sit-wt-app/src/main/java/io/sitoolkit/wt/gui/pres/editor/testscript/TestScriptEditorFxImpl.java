@@ -394,19 +394,15 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
       super.updateItem(cell, empty);
 
       if (!empty) {
+        getStyleClass().remove("debugCase");
+        getStyleClass().remove("debugStep");
 
         if (cell.isDebugCase()) {
           getStyleClass().add("debugCase");
-
-        } else {
-          getStyleClass().remove("debugCase");
         }
 
         if (cell.isDebugStep()) {
           getStyleClass().add("debugStep");
-
-        } else {
-          getStyleClass().remove("debugStep");
         }
       }
     }
