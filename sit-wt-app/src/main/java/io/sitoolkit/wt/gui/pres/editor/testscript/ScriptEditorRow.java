@@ -127,7 +127,8 @@ public class ScriptEditorRow {
   }
 
   private Property<ScriptEditorCell> getProperty(String name) {
-    properties.computeIfAbsent(name, n -> new SimpleObjectProperty<>(this, n));
+    properties.computeIfAbsent(
+        name, n -> new SimpleObjectProperty<>(this, n, ScriptEditorCell.of("")));
     return properties.get(name);
   }
 }
