@@ -79,14 +79,14 @@ public class ScriptEditorRow {
   private void setDebugStep(Property<ScriptEditorCell> p, boolean debugStep) {
     ScriptEditorCell cell = p.getValue();
     if (debugStep != cell.isDebugStep()) {
-      p.setValue(new ScriptEditorCell(cell.getValue(), cell.isDebugCase(), debugStep));
+      p.setValue(cell.toBuilder().debugStep(debugStep).build());
     }
   }
 
   private void setDebugCase(Property<ScriptEditorCell> p, boolean debugCase) {
     ScriptEditorCell cell = p.getValue();
     if (debugCase != cell.isDebugCase()) {
-      p.setValue(new ScriptEditorCell(cell.getValue(), debugCase, cell.isDebugStep()));
+      p.setValue(cell.toBuilder().debugCase(debugCase).build());
     }
   }
 

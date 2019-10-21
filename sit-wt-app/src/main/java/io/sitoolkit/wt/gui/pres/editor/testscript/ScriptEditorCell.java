@@ -5,22 +5,22 @@ import java.util.Collections;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
 import javafx.util.StringConverter;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 
 @Value
-@AllArgsConstructor
+@Builder(toBuilder = true)
 public class ScriptEditorCell {
 
   private String value;
   private boolean debugCase;
   private boolean debugStep;
 
-  public static ScriptEditorCell of(String value) {
-    return new ScriptEditorCell(value, false, false);
-  }
-
   public static final StringConverter<ScriptEditorCell> converter = new ScriptEditorCellConverter();
+
+  public static ScriptEditorCell of(String value) {
+    return builder().value(value).build();
+  }
 
   public boolean isEditable() {
     return !"uneditable".equals(value);
