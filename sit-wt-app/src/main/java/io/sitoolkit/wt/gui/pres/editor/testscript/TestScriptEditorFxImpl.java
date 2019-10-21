@@ -91,7 +91,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   private TableColumn<ScriptEditorRow, ScriptEditorCell> buildEditorColumn(
       String headerName, int columnIndex, String caseNo) {
     TableColumn<ScriptEditorRow, ScriptEditorCell> col = new TableColumn<>(headerName);
-    col.setCellFactory(l -> new ScriptEditorTestDataTableCell());
+    col.setCellFactory(l -> new ScriptEditorTableCell());
     col.setCellValueFactory(createCellValueFactory(columnIndex, caseNo));
     col.setEditable(true);
     col.setSortable(false);
