@@ -1,7 +1,7 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
@@ -12,15 +12,10 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
   private static final StringConverter<ScriptEditorCell> converter = ScriptEditorCell.converter;
 
   private TextField textField;
-
-  private ObservableList<ScriptEditorCell> items;
   private ChoiceBox<ScriptEditorCell> choiceBox;
 
   public ScriptEditorTableCell() {
     this.getStyleClass().add("sit-wt-script-editor-table-cell");
-    items = FXCollections.observableArrayList();
-    items.add(ScriptEditorCell.of("text-field"));
-    items.add(ScriptEditorCell.of("choice"));
   }
 
   private boolean isChoice() {
@@ -34,8 +29,14 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
     }
     if (isChoice()) {
       if (choiceBox == null) {
-        choiceBox = CellUtils.createChoiceBox(this, items, converter);
+        choiceBox = CellUtils.createChoiceBox(this, converter);
       }
+      choiceBox.setItems(
+          getItem()
+              .getChoices()
+              .stream()
+              .map(ScriptEditorCell::of)
+              .collect(Collectors.toCollection(FXCollections::observableArrayList)));
       choiceBox.getSelectionModel().select(getItem());
     }
     super.startEdit();
