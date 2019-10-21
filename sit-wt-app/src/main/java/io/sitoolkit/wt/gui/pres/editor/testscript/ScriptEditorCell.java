@@ -22,6 +22,10 @@ public class ScriptEditorCell {
 
   public static final StringConverter<ScriptEditorCell> converter = new ScriptEditorCellConverter();
 
+  public boolean isEditable() {
+    return !"uneditable".equals(value);
+  }
+
   public boolean isChoice() {
     return !getChoices().isEmpty();
   }
@@ -29,16 +33,19 @@ public class ScriptEditorCell {
   public List<String> getChoices() {
     switch (StringUtils.defaultString(getValue())) {
       case "choice":
-        return Arrays.asList("texiField", "choice", "country", "city");
+        return Arrays.asList("text", "choice", "country", "city", "uneditable");
 
       case "country":
-        return Arrays.asList("texiField", "choice", "country", "US", "UK", "France", "Japan");
+        return Arrays.asList(
+            "text", "choice", "country", "US", "UK", "France", "Japan", "uneditable");
 
       case "city":
-        return Arrays.asList("texiField", "choice", "city", "L.A.", "N.Y.", "Paris", "London");
+        return Arrays.asList(
+            "text", "choice", "city", "L.A.", "N.Y.", "Paris", "London", "uneditable");
 
       case "Japan":
-        return Arrays.asList("texiField", "choice", "Japan", "Tokyo", "Osaka", "Nagoya");
+        return Arrays.asList("text", "choice", "Japan", "Tokyo", "Osaka", "Nagoya", "uneditable");
+
       default:
         return Collections.emptyList();
     }

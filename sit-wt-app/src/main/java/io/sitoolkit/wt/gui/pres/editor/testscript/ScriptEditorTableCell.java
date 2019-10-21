@@ -24,7 +24,10 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
 
   @Override
   public void startEdit() {
-    if (!isEditable() || !getTableView().isEditable() || !getTableColumn().isEditable()) {
+    if (!isEditable()
+        || !getTableView().isEditable()
+        || !getTableColumn().isEditable()
+        || !getItem().isEditable()) {
       return;
     }
     if (isChoice()) {
@@ -81,13 +84,16 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
   private void updateStyle() {
     getStyleClass().remove("debugCase");
     getStyleClass().remove("debugStep");
+    getStyleClass().remove("non-editable");
 
     if (getItem().isDebugCase()) {
       getStyleClass().add("debugCase");
     }
-
     if (getItem().isDebugStep()) {
       getStyleClass().add("debugStep");
+    }
+    if (!getItem().isEditable()) {
+      getStyleClass().add("non-editable");
     }
   }
 }
