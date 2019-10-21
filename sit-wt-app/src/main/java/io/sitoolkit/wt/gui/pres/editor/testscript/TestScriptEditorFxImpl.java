@@ -350,7 +350,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public String getCellValue(int row, int column) {
     if (isInRange(row, column)) {
-      return getProperty(row, column).getValue();
+      return getProperty(row, column).getValue().getValue();
     } else {
       return null;
     }
@@ -358,7 +358,10 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public void setCellValue(int row, int column, String value) {
     if (isInRange(row, column)) {
-      getProperty(row, column).setValue(value);
+      Property<ScriptEditorCell> cellProperty = getProperty(row, column);
+      ScriptEditorCell oldCell = cellProperty.getValue();
+      cellProperty.setValue(
+          new ScriptEditorCell(value, oldCell.isDebugCase(), oldCell.isDebugStep()));
     }
   }
 
@@ -370,8 +373,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @SuppressWarnings("unchecked")
-  private Property<String> getProperty(int row, int column) {
-    return (Property<String>) tableView.getColumns().get(column).getCellObservableValue(row);
+  private Property<ScriptEditorCell> getProperty(int row, int column) {
+    return (Property<ScriptEditorCell>)
+        tableView.getColumns().get(column).getCellObservableValue(row);
   }
 
   public int getRowCount() {
