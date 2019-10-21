@@ -1,6 +1,5 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
@@ -61,12 +60,11 @@ public class CellUtils {
   };
 
   static <T> ChoiceBox<T> createChoiceBox(
-      final Cell<T> cell,
-      final ObservableList<T> items,
-      final ObjectProperty<StringConverter<T>> converter) {
+      final Cell<T> cell, final ObservableList<T> items, final StringConverter<T> converter) {
     ChoiceBox<T> choiceBox = new ChoiceBox<T>(items);
     choiceBox.setMaxWidth(Double.MAX_VALUE);
-    choiceBox.converterProperty().bind(converter);
+    choiceBox.setConverter(converter);
+    //    choiceBox.converterProperty().bind(converter);
     choiceBox
         .showingProperty()
         .addListener(

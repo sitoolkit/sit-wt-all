@@ -19,6 +19,10 @@ public class ScriptEditorCell {
 
   public static final StringConverter<ScriptEditorCell> converter = new ScriptEditorCellConverter();
 
+  public boolean isChoice() {
+    return "choice".equals(value);
+  }
+
   static class ScriptEditorCellConverter extends StringConverter<ScriptEditorCell> {
     @Override
     public String toString(ScriptEditorCell object) {
