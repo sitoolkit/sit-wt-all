@@ -1,10 +1,11 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
+import io.sitoolkit.wt.gui.pres.editor.testscript.rule.ChooseableRule;
 import io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRule;
+import io.sitoolkit.wt.gui.pres.editor.testscript.rule.NothingRule;
 import javafx.util.StringConverter;
 import lombok.Builder;
 import lombok.NonNull;
@@ -15,7 +16,7 @@ import lombok.Value;
 public class ScriptEditorCell {
 
   private String value;
-  @Builder.Default private InputRule inputRule = InputRule.NO_RULE;
+  @Builder.Default private InputRule inputRule = NothingRule.getInstance();
   private boolean debugCase;
   private boolean debugStep;
 
@@ -42,27 +43,14 @@ public class ScriptEditorCell {
   }
 
   public boolean isChoice() {
-    return !getChoices().isEmpty();
+    return inputRule instanceof ChooseableRule;
   }
 
   public List<String> getChoices() {
-    switch (StringUtils.defaultString(getValue())) {
-      case "choice":
-        return Arrays.asList("text", "choice", "country", "city", "uneditable");
-
-      case "country":
-        return Arrays.asList(
-            "text", "choice", "country", "US", "UK", "France", "Japan", "uneditable");
-
-      case "city":
-        return Arrays.asList(
-            "text", "choice", "city", "L.A.", "N.Y.", "Paris", "London", "uneditable");
-
-      case "Japan":
-        return Arrays.asList("text", "choice", "Japan", "Tokyo", "Osaka", "Nagoya", "uneditable");
-
-      default:
-        return Collections.emptyList();
+    if (inputRule instanceof ChooseableRule) {
+      return ((ChooseableRule) inputRule).getChoices();
+    } else {
+      return Collections.emptyList();
     }
   }
 

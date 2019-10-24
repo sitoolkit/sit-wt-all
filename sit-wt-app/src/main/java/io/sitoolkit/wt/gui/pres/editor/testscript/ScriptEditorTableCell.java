@@ -23,6 +23,14 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
   }
 
   @Override
+  public void commitEdit(ScriptEditorCell newValue) {
+    ScriptEditorCell oldValue = getItem();
+    if (oldValue.getInputRule().match(newValue.getValue())) {
+      super.commitEdit(oldValue.toBuilder().value(newValue.getValue()).build());
+    }
+  }
+
+  @Override
   public void startEdit() {
     if (!isEditable()
         || !getTableView().isEditable()
