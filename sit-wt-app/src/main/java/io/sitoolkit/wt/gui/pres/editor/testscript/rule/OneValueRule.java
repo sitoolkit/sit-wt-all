@@ -7,6 +7,8 @@ import lombok.Value;
 @Value
 public class OneValueRule implements InputRule {
 
+  public static final OneValueRule BLANK_VALUE_RULE = new OneValueRule("");
+
   String onlyOneValue;
 
   @Override

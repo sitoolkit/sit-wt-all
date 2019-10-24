@@ -158,7 +158,7 @@ public class ScriptEditorRow {
   }
 
   public Property<ScriptEditorCell> screenshotTimingProperty() {
-    ScriptEditorCell initial = createBlankCell(getScreenshotTimingRule(getOperationNameValue()));
+    ScriptEditorCell initial = createBlankCell(getScreenshotTimingRule());
     return getProperty("screenshotTiming", initial);
   }
 
@@ -193,7 +193,6 @@ public class ScriptEditorRow {
     setInputRule(locatorTypeProperty(), getLocatorTypeRule(newOperationName));
     setInputRule(locatorProperty(), getLocatorRule(newOperationName));
     setInputRule(dataTypeProperty(), getDataTypeRule(newOperationName));
-    setInputRule(screenshotTimingProperty(), getScreenshotTimingRule(newOperationName));
     for (String caseNo : getCaseNos()) {
       setInputRule(testDataProperty(caseNo), getTestDataRule(newOperationName));
     }
