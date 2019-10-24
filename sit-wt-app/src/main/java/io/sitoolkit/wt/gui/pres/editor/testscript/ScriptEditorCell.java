@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
+import io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRule;
 import javafx.util.StringConverter;
 import lombok.Builder;
 import lombok.NonNull;

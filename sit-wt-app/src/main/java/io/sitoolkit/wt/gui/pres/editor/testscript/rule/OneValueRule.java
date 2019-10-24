@@ -1,4 +1,4 @@
-package io.sitoolkit.wt.gui.pres.editor.testscript;
+package io.sitoolkit.wt.gui.pres.editor.testscript.rule;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
