@@ -359,7 +359,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   public void setCellValue(int row, int column, String value) {
     if (isInRange(row, column)) {
       Property<ScriptEditorCell> cellProperty = getProperty(row, column);
-      cellProperty.setValue(cellProperty.getValue().toBuilder().value(value).build());
+      if (cellProperty.getValue().getInputRule().match(value)) {
+        cellProperty.setValue(cellProperty.getValue().toBuilder().value(value).build());
+      }
     }
   }
 

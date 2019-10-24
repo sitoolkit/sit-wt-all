@@ -1,16 +1,30 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getBreakpointRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getDataTypeRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getItemNameRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getLocatorRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getLocatorTypeRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getNoRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getOperationNameRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getScreenshotTimingRule;
+import static io.sitoolkit.wt.gui.pres.editor.testscript.InputRuleProvider.getTestDataRule;
+import static java.util.stream.Collectors.toList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.apache.commons.lang3.StringUtils;
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 
 public class ScriptEditorRow {
+
+  private static final String TEST_DATA_PROP_PREFIX = "case_";
 
   // propertyName -> property
   private Map<String, Property<ScriptEditorCell>> properties = new HashMap<>();
@@ -22,18 +36,16 @@ public class ScriptEditorRow {
   }
 
   private void loadTestStep(TestStep testStep) {
-    noProperty().setValue(ScriptEditorCell.of(testStep.getNo()));
-    itemNameProperty().setValue(ScriptEditorCell.of(testStep.getItemName()));
-    operationNameProperty().setValue(ScriptEditorCell.of(testStep.getOperationName()));
-    locatorTypeProperty().setValue(ScriptEditorCell.of(testStep.getLocator().getType()));
-    locatorProperty().setValue(ScriptEditorCell.of(testStep.getLocator().getValue()));
-    dataTypeProperty().setValue(ScriptEditorCell.of(testStep.getDataType()));
-    screenshotTimingProperty()
-        .setValue(ScriptEditorCell.of(testStep.getScreenshotTiming().getLabel()));
-    breakpointProperty().setValue(ScriptEditorCell.of(testStep.getBreakPoint()));
-
+    setValue(noProperty(), testStep.getNo());
+    setValue(itemNameProperty(), testStep.getItemName());
+    setValue(operationNameProperty(), testStep.getOperationName());
+    setValue(locatorTypeProperty(), testStep.getLocator().getType());
+    setValue(locatorProperty(), testStep.getLocator().getValue());
+    setValue(dataTypeProperty(), testStep.getDataType());
+    setValue(screenshotTimingProperty(), testStep.getScreenshotTiming().getLabel());
+    setValue(breakpointProperty(), testStep.getBreakPoint());
     for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
-      testDataProperty(entry.getKey()).setValue(ScriptEditorCell.of(entry.getValue()));
+      setValue(testDataProperty(entry.getKey()), entry.getValue());
     }
   }
 
@@ -76,6 +88,18 @@ public class ScriptEditorRow {
     properties.values().forEach(tdp -> setDebugStep(tdp, false));
   }
 
+  private void setValue(Property<ScriptEditorCell> p, String value) {
+    if (p.getValue().getInputRule().match(value)) {
+      p.setValue(p.getValue().toBuilder().value(value).build());
+    }
+  }
+
+  private void setInputRule(Property<ScriptEditorCell> p, InputRule rule) {
+    ScriptEditorCell oldCell = p.getValue();
+    String newValue = rule.match(oldCell.getValue()) ? oldCell.getValue() : rule.defalutValue();
+    p.setValue(oldCell.toBuilder().inputRule(rule).value(newValue).build());
+  }
+
   private void setDebugStep(Property<ScriptEditorCell> p, boolean debugStep) {
     ScriptEditorCell cell = p.getValue();
     if (debugStep != cell.isDebugStep()) {
@@ -91,44 +115,95 @@ public class ScriptEditorRow {
   }
 
   public Property<ScriptEditorCell> noProperty() {
-    return getProperty("no");
+    ScriptEditorCell initial = createBlankCell(getNoRule());
+    return getProperty("no", initial);
   }
 
   public Property<ScriptEditorCell> itemNameProperty() {
-    return getProperty("itemName");
+    ScriptEditorCell initial = createBlankCell(getItemNameRule());
+    return getProperty("itemName", initial);
   }
 
   public Property<ScriptEditorCell> operationNameProperty() {
-    return getProperty("operationName");
+    ScriptEditorCell initial = createBlankCell(getOperationNameRule());
+    String name = "operationName";
+    properties.computeIfAbsent(
+        name,
+        n -> {
+          Property<ScriptEditorCell> p = new SimpleObjectProperty<>(this, n, initial);
+          p.addListener(this::onOperationNameCellChanged);
+          return p;
+        });
+    return properties.get(name);
+  }
+
+  private String getOperationNameValue() {
+    return operationNameProperty().getValue().getValue();
   }
 
   public Property<ScriptEditorCell> locatorTypeProperty() {
-    return getProperty("locatorType");
+    ScriptEditorCell initial = createBlankCell(getLocatorTypeRule(getOperationNameValue()));
+    return getProperty("locatorType", initial);
   }
 
   public Property<ScriptEditorCell> locatorProperty() {
-    return getProperty("locator");
+    ScriptEditorCell initial = createBlankCell(getLocatorRule(getOperationNameValue()));
+    return getProperty("locator", initial);
   }
 
   public Property<ScriptEditorCell> dataTypeProperty() {
-    return getProperty("dataType");
+    ScriptEditorCell initial = createBlankCell(getDataTypeRule(getOperationNameValue()));
+    return getProperty("dataType", initial);
   }
 
   public Property<ScriptEditorCell> screenshotTimingProperty() {
-    return getProperty("screenshotTiming");
+    ScriptEditorCell initial = createBlankCell(getScreenshotTimingRule(getOperationNameValue()));
+    return getProperty("screenshotTiming", initial);
   }
 
   public Property<ScriptEditorCell> breakpointProperty() {
-    return getProperty("breakpoint");
+    ScriptEditorCell initial = createBlankCell(getBreakpointRule());
+    return getProperty("breakpoint", initial);
   }
 
   public Property<ScriptEditorCell> testDataProperty(String caseNo) {
-    return getProperty("case_" + caseNo);
+    ScriptEditorCell initial = createBlankCell(getTestDataRule(getOperationNameValue()));
+    return getProperty(TEST_DATA_PROP_PREFIX + caseNo, initial);
   }
 
-  private Property<ScriptEditorCell> getProperty(String name) {
-    properties.computeIfAbsent(
-        name, n -> new SimpleObjectProperty<>(this, n, ScriptEditorCell.of("")));
+  private ScriptEditorCell createBlankCell(InputRule rule) {
+    return ScriptEditorCell.builder().inputRule(rule).value(rule.defalutValue()).build();
+  }
+
+  private Property<ScriptEditorCell> getProperty(String name, ScriptEditorCell initial) {
+    properties.computeIfAbsent(name, n -> new SimpleObjectProperty<>(this, n, initial));
     return properties.get(name);
+  }
+
+  private void onOperationNameCellChanged(
+      ObservableValue<? extends ScriptEditorCell> operationProperty,
+      ScriptEditorCell oldOperationCell,
+      ScriptEditorCell newOperationCell) {
+
+    String newOperationName = newOperationCell.getValue();
+    if (StringUtils.equals(oldOperationCell.getValue(), newOperationName)) {
+      return;
+    }
+    setInputRule(locatorTypeProperty(), getLocatorTypeRule(newOperationName));
+    setInputRule(locatorProperty(), getLocatorRule(newOperationName));
+    setInputRule(dataTypeProperty(), getDataTypeRule(newOperationName));
+    setInputRule(screenshotTimingProperty(), getScreenshotTimingRule(newOperationName));
+    for (String caseNo : getCaseNos()) {
+      setInputRule(testDataProperty(caseNo), getTestDataRule(newOperationName));
+    }
+  }
+
+  private List<String> getCaseNos() {
+    return properties
+        .keySet()
+        .stream()
+        .map(name -> StringUtils.substringAfter(name, TEST_DATA_PROP_PREFIX))
+        .filter(caseNo -> !caseNo.isEmpty())
+        .collect(toList());
   }
 }

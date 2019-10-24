@@ -6,6 +6,7 @@ import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
 import javafx.util.StringConverter;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 
 @Value
@@ -13,6 +14,7 @@ import lombok.Value;
 public class ScriptEditorCell {
 
   private String value;
+  @Builder.Default private InputRule inputRule = InputRule.NO_RULE;
   private boolean debugCase;
   private boolean debugStep;
 
@@ -22,8 +24,20 @@ public class ScriptEditorCell {
     return builder().value(value).build();
   }
 
+  public ScriptEditorCell(
+      String value, @NonNull InputRule inputRule, boolean debugCase, boolean debugStep) {
+    if (!inputRule.match(value)) {
+      throw new IllegalArgumentException(
+          "input value dosen't match input rule : value=" + value + ", rule=" + inputRule);
+    }
+    this.inputRule = inputRule;
+    this.value = value;
+    this.debugCase = debugCase;
+    this.debugStep = debugStep;
+  }
+
   public boolean isEditable() {
-    return !"uneditable".equals(value);
+    return inputRule.isChangeable();
   }
 
   public boolean isChoice() {
