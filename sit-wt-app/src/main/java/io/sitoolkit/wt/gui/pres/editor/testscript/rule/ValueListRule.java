@@ -2,13 +2,11 @@ package io.sitoolkit.wt.gui.pres.editor.testscript.rule;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Value;
 
 @AllArgsConstructor
-@Value
-public class ValueListRule implements ChooseableRule {
+public class ValueListRule implements InputRule {
 
-  List<String> valueList;
+  private final List<String> valueList;
 
   @Override
   public boolean match(String value) {
@@ -17,7 +15,7 @@ public class ValueListRule implements ChooseableRule {
 
   @Override
   public boolean isChangeable() {
-    return valueList.size() > 1;
+    return isChooseable();
   }
 
   @Override

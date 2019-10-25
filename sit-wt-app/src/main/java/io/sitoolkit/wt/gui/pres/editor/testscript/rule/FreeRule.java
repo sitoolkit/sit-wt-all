@@ -7,9 +7,9 @@ import lombok.Value;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Value
-public class NothingRule implements InputRule {
+public class FreeRule implements InputRule {
 
-  @Getter private static InputRule instance = new NothingRule();
+  @Getter private static final InputRule instance = new FreeRule();
 
   @Override
   public boolean match(String value) {

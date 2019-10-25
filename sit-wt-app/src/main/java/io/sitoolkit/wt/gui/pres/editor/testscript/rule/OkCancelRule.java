@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class OkCancelRule implements ChooseableRule {
+public class OkCancelRule implements InputRule {
 
   private static final String BLANK = "";
   private static final String OK = "ok";
@@ -21,7 +21,7 @@ public class OkCancelRule implements ChooseableRule {
 
   private static List<String> items = Arrays.asList(BLANK, OK, CANCEL);
 
-  @Getter public static OkCancelRule instance = new OkCancelRule();
+  @Getter private static final OkCancelRule instance = new OkCancelRule();
 
   @Override
   public boolean match(String value) {
@@ -30,7 +30,7 @@ public class OkCancelRule implements ChooseableRule {
 
   @Override
   public boolean isChangeable() {
-    return true;
+    return isChooseable();
   }
 
   @Override
@@ -43,13 +43,13 @@ public class OkCancelRule implements ChooseableRule {
     return items;
   }
 
-  // TODO call convertValue
-  public String convertValue(Object value) {
-    if (StringUtils.isBlank((String) value)) {
+  @Override
+  public String convertValue(String value) {
+    if (StringUtils.isBlank(value)) {
       return BLANK;
     }
 
-    Matcher matcher = OK_PATTERN.matcher(value.toString());
+    Matcher matcher = OK_PATTERN.matcher(value);
     return matcher.find() ? OK : CANCEL;
   }
 }

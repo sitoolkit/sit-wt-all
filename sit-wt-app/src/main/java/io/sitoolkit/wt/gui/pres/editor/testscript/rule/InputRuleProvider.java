@@ -11,14 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InputRuleProvider {
 
-  private static final InputRule NOTHING = NothingRule.getInstance();
-
   public static InputRule getNoRule() {
-    return NOTHING;
+    return FreeRule.getInstance();
   }
 
   public static InputRule getItemNameRule() {
-    return NOTHING;
+    return FreeRule.getInstance();
   }
 
   public static InputRule getOperationNameRule() {
@@ -37,9 +35,9 @@ public class InputRuleProvider {
   public static InputRule getLocatorRule(String operationName) {
     List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
     if (locatorTypes.size() == 1 && locatorTypes.get(0).equals("")) {
-      return OneValueRule.BLANK_VALUE_RULE;
+      return DisabledRule.getInstance();
     } else {
-      return NOTHING;
+      return FreeRule.getInstance();
     }
   }
 
@@ -54,7 +52,7 @@ public class InputRuleProvider {
   }
 
   public static InputRule getBreakpointRule() {
-    return NOTHING;
+    return FreeRule.getInstance();
   }
 
   public static InputRule getTestDataRule(String operationName) {
@@ -63,9 +61,9 @@ public class InputRuleProvider {
       case "ok_cancel":
         return OkCancelRule.getInstance();
       case "na":
-        return OneValueRule.BLANK_VALUE_RULE;
+        return DisabledRule.getInstance();
       default:
-        return NOTHING;
+        return FreeRule.getInstance();
     }
   }
 }
