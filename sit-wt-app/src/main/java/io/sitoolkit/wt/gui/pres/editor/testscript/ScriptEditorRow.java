@@ -1,14 +1,5 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getBreakpointRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getDataTypeRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getItemNameRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getLocatorRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getLocatorTypeRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getNoRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getOperationNameRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getScreenshotTimingRule;
-import static io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider.getTestDataRule;
 import static java.util.stream.Collectors.toList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -19,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
 import io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRule;
+import io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRuleProvider;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -29,6 +21,8 @@ public class ScriptEditorRow {
 
   // propertyName -> property
   private Map<String, Property<ScriptEditorCell>> properties = new HashMap<>();
+
+  private InputRuleProvider ruleProvider = new InputRuleProvider();
 
   public static ScriptEditorRow createFromTestStep(TestStep testStep) {
     ScriptEditorRow row = new ScriptEditorRow();
@@ -116,26 +110,24 @@ public class ScriptEditorRow {
   }
 
   public Property<ScriptEditorCell> noProperty() {
-    ScriptEditorCell initial = createBlankCell(getNoRule());
+    ScriptEditorCell initial = createBlankCell(ruleProvider.getNoRule());
     return getProperty("no", initial);
   }
 
   public Property<ScriptEditorCell> itemNameProperty() {
-    ScriptEditorCell initial = createBlankCell(getItemNameRule());
+    ScriptEditorCell initial = createBlankCell(ruleProvider.getItemNameRule());
     return getProperty("itemName", initial);
   }
 
   public Property<ScriptEditorCell> operationNameProperty() {
-    ScriptEditorCell initial = createBlankCell(getOperationNameRule());
-    String name = "operationName";
-    properties.computeIfAbsent(
-        name,
-        n -> {
-          Property<ScriptEditorCell> p = new SimpleObjectProperty<>(this, n, initial);
+    ScriptEditorCell initial = createBlankCell(ruleProvider.getOperationNameRule());
+    return properties.computeIfAbsent(
+        "operationName",
+        name -> {
+          Property<ScriptEditorCell> p = new SimpleObjectProperty<>(this, name, initial);
           p.addListener(this::onOperationNameCellChanged);
           return p;
         });
-    return properties.get(name);
   }
 
   private String getOperationNameValue() {
@@ -143,32 +135,36 @@ public class ScriptEditorRow {
   }
 
   public Property<ScriptEditorCell> locatorTypeProperty() {
-    ScriptEditorCell initial = createBlankCell(getLocatorTypeRule(getOperationNameValue()));
+    ScriptEditorCell initial =
+        createBlankCell(ruleProvider.getLocatorTypeRule(getOperationNameValue()));
     return getProperty("locatorType", initial);
   }
 
   public Property<ScriptEditorCell> locatorProperty() {
-    ScriptEditorCell initial = createBlankCell(getLocatorRule(getOperationNameValue()));
+    ScriptEditorCell initial =
+        createBlankCell(ruleProvider.getLocatorRule(getOperationNameValue()));
     return getProperty("locator", initial);
   }
 
   public Property<ScriptEditorCell> dataTypeProperty() {
-    ScriptEditorCell initial = createBlankCell(getDataTypeRule(getOperationNameValue()));
+    ScriptEditorCell initial =
+        createBlankCell(ruleProvider.getDataTypeRule(getOperationNameValue()));
     return getProperty("dataType", initial);
   }
 
   public Property<ScriptEditorCell> screenshotTimingProperty() {
-    ScriptEditorCell initial = createBlankCell(getScreenshotTimingRule());
+    ScriptEditorCell initial = createBlankCell(ruleProvider.getScreenshotTimingRule());
     return getProperty("screenshotTiming", initial);
   }
 
   public Property<ScriptEditorCell> breakpointProperty() {
-    ScriptEditorCell initial = createBlankCell(getBreakpointRule());
+    ScriptEditorCell initial = createBlankCell(ruleProvider.getBreakpointRule());
     return getProperty("breakpoint", initial);
   }
 
   public Property<ScriptEditorCell> testDataProperty(String caseNo) {
-    ScriptEditorCell initial = createBlankCell(getTestDataRule(getOperationNameValue()));
+    ScriptEditorCell initial =
+        createBlankCell(ruleProvider.getTestDataRule(getOperationNameValue()));
     return getProperty(TEST_DATA_PROP_PREFIX + caseNo, initial);
   }
 
@@ -177,8 +173,7 @@ public class ScriptEditorRow {
   }
 
   private Property<ScriptEditorCell> getProperty(String name, ScriptEditorCell initial) {
-    properties.computeIfAbsent(name, n -> new SimpleObjectProperty<>(this, n, initial));
-    return properties.get(name);
+    return properties.computeIfAbsent(name, n -> new SimpleObjectProperty<>(this, n, initial));
   }
 
   private void onOperationNameCellChanged(
@@ -190,11 +185,11 @@ public class ScriptEditorRow {
     if (StringUtils.equals(oldOperationCell.getValue(), newOperationName)) {
       return;
     }
-    setInputRule(locatorTypeProperty(), getLocatorTypeRule(newOperationName));
-    setInputRule(locatorProperty(), getLocatorRule(newOperationName));
-    setInputRule(dataTypeProperty(), getDataTypeRule(newOperationName));
+    setInputRule(locatorTypeProperty(), ruleProvider.getLocatorTypeRule(newOperationName));
+    setInputRule(locatorProperty(), ruleProvider.getLocatorRule(newOperationName));
+    setInputRule(dataTypeProperty(), ruleProvider.getDataTypeRule(newOperationName));
     for (String caseNo : getCaseNos()) {
-      setInputRule(testDataProperty(caseNo), getTestDataRule(newOperationName));
+      setInputRule(testDataProperty(caseNo), ruleProvider.getTestDataRule(newOperationName));
     }
   }
 

@@ -1,25 +1,50 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript.rule;
 
 import static java.util.stream.Collectors.toList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import io.sitoolkit.wt.domain.testscript.ScreenshotTiming;
 import io.sitoolkit.wt.domain.testscript.TestStepInputType;
-import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class InputRuleProvider {
 
-  public static InputRule getNoRule() {
-    return FreeRule.getInstance();
+  @Getter private final InputRule noRule = FreeRule.getInstance();
+  @Getter private final InputRule itemNameRule = FreeRule.getInstance();
+  @Getter private final InputRule operationNameRule = createOperationNameRule();
+
+  @Getter
+  private final InputRule screenshotTimingRule = new ValueListRule(ScreenshotTiming.getLabels());
+
+  @Getter private final InputRule breakpointRule = FreeRule.getInstance();
+
+  // operationName -> input rule
+  private final Map<String, InputRule> locatorTypeRules = new HashMap<>();
+  private final Map<String, InputRule> locatorRules = new HashMap<>();
+  private final Map<String, InputRule> dataTypeRules = new HashMap<>();
+  private final Map<String, InputRule> testDataRules = new HashMap<>();
+
+  public InputRule getLocatorTypeRule(String operationName) {
+    return locatorTypeRules.computeIfAbsent(operationName, this::createLocatorTypeRule);
   }
 
-  public static InputRule getItemNameRule() {
-    return FreeRule.getInstance();
+  public InputRule getLocatorRule(String operationName) {
+    return locatorRules.computeIfAbsent(operationName, this::createLocatorRule);
   }
 
-  public static InputRule getOperationNameRule() {
+  public InputRule getDataTypeRule(String operationName) {
+    return dataTypeRules.computeIfAbsent(operationName, this::createDataTypeRule);
+  }
+
+  public InputRule getTestDataRule(String operationName) {
+    return testDataRules.computeIfAbsent(operationName, this::createTestDataRule);
+  }
+
+  public static InputRule createOperationNameRule() {
     List<String> operationNames =
         Stream.of(TestStepInputType.values())
             .map(TestStepInputType::getOperationName)
@@ -27,12 +52,12 @@ public class InputRuleProvider {
     return new ValueListRule(operationNames);
   }
 
-  public static InputRule getLocatorTypeRule(String operationName) {
+  public InputRule createLocatorTypeRule(String operationName) {
     List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
     return new ValueListRule(locatorTypes);
   }
 
-  public static InputRule getLocatorRule(String operationName) {
+  public InputRule createLocatorRule(String operationName) {
     List<String> locatorTypes = TestStepInputType.decode(operationName).getLocatorTypes();
     if (locatorTypes.size() == 1 && locatorTypes.get(0).equals("")) {
       return DisabledRule.getInstance();
@@ -41,21 +66,12 @@ public class InputRuleProvider {
     }
   }
 
-  public static InputRule getDataTypeRule(String operationName) {
+  public InputRule createDataTypeRule(String operationName) {
     List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
     return new ValueListRule(dataTypes);
   }
 
-  public static InputRule getScreenshotTimingRule() {
-    // TODO Create ValueListRule instance only once and use it
-    return new ValueListRule(ScreenshotTiming.getLabels());
-  }
-
-  public static InputRule getBreakpointRule() {
-    return FreeRule.getInstance();
-  }
-
-  public static InputRule getTestDataRule(String operationName) {
+  public InputRule createTestDataRule(String operationName) {
     List<String> dataTypes = TestStepInputType.decode(operationName).getDataTypes();
     switch (dataTypes.get(0)) {
       case "ok_cancel":
