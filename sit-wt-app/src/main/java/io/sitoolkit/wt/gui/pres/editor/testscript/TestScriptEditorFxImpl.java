@@ -26,7 +26,6 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -384,31 +383,5 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public int getColumnCount() {
     return tableView.getColumns().size();
-  }
-
-  static class ScriptEditorTestDataTableCell
-      extends TextFieldTableCell<ScriptEditorRow, ScriptEditorCell> {
-
-    public ScriptEditorTestDataTableCell() {
-      super(ScriptEditorCell.converter);
-    }
-
-    @Override
-    public void updateItem(ScriptEditorCell cell, boolean empty) {
-      super.updateItem(cell, empty);
-
-      if (!empty) {
-        getStyleClass().remove("debugCase");
-        getStyleClass().remove("debugStep");
-
-        if (cell.isDebugCase()) {
-          getStyleClass().add("debugCase");
-        }
-
-        if (cell.isDebugStep()) {
-          getStyleClass().add("debugStep");
-        }
-      }
-    }
   }
 }

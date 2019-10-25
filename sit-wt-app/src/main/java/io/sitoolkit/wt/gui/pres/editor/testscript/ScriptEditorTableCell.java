@@ -1,33 +1,20 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import java.util.function.Consumer;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEditorCell> {
-
-  private static final StringConverter<ScriptEditorCell> converter = ScriptEditorCell.converter;
 
   private TextField textField;
   private ChoiceBox<String> choiceBox;
-
-  private String getItemText() {
-    return converter.toString(getItem());
-  }
-
-  public ScriptEditorTableCell() {
-    this.getStyleClass().add("sit-wt-script-editor-table-cell");
-  }
-
-  private boolean isChoice() {
-    return getItem() != null && getItem().isChoice();
-  }
+  private Control editingControl;
 
   @Override
   public void startEdit() {
@@ -40,29 +27,10 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
     super.startEdit();
 
     if (isEditing()) {
-      if (isChoice()) {
-        if (choiceBox == null) {
-          choiceBox = createChoiceBox(this::onCommit);
-        }
-        choiceBox.setItems(FXCollections.observableList(getItem().getChoices()));
-        choiceBox.getSelectionModel().select(getItemText());
-        setText(null);
-        setGraphic(choiceBox);
-        choiceBox.requestFocus();
-
-      } else {
-        if (textField == null) {
-          textField = createTextField(this::onCommit, this::cancelEdit);
-        }
-        textField.setText(getItemText());
-        textField.selectAll();
-        setText(null);
-        setGraphic(textField);
-
-        // requesting focus so that key input can immediately go into the
-        // TextField (see RT-28132)
-        textField.requestFocus();
-      }
+      editingControl = prepareEditControl();
+      setText(null);
+      setGraphic(editingControl);
+      editingControl.requestFocus();
     }
   }
 
@@ -73,25 +41,6 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
     setGraphic(null);
   }
 
-  void onCommit(String value) {
-    if (getItem().getInputRule().match(value)) {
-      commitEdit(getItem().toBuilder().value(value).build());
-    }
-  }
-
-  private void setText(Control editControl, String text) {
-    if (editControl instanceof TextField) {
-      TextField field = (TextField) editControl;
-      field.setText(text);
-    } else if (editControl instanceof ChoiceBox) {
-      @SuppressWarnings("unchecked")
-      ChoiceBox<String> choice = (ChoiceBox<String>) editControl;
-      choice.getSelectionModel().select(text);
-    } else {
-      throw new IllegalArgumentException("not supported control:" + editControl);
-    }
-  }
-
   @Override
   public void updateItem(ScriptEditorCell item, boolean empty) {
     super.updateItem(item, empty);
@@ -100,12 +49,11 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
       setGraphic(null);
     } else {
       if (isEditing()) {
-        Control c = isChoice() ? choiceBox : textField;
-        if (c != null) {
-          setText(c, getItemText());
+        if (editingControl != null) {
+          setTextToControl(editingControl, getItemText());
         }
         setText(null);
-        setGraphic(c);
+        setGraphic(editingControl);
       } else {
         setText(getItemText());
         setGraphic(null);
@@ -130,39 +78,82 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
     }
   }
 
-  static ChoiceBox<String> createChoiceBox(final Consumer<String> commitListener) {
-    ChoiceBox<String> choiceBox = new ChoiceBox<>();
-    choiceBox.setMaxWidth(Double.MAX_VALUE);
-    choiceBox.setConverter(new DefaultStringConverter());
-    choiceBox
+  private String getItemText() {
+    return getItem().getValue();
+  }
+
+  private void commitEdit(String text) {
+    if (getItem().getInputRule().match(text)) {
+      commitEdit(getItem().toBuilder().value(text).build());
+    }
+  }
+
+  private Control prepareEditControl() {
+    if (getItem() != null && getItem().isChoice()) {
+      if (choiceBox == null) {
+        choiceBox = createChoiceBox();
+      }
+      choiceBox.setItems(FXCollections.observableList(getItem().getChoices()));
+      setTextToControl(choiceBox, getItemText());
+      return choiceBox;
+  
+    } else {
+      if (textField == null) {
+        textField = createTextField();
+      }
+      setTextToControl(textField, getItemText());
+      textField.selectAll();
+      return textField;
+    }
+  }
+
+  private ChoiceBox<String> createChoiceBox() {
+    ChoiceBox<String> choice = new ChoiceBox<>();
+    choice.setMaxWidth(Double.MAX_VALUE);
+    choice.setConverter(new DefaultStringConverter());
+    choice
         .showingProperty()
         .addListener(
             o -> {
-              if (!choiceBox.isShowing()) {
-                commitListener.accept(choiceBox.getSelectionModel().getSelectedItem());
+              if (!choice.isShowing()) {
+                commitEdit(choice.getSelectionModel().getSelectedItem());
               }
             });
-    return choiceBox;
+    return choice;
   }
 
-  static TextField createTextField(
-      final Consumer<String> commitListener, final Runnable cancelListener) {
-    final TextField textField = new TextField();
+  private TextField createTextField() {
+    final TextField textInput = new TextField();
 
     // Use onAction here rather than onKeyReleased (with check for Enter),
     // as otherwise we encounter RT-34685
-    textField.setOnAction(
+    textInput.setOnAction(
         event -> {
-          commitListener.accept(textField.getText());
+          commitEdit(textInput.getText());
           event.consume();
         });
-    textField.setOnKeyReleased(
+    textInput.setOnKeyReleased(
         t -> {
           if (t.getCode() == KeyCode.ESCAPE) {
-            cancelListener.run();
+            cancelEdit();
             t.consume();
           }
         });
-    return textField;
+    return textInput;
+  }
+
+  private void setTextToControl(Control editControl, String text) {
+    if (editControl instanceof TextField) {
+      TextField field = (TextField) editControl;
+      field.setText(text);
+  
+    } else if (editControl instanceof ChoiceBox) {
+      @SuppressWarnings("unchecked")
+      ChoiceBox<String> choice = (ChoiceBox<String>) editControl;
+      choice.getSelectionModel().select(text);
+  
+    } else {
+      throw new IllegalArgumentException("not supported control:" + editControl);
+    }
   }
 }
