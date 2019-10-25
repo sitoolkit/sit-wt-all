@@ -1,33 +1,32 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.util.StringConverter;
+import javafx.util.converter.DefaultStringConverter;
 
 public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEditorCell> {
 
   private static final StringConverter<ScriptEditorCell> converter = ScriptEditorCell.converter;
 
   private TextField textField;
-  private ChoiceBox<ScriptEditorCell> choiceBox;
+  private ChoiceBox<String> choiceBox;
+
+  private String getItemText() {
+    return converter.toString(getItem());
+  }
 
   public ScriptEditorTableCell() {
     this.getStyleClass().add("sit-wt-script-editor-table-cell");
   }
 
   private boolean isChoice() {
-    return getItem() == null ? false : getItem().isChoice();
-  }
-
-  @Override
-  public void commitEdit(ScriptEditorCell newValue) {
-    ScriptEditorCell oldValue = getItem();
-    if (oldValue.getInputRule().match(newValue.getValue())) {
-      super.commitEdit(oldValue.toBuilder().value(newValue.getValue()).build());
-    }
+    return getItem() != null && getItem().isChoice();
   }
 
   @Override
@@ -38,29 +37,31 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
         || !getItem().isEditable()) {
       return;
     }
-    if (isChoice()) {
-      if (choiceBox == null) {
-        choiceBox = CellUtils.createChoiceBox(this, converter);
-      }
-      choiceBox.setItems(
-          getItem()
-              .getChoices()
-              .stream()
-              .map(ScriptEditorCell::of)
-              .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-      choiceBox.getSelectionModel().select(getItem());
-    }
     super.startEdit();
-    if (isChoice()) {
-      setText(null);
-      setGraphic(choiceBox);
-    } else {
-      if (isEditing()) {
-        if (textField == null) {
-          textField = CellUtils.createTextField(this, converter);
-        }
 
-        CellUtils.startEdit(this, converter, null, null, textField);
+    if (isEditing()) {
+      if (isChoice()) {
+        if (choiceBox == null) {
+          choiceBox = createChoiceBox(this::onCommit);
+        }
+        choiceBox.setItems(FXCollections.observableList(getItem().getChoices()));
+        choiceBox.getSelectionModel().select(getItemText());
+        setText(null);
+        setGraphic(choiceBox);
+        choiceBox.requestFocus();
+
+      } else {
+        if (textField == null) {
+          textField = createTextField(this::onCommit, this::cancelEdit);
+        }
+        textField.setText(getItemText());
+        textField.selectAll();
+        setText(null);
+        setGraphic(textField);
+
+        // requesting focus so that key input can immediately go into the
+        // TextField (see RT-28132)
+        textField.requestFocus();
       }
     }
   }
@@ -68,23 +69,47 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
   @Override
   public void cancelEdit() {
     super.cancelEdit();
-    if (isChoice()) {
-      setText(converter.toString(getItem()));
-      setGraphic(null);
+    setText(getItemText());
+    setGraphic(null);
+  }
+
+  void onCommit(String value) {
+    if (getItem().getInputRule().match(value)) {
+      commitEdit(getItem().toBuilder().value(value).build());
+    }
+  }
+
+  private void setText(Control editControl, String text) {
+    if (editControl instanceof TextField) {
+      TextField field = (TextField) editControl;
+      field.setText(text);
+    } else if (editControl instanceof ChoiceBox) {
+      @SuppressWarnings("unchecked")
+      ChoiceBox<String> choice = (ChoiceBox<String>) editControl;
+      choice.getSelectionModel().select(text);
     } else {
-      CellUtils.cancelEdit(this, converter, null);
+      throw new IllegalArgumentException("not supported control:" + editControl);
     }
   }
 
   @Override
   public void updateItem(ScriptEditorCell item, boolean empty) {
     super.updateItem(item, empty);
-    if (isChoice()) {
-      CellUtils.updateItem(this, converter, null, null, choiceBox);
+    if (isEmpty()) {
+      setText(null);
+      setGraphic(null);
     } else {
-      CellUtils.updateItem(this, converter, null, null, textField);
-    }
-    if (!empty) {
+      if (isEditing()) {
+        Control c = isChoice() ? choiceBox : textField;
+        if (c != null) {
+          setText(c, getItemText());
+        }
+        setText(null);
+        setGraphic(c);
+      } else {
+        setText(getItemText());
+        setGraphic(null);
+      }
       updateStyle();
     }
   }
@@ -103,5 +128,41 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
     if (!getItem().isEditable()) {
       getStyleClass().add("non-editable");
     }
+  }
+
+  static ChoiceBox<String> createChoiceBox(final Consumer<String> commitListener) {
+    ChoiceBox<String> choiceBox = new ChoiceBox<>();
+    choiceBox.setMaxWidth(Double.MAX_VALUE);
+    choiceBox.setConverter(new DefaultStringConverter());
+    choiceBox
+        .showingProperty()
+        .addListener(
+            o -> {
+              if (!choiceBox.isShowing()) {
+                commitListener.accept(choiceBox.getSelectionModel().getSelectedItem());
+              }
+            });
+    return choiceBox;
+  }
+
+  static TextField createTextField(
+      final Consumer<String> commitListener, final Runnable cancelListener) {
+    final TextField textField = new TextField();
+
+    // Use onAction here rather than onKeyReleased (with check for Enter),
+    // as otherwise we encounter RT-34685
+    textField.setOnAction(
+        event -> {
+          commitListener.accept(textField.getText());
+          event.consume();
+        });
+    textField.setOnKeyReleased(
+        t -> {
+          if (t.getCode() == KeyCode.ESCAPE) {
+            cancelListener.run();
+            t.consume();
+          }
+        });
+    return textField;
   }
 }
