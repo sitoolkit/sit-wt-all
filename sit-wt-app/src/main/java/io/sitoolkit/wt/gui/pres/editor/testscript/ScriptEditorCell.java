@@ -1,33 +1,42 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import org.codehaus.plexus.util.StringUtils;
-import javafx.util.StringConverter;
-import lombok.AllArgsConstructor;
+import java.util.List;
+import io.sitoolkit.wt.gui.pres.editor.testscript.rule.FreeRule;
+import io.sitoolkit.wt.gui.pres.editor.testscript.rule.InputRule;
+import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 
 @Value
-@AllArgsConstructor
+@Builder(toBuilder = true)
 public class ScriptEditorCell {
 
   private String value;
+  @Builder.Default private InputRule inputRule = FreeRule.getInstance();
   private boolean debugCase;
   private boolean debugStep;
 
   public static ScriptEditorCell of(String value) {
-    return new ScriptEditorCell(value, false, false);
+    return builder().value(value).build();
   }
 
-  public static final StringConverter<ScriptEditorCell> converter = new ScriptEditorCellConverter();
+  public ScriptEditorCell(
+      String value, @NonNull InputRule inputRule, boolean debugCase, boolean debugStep) {
+    this.inputRule = inputRule;
+    this.value = inputRule.convertValue(value);
+    this.debugCase = debugCase;
+    this.debugStep = debugStep;
+  }
 
-  static class ScriptEditorCellConverter extends StringConverter<ScriptEditorCell> {
-    @Override
-    public String toString(ScriptEditorCell object) {
-      return StringUtils.defaultString(object.getValue());
-    }
+  public boolean isEditable() {
+    return inputRule.isChangeable();
+  }
 
-    @Override
-    public ScriptEditorCell fromString(String string) {
-      return ScriptEditorCell.of(StringUtils.defaultString(string));
-    }
+  public boolean isChoice() {
+    return inputRule.isChooseable();
+  }
+
+  public List<String> getChoices() {
+    return inputRule.getChoices();
   }
 }

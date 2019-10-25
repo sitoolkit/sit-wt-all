@@ -26,7 +26,6 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -91,7 +90,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   private TableColumn<ScriptEditorRow, ScriptEditorCell> buildEditorColumn(
       String headerName, int columnIndex, String caseNo) {
     TableColumn<ScriptEditorRow, ScriptEditorCell> col = new TableColumn<>(headerName);
-    col.setCellFactory(l -> new ScriptEditorTestDataTableCell());
+    col.setCellFactory(l -> new ScriptEditorTableCell());
     col.setCellValueFactory(createCellValueFactory(columnIndex, caseNo));
     col.setEditable(true);
     col.setSortable(false);
@@ -350,7 +349,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public String getCellValue(int row, int column) {
     if (isInRange(row, column)) {
-      return getProperty(row, column).getValue();
+      return getProperty(row, column).getValue().getValue();
     } else {
       return null;
     }
@@ -358,7 +357,10 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public void setCellValue(int row, int column, String value) {
     if (isInRange(row, column)) {
-      getProperty(row, column).setValue(value);
+      Property<ScriptEditorCell> cellProperty = getProperty(row, column);
+      if (cellProperty.getValue().getInputRule().match(value)) {
+        cellProperty.setValue(cellProperty.getValue().toBuilder().value(value).build());
+      }
     }
   }
 
@@ -370,8 +372,9 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   }
 
   @SuppressWarnings("unchecked")
-  private Property<String> getProperty(int row, int column) {
-    return (Property<String>) tableView.getColumns().get(column).getCellObservableValue(row);
+  private Property<ScriptEditorCell> getProperty(int row, int column) {
+    return (Property<ScriptEditorCell>)
+        tableView.getColumns().get(column).getCellObservableValue(row);
   }
 
   public int getRowCount() {
@@ -380,31 +383,5 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public int getColumnCount() {
     return tableView.getColumns().size();
-  }
-
-  static class ScriptEditorTestDataTableCell
-      extends TextFieldTableCell<ScriptEditorRow, ScriptEditorCell> {
-
-    public ScriptEditorTestDataTableCell() {
-      super(ScriptEditorCell.converter);
-    }
-
-    @Override
-    public void updateItem(ScriptEditorCell cell, boolean empty) {
-      super.updateItem(cell, empty);
-
-      if (!empty) {
-        getStyleClass().remove("debugCase");
-        getStyleClass().remove("debugStep");
-
-        if (cell.isDebugCase()) {
-          getStyleClass().add("debugCase");
-        }
-
-        if (cell.isDebugStep()) {
-          getStyleClass().add("debugStep");
-        }
-      }
-    }
   }
 }

@@ -2,6 +2,10 @@
     -fx-background-color: #f3f3f3;
 }
 
+.table-cell.non-editable {
+    -fx-background-color: #E0E0E0;
+}
+
 .table-cell.debugStep {
     -fx-background-color: lightgreen;
 }
