@@ -20,20 +20,25 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 
 public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   private static final int COLUMN_INDEX_FIRST_CASE = 8;
+  private static final int SCRIPT_HEADER_INDEX_BREAK_POINT = 7;
+  private static final double PICKER_COLUMN_WIDTH = 15;
 
   private TableView<ScriptEditorRow> tableView = new TableView<>();
 
@@ -46,45 +51,52 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   public static final KeyCodeCombination KEY_CODE_PASTE =
       new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
 
+  private int lastContextMenuRequestedRowIndex = -1;
+
+  public TestScriptEditorFxImpl() {
+    tableView.setEditable(true);
+    tableView.getSelectionModel().setCellSelectionEnabled(true);
+    tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableView
+        .getStylesheets()
+        .add(getClass().getResource("/testScriptEditor.css").toExternalForm());
+    tableView.setOnKeyPressed(this::onKeyPressed);
+    tableView.setOnContextMenuRequested(this::onContextMenuRequested);
+  }
+
   @Override
   public void load(TestScript testScript) {
     caseNoPrefix = testScript.getCaseNoPrefix();
     tableView.setItems(buildEditorRows(testScript));
     tableView.getColumns().setAll(buildEditorColumns(testScript));
-    tableView.setEditable(true);
-    tableView.getSelectionModel().setCellSelectionEnabled(true);
-    tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
     tableView.setId(testScript.getScriptFile().getAbsolutePath());
-    tableView
-        .getStylesheets()
-        .add(getClass().getResource("/testScriptEditor.css").toExternalForm());
-
-    tableView.setOnKeyPressed(
-        event -> {
-          if (KEY_CODE_COPY.match(event)) {
-            getClipboardAccessor().copy();
-          }
-          if (KEY_CODE_PASTE.match(event)) {
-            getClipboardAccessor().paste();
-          }
-        });
-
-    // TODO implement SpreadSheet's RowPickers-like feature instead of breakpoint column
-    // TODO set context-menu-event-handler to tableView
-    //    tableView.setOnContextMenuRequested(new ContextMenuEventHandler());
   }
 
   private List<TableColumn<ScriptEditorRow, ScriptEditorCell>> buildEditorColumns(
       TestScript testScript) {
     List<TableColumn<ScriptEditorRow, ScriptEditorCell>> columns = new ArrayList<>();
+    columns.add(buildPickerColumn());
     int colIndex = 0;
     for (String headerName : testScript.getHeaders()) {
-      String caseNo = getCaseNo(testScript, headerName);
-      columns.add(buildEditorColumn(headerName, colIndex, caseNo));
+      if (colIndex != SCRIPT_HEADER_INDEX_BREAK_POINT) {
+        String caseNo = getCaseNo(testScript, headerName);
+        columns.add(buildEditorColumn(headerName, colIndex, caseNo));
+      }
       colIndex++;
     }
     return columns;
+  }
+
+  private TableColumn<ScriptEditorRow, ScriptEditorCell> buildPickerColumn() {
+    TableColumn<ScriptEditorRow, ScriptEditorCell> col = new TableColumn<>("");
+    col.setCellFactory(l -> new ScriptEditorTableRowPickerCell());
+    col.setCellValueFactory(p -> p.getValue().breakpointProperty());
+    col.setEditable(false);
+    col.setSortable(false);
+    col.setReorderable(false);
+    col.setResizable(false);
+    col.setPrefWidth(PICKER_COLUMN_WIDTH);
+    return col;
   }
 
   private TableColumn<ScriptEditorRow, ScriptEditorCell> buildEditorColumn(
@@ -293,8 +305,14 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   @Override
   public void toggleBreakpoint() {
-    // TODO Auto-generated method stub
-
+    int index = lastContextMenuRequestedRowIndex;
+    if (0 <= index && index < tableView.getItems().size()) {
+      ScriptEditorRow item = tableView.getItems().get(index);
+      Property<ScriptEditorCell> bp = item.breakpointProperty();
+      ScriptEditorCell oldCell = bp.getValue();
+      String newValue = StringUtils.isBlank(oldCell.getValue()) ? "y" : "";
+      bp.setValue(ScriptEditorCell.of(newValue));
+    }
   }
 
   @Override
@@ -383,5 +401,33 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
 
   public int getColumnCount() {
     return tableView.getColumns().size();
+  }
+
+  public void onKeyPressed(KeyEvent event) {
+    if (KEY_CODE_COPY.match(event)) {
+      getClipboardAccessor().copy();
+    }
+    if (KEY_CODE_PASTE.match(event)) {
+      getClipboardAccessor().paste();
+    }
+  }
+
+  public void onContextMenuRequested(ContextMenuEvent event) {
+    if (isClickedOnCell(event)) {
+      lastContextMenuRequestedRowIndex = ((IndexedCell<?>) event.getTarget()).getIndex();
+    } else if (isClickedOnCellText(event)) {
+      lastContextMenuRequestedRowIndex =
+          ((IndexedCell<?>) ((Node) event.getTarget()).getParent()).getIndex();
+    } else {
+      lastContextMenuRequestedRowIndex = -1;
+    }
+  }
+
+  private boolean isClickedOnCell(ContextMenuEvent event) {
+    return event.getTarget() instanceof IndexedCell;
+  }
+
+  private boolean isClickedOnCellText(ContextMenuEvent event) {
+    return ((Node) event.getTarget()).getParent() instanceof IndexedCell;
   }
 }
