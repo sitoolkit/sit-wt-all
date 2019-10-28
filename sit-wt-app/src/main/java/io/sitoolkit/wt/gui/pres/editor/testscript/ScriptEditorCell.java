@@ -15,17 +15,23 @@ public class ScriptEditorCell {
   @Builder.Default private InputRule inputRule = FreeRule.getInstance();
   private boolean debugCase;
   private boolean debugStep;
+  private boolean breakpoint;
 
   public static ScriptEditorCell of(String value) {
     return builder().value(value).build();
   }
 
   public ScriptEditorCell(
-      String value, @NonNull InputRule inputRule, boolean debugCase, boolean debugStep) {
+      String value,
+      @NonNull InputRule inputRule,
+      boolean debugCase,
+      boolean debugStep,
+      boolean breakpoint) {
     this.inputRule = inputRule;
     this.value = inputRule.convertValue(value);
     this.debugCase = debugCase;
     this.debugStep = debugStep;
+    this.breakpoint = breakpoint;
   }
 
   public boolean isEditable() {

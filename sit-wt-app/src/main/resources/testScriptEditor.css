@@ -18,19 +18,13 @@
     -fx-background-color: yellowgreen;
 }
 
-.test-step-picker, .test-step-picker-info {
+.table-cell.test-step-picker {
 	-fx-graphic: none;
-	-fx-background-color: transparent;
 	-fx-background-repeat: no-repeat;
     -fx-background-position: center;
     -fx-background-size: 80% auto;
 }
 
-.test-step-picker {
-	-fx-opacity: 0;
+.table-cell.test-step-picker.enabled {
 	-fx-background-image: url('/icon/ic_fiber_manual_record_black_18dp_1x.png');
-}
-
-.test-step-picker.enabled {
-	-fx-opacity: 1;	
 }
