@@ -38,7 +38,7 @@ public class ScriptEditorRow {
     setValue(locatorProperty(), testStep.getLocator().getValue());
     setValue(dataTypeProperty(), testStep.getDataType());
     setValue(screenshotTimingProperty(), testStep.getScreenshotTiming().getLabel());
-    setValue(breakpointProperty(), testStep.getBreakPoint());
+    setBreakPoint(breakpointProperty(), testStep.isBreakPointEnabled());
     for (Entry<String, String> entry : testStep.getTestData().entrySet()) {
       setValue(testDataProperty(entry.getKey()), entry.getValue());
     }
@@ -55,7 +55,7 @@ public class ScriptEditorRow {
     testStep.setLocator(loc);
     testStep.setDataType(dataTypeProperty().getValue().getValue());
     testStep.setScreenshotTiming(screenshotTimingProperty().getValue().getValue());
-    testStep.setBreakPoint(breakpointProperty().getValue().getValue());
+    testStep.setBreakPoint(breakpointProperty().getValue().isBreakpoint() ? "y" : "");
 
     Map<String, String> data = new LinkedHashMap<>();
     for (String caseNo : caseNoList) {
@@ -83,6 +83,10 @@ public class ScriptEditorRow {
     properties.values().forEach(tdp -> setDebugStep(tdp, false));
   }
 
+  public void toggleBreakpoint() {
+    setBreakPoint(breakpointProperty(), !breakpointProperty().getValue().isBreakpoint());
+  }
+
   private void setValue(Property<ScriptEditorCell> p, String value) {
     if (p.getValue().getInputRule().match(value)) {
       p.setValue(p.getValue().toBuilder().value(value).build());
@@ -93,6 +97,10 @@ public class ScriptEditorRow {
     ScriptEditorCell oldCell = p.getValue();
     String newValue = rule.match(oldCell.getValue()) ? oldCell.getValue() : rule.defalutValue();
     p.setValue(oldCell.toBuilder().inputRule(rule).value(newValue).build());
+  }
+
+  private void setBreakPoint(Property<ScriptEditorCell> p, boolean breakpoint) {
+    p.setValue(p.getValue().toBuilder().breakpoint(breakpoint).build());
   }
 
   private void setDebugStep(Property<ScriptEditorCell> p, boolean debugStep) {

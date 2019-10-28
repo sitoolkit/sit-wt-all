@@ -307,11 +307,7 @@ public class TestScriptEditorFxImpl implements TestScriptEditor {
   public void toggleBreakpoint() {
     int index = lastContextMenuRequestedRowIndex;
     if (0 <= index && index < tableView.getItems().size()) {
-      ScriptEditorRow item = tableView.getItems().get(index);
-      Property<ScriptEditorCell> bp = item.breakpointProperty();
-      ScriptEditorCell oldCell = bp.getValue();
-      String newValue = StringUtils.isBlank(oldCell.getValue()) ? "y" : "";
-      bp.setValue(ScriptEditorCell.of(newValue));
+      tableView.getItems().get(index).toggleBreakpoint();
     }
   }
 

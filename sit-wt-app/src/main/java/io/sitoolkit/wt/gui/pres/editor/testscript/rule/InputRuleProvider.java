@@ -20,7 +20,7 @@ public class InputRuleProvider {
   @Getter
   private final InputRule screenshotTimingRule = new ValueListRule(ScreenshotTiming.getLabels());
 
-  @Getter private final InputRule breakpointRule = FreeRule.getInstance();
+  @Getter private final InputRule breakpointRule = DisabledRule.getInstance();
 
   // operationName -> input rule
   private final Map<String, InputRule> locatorTypeRules = new HashMap<>();

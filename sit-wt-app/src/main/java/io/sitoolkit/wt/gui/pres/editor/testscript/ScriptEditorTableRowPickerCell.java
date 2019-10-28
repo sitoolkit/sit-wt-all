@@ -1,6 +1,5 @@
 package io.sitoolkit.wt.gui.pres.editor.testscript;
 
-import org.apache.commons.lang.StringUtils;
 import javafx.scene.control.TableCell;
 
 class ScriptEditorTableRowPickerCell extends TableCell<ScriptEditorRow, ScriptEditorCell> {
@@ -21,7 +20,7 @@ class ScriptEditorTableRowPickerCell extends TableCell<ScriptEditorRow, ScriptEd
       if (cell.isDebugStep()) {
         getStyleClass().add("debugStep");
       }
-      if (!StringUtils.isBlank(cell.getValue())) {
+      if (cell.isBreakpoint()) {
         getStyleClass().add("enabled");
       }
     }
