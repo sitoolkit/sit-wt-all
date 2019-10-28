@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
@@ -118,70 +119,67 @@ public class ScriptEditorRow {
   }
 
   public Property<ScriptEditorCell> noProperty() {
-    ScriptEditorCell initial = createBlankCell(ruleProvider.getNoRule());
-    return getProperty("no", initial);
+    return getProperty("no", () -> createBlankCell(ruleProvider.getNoRule()));
   }
 
   public Property<ScriptEditorCell> itemNameProperty() {
-    ScriptEditorCell initial = createBlankCell(ruleProvider.getItemNameRule());
-    return getProperty("itemName", initial);
+    return getProperty("itemName", () -> createBlankCell(ruleProvider.getItemNameRule()));
   }
 
   public Property<ScriptEditorCell> operationNameProperty() {
-    ScriptEditorCell initial = createBlankCell(ruleProvider.getOperationNameRule());
     return properties.computeIfAbsent(
         "operationName",
         name -> {
+          ScriptEditorCell initial = createBlankCell(ruleProvider.getOperationNameRule());
           Property<ScriptEditorCell> p = new SimpleObjectProperty<>(this, name, initial);
           p.addListener(this::onOperationNameCellChanged);
           return p;
         });
   }
 
-  private String getOperationNameValue() {
-    return operationNameProperty().getValue().getValue();
-  }
-
   public Property<ScriptEditorCell> locatorTypeProperty() {
-    ScriptEditorCell initial =
-        createBlankCell(ruleProvider.getLocatorTypeRule(getOperationNameValue()));
-    return getProperty("locatorType", initial);
+    return getProperty(
+        "locatorType",
+        () -> createBlankCell(ruleProvider.getLocatorTypeRule(getOperationNameValue())));
   }
 
   public Property<ScriptEditorCell> locatorProperty() {
-    ScriptEditorCell initial =
-        createBlankCell(ruleProvider.getLocatorRule(getOperationNameValue()));
-    return getProperty("locator", initial);
+    return getProperty(
+        "locator", () -> createBlankCell(ruleProvider.getLocatorRule(getOperationNameValue())));
   }
 
   public Property<ScriptEditorCell> dataTypeProperty() {
-    ScriptEditorCell initial =
-        createBlankCell(ruleProvider.getDataTypeRule(getOperationNameValue()));
-    return getProperty("dataType", initial);
+    return getProperty(
+        "dataType", () -> createBlankCell(ruleProvider.getDataTypeRule(getOperationNameValue())));
   }
 
   public Property<ScriptEditorCell> screenshotTimingProperty() {
-    ScriptEditorCell initial = createBlankCell(ruleProvider.getScreenshotTimingRule());
-    return getProperty("screenshotTiming", initial);
+    return getProperty(
+        "screenshotTiming", () -> createBlankCell(ruleProvider.getScreenshotTimingRule()));
   }
 
   public Property<ScriptEditorCell> breakpointProperty() {
-    ScriptEditorCell initial = createBlankCell(ruleProvider.getBreakpointRule());
-    return getProperty("breakpoint", initial);
+    return getProperty("breakpoint", () -> createBlankCell(ruleProvider.getBreakpointRule()));
   }
 
   public Property<ScriptEditorCell> testDataProperty(String caseNo) {
-    ScriptEditorCell initial =
-        createBlankCell(ruleProvider.getTestDataRule(getOperationNameValue()));
-    return getProperty(TEST_DATA_PROP_PREFIX + caseNo, initial);
+    return getProperty(
+        TEST_DATA_PROP_PREFIX + caseNo,
+        () -> createBlankCell(ruleProvider.getTestDataRule(getOperationNameValue())));
+  }
+
+  private String getOperationNameValue() {
+    return operationNameProperty().getValue().getValue();
   }
 
   private ScriptEditorCell createBlankCell(InputRule rule) {
     return ScriptEditorCell.builder().inputRule(rule).value(rule.defalutValue()).build();
   }
 
-  private Property<ScriptEditorCell> getProperty(String name, ScriptEditorCell initial) {
-    return properties.computeIfAbsent(name, n -> new SimpleObjectProperty<>(this, n, initial));
+  private Property<ScriptEditorCell> getProperty(
+      String name, Supplier<ScriptEditorCell> initialValueFactory) {
+    return properties.computeIfAbsent(
+        name, n -> new SimpleObjectProperty<>(this, n, initialValueFactory.get()));
   }
 
   private void onOperationNameCellChanged(
