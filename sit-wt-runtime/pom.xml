@@ -187,7 +187,7 @@
   <properties>
     <spring.version>5.0.8.RELEASE</spring.version>
     <slf4j.version>1.7.21</slf4j.version>
-    <jackson.version>2.9.6</jackson.version>
+    <jackson.version>2.10.0</jackson.version>
     <checkstyle.skip>false</checkstyle.skip>
     <trimStackTrace>false</trimStackTrace>
     <sitwt.test.properties>${project.build.directory}/sit-wt-test.properties</sitwt.test.properties>
