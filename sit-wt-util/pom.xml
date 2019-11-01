@@ -87,6 +87,12 @@
       <version>${javafx.version}</version>
       <classifier>mac</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>4.0.1</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <parent>
     <groupId>io.sitoolkit.wt</groupId>

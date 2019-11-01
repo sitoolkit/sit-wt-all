@@ -3,12 +3,16 @@ package io.sitoolkit.wt.util.infra.process;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import org.awaitility.Awaitility;
 import org.junit.Test;
 import io.sitoolkit.wt.util.infra.util.SystemUtils;
 
 public class ConversationProcessTest {
+
+  Duration TIMEOUT = Duration.ofMillis(5000);
 
   @Test
   public void testStartAddCallBack() {
@@ -23,7 +27,8 @@ public class ConversationProcessTest {
     ConversationProcess process = ConversationProcessContainer.create();
     process.start(params);
 
-    assertThat(testListener.getLines().isEmpty(), is(true));
+    Awaitility.await().atMost(TIMEOUT).until(() -> !testListener.getLines().isEmpty());
+    assertLines(testListener.getLines());
   }
 
   @Test
@@ -37,7 +42,8 @@ public class ConversationProcessTest {
     ConversationProcess process = ConversationProcessContainer.create();
     process.start(params);
 
-    assertThat(testListener.getLines().isEmpty(), is(true));
+    Awaitility.await().atMost(TIMEOUT).until(() -> !testListener.getLines().isEmpty());
+    assertLines(testListener.getLines());
   }
 
   @Test
