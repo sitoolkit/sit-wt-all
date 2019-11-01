@@ -36,9 +36,14 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
 
   @Override
   public void cancelEdit() {
-    super.cancelEdit();
-    setText(getItemText());
-    setGraphic(null);
+    if (editingControl instanceof TextField && getTableView().getEditingCell() != null) {
+      TextField field = (TextField) editingControl;
+      commitEdit(field.getText());
+    } else {
+      super.cancelEdit();
+      setText(getItemText());
+      setGraphic(null);
+    }
   }
 
   @Override
@@ -96,7 +101,7 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
       choiceBox.setItems(FXCollections.observableList(getItem().getChoices()));
       setTextToControl(choiceBox, getItemText());
       return choiceBox;
-  
+
     } else {
       if (textField == null) {
         textField = createTextField();
@@ -146,12 +151,12 @@ public class ScriptEditorTableCell extends TableCell<ScriptEditorRow, ScriptEdit
     if (editControl instanceof TextField) {
       TextField field = (TextField) editControl;
       field.setText(text);
-  
+
     } else if (editControl instanceof ChoiceBox) {
       @SuppressWarnings("unchecked")
       ChoiceBox<String> choice = (ChoiceBox<String>) editControl;
       choice.getSelectionModel().select(text);
-  
+
     } else {
       throw new IllegalArgumentException("not supported control:" + editControl);
     }
