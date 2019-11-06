@@ -22,6 +22,8 @@ You can immediately try the included sample website and test script.
 1. Select **Sample** Menu > **Start** to start sample web site and get sample test script.
 1. Select **Test** Menu > **Run** / **Debug** to start test.
 
+**If JNI error dialog occurs, may be using older version Java.**  
+**Please confirm javaw.exe path in property of "Java(TM) Platform SE binary".**
 
 ### CLI
 
