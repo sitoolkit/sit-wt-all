@@ -7,6 +7,7 @@ Web Tester is an automatic test tool for web applications. Automatically operate
 * **Evidence** (screenshot and operation log) is **created automatically** for the screen operation executed.
 * Selenium and Appium are used for browser operation.
 
+**Notes: Running this application requires Java 11.**
 
 ## Quick Start
 
