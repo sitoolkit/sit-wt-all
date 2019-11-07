@@ -23,7 +23,7 @@ You can immediately try the included sample website and test script.
 1. Select **Test** Menu > **Run** / **Debug** to start test.
 
 **If JNI error dialog occurs, may be using older version Java.**  
-**Please confirm javaw.exe path in property of "Java(TM) Platform SE binary".**
+**Open properties of "sit-wt-app.jar", change "Opens with" to "javaw.exe" of Java 11.**
 
 ### CLI
 
