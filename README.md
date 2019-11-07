@@ -7,6 +7,7 @@ Web Tester is an automatic test tool for web applications. Automatically operate
 * **Evidence** (screenshot and operation log) is **created automatically** for the screen operation executed.
 * Selenium and Appium are used for browser operation.
 
+**Notes: Running this application requires Java 11.**
 
 ## Quick Start
 
@@ -21,6 +22,8 @@ You can immediately try the included sample website and test script.
 1. Select **Sample** Menu > **Start** to start sample web site and get sample test script.
 1. Select **Test** Menu > **Run** / **Debug** to start test.
 
+**If JNI error dialog occurs, may be using older version Java.**  
+**Open properties of "sit-wt-app.jar", change "Opens with" to "javaw.exe" of Java 11.**
 
 ### CLI
 
