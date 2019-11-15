@@ -16,7 +16,7 @@ Web Tester is an automatic test tool for web applications. Automatically operate
 Use GUI tools to create test projects and test scripts.
 You can immediately try the included sample website and test script.
 
-1. [Download](https://repo.maven.apache.org/maven2/io/sitoolkit/wt/sit-wt-app/3.0.0-beta.1/sit-wt-app-3.0.0-beta.1.jar) jar file.
+1. [Download](https://repo.maven.apache.org/maven2/io/sitoolkit/wt/sit-wt-app/3.0.0-beta.2/sit-wt-app-3.0.0-beta.2.jar) jar file.
 1. Execute it by double clicking.
 1. Select a directory to create your test project.
 1. Select **Sample** Menu > **Start** to start sample web site and get sample test script.
