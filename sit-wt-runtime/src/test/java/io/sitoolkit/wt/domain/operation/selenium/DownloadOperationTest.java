@@ -15,7 +15,6 @@ package io.sitoolkit.wt.domain.operation.selenium;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +32,7 @@ public class DownloadOperationTest extends TestBase {
   @Resource EvidenceManager em;
 
   @Test
-  public void test001() throws FileNotFoundException, IOException {
+  public void test001() throws IOException {
     test();
 
     Path pdfPath = Paths.get("src/main/resources/webapp/pdf/DownloadTest.pdf");
