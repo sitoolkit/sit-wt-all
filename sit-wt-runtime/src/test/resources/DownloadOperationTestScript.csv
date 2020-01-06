@@ -1,6 +1,4 @@
 ﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
 1,開始URL,open,,download.html,,,y
-2,参考資料,download,link,参考資料,,,y
-3,参考資料リンク,click,link,参考資料,,,y
-4,参考資料ページ ,switchWindow,,ref,,,y
-5,参考資料表示,download,,,,,y
+2,リンク先DL,download,link,参考資料,,,y
+3,表示ページDL,download,,,,,y

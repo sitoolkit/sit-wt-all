@@ -15,10 +15,11 @@ package io.sitoolkit.wt.domain.operation.selenium;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.annotation.Resource;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,31 +27,36 @@ import org.junit.Test;
 import io.sitoolkit.wt.domain.evidence.EvidenceManager;
 import io.sitoolkit.wt.domain.tester.TestBase;
 
-/**
- *
- * @author takuya.kumakura
- */
+/** @author takuya.kumakura */
 public class DownloadOperationTest extends TestBase {
 
-  @Resource
-  EvidenceManager em;
+  @Resource EvidenceManager em;
 
   @Test
   public void test001() throws FileNotFoundException, IOException {
     test();
 
-    File targetFile = new File("src/main/resources/webapp/pdf/DownloadTest.pdf");
-    String targetHash = DigestUtils.md5Hex(new FileInputStream(targetFile));
+    Path pdfPath = Paths.get("src/main/resources/webapp/pdf/DownloadTest.pdf");
+    String pdfHash = DigestUtils.md5Hex(Files.newInputStream(pdfPath));
+
+    Path htmlPath = Paths.get("src/main/resources/webapp/download.html");
+    String htmlHash = DigestUtils.md5Hex(Files.newInputStream(htmlPath));
 
     String testScriptName = StringUtils.substringAfterLast(getTestScriptPath(), "/");
     String caseNo = "001";
-    String baseFileName = targetFile.getName();
-    File firstEvidence = em.buildDownloadFile(testScriptName, caseNo, "2", "参考資料", baseFileName);
-    File secondEvidence = em.buildDownloadFile(testScriptName, caseNo, "5", "参考資料表示", baseFileName);
 
-    assertThat(DigestUtils.md5Hex(new FileInputStream(firstEvidence)), is(targetHash));
-    assertThat(DigestUtils.md5Hex(new FileInputStream(secondEvidence)), is(targetHash));
+    Path pdfEvidence =
+        em.buildDownloadFile(
+                testScriptName, caseNo, "2", "リンク先DL", pdfPath.getFileName().toString())
+            .toPath();
 
+    Path htmlEvidence =
+        em.buildDownloadFile(
+                testScriptName, caseNo, "3", "表示ページDL", htmlPath.getFileName().toString())
+            .toPath();
+
+    assertThat(DigestUtils.md5Hex(Files.newInputStream(pdfEvidence)), is(pdfHash));
+    assertThat(DigestUtils.md5Hex(Files.newInputStream(htmlEvidence)), is(htmlHash));
   }
 
   @Override
@@ -62,5 +68,4 @@ public class DownloadOperationTest extends TestBase {
   protected String getSheetName() {
     return "TestScript";
   }
-
 }
