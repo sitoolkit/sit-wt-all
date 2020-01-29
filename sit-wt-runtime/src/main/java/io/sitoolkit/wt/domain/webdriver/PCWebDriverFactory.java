@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Dimension;
@@ -45,8 +46,9 @@ public class PCWebDriverFactory {
 
   private String defaultDriverType = DEFAULT_DRIVER_TYPE;
 
-  public RemoteWebDriver createPCDriver(PropertyManager pm, WebDriverCloser closer,
-      FirefoxManager firefoxManager) throws MalformedURLException {
+  public RemoteWebDriver createPCDriver(
+      PropertyManager pm, WebDriverCloser closer, FirefoxManager firefoxManager)
+      throws MalformedURLException {
 
     String driverType = StringUtils.defaultString(pm.getDriverType());
     DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -60,11 +62,15 @@ public class PCWebDriverFactory {
     LOG.info("webdriver.start", driverType, capabilities);
 
     RemoteWebDriver webDriver = selectWebDriver(driverType, pm, firefoxManager, capabilities);
+    if (Objects.isNull(webDriver)) return null;
 
     webDriver.manage().timeouts().implicitlyWait(pm.getImplicitlyWait(), TimeUnit.MILLISECONDS);
 
-    webDriver.manage().window().setPosition(
-        new Point(pm.getWindowLeft() + windowShiftLeft, pm.getWindowTop() + windowShiftTop));
+    webDriver
+        .manage()
+        .window()
+        .setPosition(
+            new Point(pm.getWindowLeft() + windowShiftLeft, pm.getWindowTop() + windowShiftTop));
     windowShiftTop += pm.getWindowShiftTop();
     windowShiftLeft += pm.getWindowShiftLeft();
 
@@ -78,8 +84,11 @@ public class PCWebDriverFactory {
     return webDriver;
   }
 
-  private RemoteWebDriver selectWebDriver(String driverType, PropertyManager pm,
-      FirefoxManager firefoxManager, DesiredCapabilities capabilities)
+  private RemoteWebDriver selectWebDriver(
+      String driverType,
+      PropertyManager pm,
+      FirefoxManager firefoxManager,
+      DesiredCapabilities capabilities)
       throws MalformedURLException {
 
     if (StringUtils.isNotEmpty(driverType)) {
@@ -97,13 +106,15 @@ public class PCWebDriverFactory {
     return selectWebDriver2(defaultDriverType, pm, firefoxManager, capabilities);
   }
 
-  private RemoteWebDriver selectWebDriver2(String driverType, PropertyManager pm,
-      FirefoxManager firefoxManager, DesiredCapabilities capabilities)
+  private RemoteWebDriver selectWebDriver2(
+      String driverType,
+      PropertyManager pm,
+      FirefoxManager firefoxManager,
+      DesiredCapabilities capabilities)
       throws MalformedURLException {
 
     switch (driverType) {
-
-      case "chrome":
+      case DEFAULT_DRIVER_TYPE:
         WebDriverManager.chromedriver().setup();
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("credentials_enable_service", false);
@@ -119,7 +130,7 @@ public class PCWebDriverFactory {
 
       case "ie":
       case "internet explorer":
-        WebDriverManager.iedriver().setup();
+        WebDriverManager.iedriver().arch32().setup();
         InternetExplorerOptions ieOptions = new InternetExplorerOptions(capabilities);
         return new InternetExplorerDriver(ieOptions);
 
@@ -145,7 +156,7 @@ public class PCWebDriverFactory {
         LOG.info("webdriver.remote", pm.getHubUrl());
         return new RemoteWebDriver(new URL(pm.getHubUrl()), capabilities);
 
-      case "firefox":
+      case SECOND_DEFAULT_DRIVER_TYPE:
       case "ff":
         WebDriverManager.firefoxdriver().setup();
         return firefoxManager.startWebDriver(capabilities, pm.getBrowserArguments());
@@ -156,5 +167,4 @@ public class PCWebDriverFactory {
 
     return null;
   }
-
 }
