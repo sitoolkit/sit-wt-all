@@ -8,9 +8,14 @@ import io.sitoolkit.wt.gui.domain.update.VersionCheckedCallback;
 
 public class UpdateService {
 
-  UpdateProcessClient client = new UpdateProcessClient();
+  UpdateProcessClient client;
 
-  public UpdateService() {}
+  String projectBase;
+
+  public UpdateService(String projectBase) {
+    this.projectBase = projectBase;
+    this.client = new UpdateProcessClient(projectBase);
+  }
 
   public void checkSitWtAppUpdate(File pomFile, VersionCheckedCallback callback) {
 

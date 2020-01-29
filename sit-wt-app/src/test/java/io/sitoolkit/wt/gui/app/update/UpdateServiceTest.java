@@ -22,7 +22,7 @@ import io.sitoolkit.wt.gui.testutil.ThreadUtils;
 
 public class UpdateServiceTest {
 
-  UpdateService service = new UpdateService();
+  UpdateService service = new UpdateService(".");
 
   private volatile boolean tested = false;
 
@@ -33,18 +33,21 @@ public class UpdateServiceTest {
   }
 
   @Test
-  public void testCheckAppUpdate() throws URISyntaxException, InterruptedException,
-      ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+  public void testCheckAppUpdate()
+      throws URISyntaxException, InterruptedException, ParserConfigurationException, SAXException,
+          IOException, XPathExpressionException {
 
     String pom = "pom.xml";
 
     File pomFile = new File(getClass().getResource(pom).toURI());
     String currentVersion = getVersion(pom);
 
-    service.checkSitWtAppUpdate(pomFile, newVersion -> {
-      assertThat("newVersion", VersionUtils.isNewer(currentVersion, newVersion), is(true));
-      tested = true;
-    });
+    service.checkSitWtAppUpdate(
+        pomFile,
+        newVersion -> {
+          assertThat("newVersion", VersionUtils.isNewer(currentVersion, newVersion), is(true));
+          tested = true;
+        });
 
     ThreadUtils.waitFor(() -> tested);
   }
@@ -52,11 +55,14 @@ public class UpdateServiceTest {
   @Test
   public void testDownload() {
 
-    service.downloadSitWtApp(new File("target"), "3.0.0-alpha.1", downloadedFile -> {
-      downloadedFile.deleteOnExit();
-      assertThat("file downloaded", downloadedFile.exists(), is(true));
-      tested = true;
-    });
+    service.downloadSitWtApp(
+        new File("target"),
+        "3.0.0-alpha.1",
+        downloadedFile -> {
+          downloadedFile.deleteOnExit();
+          assertThat("file downloaded", downloadedFile.exists(), is(true));
+          tested = true;
+        });
 
     ThreadUtils.waitFor(() -> tested);
   }
@@ -74,5 +80,4 @@ public class UpdateServiceTest {
       return xpath.evaluate("/project/parent/version", document);
     }
   }
-
 }

@@ -36,56 +36,39 @@ import javafx.stage.DirectoryChooser;
 
 public class AppController implements Initializable {
 
-  @FXML
-  private HBox projectGroup;
+  @FXML private HBox projectGroup;
 
-  @FXML
-  private ToolBar genScriptGroup;
+  @FXML private ToolBar genScriptGroup;
 
-  @FXML
-  private ToolBar browsingGroup;
+  @FXML private ToolBar browsingGroup;
 
-  @FXML
-  private TextArea console;
+  @FXML private TextArea console;
 
-  @FXML
-  private Label exportButton;
+  @FXML private Label exportButton;
 
-  @FXML
-  private Label toggleButton;
+  @FXML private Label toggleButton;
 
-  @FXML
-  private Label openButton;
+  @FXML private Label openButton;
 
-  @FXML
-  private Label saveButton;
+  @FXML private Label saveButton;
 
-  @FXML
-  private Label saveAsButton;
+  @FXML private Label saveAsButton;
 
-  @FXML
-  private SampleToolbarController sampleToolbarController;
+  @FXML private SampleToolbarController sampleToolbarController;
 
-  @FXML
-  private FileTreeController fileTreeController;
+  @FXML private FileTreeController fileTreeController;
 
-  @FXML
-  private TestToolbarController testToolbarController;
+  @FXML private TestToolbarController testToolbarController;
 
-  @FXML
-  private DiffEvidenceToolbarController diffEvidenceToolbarController;
+  @FXML private DiffEvidenceToolbarController diffEvidenceToolbarController;
 
-  @FXML
-  private MenuItem sampleRunMenu;
+  @FXML private MenuItem sampleRunMenu;
 
-  @FXML
-  private MenuItem sampleStopMenu;
+  @FXML private MenuItem sampleStopMenu;
 
-  @FXML
-  private TabPane editorTab;
+  @FXML private TabPane editorTab;
 
-  @FXML
-  private MenuBarController menuBarController;
+  @FXML private MenuBarController menuBarController;
 
   private MessageView messageView = new MessageView();
 
@@ -93,7 +76,7 @@ public class AppController implements Initializable {
 
   private ProjectState projectState = new ProjectState();
 
-  UpdateController updateController = new UpdateController();
+  UpdateController updateController;
 
   EditorTabController editorTabController = new EditorTabController();
 
@@ -103,8 +86,7 @@ public class AppController implements Initializable {
 
   ProjectService projectService = new ProjectService();
 
-  @Resource
-  ScriptService scriptService;
+  @Resource ScriptService scriptService;
 
   // private double stageHeight;
   //
@@ -132,13 +114,20 @@ public class AppController implements Initializable {
     // FxUtils.bindVisible(minimizeButton, windowMaximized);
 
     messageView.setTextArea(console);
-    StdoutListenerContainer.getInstance().getStdoutListeners()
+    StdoutListenerContainer.getInstance()
+        .getStdoutListeners()
         .add(new TextAreaStdoutListener(console));
-    StdoutListenerContainer.getInstance().getStderrListeners()
+    StdoutListenerContainer.getInstance()
+        .getStderrListeners()
         .add(new TextAreaStdoutListener(console));
 
-    testToolbarController.initialize(messageView, fileTreeController, projectState,
-        editorTabController, editorTabController, editorTabController);
+    testToolbarController.initialize(
+        messageView,
+        fileTreeController,
+        projectState,
+        editorTabController,
+        editorTabController,
+        editorTabController);
     testToolbarController.testService = testService;
     sampleToolbarController.initialize(messageView, testToolbarController, projectState);
     diffEvidenceToolbarController.initialize(messageView, fileTreeController, projectState);
@@ -175,7 +164,6 @@ public class AppController implements Initializable {
     testToolbarController.destroy();
     fileTreeController.destroy();
     sampleToolbarController.destroy();
-
   }
 
   @FXML
@@ -198,7 +186,7 @@ public class AppController implements Initializable {
       alert.setContentText(projectDir.getAbsolutePath() + "にプロジェクトを作成しますか？");
 
       Optional<ButtonType> answer = alert.showAndWait();
-      if (answer.get() == ButtonType.OK) {
+      if (answer.orElse(null) == ButtonType.OK) {
         pomFile = projectService.createProject(projectDir, projectState);
         loadProject(pomFile);
       }
@@ -206,15 +194,14 @@ public class AppController implements Initializable {
     } else {
 
       loadProject(pomFile);
-
     }
 
+    updateController = new UpdateController(projectDir.getAbsolutePath());
     if (!Boolean.getBoolean("skipUpdate")) {
       ExecutorContainer.get().execute(() -> updateController.checkAndInstall());
     }
 
     System.setProperty("sitwt.projectDirectory", projectDir.getAbsolutePath());
-
   }
 
   private void loadProject(File pomFile) {
@@ -247,8 +234,8 @@ public class AppController implements Initializable {
 
     projectState.setState(State.BROWSING);
 
-    scriptService.page2script(testToolbarController.getDriverType(),
-        testToolbarController.getBaseUrl());
+    scriptService.page2script(
+        testToolbarController.getDriverType(), testToolbarController.getBaseUrl());
   }
 
   @FXML
@@ -263,7 +250,6 @@ public class AppController implements Initializable {
     messageView.addMsg("Selenium IDEで記録したテストスクリプトをhtml形式でtestscriptディレクトリに保存してください。");
 
     scriptService.ope2script(testToolbarController.getBaseUrl());
-
   }
 
   @FXML

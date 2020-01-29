@@ -30,7 +30,7 @@ public class ProjectService {
     }
 
     createPom(pomFile, projectState);
-    unpackResources(pomFile, projectDir);
+    unpackResources(projectDir);
 
     return pomFile;
   }
@@ -79,7 +79,7 @@ public class ProjectService {
     projectState.init(pomFile);
   }
 
-  private void unpackResources(File pomFile, File projectDir) {
+  private void unpackResources(File projectDir) {
 
     Path siteXml = Paths.get(projectDir.getAbsolutePath(), "src/site/site.xml");
     FileIOUtils.sysRes2file("site.xml", siteXml);
