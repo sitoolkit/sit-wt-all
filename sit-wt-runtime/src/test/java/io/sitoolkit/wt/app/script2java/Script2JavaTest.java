@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import io.sitoolkit.wt.app.config.ExtConfig;
 import io.sitoolkit.wt.domain.testclass.TestClass;
@@ -22,7 +21,9 @@ public class Script2JavaTest {
     assertThat("スクリプトパス", actual.getScriptPath(), is("testscript/a/b/c/ABCTestScript.csv"));
     assertThat("テストクラス物理名", actual.getFileBase(), is("ABCTestScriptIT"));
     assertThat("テストクラスファイル拡張子", actual.getFileExt(), is("java"));
-    assertThat("テストクラス出力ディレクトリ", actual.getOutDir(),
+    assertThat(
+        "テストクラス出力ディレクトリ",
+        actual.getOutDir(),
         is(FilenameUtils.separatorsToSystem("target/generated-test-sources/test/a/b/c/")));
     assertThat("テストクラスパッケージ名", actual.getPkg(), is("a.b.c"));
   }
@@ -34,7 +35,9 @@ public class Script2JavaTest {
     assertThat("スクリプトパス", actual.getScriptPath(), is("src/test/resources/テスト-スクリプト(サンプル).csv"));
     assertThat("テストクラス物理名", actual.getFileBase(), is("テスト_スクリプト_サンプル_IT"));
     assertThat("テストクラスファイル拡張子", actual.getFileExt(), is("java"));
-    assertThat("テストクラス出力ディレクトリ", actual.getOutDir(),
+    assertThat(
+        "テストクラス出力ディレクトリ",
+        actual.getOutDir(),
         is(FilenameUtils.separatorsToSystem("target/generated-test-sources/test/")));
     assertNull("テストクラスパッケージ名", actual.getPkg());
     assertThat("テストケース数", actual.getCaseNos().size(), is(8));
@@ -74,19 +77,20 @@ public class Script2JavaTest {
   }
 
   private TestClass loadScript(String testscript, String scriptDir) {
-    ApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(Script2JavaConfig.class, ExtConfig.class);
-    Script2Java gen = appCtx.getBean(Script2Java.class);
+    try (AnnotationConfigApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(Script2JavaConfig.class, ExtConfig.class)) {
+      Script2Java gen = appCtx.getBean(Script2Java.class);
 
-    TestClass actual = new TestClass();
-    gen.load(actual, new File(".", testscript), scriptDir);
+      TestClass actual = new TestClass();
+      gen.load(actual, new File(".", testscript), scriptDir, new File("."));
 
-    File scriptFile = new File(testscript);
-    if (scriptFile.exists()) {
-      TestScript testScript = gen.getDao().load(testscript, actual.getSheetName(), true);
-      actual.getCaseNos().addAll(testScript.getCaseNoMap().keySet());
+      File scriptFile = new File(testscript);
+      if (scriptFile.exists()) {
+        TestScript testScript = gen.getDao().load(testscript, actual.getSheetName(), true);
+        actual.getCaseNos().addAll(testScript.getCaseNoMap().keySet());
+      }
+
+      return actual;
     }
-
-    return actual;
   }
 }
