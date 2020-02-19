@@ -31,11 +31,15 @@ public class EvidenceReportEditor {
   private static final String REPORT_RESOURCE_PATH = "target/site";
 
   private static final String ADDITIONAL_SCRIPT_TAGS =
-      "    <script src=\"../js/jquery.js\"></script>\n" + "    <script src=\"" + SCRIPT_DIR
-          + SCRIPT_BASENAME + "." + SCRIPT_EXTENTION + "\"></script>\n";
+      "    <script src=\"../js/jquery.js\"></script>\n"
+          + "    <script src=\""
+          + SCRIPT_DIR
+          + SCRIPT_BASENAME
+          + "."
+          + SCRIPT_EXTENTION
+          + "\"></script>\n";
 
-  @Resource
-  private MergedFileGenerator mergedFileGenerator;
+  @Resource private MergedFileGenerator mergedFileGenerator;
 
   public static void main(String[] args) {
     staticExecute(EvidenceDir.getLatest());
@@ -49,21 +53,32 @@ public class EvidenceReportEditor {
     }
   }
 
+  public static void staticExecute(EvidenceDir evidenceDir, String resourceDir) {
+    try (AnnotationConfigApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(EvidenceReportEditorConfig.class)) {
+
+      appCtx.getBean(EvidenceReportEditor.class).edit(evidenceDir, resourceDir);
+    }
+  }
+
   public void edit(EvidenceDir evidenceDir) {
+    edit(evidenceDir, REPORT_RESOURCE_PATH);
+  }
+
+  public void edit(EvidenceDir evidenceDir, String resourceDir) {
 
     if (!evidenceDir.exists()) {
       LOG.error("evidence.error");
       return;
     }
 
-    if (!EvidenceDir.existsReport(REPORT_RESOURCE_PATH)) {
+    if (!EvidenceDir.existsReport(resourceDir)) {
       LOG.error("report.error");
       return;
     }
 
     try {
-      FileUtils.copyDirectory(new File(REPORT_RESOURCE_PATH), evidenceDir.getReportDir().toFile(),
-          false);
+      FileUtils.copyDirectory(new File(resourceDir), evidenceDir.getReportDir().toFile(), false);
     } catch (IOException e) {
       LOG.error("resource.copy.error", e);
       return;
@@ -72,7 +87,6 @@ public class EvidenceReportEditor {
     generateReportScript(evidenceDir);
 
     addTags(evidenceDir);
-
   }
 
   private void generateReportScript(EvidenceDir evidenceDir) {
@@ -80,8 +94,8 @@ public class EvidenceReportEditor {
     Map<String, String> properties = MessageManager.getResourceAsMap();
 
     Path destDir = evidenceDir.getReportDir().resolve(SCRIPT_DIR);
-    mergedFileGenerator.generate(resourceBase, destDir, SCRIPT_BASENAME, SCRIPT_EXTENTION,
-        properties);
+    mergedFileGenerator.generate(
+        resourceBase, destDir, SCRIPT_BASENAME, SCRIPT_EXTENTION, properties);
   }
 
   private void addTags(EvidenceDir evidenceDir) {
@@ -107,7 +121,6 @@ public class EvidenceReportEditor {
         if (trimmed.equals("<head>")) {
           sb.append(ADDITIONAL_SCRIPT_TAGS);
         }
-
       }
 
       FileUtils.writeStringToFile(failsafeReport.toFile(), sb.toString(), StandardCharsets.UTF_8);
@@ -115,7 +128,6 @@ public class EvidenceReportEditor {
     } catch (IOException e) {
       LOG.error("add.tags.error", e);
     }
-
   }
 
   private String buildInputTags(EvidenceDir evidenceDir) {
@@ -137,14 +149,19 @@ public class EvidenceReportEditor {
     sb.append(buildAttribute("data-name", testMethodFullName));
 
     sb.append(buildAttribute("data-evidence", relativizePath(evidenceDir, evidenceFile)));
-    sb.append(buildAttribute("data-mask",
-        fetchPath(evidenceDir, evidenceDir.getMaskEvidence(evidenceName))));
-    sb.append(buildAttribute("data-comp",
-        fetchPath(evidenceDir, evidenceDir.getCompareEvidence(evidenceName))));
-    sb.append(buildAttribute("data-compmask",
-        fetchPath(evidenceDir, evidenceDir.getCompareMaskEvidence(evidenceName))));
-    sb.append(buildAttribute("data-compng",
-        fetchPath(evidenceDir, evidenceDir.getCompareNgEvidence(evidenceName))));
+    sb.append(
+        buildAttribute(
+            "data-mask", fetchPath(evidenceDir, evidenceDir.getMaskEvidence(evidenceName))));
+    sb.append(
+        buildAttribute(
+            "data-comp", fetchPath(evidenceDir, evidenceDir.getCompareEvidence(evidenceName))));
+    sb.append(
+        buildAttribute(
+            "data-compmask",
+            fetchPath(evidenceDir, evidenceDir.getCompareMaskEvidence(evidenceName))));
+    sb.append(
+        buildAttribute(
+            "data-compng", fetchPath(evidenceDir, evidenceDir.getCompareNgEvidence(evidenceName))));
 
     return StringUtils.join("<input class='evidence' type='hidden' ", sb.toString(), "/>\n");
   }
@@ -160,5 +177,4 @@ public class EvidenceReportEditor {
   private String relativizePath(EvidenceDir evidenceDir, Path target) {
     return evidenceDir.getReportDir().relativize(target).toString();
   }
-
 }

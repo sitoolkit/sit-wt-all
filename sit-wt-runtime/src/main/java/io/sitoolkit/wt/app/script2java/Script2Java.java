@@ -19,7 +19,6 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -37,8 +36,7 @@ import io.sitoolkit.wt.infra.template.TemplateEngine;
  * このクラスは、テストスクリプトを実行するためのJUnitテストクラスを生成します。 mainメソッドを実行すると、テストスクリプトディレクトリ以下の全テストスクリプトを読込み、
  * 対応するJUnitテストクラスのjavaファイルをテストソースディレクトリ以下に出力します。 これらのファイル、ディレクトリの位置関係を以下に示します。
  *
- * <pre>
- * {@code
+ * <pre>{@code
  * project_root
  *   testscript                           <- テストスクリプトディレクトリ
  *     a/b/c
@@ -46,9 +44,7 @@ import io.sitoolkit.wt.infra.template.TemplateEngine;
  *   target/generated-test-sources/test   <- テストソースディレクトリ
  *     a/b/c
  *       ABCTestScriptTest.java           <- JUnitテストクラス
- * }
- * </pre>
- *
+ * }</pre>
  *
  * @author yuichi.kuwahara
  */
@@ -60,14 +56,12 @@ public class Script2Java implements ApplicationContextAware {
 
   private static final String DEFAULT_TEST_SRC_DIR = "target/generated-test-sources/test/";
 
-  /**
-   * テストソースディレクトリのパス
-   */
+  private static final File DEFAULT_PROJECT_DIR = new File(".");
+
+  /** テストソースディレクトリのパス */
   private String testSrcDir = DEFAULT_TEST_SRC_DIR;
 
-  /**
-   * テストスクリプトディレクトリのパス
-   */
+  /** テストスクリプトディレクトリのパス */
   private String testScriptDirs = "testscript,target/testscript";
 
   private ApplicationContext appCtx;
@@ -78,22 +72,22 @@ public class Script2Java implements ApplicationContextAware {
 
   private TemplateEngine templateEngine;
 
-  /**
-   * キー：テストスクリプトのファイルパス、値：ファイルの更新日時
-   */
+  /** キー：テストスクリプトのファイルパス、値：ファイルの更新日時 */
   private Properties timestampLog = new Properties();
 
   public static void main(String[] args) {
-    System.exit(staticExecute(DEFAULT_TEST_SRC_DIR, System.getProperty("file.encoding")));
+    System.exit(staticExecute(DEFAULT_TEST_SRC_DIR, DEFAULT_PROJECT_DIR));
   }
 
-  public static int staticExecute(String testSrcDir, String testScriptCsvEncoding) {
-    ApplicationContext appCtx =
-        new AnnotationConfigApplicationContext(Script2JavaConfig.class, ExtConfig.class);
-    Script2Java script2java = appCtx.getBean(Script2Java.class);
-    script2java.setTestSrcDir(testSrcDir);
+  public static int staticExecute(String testSrcDir, File basedir) {
+    try (AnnotationConfigApplicationContext appCtx =
+        new AnnotationConfigApplicationContext(Script2JavaConfig.class, ExtConfig.class)) {
 
-    return script2java.execute();
+      Script2Java script2java = appCtx.getBean(Script2Java.class);
+      script2java.setTestSrcDir(testSrcDir);
+
+      return script2java.execute(basedir);
+    }
   }
 
   /**
@@ -103,25 +97,27 @@ public class Script2Java implements ApplicationContextAware {
    * @return 0 (固定)
    * @see #generate(File, String)
    */
-  public int execute() {
+  public int execute(File basedir) {
+    log.info("msg", basedir.toString());
+
     loadTimestampFile();
 
     String scriptPathes = System.getProperty(SYSPROP_TESTS_SCRIPT_PATH);
     if (StringUtils.isNotEmpty(scriptPathes)) {
       for (String path : scriptPathes.split(",")) {
-        generate(new File(path), ".");
+        generate(new File(path), ".", basedir);
       }
 
     } else {
       for (String testScriptDir : testScriptDirs.split(",")) {
-        File testScriptDirF = new File(testScriptDir);
+        File testScriptDirF = new File(basedir, testScriptDir);
         if (!testScriptDirF.exists()) {
           continue;
         }
 
         log.info("test.script", testScriptDirF.getAbsolutePath());
         for (File scriptFile : FileUtils.listFiles(testScriptDirF, new String[] {"csv"}, true)) {
-          generate(scriptFile, testScriptDir);
+          generate(scriptFile, testScriptDirF.getAbsolutePath(), basedir);
         }
       }
     }
@@ -136,7 +132,7 @@ public class Script2Java implements ApplicationContextAware {
    * @param scriptFile テストスクリプト
    * @param testScriptDir
    */
-  public void generate(File scriptFile, String testScriptDir) {
+  public void generate(File scriptFile, String testScriptDir, File basedir) {
 
     if (scriptFile.getName().startsWith("~$")) {
       log.debug("system.file.exclusion", scriptFile.getAbsolutePath());
@@ -155,7 +151,7 @@ public class Script2Java implements ApplicationContextAware {
     log.info("script.load", scriptFile.getAbsolutePath());
 
     TestClass testClass = appCtx.getBean(TestClass.class);
-    load(testClass, scriptFile, testScriptDir);
+    load(testClass, scriptFile, testScriptDir, basedir);
 
     TestScript testScript = dao.load(scriptFile, testClass.getSheetName(), true);
     testClass.getCaseNos().addAll(testScript.getCaseNoMap().keySet());
@@ -167,33 +163,29 @@ public class Script2Java implements ApplicationContextAware {
    * テストスクリプトに対応するテストクラスインスタンスを作成します。
    *
    * <dl>
-   * <dt>スクリプトパス
-   * <dd>スクリプトファイルのプロジェクトルートからの相対パス
-   *
-   * <dt>テストクラスの物理名
-   * <dd>スクリプトファイルの基底名を1文字目を大文字化し末尾に"Test"を付与
-   *
-   * <dt>パッケージパス
-   * <dd>スクリプトファイルのテストスクリプトルートからの相対パス
-   *
-   *
+   *   <dt>スクリプトパス
+   *   <dd>スクリプトファイルのプロジェクトルートからの相対パス
+   *   <dt>テストクラスの物理名
+   *   <dd>スクリプトファイルの基底名を1文字目を大文字化し末尾に"Test"を付与
+   *   <dt>パッケージパス
+   *   <dd>スクリプトファイルのテストスクリプトルートからの相対パス
    * </dl>
-   *
    *
    * @param scriptFile スクリプトファイル
    * @param testScriptDir
    * @return スクリプトファイルに対応するテストクラス
    */
-  void load(TestClass testClass, File scriptFile, String testScriptDir) {
+  void load(TestClass testClass, File scriptFile, String testScriptDir, File basedir) {
 
     // スクリプトパスの設定
-    testClass.setScriptPath(SitPathUtils.relatvePath(new File("."), scriptFile));
+    testClass.setScriptPath(SitPathUtils.relatvePath(basedir, scriptFile));
 
     // テストクラスの物理名の設定
     testClass.setFileBase(TestClassNameConverter.script2Class(testClass.getScriptPath()));
 
     // パッケージパス
-    String scriptPathFromPkg = SitPathUtils.relatvePath(testScriptDir, testClass.getScriptPath());
+    String scriptPathFromPkg =
+        SitPathUtils.relatvePath(testScriptDir, scriptFile.getAbsolutePath());
     String pkgPath = FilenameUtils.getPath(scriptPathFromPkg);
 
     // テストクラスの出力ディレクトリの設定
@@ -209,9 +201,7 @@ public class Script2Java implements ApplicationContextAware {
     }
   }
 
-  /**
-   * タイムスタンプファイルをロードし、タイムスタンプログに保持します。
-   */
+  /** タイムスタンプファイルをロードし、タイムスタンプログに保持します。 */
   private void loadTimestampFile() {
     File timestampFile = new File(testSrcDir, timestampFileName);
     if (timestampFile.exists()) {
@@ -258,7 +248,7 @@ public class Script2Java implements ApplicationContextAware {
   }
 
   @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+  public void setApplicationContext(ApplicationContext applicationContext) {
     this.appCtx = applicationContext;
   }
 
@@ -269,5 +259,4 @@ public class Script2Java implements ApplicationContextAware {
   public void setTemplateEngine(TemplateEngine templateEngine) {
     this.templateEngine = templateEngine;
   }
-
 }
