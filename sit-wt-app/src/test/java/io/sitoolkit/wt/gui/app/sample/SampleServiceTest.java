@@ -77,8 +77,6 @@ public class SampleServiceTest {
             MavenProject.load(projectDir)
                 .mvnw(
                     "verify",
-                    "-P",
-                    "parallel",
                     "-DbaseUrl=http://localhost:8280",
                     "-Ddriver.type=chrome",
                     "-Dheadless=" + headless)
