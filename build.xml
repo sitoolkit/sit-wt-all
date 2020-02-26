@@ -65,6 +65,7 @@
       <arg value="-Dfile.encoding=${file.encoding}" />
       <arg value="-Dmaven.test.skip=false" />
       <arg value="-Ddriver.type=${driver.type}" />
+      <arg value="-Dheadless=true" />
     </exec>
 
   </target>
