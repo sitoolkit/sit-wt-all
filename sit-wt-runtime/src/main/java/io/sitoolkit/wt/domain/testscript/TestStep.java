@@ -22,57 +22,33 @@ import org.apache.commons.lang3.StringUtils;
 import io.sitoolkit.wt.domain.operation.Operation;
 import io.sitoolkit.wt.infra.ELSupport;
 
-/**
- *
- * @author yuichi.kuwahara
- */
+/** @author yuichi.kuwahara */
 public class TestStep {
 
-  @Resource
-  ELSupport el;
-  /**
-   * ステップNo
-   */
+  @Resource ELSupport el;
+  /** ステップNo */
   private String no;
-  /**
-   * 項目名
-   */
+  /** 項目名 */
   private String itemName;
-  /**
-   * 操作
-   */
+  /** 操作 */
   private Operation operation;
-  /**
-   * 操作名
-   */
+  /** 操作名 */
   private String operationName;
-  /**
-   * 操作対象の項目を特定するロケーター
-   */
-  @Resource
-  private Locator locator;
-  /**
-   * スクリーンショットを撮るタイミング
-   */
+  /** 操作対象の項目を特定するロケーター */
+  @Resource private Locator locator;
+  /** スクリーンショットを撮るタイミング */
   private ScreenshotTiming screenshotTiming = ScreenshotTiming.NONE;
-  /**
-   * テストデータの形式
-   */
+  /** テストデータの形式 */
   private String dataType;
-  /**
-   * 操作対象の項目に適用するテストデータ
-   */
+  /** 操作対象の項目に適用するテストデータ */
   private Map<String, String> testData = new HashMap<>();
+
   private String currentCaseNo;
 
-  /**
-   * ダイアログのスクリーンショットを取得するケース番号
-   */
-  private Set<String> dialogScreenshotCaseNoSet = new HashSet<String>();
+  /** ダイアログのスクリーンショットを取得するケース番号 */
+  private Set<String> dialogScreenshotCaseNoSet = new HashSet<>();
 
-  /**
-   * ブレークポイント
-   */
+  /** ブレークポイント */
   private String breakPoint;
 
   public String getNo() {
@@ -214,7 +190,7 @@ public class TestStep {
   /**
    * 実行中ケースでは当該操作を行わないことを表します。 テスト値が空の場合にtrueとなります。
    *
-   * @return
+   * @return スキップ要否
    */
   public boolean isSkip() {
     return StringUtils.isBlank(getValue());

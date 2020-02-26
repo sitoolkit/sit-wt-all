@@ -9,10 +9,7 @@ public class TestCase {
 
   private String caseNo;
 
-  /**
-   * デフォルトコンストラクタ
-   *
-   */
+  /** デフォルトコンストラクタ */
   public TestCase() {
     this.scriptPath = "";
     this.sheetName = "TestScript";
@@ -36,6 +33,7 @@ public class TestCase {
    * テスト条件の一括指定
    *
    * @param testCondition テストケース文字列(scriptPath!sheetName#caseNo)
+   * @return テストケース
    */
   public static TestCase parse(String testCondition) {
     String scriptPath = "";

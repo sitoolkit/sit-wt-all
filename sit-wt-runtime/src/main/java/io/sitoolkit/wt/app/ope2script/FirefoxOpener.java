@@ -1,17 +1,16 @@
 package io.sitoolkit.wt.app.ope2script;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import io.sitoolkit.wt.domain.guidance.GuidanceUtils;
 import io.sitoolkit.wt.infra.MultiThreadUtils;
 import io.sitoolkit.wt.infra.firefox.FirefoxManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
-import io.sitoolkit.wt.infra.selenium.WebDriverInstaller;
 
 public class FirefoxOpener {
 
@@ -21,8 +20,13 @@ public class FirefoxOpener {
 
   private String guidanceFile = "guidance/guidance-ope2script.html";
 
-  private String[] guidanceResources = new String[] {guidanceFile, "guidance/css/bootstrap.min.css",
-      "guidance/css/style.css", "guidance/js/open.js"};
+  private String[] guidanceResources =
+      new String[] {
+        guidanceFile,
+        "guidance/css/bootstrap.min.css",
+        "guidance/css/style.css",
+        "guidance/js/open.js"
+      };
 
   private String baseUrl;
 
@@ -36,11 +40,15 @@ public class FirefoxOpener {
   }
 
   /**
+   *
+   *
    * <ul>
-   * <li>Firefoxがインストールされていない場合、インストールする
-   * <li>Selenium IDEがインストールされていない場合、インストールする
-   * <li>Firefoxを起動する
+   *   <li>Firefoxがインストールされていない場合、インストールする
+   *   <li>Selenium IDEがインストールされていない場合、インストールする
+   *   <li>Firefoxを起動する
    * </ul>
+   *
+   * @return 0:成功/1:失敗
    */
   public int open() {
     try {

@@ -30,22 +30,16 @@ import io.sitoolkit.wt.infra.PropertyManager;
 import io.sitoolkit.wt.infra.log.SitLogger;
 import io.sitoolkit.wt.infra.log.SitLoggerFactory;
 
-/**
- *
- * @author yuichi.kuwahara
- */
+/** @author yuichi.kuwahara */
 public abstract class SeleniumOperation implements Operation {
 
-  @Resource
-  PropertyManager pm;
+  @Resource PropertyManager pm;
 
   protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
-  @Resource
-  protected WebDriver seleniumDriver;
+  @Resource protected WebDriver seleniumDriver;
 
-  @Resource
-  ElementPositionSupport2 position;
+  @Resource ElementPositionSupport2 position;
 
   @Override
   public OperationResult operate(TestStep testStep) {
@@ -102,7 +96,9 @@ public abstract class SeleniumOperation implements Operation {
    * WebElementのチェック状態を設定します。
    *
    * @param checkElement WebElement
+   * @param clickElement クリック対象WebElement
    * @param checked チェック状態
+   * @return チェック実行要否
    */
   protected boolean setChecked(WebElement checkElement, WebElement clickElement, boolean checked) {
     log.debug("check.element", checkElement, clickElement, checked);

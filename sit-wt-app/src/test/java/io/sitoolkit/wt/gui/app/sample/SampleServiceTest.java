@@ -33,8 +33,7 @@ public class SampleServiceTest {
 
   ProjectService projectService = new ProjectService();
 
-  @Resource
-  SampleService sampleService;
+  @Resource SampleService sampleService;
 
   Path projectDir = Paths.get("target/sampletest").toAbsolutePath();
 
@@ -56,8 +55,7 @@ public class SampleServiceTest {
 
   public class SampleProjectTester {
 
-    @Getter
-    private Integer exitCode;
+    @Getter private Integer exitCode;
 
     public synchronized boolean finished() {
       return exitCode != null;
@@ -68,34 +66,48 @@ public class SampleServiceTest {
       insertParentRelativePath(pom);
       sampleService.create(projectDir);
 
-      ProcessExitCallback exitCallback = (exitCode) -> {
-        this.exitCode = exitCode;
-      };
+      ProcessExitCallback exitCallback =
+          (exitCode) -> {
+            this.exitCode = exitCode;
+          };
 
-      SampleStartedCallback sampleStartedCallback = (success) -> {
-        MavenProject.load(projectDir)
-            .mvnw("verify", "-P", "parallel", "-DbaseUrl=http://localhost:8280")
-            .stdout(line -> log.debug(line)).exitCallback(exitCallback).execute();
-      };
+      String headless = (Boolean.valueOf(System.getProperty("headless"))) ? "true" : "false";
+      SampleStartedCallback sampleStartedCallback =
+          (success) -> {
+            MavenProject.load(projectDir)
+                .mvnw(
+                    "verify",
+                    "-P",
+                    "parallel",
+                    "-DbaseUrl=http://localhost:8280",
+                    "-Ddriver.type=chrome",
+                    "-Dheadless=" + headless)
+                .stdout(line -> log.debug(line))
+                .exitCallback(exitCallback)
+                .execute();
+          };
 
       sampleService.start(8280, projectDir, sampleStartedCallback);
-
     }
   }
 
   static void insertParentRelativePath(Path pom) {
     try {
-      List<String> edittedLines = Files.readAllLines(pom).stream().map(line -> {
-        if (StringUtils.contains(line, "</parent>")) {
-          return "<relativePath>../../../sit-wt-project/pom.xml</relativePath>" + line;
-        }
-        return line;
-      }).collect(Collectors.toList());
+      List<String> edittedLines =
+          Files.readAllLines(pom)
+              .stream()
+              .map(
+                  line -> {
+                    if (StringUtils.contains(line, "</parent>")) {
+                      return "<relativePath>../../../sit-wt-project/pom.xml</relativePath>" + line;
+                    }
+                    return line;
+                  })
+              .collect(Collectors.toList());
 
       Files.write(pom, edittedLines);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
   }
-
 }

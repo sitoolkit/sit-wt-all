@@ -94,8 +94,9 @@ public class Script2Java implements ApplicationContextAware {
    * テストクラスの生成処理を実行します。 システムプロパティ{@code testsScriptPath}が指定されていた場合は、
    * そこで指定されたテストスクリプトに対しテストクラスを生成します。 指定されていない場合はテストスクリプトディレクトリ以下の テストスクリプトに対しテストクラスを生成します。
    *
+   * @param basedir プロジェクトルート
    * @return 0 (固定)
-   * @see #generate(File, String)
+   * @see #generate(File, String, File)
    */
   public int execute(File basedir) {
     log.info("msg", basedir.toString());
@@ -130,7 +131,8 @@ public class Script2Java implements ApplicationContextAware {
    * テストスクリプトからテストクラスを生成します。 テストスクリプトのファイル名が"~$"で始まる場合は生成処理を行いません。
    *
    * @param scriptFile テストスクリプト
-   * @param testScriptDir
+   * @param testScriptDir テストスクリプトディレクトリ
+   * @param basedir プロジェクトルート
    */
   public void generate(File scriptFile, String testScriptDir, File basedir) {
 
