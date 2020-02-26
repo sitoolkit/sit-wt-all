@@ -47,48 +47,32 @@ public class Tester {
 
   protected final SitLogger log = SitLoggerFactory.getLogger(getClass());
 
-  @Resource
-  TestContext current;
-  @Resource
-  DebugSupport debug;
+  @Resource TestContext current;
+  @Resource DebugSupport debug;
 
-  @Resource
-  DialogScreenshotSupport dialog;
+  @Resource DialogScreenshotSupport dialog;
 
-  @Resource
-  EvidenceManager em;
+  @Resource EvidenceManager em;
 
-  @Resource
-  ScreenshotTaker screenshotTaker;
+  @Resource ScreenshotTaker screenshotTaker;
 
-  @Resource
-  TestScriptDao dao;
+  @Resource TestScriptDao dao;
 
-  @Resource
-  TestScriptCatalog catalog;
+  @Resource TestScriptCatalog catalog;
 
-  @Resource
-  PropertyManager pm;
+  @Resource PropertyManager pm;
 
-  @Resource
-  OperationSupport operationSupport;
+  @Resource OperationSupport operationSupport;
 
-  // /**
-  // * スクリーンショット操作
-  // */
-  // private ScreenshotOperation screenshotOpe;
-  /**
-   * テストスクリプトがロード済の場合にtrue
-   */
+  /** テストスクリプトがロード済の場合にtrue */
   private boolean scriptLoaded = false;
+
   private TestScript testScript;
 
   public void setUp(String caseNo) {
     current.reset();
     current.setCaseNo(caseNo);
     current.setScriptName(testScript.getName());
-
-    // opelog.beginScript();
   }
 
   public void prepare(String scriptPath, String sheetName, String caseNo) {
@@ -103,6 +87,7 @@ public class Tester {
    * テストスクリプトファイルを読み込み内部に保持します。
    *
    * @param testScriptPath テストスクリプトのパス
+   * @param sheetName シート名
    */
   public void setUpClass(String testScriptPath, String sheetName) {
     if (!isScriptLoaded()) {
@@ -115,7 +100,6 @@ public class Tester {
         TestStep lastStep = testScript.getLastStep();
         lastStep.setBreakPoint("y");
       }
-
     }
   }
 
@@ -134,8 +118,9 @@ public class Tester {
     if (StringUtils.isEmpty(caseNo)) {
       caseNo = testScript.getCaseNoMap().keySet().iterator().next();
     } else if (!testScript.containsCaseNo(caseNo)) {
-      String msg = MessageManager.getMessage("case.number.error", caseNo)
-          + testScript.getCaseNoMap().keySet();
+      String msg =
+          MessageManager.getMessage("case.number.error", caseNo)
+              + testScript.getCaseNoMap().keySet();
       throw new TestException(msg);
     }
 
@@ -144,7 +129,7 @@ public class Tester {
     dialog.checkReserve(testScript.getTestStepList(), caseNo);
     log.info("case.execute", caseNo);
 
-    List<Exception> ngList = new ArrayList<Exception>();
+    List<Exception> ngList = new ArrayList<>();
     TestResult result = new TestResult();
 
     Evidence evidence = em.createEvidence(current.getScriptName(), caseNo);
@@ -163,8 +148,9 @@ public class Tester {
         } catch (VerifyException e) {
           ngList.add(e);
           result.add(e);
-          evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
-              "unexpected.result", e.getLocalizedMessage()));
+          evidence.addLogRecord(
+              LogRecord.create(
+                  log, LogLevelVo.ERROR, testStep, "unexpected.result", e.getLocalizedMessage()));
           if (!operationSupport.isDbVerify(testStep.getOperation())) {
             addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
           }
@@ -177,8 +163,9 @@ public class Tester {
 
           if (pm.isDebug()) {
             ngList.add(e);
-            evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep,
-                "unexpected.error2", e.getLocalizedMessage()));
+            evidence.addLogRecord(
+                LogRecord.create(
+                    log, LogLevelVo.ERROR, testStep, "unexpected.error2", e.getLocalizedMessage()));
             log.debug("exception", e);
             if (!operationSupport.isDbVerify(testStep.getOperation())) {
               addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
@@ -187,14 +174,14 @@ public class Tester {
           } else {
             throw e;
           }
-
         }
 
       } while (debug.next());
 
     } catch (Exception e) {
-      evidence.addLogRecord(LogRecord.create(log, LogLevelVo.ERROR, testStep, "unexpected.error2",
-          e.getLocalizedMessage()));
+      evidence.addLogRecord(
+          LogRecord.create(
+              log, LogLevelVo.ERROR, testStep, "unexpected.error2", e.getLocalizedMessage()));
       log.debug("exception", e);
       if (!operationSupport.isDbVerify(testStep.getOperation())) {
         addScreenshot(evidence, ScreenshotTiming.ON_ERROR);
@@ -243,6 +230,7 @@ public class Tester {
       Thread.sleep(pm.getOperationWait());
     } catch (InterruptedException e) {
       log.warn("thread.sleep.error", e);
+      Thread.currentThread().interrupt();
     }
   }
 
@@ -259,5 +247,4 @@ public class Tester {
   public TestScript getTestScript() {
     return testScript;
   }
-
 }

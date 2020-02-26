@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -39,38 +38,41 @@ public class EvidenceManager implements ApplicationContextAware {
 
   private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceManager.class);
 
-  /**
-   * エビデンスのVelocityテンプレート
-   */
+  /** エビデンスのVelocityテンプレート */
   private String templatePath = "/evidence/evidence-template.vm";
 
-  /**
-   * エビデンスの表示に関連する資源
-   */
+  /** エビデンスの表示に関連する資源 */
   private String[] evidenceResources =
-      new String[] {"css/bootstrap.min.css", "css/style.css", "css/jquery-ui.min.css",
-          "js/jquery.js", "js/numbering.js", "js/image.js", "js/jquery-ui.min.js"};
+      new String[] {
+        "css/bootstrap.min.css",
+        "css/style.css",
+        "css/jquery-ui.min.css",
+        "js/jquery.js",
+        "js/numbering.js",
+        "js/image.js",
+        "js/jquery-ui.min.js"
+      };
 
-  /**
-   * エビデンスの出力先ディレクトリ
-   */
+  /** エビデンスの出力先ディレクトリ */
   private File evidenceDir;
-  /**
-   * スクリーンショットの出力先ディレクトリ
-   */
+  /** スクリーンショットの出力先ディレクトリ */
   private File imgDir;
+
   private String logFilePath = "target/sit-wt.log";
   private Template tmpl;
   private ApplicationContext appCtx;
   private File downloadDir;
 
-  @Resource
-  PropertyManager pm;
+  @Resource PropertyManager pm;
 
   @PostConstruct
   public void init() {
-    evidenceDir = new File(pm.getProjectDir(), EvidenceDir.getRoot() + "/evidence_"
-        + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+    evidenceDir =
+        new File(
+            pm.getProjectDir(),
+            EvidenceDir.getRoot()
+                + "/evidence_"
+                + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
     evidenceDir.mkdirs();
     if (evidenceDir.exists()) {
       LOG.info("evidence.mkdirs", evidenceDir.getAbsolutePath());
@@ -133,8 +135,12 @@ public class EvidenceManager implements ApplicationContextAware {
     }
 
     String screenshotFileName =
-        EvidenceNameConverter.buildScreenshotFileName(evidence.getScriptName(),
-            evidence.getCaseNo(), testStepNo, itemName, screenshot.getTiming().name());
+        EvidenceNameConverter.buildScreenshotFileName(
+            evidence.getScriptName(),
+            evidence.getCaseNo(),
+            testStepNo,
+            itemName,
+            screenshot.getTiming().name());
     File dstFile = new File(imgDir, screenshotFileName);
 
     try {
@@ -152,19 +158,21 @@ public class EvidenceManager implements ApplicationContextAware {
     } catch (IOException e) {
       LOG.warn("screenshot.set.error", e);
     }
-
   }
 
   /**
    * エビデンスをファイルに書き出します。
    *
    * @param evidence エビデンス
+   * @return エビデンスパス
    */
   public Path flushEvidence(Evidence evidence) {
     String html = build(evidence);
 
-    File htmlFile = new File(evidenceDir,
-        EvidenceNameConverter.caseNo2evidence(evidence.getScriptName(), evidence.getCaseNo()));
+    File htmlFile =
+        new File(
+            evidenceDir,
+            EvidenceNameConverter.caseNo2evidence(evidence.getScriptName(), evidence.getCaseNo()));
 
     if (htmlFile.exists()) {
       htmlFile =
@@ -201,6 +209,7 @@ public class EvidenceManager implements ApplicationContextAware {
         screenshotRezeFuture.get(3, TimeUnit.SECONDS);
       } catch (InterruptedException | ExecutionException | TimeoutException e) {
         LOG.warn("screenshot.resize.wait.error", e);
+        Thread.currentThread().interrupt();
       }
     }
 
@@ -222,12 +231,12 @@ public class EvidenceManager implements ApplicationContextAware {
   }
 
   @Override
-  public void setApplicationContext(ApplicationContext arg0) throws BeansException {
+  public void setApplicationContext(ApplicationContext arg0) {
     appCtx = arg0;
   }
 
-  public File buildDownloadFile(String scriptName, String caseNo, String testStepNo,
-      String itemName, String baseFilename) {
+  public File buildDownloadFile(
+      String scriptName, String caseNo, String testStepNo, String itemName, String baseFilename) {
 
     if (!downloadDir.exists()) {
       downloadDir.mkdirs();
@@ -236,11 +245,16 @@ public class EvidenceManager implements ApplicationContextAware {
       }
     }
 
-    String fileName = StrUtils.sanitizeMetaCharacter(
-        StringUtils.join(new String[] {scriptName, caseNo, testStepNo, itemName,}, "_")) + "_"
-        + baseFilename;
+    String fileName =
+        StrUtils.sanitizeMetaCharacter(
+                StringUtils.join(
+                    new String[] {
+                      scriptName, caseNo, testStepNo, itemName,
+                    },
+                    "_"))
+            + "_"
+            + baseFilename;
 
     return new File(downloadDir, fileName);
   }
-
 }

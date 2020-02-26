@@ -14,18 +14,17 @@
 package io.sitoolkit.wt.infra;
 
 import org.apache.commons.lang3.StringUtils;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-/**
- *
- * @author yuichi.kuwahara
- */
+/** @author yuichi.kuwahara */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegexHelper {
 
   /**
-   * 
-   * @param regex
-   * @param value
-   * @return
+   * @param regex pattern
+   * @param value check string
+   * @return result
    */
   public static boolean matches(String regex, String value) {
     String regexpStr = StringUtils.substringAfter(regex, "regexp:");
