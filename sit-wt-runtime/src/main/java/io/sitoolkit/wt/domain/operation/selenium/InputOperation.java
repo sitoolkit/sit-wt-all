@@ -15,6 +15,7 @@ package io.sitoolkit.wt.domain.operation.selenium;
 
 import java.io.File;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Component;
 import io.sitoolkit.wt.domain.evidence.MessagePattern;
@@ -56,7 +57,7 @@ public class InputOperation extends SeleniumOperation {
       } else {
         ctx.info(element, MessagePattern.項目にXXをYYします, value,
             MessageManager.getMessage("input.overwite"));
-        element.clear();
+        element.sendKeys(Keys.CONTROL, "a");
       }
 
       input(element, value);
