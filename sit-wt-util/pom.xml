@@ -17,6 +17,11 @@
       <version>2.5</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.20</version>
+    </dependency>
+    <dependency>
       <groupId>io.takari</groupId>
       <artifactId>maven-wrapper</artifactId>
       <version>0.3.0</version>

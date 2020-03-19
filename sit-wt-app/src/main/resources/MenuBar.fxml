@@ -40,6 +40,7 @@
     <Menu text="%createTestScript">
       <items>
         <MenuItem text="%recordBrowserOperation" fx:id="ope2scriptMenu" onAction="#ope2script"/>
+        <MenuItem text="%quitOperating" fx:id="quitOperatingMenu" onAction="#quitOperating"/>
         <MenuItem text="%generateFromPage" fx:id="page2scriptMenu" onAction="#page2script"/>
         <MenuItem text="%exportScript" fx:id="exportMenu" onAction="#export"/>
         <MenuItem text="%quitBrowser" fx:id="quitBrowsingMenu" onAction="#quitBrowsing"/>

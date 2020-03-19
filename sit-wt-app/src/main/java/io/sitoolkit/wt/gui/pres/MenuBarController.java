@@ -13,80 +13,57 @@ import lombok.Setter;
 
 public class MenuBarController implements Initializable {
 
-  @FXML
-  MenuItem saveMenu;
+  @FXML MenuItem saveMenu;
 
-  @FXML
-  MenuItem saveAsMenu;
+  @FXML MenuItem saveAsMenu;
 
-  @FXML
-  MenuItem runMenu;
+  @FXML MenuItem runMenu;
 
-  @FXML
-  MenuItem debugMenu;
+  @FXML MenuItem debugMenu;
 
-  @FXML
-  MenuItem runParallelMenu;
+  @FXML MenuItem runParallelMenu;
 
-  @FXML
-  MenuItem quitMenu;
+  @FXML MenuItem quitMenu;
 
-  @FXML
-  MenuItem pauseMenu;
+  @FXML MenuItem pauseMenu;
 
-  @FXML
-  MenuItem restartMenu;
+  @FXML MenuItem restartMenu;
 
-  @FXML
-  MenuItem backMenu;
+  @FXML MenuItem backMenu;
 
-  @FXML
-  MenuItem forwardMenu;
+  @FXML MenuItem forwardMenu;
 
-  @FXML
-  MenuItem maskEvidenceMenu;
+  @FXML MenuItem maskEvidenceMenu;
 
-  @FXML
-  MenuItem setBaseEvidenceMenu;
+  @FXML MenuItem setBaseEvidenceMenu;
 
-  @FXML
-  MenuItem genDiffEvidenceMenu;
+  @FXML MenuItem genDiffEvidenceMenu;
 
-  @FXML
-  MenuItem ope2scriptMenu;
+  @FXML MenuItem ope2scriptMenu;
 
-  @FXML
-  MenuItem page2scriptMenu;
+  @FXML MenuItem quitOperatingMenu;
 
-  @FXML
-  MenuItem exportMenu;
+  @FXML MenuItem page2scriptMenu;
 
-  @FXML
-  MenuItem quitBrowsingMenu;
+  @FXML MenuItem exportMenu;
 
-  @FXML
-  MenuItem runSampleMenu;
+  @FXML MenuItem quitBrowsingMenu;
 
-  @FXML
-  MenuItem stopSampleMenu;
+  @FXML MenuItem runSampleMenu;
 
-  @Setter
-  AppController appController;
+  @FXML MenuItem stopSampleMenu;
 
-  @Setter
-  private EditorTabController editorTabController;
+  @Setter AppController appController;
 
-  @Setter
-  TestToolbarController testToolbarController;
+  @Setter private EditorTabController editorTabController;
 
-  @Setter
-  DiffEvidenceToolbarController diffEvidenceToolbarController;
+  @Setter TestToolbarController testToolbarController;
 
-  @Setter
-  SampleToolbarController sampleToolbarController;
+  @Setter DiffEvidenceToolbarController diffEvidenceToolbarController;
 
-  @Setter
-  ProjectState projectState;
+  @Setter SampleToolbarController sampleToolbarController;
+
+  @Setter ProjectState projectState;
 
   private ScriptDialog scriptDialog = new ScriptDialog();
 
@@ -103,9 +80,11 @@ public class MenuBarController implements Initializable {
 
     quitMenu.visibleProperty().bind(projectState.isRunning());
 
-    pauseMenu.visibleProperty()
+    pauseMenu
+        .visibleProperty()
         .bind(projectState.isDebugging().and(testToolbarController.getPausing().not()));
-    restartMenu.visibleProperty()
+    restartMenu
+        .visibleProperty()
         .bind(projectState.isDebugging().and(testToolbarController.getPausing()));
     backMenu.visibleProperty().bind(projectState.isDebugging());
     forwardMenu.visibleProperty().bind(projectState.isDebugging());
@@ -120,9 +99,13 @@ public class MenuBarController implements Initializable {
     exportMenu.visibleProperty().bind(projectState.isBrowsing());
     quitBrowsingMenu.visibleProperty().bind(projectState.isBrowsing());
 
-    runSampleMenu.visibleProperty()
+    quitOperatingMenu.visibleProperty().bind(projectState.isOperating());
+
+    runSampleMenu
+        .visibleProperty()
         .bind(sampleToolbarController.getRunning().not().and(projectState.isLoaded()));
-    stopSampleMenu.visibleProperty()
+    stopSampleMenu
+        .visibleProperty()
         .bind(sampleToolbarController.getRunning().and(projectState.isLoaded()));
   }
 
@@ -210,6 +193,11 @@ public class MenuBarController implements Initializable {
   @FXML
   public void ope2script() {
     appController.ope2script();
+  }
+
+  @FXML
+  public void quitOperating() {
+    appController.quitOperating();
   }
 
   @FXML
