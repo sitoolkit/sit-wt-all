@@ -7,21 +7,22 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  *
+ *
  * <dl>
- * <dt>初期化前
- * <dd>pom.xmlをロードしていない状態
- * <dt>初期化済
- * <dd>pom.xmlをロードした状態
- * <dt>実行中
- * <dd>テストを実行中
- * <dt>デバッグ中
- * <dd>テストをデバッグ中
- * <dt>ブラウザ実行中
- * <dd>page2scriptでブラウザを実行中
+ *   <dt>初期化前
+ *   <dd>pom.xmlをロードしていない状態
+ *   <dt>初期化済
+ *   <dd>pom.xmlをロードした状態
+ *   <dt>実行中
+ *   <dd>テストを実行中
+ *   <dt>デバッグ中
+ *   <dd>テストをデバッグ中
+ *   <dt>ブラウザ実行中
+ *   <dd>page2scriptでブラウザを実行中
+ *   <dd>ope2scriptでブラウザを実行中
  * </dl>
  *
  * @author yuichi_kuwahara
- *
  */
 public class ProjectState {
 
@@ -39,8 +40,16 @@ public class ProjectState {
 
   private BooleanProperty locking = new SimpleBooleanProperty();
 
+  private BooleanProperty operating = new SimpleBooleanProperty();
+
   public enum State {
-    NOT_LOADED, LOADED, RUNNING, DEBUGGING, BROWSING, LOCKING
+    NOT_LOADED,
+    LOADED,
+    RUNNING,
+    DEBUGGING,
+    BROWSING,
+    LOCKING,
+    OPERATING
   }
 
   public void setState(State state) {
@@ -49,6 +58,7 @@ public class ProjectState {
     browsing.set(state == State.BROWSING);
     debugging.set(state == State.DEBUGGING);
     locking.set(state == State.LOCKING);
+    operating.set(state == State.OPERATING);
   }
 
   public BooleanProperty isRunning() {
@@ -69,6 +79,10 @@ public class ProjectState {
 
   public BooleanProperty isLocking() {
     return locking;
+  }
+
+  public BooleanProperty isOperating() {
+    return operating;
   }
 
   public void init(File pomFile) {

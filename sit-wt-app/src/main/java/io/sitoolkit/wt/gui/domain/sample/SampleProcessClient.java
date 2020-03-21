@@ -9,12 +9,9 @@ public class SampleProcessClient {
 
   private SitHttpServer server;
 
-  public SampleProcessClient() {
-  }
-
   /**
    * Start HTTP server.
-   * 
+   *
    * @param port HTTP server port
    * @param sampleDir SIT-WT sample contents directory
    * @param callback Callback function
@@ -37,7 +34,10 @@ public class SampleProcessClient {
    * @param callback Callback function
    */
   public void stop(ProcessExitCallback callback) {
-    server.stopNow();
+    if (server != null) {
+      server.stopNow();
+    }
+
     if (callback != null) {
       callback.callback(0);
     }

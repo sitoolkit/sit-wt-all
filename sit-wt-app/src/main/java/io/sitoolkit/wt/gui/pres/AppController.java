@@ -42,6 +42,8 @@ public class AppController implements Initializable {
 
   @FXML private ToolBar browsingGroup;
 
+  @FXML private ToolBar operatingGroup;
+
   @FXML private TextArea console;
 
   @FXML private Label exportButton;
@@ -109,6 +111,7 @@ public class AppController implements Initializable {
     FxUtils.bindVisible(projectGroup, projectState.isLocking().not());
     FxUtils.bindVisible(genScriptGroup, projectState.isLoaded());
     FxUtils.bindVisible(browsingGroup, projectState.isBrowsing());
+    FxUtils.bindVisible(operatingGroup, projectState.isOperating());
 
     // FxUtils.bindVisible(maximizeButton, windowMaximized.not());
     // FxUtils.bindVisible(minimizeButton, windowMaximized);
@@ -246,10 +249,17 @@ public class AppController implements Initializable {
 
   @FXML
   public void ope2script() {
-    messageView.startMsg("ブラウザ操作の記録はFirefoxとSelenium IDE Pluginを使用します。");
+    messageView.startMsg("ブラウザ操作の記録はChromiumとSelenium IDE Pluginを使用します。");
     messageView.addMsg("Selenium IDEで記録したテストスクリプトをhtml形式でtestscriptディレクトリに保存してください。");
 
+    projectState.setState(State.OPERATING);
     scriptService.ope2script(testToolbarController.getBaseUrl());
+  }
+
+  @FXML
+  public void quitOperating() {
+    scriptService.quitOperating();
+    projectState.reset();
   }
 
   @FXML

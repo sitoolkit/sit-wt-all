@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import io.sitoolkit.wt.app.config.ExtConfig;
-import io.sitoolkit.wt.app.ope2script.FirefoxOpener;
+import io.sitoolkit.wt.app.ope2script.ChromiumOpener;
 import io.sitoolkit.wt.app.page2script.Page2Script;
 import io.sitoolkit.wt.app.page2script.Page2ScriptConfig;
 import io.sitoolkit.wt.app.test.TestCaseReader;
@@ -26,26 +26,21 @@ public class ScriptService {
 
   CaseNoCache cache = new CaseNoCache();
 
-  @Resource
-  TestScriptDao dao;
+  @Resource TestScriptDao dao;
 
-  @Resource
-  io.sitoolkit.wt.infra.PropertyManager runtimePm;
+  @Resource io.sitoolkit.wt.infra.PropertyManager runtimePm;
 
   Page2Script page2script;
 
-  FirefoxOpener firefoxOpener = new FirefoxOpener();
+  ChromiumOpener chromiumOpener = new ChromiumOpener();
 
   ConfigurableApplicationContext pageCtx;
 
-  @Resource
-  TestCaseReader testCaseReader;
+  @Resource TestCaseReader testCaseReader;
 
   OperationConverter operationConverter = new OperationConverter();
 
-  @Resource
-  TestScriptGenerator testScriptGenerator;
-
+  @Resource TestScriptGenerator testScriptGenerator;
 
   public void loadProject() {
     PropertyManager pm = PropertyManager.get();
@@ -54,15 +49,13 @@ public class ScriptService {
   }
 
   public TestScript read(File file) {
-    while (!initialized()) {
-
-    }
+    while (!initialized()) {}
     return dao.load(file, "TestScript", false);
   }
 
   public void write(TestScript testScript) {
-    dao.write(testScript.getScriptFile(), testScript.getTestStepList(), testScript.getHeaders(),
-        true);
+    dao.write(
+        testScript.getScriptFile(), testScript.getTestStepList(), testScript.getHeaders(), true);
   }
 
   private synchronized boolean initialized() {
@@ -77,9 +70,11 @@ public class ScriptService {
   }
 
   public void ope2script(String baseUrl) {
-    ExecutorContainer.get().execute(() -> {
-      firefoxOpener.open(baseUrl);
-    });
+    ExecutorContainer.get().execute(() -> chromiumOpener.open(baseUrl));
+  }
+
+  public void quitOperating() {
+    chromiumOpener.close();
   }
 
   public List<String> readCaseNo(File testScript) {
@@ -107,12 +102,13 @@ public class ScriptService {
   private <T> T doWithScriptFileType(Optional<ScriptFileType> scriptFileType, Supplier<T> s) {
     Charset charset = runtimePm.getCsvCharset();
     boolean hasBom = runtimePm.isCsvHasBOM();
-    scriptFileType.ifPresent(ft -> {
-      if (ft.isTextFile()) {
-        runtimePm.setCsvCharset(ft.getCharset());
-        runtimePm.setCsvHasBOM(ft.isHasBom());
-      }
-    });
+    scriptFileType.ifPresent(
+        ft -> {
+          if (ft.isTextFile()) {
+            runtimePm.setCsvCharset(ft.getCharset());
+            runtimePm.setCsvHasBOM(ft.isHasBom());
+          }
+        });
     T result = s.get();
     runtimePm.setCsvCharset(charset);
     runtimePm.setCsvHasBOM(hasBom);
@@ -120,10 +116,12 @@ public class ScriptService {
   }
 
   private void doWithScriptFileType(Optional<ScriptFileType> scriptFileType, Runnable r) {
-    doWithScriptFileType(scriptFileType, () -> {
-      r.run();
-      return null;
-    });
+    doWithScriptFileType(
+        scriptFileType,
+        () -> {
+          r.run();
+          return null;
+        });
   }
 
   public Path export() {
@@ -138,5 +136,4 @@ public class ScriptService {
   public void generateNewScript(Path destFile) {
     testScriptGenerator.generateNewScript(destFile);
   }
-
 }

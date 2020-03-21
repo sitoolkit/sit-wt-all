@@ -87,6 +87,12 @@
             <Label onMouseClicked="#quitBrowsing" styleClass="image-btn,quit-btn" />
           </items>
         </ToolBar>
+        <ToolBar fx:id="operatingGroup">
+          <items>
+            <Separator orientation="VERTICAL" />
+            <Label onMouseClicked="#quitOperating" styleClass="image-btn,quit-btn" />
+          </items>
+        </ToolBar>
         <fx:include fx:id="sampleToolbar" source="SampleToolbar.fxml" />
         <ToolBar>
           <items>
