@@ -1,6 +1,10 @@
 /site/
-/target/
+target
 pom.xml.versionsBackup
 /sit-wt-test/
+.classpath
+.factorypath
+.project
 .idea
 *.iml
+.settings
