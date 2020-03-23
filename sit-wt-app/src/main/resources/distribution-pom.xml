@@ -11,7 +11,10 @@
   <parent>
     <groupId>io.sitoolkit.wt</groupId>
     <artifactId>sit-wt-project</artifactId>
-    <version>3.0.0-beta.3-SNAPSHOT</version>
+    <version>${sitwt.version}</version>
   </parent>
-  
+
+  <properties>
+    <sitwt.version>3.0.0-beta.3-SNAPSHOT</sitwt.version>
+  </properties>
 </project>
