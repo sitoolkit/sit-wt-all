@@ -57,7 +57,7 @@ public class InputOperation extends SeleniumOperation {
       } else {
         ctx.info(element, MessagePattern.項目にXXをYYします, value,
             MessageManager.getMessage("input.overwite"));
-        element.sendKeys(Keys.CONTROL, "a");
+        element.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
       }
 
       input(element, value);
