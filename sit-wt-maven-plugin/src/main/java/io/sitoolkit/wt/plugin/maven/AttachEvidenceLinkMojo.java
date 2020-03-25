@@ -1,6 +1,5 @@
 package io.sitoolkit.wt.plugin.maven;
 
-import java.nio.file.Paths;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,7 +29,6 @@ public class AttachEvidenceLinkMojo extends AbstractMojo {
       return;
     }
 
-    EvidenceReportEditor.staticExecute(
-        targetDir, Paths.get(project.getBasedir().getAbsolutePath(), "target/site").toString());
+    EvidenceReportEditor.staticExecute(targetDir, project.getBasedir().getAbsolutePath());
   }
 }

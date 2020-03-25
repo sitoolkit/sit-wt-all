@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.apache.commons.io.FileUtils;
@@ -20,6 +21,8 @@ public class EvidenceReportEditor {
 
   private static final SitLogger LOG = SitLoggerFactory.getLogger(EvidenceReportEditor.class);
 
+  private static final String PROJECT_DIR = ".";
+
   private static final String EVIDENCE_RESOURCE_DIR = "evidence/";
 
   private static final String SCRIPT_DIR = "js/";
@@ -29,6 +32,8 @@ public class EvidenceReportEditor {
   private static final String SCRIPT_EXTENTION = "js";
 
   private static final String REPORT_RESOURCE_PATH = "target/site";
+
+  private static final String PROCESSED_EVIDENCE = "target/processed_evidence";
 
   private static final String ADDITIONAL_SCRIPT_TAGS =
       "    <script src=\"../js/jquery.js\"></script>\n"
@@ -53,19 +58,21 @@ public class EvidenceReportEditor {
     }
   }
 
-  public static void staticExecute(EvidenceDir evidenceDir, String resourceDir) {
+  public static void staticExecute(EvidenceDir evidenceDir, String projectDir) {
     try (AnnotationConfigApplicationContext appCtx =
         new AnnotationConfigApplicationContext(EvidenceReportEditorConfig.class)) {
 
-      appCtx.getBean(EvidenceReportEditor.class).edit(evidenceDir, resourceDir);
+      appCtx.getBean(EvidenceReportEditor.class).edit(evidenceDir, projectDir);
     }
   }
 
   public void edit(EvidenceDir evidenceDir) {
-    edit(evidenceDir, REPORT_RESOURCE_PATH);
+    edit(evidenceDir, PROJECT_DIR);
   }
 
-  public void edit(EvidenceDir evidenceDir, String resourceDir) {
+  public void edit(EvidenceDir evidenceDir, String projectDir) {
+
+    String resourceDir = Paths.get(projectDir, REPORT_RESOURCE_PATH).toString();
 
     if (!evidenceDir.exists()) {
       LOG.error("evidence.error");
@@ -87,6 +94,17 @@ public class EvidenceReportEditor {
     generateReportScript(evidenceDir);
 
     addTags(evidenceDir);
+
+    copyEvidenceToTargetDir(evidenceDir, Paths.get(projectDir, PROCESSED_EVIDENCE));
+  }
+
+  private void copyEvidenceToTargetDir(EvidenceDir evidenceDir, Path targetDir) {
+    try {
+      FileUtils.copyDirectory(evidenceDir.getDir(), targetDir.toFile());
+
+    } catch (IOException e) {
+      LOG.error("resource.copy.error", e);
+    }
   }
 
   private void generateReportScript(EvidenceDir evidenceDir) {
