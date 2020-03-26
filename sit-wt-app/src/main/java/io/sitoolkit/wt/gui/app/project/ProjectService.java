@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
+
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenUtils;
 import io.sitoolkit.wt.gui.domain.project.ProjectState;
@@ -92,5 +93,10 @@ public class ProjectService {
         Paths.get(projectDir.getAbsolutePath(), "src/main/resources/capabilities.properties");
     FileIOUtils.sysRes2file("capabilities.properties", capabilitiesProperties);
 
+    Path winAppJarCommand = Paths.get(projectDir.getAbsolutePath(), "sit-wt-app.cmd");
+    FileIOUtils.sysRes2file("sit-wt-app.cmd", winAppJarCommand);
+
+    Path macAppJarCommand = Paths.get(projectDir.getAbsolutePath(), "sit-wt-app");
+    FileIOUtils.sysRes2file("sit-wt-app.sh", macAppJarCommand);
   }
 }

@@ -13,4 +13,68 @@
     <artifactId>sit-wt-project</artifactId>
     <version>3.0.0-beta.3-SNAPSHOT</version>
   </parent>
+
+  <profiles>
+    <profile>
+      <id>app-jar-download</id>
+      <dependencies>
+        <dependency>
+          <groupId>io.sitoolkit.wt</groupId>
+          <artifactId>sit-wt-app</artifactId>
+          <version>${project.parent.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>os-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <exec_app>cmd</exec_app>
+        <exec_args>/c</exec_args>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>os-mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <exec_app>sh</exec_app>
+        <exec_args>-c</exec_args>
+      </properties>
+    </profile>
+  </profiles>
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>${exec_app}</executable>
+          <arguments>
+            <argument>${exec_args}</argument>
+            <argument>echo VERSION=${project.parent.version}> ${env_file}</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
