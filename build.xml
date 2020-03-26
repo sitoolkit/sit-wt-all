@@ -104,8 +104,8 @@
     <property name="version" value="3.0.0-beta.3-SNAPSHOT" />
 
     <replaceregexp file="${distribution.pom}"
-                   match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
-                   replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
+                   match="sit-wt-project&lt;/artifactId&gt;${line.separator}\s+&lt;version&gt;.*&lt;/version&gt;"
+                   replace="sit-wt-project&lt;/artifactId&gt;${line.separator}    &lt;version&gt;${version}&lt;/version&gt;" />
 
     <replaceregexp file="${basedir}/sit-wt-project/pom.xml"
                    match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
