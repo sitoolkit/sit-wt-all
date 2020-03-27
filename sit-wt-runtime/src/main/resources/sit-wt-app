@@ -4,7 +4,7 @@ ENV_FILE=sit-wt.env
 WT_APP_DIR=~/.m2/repository/io/sitoolkit/wt/sit-wt-app
 
 if [[ ! -f ./${ENV_FILE} ]]; then
-  ./mvnw exec:exec -Denv_file=${ENV_FILE}
+  ./mvnw antrun:run@make_env -Denv_file=${ENV_FILE}
 fi
 
 source ./${ENV_FILE}

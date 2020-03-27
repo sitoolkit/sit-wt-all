@@ -13,7 +13,7 @@
       <artifactId>sit-wt-runtime</artifactId>
       <version>${sitwt.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>io.appium</groupId>
       <artifactId>java-client</artifactId>
@@ -32,7 +32,7 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-   
+
   </dependencies>
 
   <parent>
@@ -136,6 +136,26 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>make_env</id>
+            <configuration>
+              <target>
+                <echo message="VERSION=${sitwt.version}" file="${env_file}" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
@@ -162,6 +182,17 @@
         <threadCountClasses>1</threadCountClasses>
         <threadCountMethods>1</threadCountMethods>
       </properties>
+    </profile>
+
+    <profile>
+      <id>app-jar-download</id>
+      <dependencies>
+        <dependency>
+          <groupId>io.sitoolkit.wt</groupId>
+          <artifactId>sit-wt-app</artifactId>
+          <version>${sitwt.version}</version>
+        </dependency>
+      </dependencies>
     </profile>
 
   </profiles>
