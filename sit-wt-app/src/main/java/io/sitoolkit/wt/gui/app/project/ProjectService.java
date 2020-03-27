@@ -63,7 +63,6 @@ public class ProjectService {
     if (pomFile.exists()) {
 
       loadProject(pomFile, projectState);
-
     }
   }
 
@@ -92,5 +91,10 @@ public class ProjectService {
         Paths.get(projectDir.getAbsolutePath(), "src/main/resources/capabilities.properties");
     FileIOUtils.sysRes2file("capabilities.properties", capabilitiesProperties);
 
+    Path winAppJarCommand = Paths.get(projectDir.getAbsolutePath(), "sit-wt-app.cmd");
+    FileIOUtils.sysRes2file("sit-wt-app.cmd", winAppJarCommand);
+
+    Path macAppJarCommand = Paths.get(projectDir.getAbsolutePath(), "sit-wt-app");
+    FileIOUtils.sysRes2file("sit-wt-app", macAppJarCommand);
   }
 }
