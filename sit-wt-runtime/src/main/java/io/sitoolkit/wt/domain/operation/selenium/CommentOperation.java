@@ -16,10 +16,10 @@ public class CommentOperation extends SeleniumOperation {
   @Override
   public void execute(TestStep testStep, SeleniumOperationContext ctx) {
     if (testStep.getLocator().isEmpty()) {
-      ctx.info("msg", testStep.getValue());
+      ctx.info("comment", testStep.getValue());
     } else {
       WebElement element = findElement(testStep.getLocator());
-      ctx.info(element, "msg", testStep.getValue());
+      ctx.info(element, "comment", testStep.getValue());
     }
   }
 }
