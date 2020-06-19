@@ -1,0 +1,7 @@
+﻿No.,項目名,操作,ロケーター形式,ロケーター,データ形式,スクリーンショット,ケース_001
+1,開始URL,open,,input.html,,,y
+2,ID指定,comment,id,prefecture,,,コメント1
+3,リンク指定,comment,link,利用規約,,,コメント2
+4,コメントのみ,comment,,,,後,コメント3
+5,ロケーターあり、Dataなし,comment,id,prefecture,,,
+6,ロケーターなし、Dataなし,comment,,,,,
