@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -116,7 +115,7 @@ public class EvidenceManager implements ApplicationContextAware {
     for (org.springframework.core.io.Resource res : resources) {
       URL url = res.getURL();
       String evidenceRes = StringUtils.substringAfterLast(url.toString(), "evidence/");
-      File dstFile = Paths.get(evidenceDir, evidenceRes).toFile();
+      File dstFile = new File(FilenameUtils.concat(evidenceDir, evidenceRes));
       FileUtils.copyURLToFile(url, dstFile);
     }
   }
