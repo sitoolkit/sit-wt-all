@@ -157,7 +157,7 @@ public class AppController implements Initializable {
   }
 
   public void postInit() {
-    File pomFile = projectService.openProject(getProjectDirectory(), projectState);
+    File pomFile = projectService.openProject(new File(""), projectState);
     if (pomFile == null) {
       openProject();
     } else {
@@ -217,15 +217,6 @@ public class AppController implements Initializable {
     testToolbarController.loadProject();
     scriptService.loadProject();
     FxContext.setTitie(projectDir.getAbsolutePath());
-  }
-
-  private File getProjectDirectory() {
-    String projectDirectory = System.getProperty("sitwt.projectDirectory");
-    if (StringUtils.isEmpty(projectDirectory)) {
-      return new File("");
-    } else {
-      return new File(projectDirectory);
-    }
   }
 
   @FXML

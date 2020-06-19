@@ -8,9 +8,9 @@
       "mainClass": "io.sitoolkit.wt.gui.pres.SitWtLauncher",
       "projectName": "sit-wt-app",
       "vmArgs": [
-        "-Dsitwt.projectDirectory=../sit-wt-dev-project",
         "-DskipUpdate=true"
-      ]
+      ],
+      "cwd": "${workspaceFolder}/sit-wt-app/target"
     },
     {
       "type": "java",
@@ -21,9 +21,9 @@
       "vmArgs": [
         "-Duser.language=en",
         "-Duser.country=US",
-        "-Dsitwt.projectDirectory=../sit-wt-dev-project",
         "-DskipUpdate=true"
-      ]
+      ],
+      "cwd": "${workspaceFolder}/sit-wt-app/target"
     }
   ]
 }
