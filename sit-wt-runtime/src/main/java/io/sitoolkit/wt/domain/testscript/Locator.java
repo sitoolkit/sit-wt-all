@@ -110,8 +110,6 @@ public class Locator {
     public static List<Type> SELECTOR_TYPES = Arrays.asList(id, name, tag, css, xpath);
     public static List<Type> SELECTOR_WITH_LINK_TYPES =
         Arrays.asList(id, name, tag, link, css, xpath);
-    public static List<Type> SELECTOR_WITH_LINK_CAN_BE_BLANK_TYPES =
-        Arrays.asList(na, id, name, tag, link, css, xpath);
     public static List<Type> TITLE_TYPES = Arrays.asList(na, title);
 
     @Getter
