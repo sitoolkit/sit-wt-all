@@ -3,6 +3,8 @@ package io.sitoolkit.wt.domain.operation.selenium;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import io.sitoolkit.wt.domain.tester.TestBase;
+import io.sitoolkit.wt.domain.tester.TestResult;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -10,12 +12,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
-import io.sitoolkit.wt.domain.tester.TestBase;
-import io.sitoolkit.wt.domain.tester.TestResult;
 
 public class CommentOperationTest extends TestBase {
 
@@ -24,7 +22,8 @@ public class CommentOperationTest extends TestBase {
     TestResult result = tester.operate(getCurrentCaseNo());
     Path evidenceFile = result.getEvidenceFile();
 
-    String evidenceHtml = FileUtils.readFileToString(evidenceFile.toFile(), Charset.defaultCharset());
+    String evidenceHtml =
+        FileUtils.readFileToString(evidenceFile.toFile(), Charset.defaultCharset());
 
     Pattern pattern = Pattern.compile("^\\s*<td>\\[.*\\] コメント： (.*)$", Pattern.MULTILINE);
     Matcher matcher = pattern.matcher(evidenceHtml);

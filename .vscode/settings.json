@@ -1,9 +1,12 @@
 {
-  "java.configuration.updateBuildConfiguration": "automatic",
-  "files.exclude": {
-    "**/.classpath": true,
-    "**/.project": true,
-    "**/.settings": true,
-    "**/.factorypath": true
-  }
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "\\.java$",
+        "cmd": "java -jar ./lib/google-java-format/google-java-format-1.8-all-deps.jar --replace ${file}"
+      }
+    ]
+  },
+  "java.format.enabled": false,
+  "editor.formatOnSave": true
 }

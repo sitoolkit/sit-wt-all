@@ -1,10 +1,9 @@
 package io.sitoolkit.wt.domain.operation.selenium;
 
-import org.openqa.selenium.WebElement;
-import org.springframework.stereotype.Component;
-
 import io.sitoolkit.wt.domain.testscript.Locator;
 import io.sitoolkit.wt.domain.testscript.TestStep;
+import org.openqa.selenium.WebElement;
+import org.springframework.stereotype.Component;
 
 @Component
 public class CommentOperation extends SeleniumOperation {
