@@ -11,6 +11,7 @@ public enum TestStepInputType {
   na("", Locator.Type.na, DataType.na),
   choose(Locator.Type.SELECTOR_TYPES, DataType.SELECT_TYPES),
   click(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.execution),
+  comment(Locator.Type.SELECTOR_WITH_LINK_CAN_BE_BLANK_TYPES, DataType.value),
   dbverify(Locator.Type.sql_file, DataType.verification_value),
   dialog(Locator.Type.na, DataType.ok_cancel),
   download(Locator.Type.SELECTOR_WITH_LINK_TYPES, DataType.execution),
