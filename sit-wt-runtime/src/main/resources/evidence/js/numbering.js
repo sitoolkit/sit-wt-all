@@ -12,21 +12,8 @@ function buildPosStyle(basePos, pos, scale) {
 }
 
 function buildBox() {
-	var posMap = {};
-
-	/**
-	 * 同一座標に紐づく操作ログのNoをまとめる処理
-	 */
-	var checkPos = function(pos, td) {
-		var key = pos.x + "_" + pos.y
-		var mappedId = posMap[key] ;
-		if (mappedId) {
-			td.find("#" + mappedId).append("," + pos.no);
-			return;
-		}
-		var id = "numbring_" + pos.no;
-		posMap[key] = id;
-		return id;
+	var pos2Key = function (pos) {
+		return pos.x + "_" + pos.y;
 	};
 
 	$("td.screenshot").each(function() {
@@ -35,18 +22,20 @@ function buildBox() {
 		var scale = $img.width() / $img.data("original-width");
 		var basePos = $img.offset();
 
-
 		$td.find("input:hidden").each(function() {
 			var val = $(this).val();
 			var pos = $.parseJSON(val);
 
-			var id = checkPos(pos, $td);
-			if (!id) {
+			var posKey = pos2Key(pos);
+			var posBox = $td.find("[data-pos-key='" + posKey + "']");
+
+			if (posBox[0] !== undefined) {
+				posBox.append("," + pos.no);
 				return;
 			}
-			var style = buildPosStyle(basePos, pos, scale);
 
-			$td.prepend("<div id='" + id + "' class='box' style=" + style + ">" + pos.no + "</div>");
+			var style = buildPosStyle(basePos, pos, scale);
+			$td.prepend("<div data-pos-key='" + posKey + "' class='box' style=" + style + ">" + pos.no + "</div>");
 		});
 	});
 
