@@ -1,0 +1,48 @@
+= Settings for AsciiDoc 
+
+1. Install https://www.ruby-lang.org/ja/documentation/installation/[Ruby].
+2. Install asciidoctor and related tools with following commands.
+
+----
+gem install asciidoctor
+gem install asciidoctor-diagram
+
+code --install-extension joaompinto.asciidoctor-vscode
+----
+
+3. Update VSCode settings.
+
+|===
+| Setting Item | Value
+
+|Asciidoc: Asciidoctor_command 
+|asciidoctor -a outdir=tmp -a imagesdir=tmp -a imagesoutdir=tmp -r asciidoctor-diagram -o-
+
+|Asciidoc › Preview: Refresh Interval
+|500
+
+|Asciidoc › Preview: Use Editor Style
+| false
+
+|Asciidoc: Use_asciidoctor_js
+|false
+
+|===
+
+== Generate Documents
+
+=== Windows
+
+----
+mvnw -f sit-wt-docs generate-resources
+
+open sit-wt-docs/target/generated-docs/index.html
+----
+
+=== macOS
+
+----
+./mvnw -f sit-wt-docs generate-resources
+
+open sit-wt-docs/target/generated-docs/index.html
+----
