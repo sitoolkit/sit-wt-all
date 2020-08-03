@@ -1,0 +1,94 @@
+= 実行時のプロパティ
+
+
+SIT-WTはプロパティを指定することで実行時の挙動を変えることができます。
+ここではそのプロパティについて説明します。
+
+
+=== 指定方法
+
+
+==== プロパティファイル
+
+プロパティは以下のプロパティファイルで指定することができます。
+ファイル形式はJavaのプロパティファイル形式です。
+
+....
+project_root/src/main/resources/sit-wt.properties
+....
+
+
+==== コマンド
+
+プロパティはMaven実行時のVM引数として指定することもできます。
+
+....
+mvn verify -Dkey=value
+....
+
+
+=== 指定可能なプロパティ
+
+SIT-WTでは以下のプロパティが指定可能です。
+
+[%autowidth]
+|===
+|プロパティ|説明
+
+|baseUrl
+|テストスクリプトのopen操作で指定したURLの先頭に付与する文字列です。　Default : src/main/webapp
+
+|driver.type
+|Selenium Driverの種類、つまりテストに使用するブラウザの種類です。chrome、edge、firefox、ie、safari、remote、android、iosのいずれかが指定可能です。　Default : firefox
+
+|window.width
+|ブラウザのウィンドウ幅です。Default : 900
+
+|window.height
+|ブラウザのウィンドウ高さです。Default : 900
+
+|window.top
+|ブラウザのウィンドウ位置のy座標です。Default : 0
+
+|window.left
+|ブラウザのウィンドウ位置のx座標です。Default : 0
+
+|window.shift.top
+|テストを並列実行した場合のブラウザのウィンドウ位置y座標のずれ幅です。Default : 10
+
+|window.shift.left
+|テストを並列実行した場合のブラウザのウィンドウ位置y座標のずれ幅です。Default : 50
+
+|window.resize
+|trueを指定すると、スクリーンショット取得の際にウィンドウサイズをページのコンテンツサイズに合わせて自動調節します。Default : false
+
+|implicitlyWait
+|WebDriverのブラウザ操作APIの戻り値を待つ時間、つまり、WebDriver.manage().timeouts().implicitlyWaitに指定する値です。(ミリ秒)　Default : 10000
+
+|operationWait
+|テストステップ間で処理を待機する時間(ミリ秒)です。Default : 0
+
+|dialogWaitInSecond
+|JavaScriptのダイアログが表示されるまで処理を待機する時間(秒)です。　Default : 3
+
+|pageobj.dir
+|テストスクリプトのinclude操作で読み込む別テストスクリプトのパスの基底です。Default : pageobj
+
+|screenshot.resize
+|trueを指定するとスクリーンショット(png)のサイズを自動調節します。調整後のサイズは、スクリーンショットに含まれる操作項目が全て含まれる最小のもの + 余白になります。 Default : false
+
+|screenshot.padding.width
+|screenshot.resize=trueの場合のスクリーンショットの余白幅です。Default : 200
+
+|screenshot.padding.height
+|screenshot.resize=trueの場合のスクリーンショットの余白高さです。Default : 200
+
+|selenium.screenshot.pattern
+|Selenium IDEのスクリプトを変換する際に、スクリーンショットを取得するCommandのパターン(正規表現)です。このパターンに一致するCommandのテストステップのスクリーンショット列には「前」が入力されます。Default : .*AndWait$
+
+|appium.address
+|AppiumサーバーのURLです。Default : http://127.0.0.1:4723/wd/hub
+
+|hubUrl
+|Selenium Grid HubサーバーのURLです。Default:
+|===

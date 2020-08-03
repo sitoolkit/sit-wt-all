@@ -1,0 +1,33 @@
+= テストの並列実行
+
+
+SIT-WTは複数のテストスクリプト、テストケースを並列に実行することができます。
+並列実行を有効にするには、テスト実行のMavenコマンドに**paralell**プロファイルを指定します。
+
+....
+mvn verify -P parallel
+....
+
+
+=== 並列実行に関する設定
+
+並列実行に関する設定は**pom.xml**のparallelプロファイルで指定しています。
+デフォルトでは**CPUのコア数と同じ数のスレッドを、テストスクリプトとテストケースに1:1で割り当てる**設定となっています。
+
+[source,xml]
+----
+  <profile>
+    <id>parallel</id>
+    <properties>
+      <parallel>classesAndMethods</parallel>
+      <threadCountClasses>1</threadCountClasses>
+      <threadCountMethods>1</threadCountMethods>
+    </properties>
+  </profile>
+----
+
+SIT-WTはテスト実行にMaven Failsafe Pluginを使用していて、並列実行に関する設定もこれに従います。
+これらプロパティの詳細な仕様はMaven Failsafe Pluginのサイトを参照してください。
+
+link:http://maven.apache.org/surefire/maven-failsafe-plugin/integration-test-mojo.html[]
+
