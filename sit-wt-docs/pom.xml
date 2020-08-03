@@ -32,9 +32,10 @@
           <requires>
 ​            <require>asciidoctor-diagram</require>
           </requires>
-          <sourceHighlighter>highlight.js</sourceHighlighter>
+          <preserveDirectories>true</preserveDirectories>
           <attributes>
             <toc>left</toc>
+            <source-highlighter>highlight.js</source-highlighter>
           </attributes>
         </configuration>
         <executions>
