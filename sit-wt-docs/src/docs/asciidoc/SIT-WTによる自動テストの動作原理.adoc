@@ -1,4 +1,4 @@
-= SIT-WTによる自動テストの動作原理
+== SIT-WTによる自動テストの動作原理
 
 
 SIToolkit for Web Testing (SIT-WT)はlink:http://www.seleniumhq.org/[Selenium]をベースとしたWebアプリケーションの自動テストモジュールです。ここではSIT-WTによる自動テストの種類、及びそれらの動作原理について説明します。おおまかに以下の流れで解説します。また、最後に対応ブラウザ・動作環境についても説明します。
@@ -8,16 +8,14 @@ SIToolkit for Web Testing (SIT-WT)はlink:http://www.seleniumhq.org/[Selenium]�
 * モバイル端末の自動テスト
 * SIT-WTで可能な自動テストおよび動作環境
 
----
 
 
-
-== Selenium WebDriverについて
+=== Selenium WebDriverについて
 
 SIT-WTのテスト実行では、Selenium WebDriverを使用しています。Selenium WebDriverとはプログラミング言語のコードからブラウザ操作が可能なライブラリです。Java、Ruby、JavaScriptなど、各言語のライブラリとして提供されています。SIT-WTはJavaで実装されているため、Java版を使用しています。単にWebDriverと呼ばれることが多いため、以降ではWebDriverと表記します。
 
 
-=== WebDriverの種類
+==== WebDriverの種類
 
 WebDriverはブラウザごとに固有の実装がされています。利用したいブラウザに応じて切り替えることにより、様々なブラウザでテスト実行をすることが可能です。現在SIT-WTで使用可能なWebDriverは以下の通りです。
 
@@ -31,7 +29,7 @@ WebDriverはブラウザごとに固有の実装がされています。利用�
 SIT-WTではプロパティファイル上で対象のWebDriverを指定することで、テストに使用するWebDriverを切り替えることができます。
 
 
-=== WebDriverのアーキテクチャー
+==== WebDriverのアーキテクチャー
 
 WebDriverはプログラミングで記述されたコマンドを発行するクライアント側のロジックと、コマンドを受信してブラウザ操作を行うサーバ側のロジックで構成されています。このコマンドはJSON Wire Protocolと呼ばれるHTTP通信をベースとした独自プロトコルでやり取りされています。
 クライアント側から発行されたコマンドがサーバ側へ送信され、ブラウザ操作の結果は再び通信によってクライアント側へ返されます。
@@ -41,7 +39,7 @@ image::webdriver_architecture.png[WebDriverのアーキテクチャー]
 
 
 
-== SIT-WTによる自動テスト
+=== SIT-WTによる自動テスト
 
 SIT-WTによる自動テストは、大まかに以下の流れになります。
 
@@ -59,14 +57,14 @@ image::sit-wt_test.png[SIT-WTによる自動テスト]
 
 
 
-== モバイル端末の自動テスト
+=== モバイル端末の自動テスト
 
 SIT-WTはスマートフォン、タブレットなどのモバイル端末の自動テストもサポートしています。
 モバイル端末のテストではAppiumと呼ばれるツールを使用します。
 ここではAppiumがSIT-WTからWebDriverの操作コマンドを受信してから、シミュレータもしくはモバイル端末実機上でテストが実行されるまでの動作について説明します。
 
 
-=== Appium
+==== Appium
 
 Appiumはネイティブ、 ハイブリッド型モバイルアプリのために開発されたオープンソースのテスト自動化ツールです。
 Node.js上でサーバとして動作します。WebDriverのクライアントライブラリから発行されたコマンドをHTTP通信ベースのMobile JSON wire Protocolでやりとりします。Appiumサーバはクライアントが接続してくるとiOSの「Automation」やAndroidの「UI Automator」を利用して、モバイルアプリやモバイルブラウザを操作できるようになります。
@@ -77,7 +75,7 @@ image::mobile_test_with_appium.png[Appiumを利用したモバイルテスト]
 AndroidとiOSで使用するソフトウェアが異なるため、それぞれについて以下で説明します。
 
 
-=== Androidアプリのテスト
+==== Androidアプリのテスト
 
 * **UI Automator**
 +
@@ -85,7 +83,7 @@ Androidアプリ開発の開発キットであるAndroid SDKに標準で含ま�
 Appiumから渡されたコマンドをシミューレータもしくは実機上で実行します。コマンドが実行された後はレスポンスを受け取り、UI Automatorレスポンス形式でAppiumへ転送します。
 
 
-=== iOS(Mobile Safari)のテスト
+==== iOS(Mobile Safari)のテスト
 
 * **Apple instruments**
 +
@@ -102,10 +100,10 @@ iOS端末実機上のMobile Safariを操作するためのソフトウェアで�
 
 
 
-== SIT-WTで可能な自動テストおよび動作環境
+=== SIT-WTで可能な自動テストおよび動作環境
 
 
-=== 自動テスト対応ブラウザ
+==== 自動テスト対応ブラウザ
 
 テスト実行に使用可能なブラウザです。
 
@@ -115,7 +113,7 @@ iOS端末実機上のMobile Safariを操作するためのソフトウェアで�
 * Safari(Mobile Safari)
 
 
-=== 対応モバイルアプリの種類
+==== 対応モバイルアプリの種類
 
 自動テストが可能なモバイルアプリの種類です。
 
@@ -126,7 +124,7 @@ iOS端末実機上のMobile Safariを操作するためのソフトウェアで�
 ** ハイブリッドアプリ
 
 
-=== SIT-WTの対応OS
+==== SIT-WTの対応OS
 
 SIT-WTを動作させることができるOSです。
 
@@ -134,7 +132,7 @@ SIT-WTを動作させることができるOSです。
 * Mac OS
 
 
-=== SIT-WTの動作に必要なソフトウェア
+==== SIT-WTの動作に必要なソフトウェア
 
 * JDK 1.8.x
 * Maven 3.3.x
@@ -143,6 +141,6 @@ SIT-WTを動作させることができるOSです。
 モバイル端末のテストでは上記以外に追加でインストールが必要なソフトウェアがあります。
 詳細は下記を参照してください。
 
-* Androidの場合 → <<Android上のブラウザでのテスト.adoc#,Androidアプリのテスト>>
+* Androidの場合 → <<_android上のブラウザでのテスト,Androidアプリのテスト>>
 
-* iOSの場合 → <<Mobile Safariのテスト.adoc#,Mobile Safariのテスト>>
+* iOSの場合 → <<_mobile_safariのテスト,Mobile Safariのテスト>>

@@ -1,4 +1,4 @@
-= Mobile-Safariのテスト
+== Mobile-Safariのテスト
 :imagesdir: img/Mobile-Safariのテスト
 
 
@@ -10,11 +10,9 @@
 * 実機の準備
 * テストの実行
 
----
 
 
-
-== 実行環境
+=== 実行環境
 
 SI-Toolkitの動作環境に加え、以下のソフトウェアをインストールします。
 
@@ -26,7 +24,7 @@ SI-Toolkitの動作環境に加え、以下のソフトウェアをインスト�
 * ios-deploy
 * ios-webkit-debug-proxy
 
-=== 実行環境の準備
+==== 実行環境の準備
 
 下記コマンドでソフトウェアの入手およびインストールを行います。
 
@@ -54,7 +52,7 @@ Node.js用パッケージマネージャであるnpmはNode.jsに同梱されて
 
 
 
-== プロパティファイル作成
+=== プロパティファイル作成
 
 テスト実行時に必要となるプロパティファイルを作成します。 +
 3行目のdeviceName、platformVersionは、テストしたい端末に合わせて設定します。 +
@@ -69,10 +67,10 @@ echo udid=<UDID> >> src/main/resources/capabilities.properties
 
 
 
-== 実機の設定
+=== 実機の設定
 
 
-=== Web Inspectorの有効化
+==== Web Inspectorの有効化
 
 ios-webkit-debug-proxyで実機上のWebViewにアクセスするため、Web Inspectorを有効にします。
 
@@ -82,22 +80,22 @@ ios-webkit-debug-proxyで実機上のWebViewにアクセスするため、Web In
 
 
 
-== テストの実行
+=== テストの実行
 
 
-=== 準備
+==== 準備
 
 テスト実行前に、テストの実行に必要となるソフトウェアを起動します。
 
 
-==== Appiumの起動
+===== Appiumの起動
 
 ....
 osascript -e 'tell application "Terminal" to do script "appium"'
 ....
 
 
-==== ios-webkit-debug-proxyの起動（実機でテストする場合のみ）
+===== ios-webkit-debug-proxyの起動（実機でテストする場合のみ）
 
 以下のコマンドを実行します。
 「<UDID>」は<<_プロパティファイル作成,プロパティファイル作成>>で指定したものと同じ値を設定します。
@@ -107,7 +105,7 @@ osascript -e 'tell application "Terminal" to do script "ios_webkit_debug_proxy -
 ....
 
 
-=== テスト実行
+==== テスト実行
 
 上記ソフトウェア起動後、以下のコマンドを実行します。
 
@@ -118,10 +116,10 @@ mvn clean verify -Ddriver.type=ios
 
 
 
-== 参考
+=== 参考
 
 
-=== プロパティファイルについて
+==== プロパティファイルについて
 
 <<_プロパティファイル作成,プロパティファイル作成>>ではDesired Capabilitiesと呼ばれる、
 Appiumの振る舞いを定義するキー・値のペアを、SIT-WTが使用するプロパティファイルの形式で設定しています。
@@ -131,7 +129,7 @@ Desired Capabilitiesについては、Appiumの公式サイトをご確認下さ
 link:http://appium.io/slate/en/master/?ruby#appium-server-capabilities[target="appium-server-capabilities"]
 
 
-=== UDIDの確認方法
+==== UDIDの確認方法
 
 以下の手順で確認できます。
 

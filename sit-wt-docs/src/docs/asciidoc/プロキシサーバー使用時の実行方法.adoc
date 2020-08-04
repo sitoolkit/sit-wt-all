@@ -1,14 +1,12 @@
-= プロキシサーバー使用時の実行方法
+== プロキシサーバー使用時の実行方法
 
 
 ここではインターネット接続にプロキシサーバーを使用する環境でのSIT-WT起動方法について記載します。
 プロキシサーバーを使用する場合、FirefoxインストーラーとMavenを所定のフォルダに配置して、SIT-WTを実行する必要があります。
 
----
 
 
-
-== SIT-WT最新版のダウンロード
+=== SIT-WT最新版のダウンロード
 
 SIT-WTは起動時に最新版をダウンロードするため、事前ダウンロードが必要となります。
 プロジェクトサイトより、SIT-WTの最新版をダウンロードしてください。
@@ -17,10 +15,10 @@ link:https://sitoolkit.org/sit-wt.html[]
 
 
 
-== Firefoxインストーラー/Mavenの配置
+=== Firefoxインストーラー/Mavenの配置
 
 
-=== Firefoxインストーラー
+==== Firefoxインストーラー
 
 下記URLより、Firefoxのインストーラーをダウンロードしてください。
 
@@ -33,7 +31,7 @@ C:\ProgramData\sitoolkit\repository\firefox\Firefox Setup 47.0.1.exe
 ....
 
 
-=== Maven
+==== Maven
 
 下記URLより、Mavenをダウンロードしてください。
 
@@ -47,7 +45,7 @@ C:\ProgramData\sitoolkit\repository\maven\download\apache-maven-3.3.9-bin.zip
 
 
 
-== Mavenのプロキシ設定
+=== Mavenのプロキシ設定
 
 以下フォルダにMavenのsettings.xmlを配置し、ご利用のプロキシサーバーの情報で更新してください。
 

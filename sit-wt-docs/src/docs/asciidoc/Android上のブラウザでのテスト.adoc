@@ -1,4 +1,4 @@
-= Android上のブラウザでのテスト
+== Android上のブラウザでのテスト
 :imagesdir: img/Android上のブラウザでのテスト
 
 
@@ -11,11 +11,9 @@
 * 実機の準備
 * テストの実行
 
----
 
 
-
-== 実行環境
+=== 実行環境
 
 以下のソフトウェアをインストールします。
 
@@ -34,7 +32,7 @@
 ※2 エミュレータ上のテストのみでインストール
 
 
-=== 実行環境の準備 (Windows)
+==== 実行環境の準備 (Windows)
 
 . **android-sdk**
 +
@@ -60,7 +58,7 @@ setx PATH "%PATH%;%ANDROID_HOME%" -m
 ....
 
 
-=== 実行環境の準備 (macOS)
+==== 実行環境の準備 (macOS)
 
 下記コマンドでソフトウェアの入手およびインストールを行います。
 
@@ -72,7 +70,7 @@ brew install android-sdk
 ....
 
 
-=== Android SDK追加パッケージの準備
+==== Android SDK追加パッケージの準備
 
 Android SDK追加パッケージは、Android SDK標準のパッケージ管理マネージャ「Android SDK Manager」を利用して入手・インストールを行います。
 
@@ -94,7 +92,7 @@ image::select_package.png[,500]
 image::accept_license.png[,600]
 
 
-==== 補足
+===== 補足
 
 * **Intel x86 Emulator Accelerator(HAXM installer)**
 +
@@ -104,7 +102,7 @@ link:https://software.intel.com/en-us/android/articles/intel-hardware-accelerate
 
 
 
-== プロパティファイル作成
+=== プロパティファイル作成
 
 テスト実行時に必要となるプロパティファイルを作成します。コマンドプロンプトまたはターミナルで下記コマンドを実行します。
 
@@ -117,10 +115,10 @@ mkdir -p src/main/resources    <- macOS
 
 
 
-== エミュレータの準備
+=== エミュレータの準備
 
 
-=== Android Virtual Device (AVD)の作成
+==== Android Virtual Device (AVD)の作成
 
 エミュレートするデバイスの環境設定である、AVDを作成します。
 
@@ -146,7 +144,7 @@ image::create_avd.png[,500]
 image::result_of_creating_avd.png[,500]
 
 
-=== エミュレータの起動
+==== エミュレータの起動
 
 . AVD Managerで起動したいAVDを選択し、「Start...」ボタンをクリックします。
 +
@@ -162,10 +160,10 @@ image::android_emulator.png[,300]
 
 
 
-== 実機の準備
+=== 実機の準備
 
 
-=== USBデバッグの許可
+==== USBデバッグの許可
 
 USBデバッグの許可を有効にし、Appiumから端末へのアクセスを有効にします。
 
@@ -180,29 +178,29 @@ USBデバッグの許可を有効にし、Appiumから端末へのアクセス�
 
 
 
-== テストの実行
+=== テストの実行
 
 
-=== 準備
+==== 準備
 
 テスト実行前に、テストの実行に必要となるソフトウェアを起動します。
 
 
-==== Appiumの起動 (Windows)
+===== Appiumの起動 (Windows)
 
 ....
 start appium
 ....
 
 
-==== Appiumの起動 (macOS)
+===== Appiumの起動 (macOS)
 
 ....
 osascript -e 'tell application "Terminal" to do script "export ANDROID_HOME=/usr/local/opt/android-sdk; appium"'
 ....
 
 
-=== テスト実行
+==== テスト実行
 
 上記ソフトウェア起動後、以下のコマンドを実行します。
 
