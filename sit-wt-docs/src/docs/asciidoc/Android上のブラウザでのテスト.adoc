@@ -1,0 +1,210 @@
+== Android上のブラウザでのテスト
+:imagesdir: img/Android上のブラウザでのテスト
+
+
+ここではAndroidエミュレータもしくはAndroid端末実機上のブラウザでSIT-WTの自動テストを実行する手順を説明します。
+全体の大まかな流れは下記の通りです。
+
+* 実行環境
+* プロパティファイル作成
+* エミュレータの準備
+* 実機の準備
+* テストの実行
+
+
+
+=== 実行環境
+
+以下のソフトウェアをインストールします。
+
+* Homebrew ※1
+* Node.js
+* Appium
+* Android SDK
+* Android SDK追加パッケージ
+** Android SDK Platform-tools
+** Android SDK Build-tools
+** SDK Platform (Android X.X(API XX)) ※2
+** Intel x86 Emulator Accelerator(HAXM installer) ※2
+
+※1 macOSのみでインストール
+
+※2 エミュレータ上のテストのみでインストール
+
+
+==== 実行環境の準備 (Windows)
+
+. **android-sdk**
++
+以下のサイトからandroid-sdkのzipファイル（android-sdk_rXX.X.X-windows.zip）をダウンロードし、任意のディレクトリに解凍します。 +
+link:https://developer.android.com/studio/index.html?hl=ja[,target="android-sdk"]
+
+. **Node.js**
++
+以下のサイトからNode.jsのインストーラー（Windows Installer (.msi)）をダウンロードし、実行します。 +
+link:https://nodejs.org/ja/download/[target="node.js"]
+
+. **Appium**
++
+コマンドプロンプトでコマンド`npm install -g appium`を実行します。
+
+. **環境変数**
++
+コマンドプロンプトを管理者モードで起動し、以下のコマンドを実行します。
++
+....
+setx ANDROID_HOME "<android-sdkの解凍先ディレクトリ>" -m
+setx PATH "%PATH%;%ANDROID_HOME%" -m
+....
+
+
+==== 実行環境の準備 (macOS)
+
+下記コマンドでソフトウェアの入手およびインストールを行います。
+
+....
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install node
+npm install -g appium
+brew install android-sdk
+....
+
+
+==== Android SDK追加パッケージの準備
+
+Android SDK追加パッケージは、Android SDK標準のパッケージ管理マネージャ「Android SDK Manager」を利用して入手・インストールを行います。
+
+. Android SDK Managerを起動します。
+* **Windows**
++
+解凍先ディレクトリの「SDK Manager.exe」を開きます。
+
+* **macOS**
++
+ターミナルでコマンド `android` を実行します。
+
+. 必要なパッケージにチェックを入れて「Install X packages...」ボタンをクリックします。
++
+image::select_package.png[,500]
+
+. ライセンス確認ウィンドウが開くので、同意してインストールを「Install」ボタンをクリックします。
++
+image::accept_license.png[,600]
+
+
+===== 補足
+
+* **Intel x86 Emulator Accelerator(HAXM installer)**
++
+Android SDK Managerで指定されているバージョンのものが入手できない場合は、配布サイトから個別に入手する必要があります。
+ダウンロード・インストール方法の詳細は以下のサイトを参照してください。 +
+link:https://software.intel.com/en-us/android/articles/intel-hardware-accelerated-execution-manager[target="HAXM_installer"]
+
+
+
+=== プロパティファイル作成
+
+テスト実行時に必要となるプロパティファイルを作成します。コマンドプロンプトまたはターミナルで下記コマンドを実行します。
+
+....
+cd project_root
+mkdir -p src¥main¥resources    <- Windows
+mkdir -p src/main/resources    <- macOS
+(echo browserName=browser&echo deviceName=Android) > src/main/resources/capabilities.properties
+....
+
+
+
+=== エミュレータの準備
+
+
+==== Android Virtual Device (AVD)の作成
+
+エミュレートするデバイスの環境設定である、AVDを作成します。
+
+. Android Virtual Device (AVD) Managerを起動します。
+* **Windows**
++
+解凍先ディレクトリの「AVD Manager.exe」を開きます。
+
+* **macOS**
++
+ターミナルでコマンド `android avd` を実行します。
+
+. 「Create...」ボタンをクリックします。
++
+image::avd_manager.png[,500]
+
+. 以下のように設定します。ここでは例としてTargetに「Android 6.0」、CPU/ABIに「Intel Atom (x86)」を設定しています。入力が終わったら「OK」ボタンをクリックします。
++
+image::create_avd.png[,500]
+
+. 確認画面が表示されるので、「OK」ボタンをクリックします。
++
+image::result_of_creating_avd.png[,500]
+
+
+==== エミュレータの起動
+
+. AVD Managerで起動したいAVDを選択し、「Start...」ボタンをクリックします。
++
+image::start_avd.png[,500]
+
+. 「Launch」ボタンをクリックします。
++
+image::launch_options.png[,300]
+
+. エミュレータが起動し、HOME画面が表示されればOKです。
++
+image::android_emulator.png[,300]
+
+
+
+=== 実機の準備
+
+
+==== USBデバッグの許可
+
+USBデバッグの許可を有効にし、Appiumから端末へのアクセスを有効にします。
+
+. テスト対象端末の「設定」メニュー＞「端末情報」を開き、「ビルド番号」を連続でタップします。
++
+指定回数をタップすると、デベロッパーになった旨のメッセージが表示されます。 +
+設定に戻ると「開発者向けオプション」が追加されているはずです。
+
+. 開発者向けオプションを開き、USBデバッグの設定を有効にします。
+
+上記準備ができたら、PCと実機をUSBで接続します。
+
+
+
+=== テストの実行
+
+
+==== 準備
+
+テスト実行前に、テストの実行に必要となるソフトウェアを起動します。
+
+
+===== Appiumの起動 (Windows)
+
+....
+start appium
+....
+
+
+===== Appiumの起動 (macOS)
+
+....
+osascript -e 'tell application "Terminal" to do script "export ANDROID_HOME=/usr/local/opt/android-sdk; appium"'
+....
+
+
+==== テスト実行
+
+上記ソフトウェア起動後、以下のコマンドを実行します。
+
+....
+ cd project_root
+ mvn clean verify -Ddriver.type=android
+....

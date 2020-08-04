@@ -1,0 +1,19 @@
+== SIT-WTが使うSeleniumのバージョンを変更する方法
+
+
+ここではテストに使用するSeleniumのバージョンを変更する方法について説明します。
+
+テストの実行には、Seleniumのライブラリが、使用するブラウザをサポートしているバージョンのものである必要があります。
+
+Seleniumのバージョンは、クイックスタート「<<_サンプルテストの実行,サンプルテストの実行>>」
+1行目のコマンドでダウンロードしたpom.xmlにプロパティとして定義されています。selenium.versionに使用するバージョンを指定します。
+
+....
+  <properties>
+          :
+    <selenium.version>3.X.X</selenium.version>
+          :
+  </properties>
+....
+
+Firefoxのバージョンに対応するSeleniumのバージョンを調べるにはSeleniumHQが公開しているlink:https://github.com/SeleniumHQ/selenium/blob/master/java/CHANGELOG[CHANGELOG]を参照してください。

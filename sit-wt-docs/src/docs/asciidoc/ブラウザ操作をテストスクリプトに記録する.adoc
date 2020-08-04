@@ -1,0 +1,55 @@
+== ブラウザ操作をテストスクリプトに記録する
+
+
+SIT-WT単独ではキャプチャーリプレイ機能（ブラウザ操作を記録して再生する機能)を持っていません。その代替手段として、キャプチャーリプレイ機能を持ったlink:http://www.seleniumhq.org/projects/ide/[Selenium IDE] のテストスクリプトをSIT-WTの形式に変換する機能を提供しています。
+ここではこの変換機能について説明します。
+
+**1. テストスクリプトの作成**
+
+Selenium IDEを使用してテストスクリプトを作成します。
+テストスクリプトはプロジェクトルート(1)、またはseleniumscriptディレクトリ(2)に保存します。プロジェクトルートとは、クイックスタートで取得するpom.xmlを配置したディレクトリです。
+保存はHTML形式とし拡張子はhtmlとしてください。
+
+....
+project_root
+  - pom.xml
+
+  - SeleniumIDETestScript.html    <- (1)
+    or
+  - seleniumscript
+    - SeleniumIDETestScript.html  <- (2)
+....
+
+**2-a. Selenium IDEのテストスクリプトを実行する場合**
+
+ターミナルウィンドウ(Windowsではコマンドプロンプト、Macではターミナル)を起動し、以下のコマンドを実行します。
+
+....
+cd project_root
+mvn verify
+....
+
+**2-b. テストスクリプトの変換機能のみを実行する場合**
+
+ターミナルウィンドウ(Windowsではコマンドプロンプト、Macではターミナル)を起動し、以下のコマンドを実行します。
+
+....
+cd project_root
+mvn sit-wt:selenium2script
+....
+
+コマンドの実行が終わると、プロジェクトルート以下のtarget/testscriptディレクトリにSIT−Wt形式のテストスクリプトが作成されます。
+
+....
+project_root
+  - pom.xml
+  - target
+    - testscript
+      - SeleniumIDETestCase.xlsx
+....
+
+
+
+=== 注意事項
+
+この機能は、Selenium IDEで作成できるあらゆるスクリプトに対して変換を保障するものではありません。キャプチャーリプレイの代替手段としての位置付けであるため、ブラウザ操作で記録できる範囲のコマンドのみ変換をサポートします。

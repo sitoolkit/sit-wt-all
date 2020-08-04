@@ -1,0 +1,44 @@
+== テストするブラウザの変更
+:imagesdir: img/テストするブラウザの変更
+
+
+ここではSIT-WTをFirefox以外のブラウザで実行する方法を説明します。
+
+
+=== ブラウザを指定してテストを実行
+
+VM引数driver.typeを指定してテストを実行します。
+以下はChromeで実行する場合の例です。
+
+....
+mvn verify -Ddriver.type=chrome
+....
+
+テスト開始時に、指定したブラウザのSelenium Driverが自動的にインストールされます。
+
+image::eclipse-log１.png[,500]
+
+Selenium Driverは以下のディレクトリにブラウザ別に保存されます。
+
+* C:¥ProgramData¥sitoolkit¥repository¥selenium
+
+
+=== driver.typeの指定
+
+テスト実行するブラウザとVM引数driver.typeの値は以下を参照してください。
+
+[%autowidth]
+|===
+|ブラウザ|driver.typeの値
+
+|Chrome
+|chrome
+
+|Internet Explorer
+|ie
+
+|Microsoft Edge
+|edge
+|===
+
+
