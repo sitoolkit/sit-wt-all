@@ -38,7 +38,7 @@ mvnw sit-wt:open-report
 ==== macOS
 
 ....
-cd \path\to\testproject
+cd /path/to/testproject
 ./mvnw verify -DbaseUrl=http://localhost:8280
 ./mvnw sit-wt:open-report
 ....
