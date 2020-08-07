@@ -2,146 +2,67 @@
 :imagesdir: img/クイックスタート
 
 
-=== 実行環境
+GUIツール(sit-wt-app.jar)を使ってテストプロジェクトとテストスクリプトを作成します。 +
+同梱のサンプルWebサイトとテストスクリプトで直ぐに動かすことができます。
 
-SIT-WTの動作には次のソフトウェアが必要です。
+**※実行にはJava11が必要となります。**
 
-* JDK 1.8.x
-* Maven 3.3.x
-* Firefox
+. https://repo.maven.apache.org/maven2/io/sitoolkit/wt/sit-wt-app/3.0.0-beta.3/sit-wt-app-3.0.0-beta.3.jar[jarファイル]をダウンロードします。
+. ダウンロードしたjarファイルをダブルクリックで実行するとGUIツールが起動します。以降はGUIツールの操作です。
+. テストプロジェクトを作成するフォルダを選択します。
+. **Sample** メニュー > **Start** を選択します。サンプルWebサイトが起動し、サンプルテストスクリプトが生成されます。
+. 生成されたサンプルテストスクリプトが画面左の **testscriptフォルダ** 内にあるので選択します。
+. **Test** メニュー > **Run** (または **Debug**) を選択し、テストを実行します。
 
+**※JNIエラーダイアログが表示される場合は、古いバージョンのJavaを使用している可能性があります。** +
+**「sit-wt-app.jar」のプロパティを開き、「Opens with」をJava 11の「javaw.exe」に変更して下さい。**
 
-==== 実行環境の準備 (Windows)
+=== CLIでのテスト実行
 
-**JDK** 以下のサイトからJDKのインストーラーをダウンロードし、実行します。
+テストプロジェクトでテストスクリプトを一度に実行するには、CLIツール（Mavenプラグイン）を使用します。 +
+以下はCLIでサンプルWebサイトのテストを実行する手順です。
 
-link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[target="jdk"]
-
-
-**Maven** 以下のサイトからMavenのzipファイルをダウンロードし、任意のディレクトリに解凍します。
-
-link:https://maven.apache.org/download.cgi[target="maven"]
-
-**環境変数** コマンドプロンプトを管理者モードで起動し、以下のコマンドを実行します。
-
-....
-setx JAVA_HOME "<JDKのインストール先ディレクトリ>" -m
-setx MAVEN_HOME "<Mavenの解凍先ディレクトリ>" -m
-setx PATH "%PATH%;%MAVEN_HOME%¥bin" -m
-....
-
-
-==== 実行環境の準備 (Mac OS X)
-
-**JDK,Maven** ソフトウェアの入手およびインストールを行います。ターミナルを起動し、以下のコマンドを入力します。
-
-....
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install caskroom/cask/brew-cask
-brew tap caskroom/versions
-brew cask install java
-brew install maven
-....
-
-
-==== 実行環境の準備 (Windows、Mac OS X共通)
-
-**JDK,Maven** コマンドプロンプトまたはターミナルで「mvn -version」コマンドを実行し、Mavenのバージョン情報が表示されることを確認します。
-
-....
-> mvn -version
-Apache Maven 3.3.x (xxxxxxxx; yyyy-MM-dd hh:mm:ss tz)
-Maven home: /e/t/c
-Java version: 1.8.x_xx, vendor: Oracle Corporation
-Java home: /e/t/c
-Default locale: ja_JP, platform encoding: UTF-8
-OS name: "your os name and version"
-....
-
-**Firefox** 以下のサイトからFirefoxのインストーラーをダウンロードして実行します。
-
-link:https://www.mozilla.org/ja/firefox/new/[target="ff"]
-
-
-
-=== サンプルテストの実行
-
-サンプルのテストスクリプトとWebページに対して自動テストを実行します。
+. GUIツールを起動し、サンプルWebサイトを起動します。
+. 以下に示すコマンドを実行します。使用OSのコマンドを参照して下さい。
 
 
 ==== Windows
 
-コマンドプロンプトを起動し、以下のコマンドを実行します。
-
 ....
-powershell -Command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml -OutFile pom.xml"
-mvn sit-wt:sample
-mvn verify
+cd \path\to\testproject
+mvnw verify -DbaseUrl=http://localhost:8280
+mvnw sit-wt:open-report
 ....
 
 
-==== Mac OS X
-
-ターミナルを起動し、以下のコマンドを実行します。
+==== macOS
 
 ....
-curl -O https://raw.githubusercontent.com/sitoolkit/sit-wt-all/master/distribution/pom.xml
-mvn sit-wt:sample
-mvn verify
+cd /path/to/testproject
+./mvnw verify -DbaseUrl=http://localhost:8280
+./mvnw sit-wt:open-report
 ....
-
-
-==== 動作説明
-
-「mvn verify」コマンドを実行すると、FireFoxが起動しテストスクリプトに従ってテストが実行されます。
-
-image:動作説明1.png[,700]
-
-テストが終了するとブラウザが起動し、テストエビデンスが表示されます。
-
-image:動作説明2.png[,700]
-
-
-
-=== 処理説明
-
-「mvn sit-wt:sample」コマンドを実行すると、サンプルのWebページとテストスクリプトがカレントディレクトリ以下にダウンロードされます。
-
-....
-current_directory
-  - pom.xml
-  - src/main/webapp           <- Webページ
-    - bootstrap.min.html
-    - done.html
-    - input.html
-    - terms.html
-  - testscript
-    - ExcelTestScript.xlsx   <- テストスクリプト
-....
-
-「mvn verify」コマンドを実行すると、testscriptディレクトリ以下のテストスクリプトに従って自動テストが実行されます。
-
 
 
 === Learn More
 
 クイックスタートは以上です。  
 
-次は実際にテストスクリプトを作成し、自動テストを動かしてみてください。  
-また、SIT-WTには自動テストを行うための便利な機能がたくさんあります。
-以下のリンクを参照し、是非試してみてください。  
+次は実際にテストスクリプトを作成し、自動テストを動かしてみてください。 +
+また、Web Testerには自動テストを行うための便利な機能がたくさんあります。 +
+以下の項目を参照し、是非試してみてください。  
 
-* <<_テストスクリプトの仕様,**テストスクリプトを作成する**>>
+* <<_テストスクリプトの仕様,**テストスクリプトの仕様**>>
 +
 こちらで仕様を参照しながら、テストスクリプトを作成してみてください。
 
-* <<_デバッグ機能,**テスト実行をデバッグする**>>
+* <<_デバッグ機能,**デバッグ機能**>>
 +
 テストが想定外の動きをした際の原因特定には、デバッグ機能が有用です。
 
-* <<_テストするブラウザの変更,**テストするブラウザを変更する**>>
+* <<_テストするブラウザの変更,**テストするブラウザの変更**>>
 +
-FireFox以外のブラウザでもテストが実行できます。
+Chrome以外のブラウザでもテストが実行できます。
 
 * <<_ブラウザ操作をテストスクリプトに記録する,**ブラウザ操作をテストスクリプトに記録する**>>
 +
@@ -149,4 +70,4 @@ Selenium IDEを使用し、ブラウザ操作からテストスクリプトを�
 
 * <<_jenkinsでテストする,**Jenkinsで自動テストを実行する**>>
 +
-SIT-WTをJenkinsで実行することができます。
+Web TesterをJenkinsで実行することができます。
