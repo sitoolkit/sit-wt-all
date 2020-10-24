@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- The Basics -->
@@ -73,8 +74,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${surefire.version}</version>
           <configuration>
-            <argLine>-Dfile.encoding=${file.encoding}
-              -Duser.language=${user.language} -Duser.country=${user.country}</argLine>
+            <argLine>-Dfile.encoding=${file.encoding} -Duser.language=${user.language} -Duser.country=${user.country}</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -86,7 +86,7 @@
               <additionalJOption>-J-Dfile.encoding=${file.encoding}</additionalJOption>
             </additionalJOptions>
             <bottom>
-    <![CDATA[
+              <![CDATA[
     &copy; 2016 Monocre Inc. AllRights Reserved.
     ]]>
             </bottom>
@@ -104,7 +104,7 @@
           <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.10.5</version>
+            <version>1.10.8</version>
           </dependency>
           <dependency>
             <groupId>ant-contrib</groupId>
