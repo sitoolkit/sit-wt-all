@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:if="ant:if"
-         xmlns:unless="ant:unless"
-         name="sit-wt-all"
-         basedir="."
-         default="install">
+  xmlns:unless="ant:unless" name="sit-wt-all" basedir="." default="install">
 
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${maven.plugin.classpath}"/>
-  
+
   <property environment="env" />
   <property name="testArtifactId" value="sit-wt-test" />
   <property name="testdir" value="${basedir}/${testArtifactId}" />
@@ -103,31 +100,37 @@
 
     <property name="version" value="3.0.0-SNAPSHOT" />
 
-    <replaceregexp file="${distribution.pom}"
-                   match="sit-wt-project&lt;/artifactId&gt;&#13;&#10;\s+&lt;version&gt;.*&lt;/version&gt;"
-                   replace="sit-wt-project&lt;/artifactId&gt;&#13;&#10;    &lt;version&gt;${version}&lt;/version&gt;" />
+    <replaceregexp file="${distribution.pom}" match="sit-wt-project&lt;/artifactId&gt;&#13;&#10;\s+&lt;version&gt;.*&lt;/version&gt;" replace="sit-wt-project&lt;/artifactId&gt;&#13;&#10;    &lt;version&gt;${version}&lt;/version&gt;" />
 
-    <replaceregexp file="${basedir}/sit-wt-project/pom.xml"
-                   match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;"
-                   replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
+    <replaceregexp file="${basedir}/sit-wt-project/pom.xml" match="&lt;sitwt.version&gt;.*&lt;/sitwt.version&gt;" replace="&lt;sitwt.version&gt;${version}&lt;/sitwt.version&gt;" />
 
     <if>
       <not>
         <matches string="${version}" pattern="^.*-SNAPSHOT$" />
       </not>
       <then>
-          <replaceregexp file="${basedir}/README.md"
-                 match="io/sitoolkit/wt/sit-wt-app/.*/sit-wt-app-.*\.jar"
-                 replace="io/sitoolkit/wt/sit-wt-app/${version}/sit-wt-app-${version}.jar" />
+        <replaceregexp file="${basedir}/README.md" match="io/sitoolkit/wt/sit-wt-app/.*/sit-wt-app-.*\.jar" replace="io/sitoolkit/wt/sit-wt-app/${version}/sit-wt-app-${version}.jar" />
       </then>
     </if>
-    
+
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />
       <arg value="versions:set" />
     </exec>
-    
+
   </target>
 
- 
+
+  <target name="generate-docs">
+    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
+      <arg line="-f sit-wt-docs" />
+    </exec>
+
+    <delete dir="docs" />
+
+    <copy todir="docs">
+      <fileset dir="sit-wt-docs/target/generated-docs"/>
+    </copy>
+  </target>
+
 </project>

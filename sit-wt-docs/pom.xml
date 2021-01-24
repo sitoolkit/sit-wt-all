@@ -13,6 +13,8 @@
 
   <!-- Build Settings -->
   <build>
+    <defaultGoal>asciidoctor:process-asciidoc</defaultGoal>
+
     <plugins>
       <plugin>
         <groupId>org.asciidoctor</groupId>
@@ -38,15 +40,6 @@
             <source-highlighter>highlight.js</source-highlighter>
           </attributes>
         </configuration>
-        <executions>
-          <execution>
-            <id>output-html</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>process-asciidoc</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
