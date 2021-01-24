@@ -110,6 +110,7 @@
       </not>
       <then>
         <replaceregexp file="${basedir}/README.md" match="io/sitoolkit/wt/sit-wt-app/.*/sit-wt-app-.*\.jar" replace="io/sitoolkit/wt/sit-wt-app/${version}/sit-wt-app-${version}.jar" />
+        <replaceregexp file="${basedir}/sit-wt-docs/src/docs/asciidoc/クイックスタート.adoc" match="io/sitoolkit/wt/sit-wt-app/.*/sit-wt-app-.*\.jar" replace="io/sitoolkit/wt/sit-wt-app/${version}/sit-wt-app-${version}.jar" />
       </then>
     </if>
 

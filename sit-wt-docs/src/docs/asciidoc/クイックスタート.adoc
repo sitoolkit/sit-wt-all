@@ -7,7 +7,7 @@ GUIツール(sit-wt-app.jar)を使ってテストプロジェクトとテスト�
 
 **※実行にはJava11が必要となります。**
 
-. https://repo.maven.apache.org/maven2/io/sitoolkit/wt/sit-wt-app/3.0.0-beta.3/sit-wt-app-3.0.0-beta.3.jar[jarファイル]をダウンロードします。
+. https://repo.maven.apache.org/maven2/io/sitoolkit/wt/sit-wt-app/3.0.0/sit-wt-app-3.0.0.jar[jarファイル]をダウンロードします。
 . ダウンロードしたjarファイルをダブルクリックで実行するとGUIツールが起動します。以降はGUIツールの操作です。
 . テストプロジェクトを作成するフォルダを選択します。
 . **Sample** メニュー > **Start** を選択します。サンプルWebサイトが起動し、サンプルテストスクリプトが生成されます。
