@@ -8,7 +8,7 @@
     <dependency>
       <groupId>io.sitoolkit.wt</groupId>
       <artifactId>sit-wt-runtime</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
     </dependency>
 
     <dependency>
@@ -130,7 +130,7 @@
   <parent>
     <groupId>io.sitoolkit.wt</groupId>
     <artifactId>sit-wt-all</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
 
   <properties>

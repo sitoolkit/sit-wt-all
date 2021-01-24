@@ -98,7 +98,7 @@
 
   <target name="set-version">
 
-    <property name="version" value="3.0.0-SNAPSHOT" />
+    <property name="version" value="3.0.0" />
 
     <replaceregexp file="${distribution.pom}" match="sit-wt-project&lt;/artifactId&gt;&#13;&#10;\s+&lt;version&gt;.*&lt;/version&gt;" replace="sit-wt-project&lt;/artifactId&gt;&#13;&#10;    &lt;version&gt;${version}&lt;/version&gt;" />
 
